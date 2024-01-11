@@ -39,7 +39,7 @@ import java.util.Queue;
  * absolute encoders using AdvantageScope. These values are logged under
  * "/Drive/ModuleX/TurnAbsolutePositionRad"
  */
-public class ModuleIOTalonFX implements ModuleIO {
+public class ModuleIO2023 implements ModuleIO {
   private final TalonFX driveTalon;
   private final TalonFX turnTalon;
   private final CANcoder cancoder;
@@ -64,30 +64,30 @@ public class ModuleIOTalonFX implements ModuleIO {
   private final boolean isTurnMotorInverted = true;
   private final Rotation2d absoluteEncoderOffset;
 
-  public ModuleIOTalonFX(int index) {
+  public ModuleIO2023(int index) {
     switch (index) {
       case Drive.FL:
         driveTalon = new TalonFX(0);
         turnTalon = new TalonFX(1);
-        cancoder = new CANcoder(2);
+        cancoder = new CANcoder(2); // Switch from CANcoder
         absoluteEncoderOffset = new Rotation2d(0.0); // MUST BE CALIBRATED
         break;
       case Drive.FR:
         driveTalon = new TalonFX(3);
         turnTalon = new TalonFX(4);
-        cancoder = new CANcoder(5);
+        cancoder = new CANcoder(5); // Switch from CANcoder
         absoluteEncoderOffset = new Rotation2d(0.0); // MUST BE CALIBRATED
         break;
       case Drive.BL:
         driveTalon = new TalonFX(6);
         turnTalon = new TalonFX(7);
-        cancoder = new CANcoder(8);
+        cancoder = new CANcoder(8); // Switch from CANcoder
         absoluteEncoderOffset = new Rotation2d(0.0); // MUST BE CALIBRATED
         break;
       case Drive.BR:
         driveTalon = new TalonFX(9);
         turnTalon = new TalonFX(10);
-        cancoder = new CANcoder(11);
+        cancoder = new CANcoder(11); // Switch from CANcoder
         absoluteEncoderOffset = new Rotation2d(0.0); // MUST BE CALIBRATED
         break;
       default:

@@ -67,11 +67,11 @@ public class Drive extends StateMachineSubsystemBase {
         // Real robot, instantiate hardware IO implementations
         instance =
         new Drive(
-          new GyroIOPigeon2(true),
-          new ModuleIOTalonFX(0),
-          new ModuleIOTalonFX(1),
-          new ModuleIOTalonFX(2),
-          new ModuleIOTalonFX(3));
+          new GyroIOPigeon2(),
+          new ModuleIO2023(0),
+          new ModuleIO2023(1),
+          new ModuleIO2023(2),
+          new ModuleIO2023(3));
           break;
 
           case SIM:
