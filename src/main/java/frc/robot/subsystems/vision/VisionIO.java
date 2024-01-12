@@ -11,9 +11,7 @@ public interface VisionIO {
     public double xOffset;
     public double yOffset;
     public int tagID;
-    public double fps;
     public double pipelineID;
-    public String resolution;
     public Pose2d pose;
   }
 
@@ -24,5 +22,5 @@ public interface VisionIO {
    *
    * @param pipelineID
    */
-  public default void setPipeline(double pipelineID) {}
+  public default void setPipeline(int pipelineID) {}
 }
