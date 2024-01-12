@@ -7,7 +7,6 @@ package frc.robot.commands;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.OI;
 import frc.robot.subsystems.drive.Drive;
-import frc.robot.subsystems.drive.Module.Mode;
 
 public class RobotTeleop extends Command {
 
@@ -55,14 +54,12 @@ public class RobotTeleop extends Command {
         drive.setCurrentState(drive.STRAFE_N_TURN);
       }
 
-
       // if (OI.XK.get(0, 0)) {
       //   drive.setModuleModes(Mode.VOLTAGE);
       // } else if (OI.XK.get(0, 1)) {
       //   drive.setModuleModes(Mode.SETPOINT);
       // }
     }
-
   }
 
   // Called once the command ends or is interrupted.

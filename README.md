@@ -1,4 +1,4 @@
-Goals: 
+Goals:
 
 1) Swerve movement
 2) Intaking

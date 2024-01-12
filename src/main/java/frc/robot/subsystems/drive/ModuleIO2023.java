@@ -15,17 +15,19 @@ package frc.robot.subsystems.drive;
 
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
-import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.controls.PositionVoltage;
+import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
-import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
+import frc.robot.util.MagEncoderDIO;
 import java.util.Queue;
+import java.util.function.DoubleSupplier;
 
 /**
  * Module IO implementation for Talon FX drive motor controller, Talon FX turn motor controller, and
@@ -42,7 +44,7 @@ import java.util.Queue;
 public class ModuleIO2023 implements ModuleIO {
   private final TalonFX driveTalon;
   private final TalonFX turnTalon;
-  private final CANcoder cancoder;
+  private final MagEncoderDIO encoder;
 
   private final StatusSignal<Double> drivePosition;
   private final Queue<Double> drivePositionQueue;
@@ -50,7 +52,7 @@ public class ModuleIO2023 implements ModuleIO {
   private final StatusSignal<Double> driveAppliedVolts;
   private final StatusSignal<Double> driveCurrent;
 
-  private final StatusSignal<Double> turnAbsolutePosition;
+  private final DoubleSupplier turnAbsolutePosition;
   private final StatusSignal<Double> turnPosition;
   private final Queue<Double> turnPositionQueue;
   private final StatusSignal<Double> turnVelocity;
@@ -67,28 +69,28 @@ public class ModuleIO2023 implements ModuleIO {
   public ModuleIO2023(int index) {
     switch (index) {
       case Drive.FL:
-        driveTalon = new TalonFX(0);
-        turnTalon = new TalonFX(1);
-        cancoder = new CANcoder(2); // Switch from CANcoder
-        absoluteEncoderOffset = new Rotation2d(0.0); // MUST BE CALIBRATED
+        driveTalon = new TalonFX(2);
+        turnTalon = new TalonFX(6);
+        encoder = new MagEncoderDIO(0);
+        absoluteEncoderOffset = new Rotation2d(24.4);
         break;
       case Drive.FR:
         driveTalon = new TalonFX(3);
-        turnTalon = new TalonFX(4);
-        cancoder = new CANcoder(5); // Switch from CANcoder
-        absoluteEncoderOffset = new Rotation2d(0.0); // MUST BE CALIBRATED
+        turnTalon = new TalonFX(7);
+        encoder = new MagEncoderDIO(2);
+        absoluteEncoderOffset = new Rotation2d(197.2);
         break;
       case Drive.BL:
-        driveTalon = new TalonFX(6);
-        turnTalon = new TalonFX(7);
-        cancoder = new CANcoder(8); // Switch from CANcoder
-        absoluteEncoderOffset = new Rotation2d(0.0); // MUST BE CALIBRATED
+        driveTalon = new TalonFX(1);
+        turnTalon = new TalonFX(5);
+        encoder = new MagEncoderDIO(1);
+        absoluteEncoderOffset = new Rotation2d(336.2); // MUST BE CALIBRATED
         break;
       case Drive.BR:
-        driveTalon = new TalonFX(9);
-        turnTalon = new TalonFX(10);
-        cancoder = new CANcoder(11); // Switch from CANcoder
-        absoluteEncoderOffset = new Rotation2d(0.0); // MUST BE CALIBRATED
+        driveTalon = new TalonFX(4);
+        turnTalon = new TalonFX(8);
+        encoder = new MagEncoderDIO(3);
+        absoluteEncoderOffset = new Rotation2d(59.6); // MUST BE CALIBRATED
         break;
       default:
         throw new RuntimeException("Invalid module index");
@@ -106,8 +108,6 @@ public class ModuleIO2023 implements ModuleIO {
     turnTalon.getConfigurator().apply(turnConfig);
     setTurnBrakeMode(true);
 
-    cancoder.getConfigurator().apply(new CANcoderConfiguration());
-
     drivePosition = driveTalon.getPosition();
     drivePositionQueue =
         PhoenixOdometryThread.getInstance().registerSignal(driveTalon, driveTalon.getPosition());
@@ -115,7 +115,7 @@ public class ModuleIO2023 implements ModuleIO {
     driveAppliedVolts = driveTalon.getMotorVoltage();
     driveCurrent = driveTalon.getStatorCurrent();
 
-    turnAbsolutePosition = cancoder.getAbsolutePosition();
+    turnAbsolutePosition = () -> encoder.getAbsolutePosition();
     turnPosition = turnTalon.getPosition();
     turnPositionQueue =
         PhoenixOdometryThread.getInstance().registerSignal(turnTalon, turnTalon.getPosition());
@@ -130,7 +130,6 @@ public class ModuleIO2023 implements ModuleIO {
         driveVelocity,
         driveAppliedVolts,
         driveCurrent,
-        turnAbsolutePosition,
         turnVelocity,
         turnAppliedVolts,
         turnCurrent);
@@ -145,7 +144,6 @@ public class ModuleIO2023 implements ModuleIO {
         driveVelocity,
         driveAppliedVolts,
         driveCurrent,
-        turnAbsolutePosition,
         turnPosition,
         turnVelocity,
         turnAppliedVolts,
@@ -159,8 +157,7 @@ public class ModuleIO2023 implements ModuleIO {
     inputs.driveCurrentAmps = new double[] {driveCurrent.getValueAsDouble()};
 
     inputs.turnAbsolutePosition =
-        Rotation2d.fromRotations(turnAbsolutePosition.getValueAsDouble())
-            .minus(absoluteEncoderOffset);
+        Rotation2d.fromRotations(turnAbsolutePosition.getAsDouble()).minus(absoluteEncoderOffset);
     inputs.turnPosition =
         Rotation2d.fromRotations(turnPosition.getValueAsDouble() / TURN_GEAR_RATIO);
     inputs.turnVelocityRadPerSec =
@@ -187,7 +184,7 @@ public class ModuleIO2023 implements ModuleIO {
 
   @Override
   public void setDriveVelocity(double velocity) {
-    //TODO: figure out correct control
+    driveTalon.setControl(new VelocityVoltage(velocity));
   }
 
   @Override
@@ -197,7 +194,7 @@ public class ModuleIO2023 implements ModuleIO {
 
   @Override
   public void setTurnAngle(double rad) {
-    //TODO: figure out correct control
+    turnTalon.setControl(new PositionVoltage(rad));
   }
 
   @Override
