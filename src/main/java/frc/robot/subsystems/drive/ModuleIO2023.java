@@ -72,25 +72,25 @@ public class ModuleIO2023 implements ModuleIO {
         driveTalon = new TalonFX(2);
         turnTalon = new TalonFX(6);
         encoder = new MagEncoderDIO(0);
-        absoluteEncoderOffset = new Rotation2d(24.4);
+        absoluteEncoderOffset = new Rotation2d(24.4); // TODO: TUNE
         break;
       case Drive.FR:
         driveTalon = new TalonFX(3);
         turnTalon = new TalonFX(7);
         encoder = new MagEncoderDIO(2);
-        absoluteEncoderOffset = new Rotation2d(197.2);
+        absoluteEncoderOffset = new Rotation2d(197.2);// TODO: TUNE
         break;
       case Drive.BL:
         driveTalon = new TalonFX(1);
         turnTalon = new TalonFX(5);
         encoder = new MagEncoderDIO(1);
-        absoluteEncoderOffset = new Rotation2d(336.2); // MUST BE CALIBRATED
+        absoluteEncoderOffset = new Rotation2d(336.2); // TODO: TUNE
         break;
       case Drive.BR:
         driveTalon = new TalonFX(4);
         turnTalon = new TalonFX(8);
         encoder = new MagEncoderDIO(3);
-        absoluteEncoderOffset = new Rotation2d(59.6); // MUST BE CALIBRATED
+        absoluteEncoderOffset = new Rotation2d(59.6); // TODO: TUNE
         break;
       default:
         throw new RuntimeException("Invalid module index");
@@ -99,12 +99,22 @@ public class ModuleIO2023 implements ModuleIO {
     var driveConfig = new TalonFXConfiguration();
     driveConfig.CurrentLimits.StatorCurrentLimit = 40.0;
     driveConfig.CurrentLimits.StatorCurrentLimitEnable = true;
+    driveConfig.Slot0.kP = 0.1;
+    driveConfig.Slot0.kD = 0;
+    driveConfig.Slot0.kI = 0;
+    driveConfig.Slot0.kS = 0.55493;
+    driveConfig.Slot0.kV = 2.3014;
+    driveConfig.Slot0.kA = 0.12872;
     driveTalon.getConfigurator().apply(driveConfig);
     setDriveBrakeMode(true);
 
     var turnConfig = new TalonFXConfiguration();
     turnConfig.CurrentLimits.StatorCurrentLimit = 30.0;
     turnConfig.CurrentLimits.StatorCurrentLimitEnable = true;
+    turnConfig.Slot0.kP = 0.6;
+    turnConfig.Slot0.kI = 0.0;
+    turnConfig.Slot0.kD = 12.0;
+    turnConfig.Slot0.kS = 0.0;
     turnTalon.getConfigurator().apply(turnConfig);
     setTurnBrakeMode(true);
 
