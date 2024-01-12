@@ -8,13 +8,13 @@ public interface VisionIO {
   @AutoLog
   public static class VisionIOInputs {
     // TODO: might need more stuff idk
-    public double xOffset;
-    public double yOffset;
-    public int tagID;
-    public double pipelineID;
-    public Pose2d pose;
-    public double timestamp;
-    public double latency;
+    public double xOffset = 0;
+    public double yOffset = 0;
+    public int tagID = -1;
+    public double pipelineID = 0;
+    public Pose2d pose = new Pose2d();
+    public double timestamp = -1;
+    public double latency = -1;
   }
 
   public default void updateInputs(VisionIOInputs inputs) {}
