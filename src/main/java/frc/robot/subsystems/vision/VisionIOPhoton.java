@@ -45,7 +45,8 @@ public class VisionIOPhoton implements VisionIO {
         inputs.pose = pose.estimatedPose.toPose2d();
       });
       inputs.pipelineID = camera.getPipelineIndex();
-      
+      inputs.timestamp = latestResult.getTimestampSeconds();
+      inputs.latency = latestResult.getLatencyMillis();
     }
   }
 

@@ -13,6 +13,8 @@ public interface VisionIO {
     public int tagID;
     public double pipelineID;
     public Pose2d pose;
+    public double timestamp;
+    public double latency;
   }
 
   public default void updateInputs(VisionIOInputs inputs) {}
