@@ -187,7 +187,7 @@ public class ModuleIO2023 implements ModuleIO {
 
   @Override
   public void setDriveVelocity(double velocity) {
-    //TODO: figure out correct control
+    // TODO: figure out correct control
   }
 
   @Override
@@ -197,7 +197,7 @@ public class ModuleIO2023 implements ModuleIO {
 
   @Override
   public void setTurnAngle(double rad) {
-    //TODO: figure out correct control
+    // TODO: figure out correct control
   }
 
   @Override
