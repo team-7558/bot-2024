@@ -11,7 +11,7 @@ public interface VisionIO {
     public double xOffset = 0;
     public double yOffset = 0;
     public int tagID = -1;
-    public double pipelineID = 0;
+    public int pipelineID = 0;
     public Pose2d pose = new Pose2d();
     public double timestamp = -1;
     public double latency = -1;

@@ -17,7 +17,7 @@ public class VisionIOLimelight implements VisionIO {
     public void updateInputs(VisionIOInputs inputs) {
         inputs.xOffset = limelight.getEntry("tx").getDouble(0);
         inputs.yOffset = limelight.getEntry("ty").getDouble(0);
-        inputs.pipelineID = limelight.getEntry("pl").getDouble(-1);
+        inputs.pipelineID = (int) limelight.getEntry("pl").getDouble(-1);
         inputs.tagID = (int) limelight.getEntry("tid").getDouble(-1);
 
         double[] botpose_double = limelight.getEntry("botpose").getDoubleArray(new double[7]);

@@ -18,6 +18,9 @@ import com.pathplanner.lib.pathfinding.Pathfinding;
 import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
 import com.pathplanner.lib.util.PathPlannerLogging;
 import com.pathplanner.lib.util.ReplanningConfig;
+
+import edu.wpi.first.apriltag.AprilTagFieldLayout;
+import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
@@ -39,11 +42,11 @@ import frc.robot.OI;
 import frc.robot.subsystems.StateMachineSubsystemBase;
 import frc.robot.subsystems.drive.Module.Mode;
 import frc.robot.subsystems.vision.Vision;
-import frc.robot.subsystems.vision.VisionIO;
 import frc.robot.subsystems.vision.VisionIOInputsAutoLogged;
-import frc.robot.subsystems.vision.VisionIO.VisionIOInputs;
 import frc.robot.util.LocalADStarAK;
 import frc.robot.util.Util;
+
+import java.io.IOException;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import org.littletonrobotics.junction.AutoLogOutput;
@@ -53,12 +56,27 @@ public class Drive extends StateMachineSubsystemBase {
   public static final int FL = 0, FR = 1, BL = 2, BR = 3;
   public static final double MAX_LINEAR_SPEED = Units.feetToMeters(14.5);
   private static final double TRACK_WIDTH_X = Units.inchesToMeters(25.0);
-  private static final double APRILTAG_COEFFICIENT = 0.01;
   private static final double TRACK_WIDTH_Y = Units.inchesToMeters(25.0);
   private static final double SKEW_CONSTANT = 0.06;
   private static final double DRIVE_BASE_RADIUS =
       Math.hypot(TRACK_WIDTH_X / 2.0, TRACK_WIDTH_Y / 2.0);
   public static final double MAX_ANGULAR_SPEED = MAX_LINEAR_SPEED / DRIVE_BASE_RADIUS;
+
+  //TODO: tune all this
+  // -- VISION CONSTANTS --
+  
+  // maximum distance on high fps, low res before we switch the camera to high res lower fps
+  public static final double MAX_DISTANCE = 4.0;
+
+  // default pipeline, tracking apriltags at high FPS.
+  public static final int HIGH_FPS_PIPELINE_ID = 0;
+
+  // secondary pipeline, tracking apriltags at high res and low FPS.
+  public static final int HIGH_RES_PIPELINE_ID = 1;
+
+  // ratio for the distance scaling on the standard deviation
+  private static final double APRILTAG_COEFFICIENT = 0.01; // NEEDS TO BE TUNED
+
 
   public static final Lock odometryLock = new ReentrantLock();
 
@@ -112,11 +130,11 @@ public class Drive extends StateMachineSubsystemBase {
   private final GyroIO gyroIO;
   private final GyroIOInputsAutoLogged gyroInputs = new GyroIOInputsAutoLogged();
 
-  private final Vision vision = Vision.getInstance();
   private final VisionIOInputsAutoLogged visionInputs = new VisionIOInputsAutoLogged();
 
   private final Module[] modules = new Module[4]; // FL, FR, BL, BR
 
+  private AprilTagFieldLayout aprilTagFieldLayout = null;
   private SwerveDriveKinematics kinematics = new SwerveDriveKinematics(getModuleTranslations());
   private SwerveDrivePoseEstimator poseEstimator;
   private double autolockSetpoint = 0;
@@ -138,7 +156,11 @@ public class Drive extends StateMachineSubsystemBase {
     modules[BL] = new Module(blModuleIO, BL, Mode.SETPOINT);
     modules[BR] = new Module(brModuleIO, BR, Mode.SETPOINT);
 
-    
+    try {
+      aprilTagFieldLayout = AprilTagFieldLayout.loadFromResource(AprilTagFields.k2024Crescendo.m_resourceFile);
+    } catch(IOException e) {
+      e.printStackTrace();
+    } 
 
     // Configure AutoBuilder for PathPlanner
     AutoBuilder.configureHolonomic(
@@ -285,15 +307,41 @@ public class Drive extends StateMachineSubsystemBase {
 
     }
 
-    // poseEstimator.updateWithTime(Timer.getFPGATimestamp(), getRotation(), getModulePositions());
-    // if(visionInputs.tagID != -1) {
-    //   Pose2d tagPose2d = aprilTagFieldLayout.getTagPose((int) limelightInputs.tid).get().toPo
-    // }
+    poseEstimator.updateWithTime(Timer.getFPGATimestamp(), getRotation(), getModulePositions());
 
     // TODO: figure out if needs to be moved into 250Hz processing loop
     chassisSpeeds = kinematics.toChassisSpeeds(getModuleStates());
 
-  }
+
+    //TODO: see if this works on a bot
+    Vision vision = Vision.getInstance();
+      if(vision.hasTagInView()) {
+        for(int i = 0; i < vision.getCameras(); i++) {
+          double tagID = vision.getTagID(i);
+          double timestamp = vision.getTimestamp(i);
+          int pipelineID = vision.getPipeline(i);
+        
+          // where the ACTUAL tag is 
+          Pose2d tagPose2d = aprilTagFieldLayout.getTagPose((int) tagID).get().toPose2d();
+
+          // where this camera thinks it is
+          Pose2d estimatedPose = vision.getPose(i);
+        
+          // adding to the pose estimator with the timestamp
+          poseEstimator.addVisionMeasurement(estimatedPose, timestamp);
+
+          // distance between tag and estimated pose
+          double translationDistance = tagPose2d.getTranslation().getDistance(estimatedPose.getTranslation());
+
+          // check distance and increase res if bigger (only if the pipeline isnt already switched)
+          if(translationDistance > MAX_DISTANCE && pipelineID != HIGH_RES_PIPELINE_ID) {
+            vision.setPipeline(i, HIGH_RES_PIPELINE_ID);
+          } else if(translationDistance < MAX_DISTANCE && pipelineID != HIGH_FPS_PIPELINE_ID) {
+            vision.setPipeline(i, HIGH_FPS_PIPELINE_ID);
+          }
+        }
+      }
+    }
 
   public void drive(double x, double y, double w, double throttle) {
     // Apply deadband
