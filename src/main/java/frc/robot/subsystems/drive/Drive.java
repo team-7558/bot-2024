@@ -18,7 +18,6 @@ import com.pathplanner.lib.pathfinding.Pathfinding;
 import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
 import com.pathplanner.lib.util.PathPlannerLogging;
 import com.pathplanner.lib.util.ReplanningConfig;
-
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.MathUtil;
@@ -35,17 +34,17 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.Timer;
 import frc.robot.Constants;
 import frc.robot.OI;
+import frc.robot.RobotContainer;
 import frc.robot.subsystems.StateMachineSubsystemBase;
 import frc.robot.subsystems.drive.Module.Mode;
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionIOInputsAutoLogged;
 import frc.robot.util.LocalADStarAK;
 import frc.robot.util.Util;
-
 import java.io.IOException;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -62,9 +61,9 @@ public class Drive extends StateMachineSubsystemBase {
       Math.hypot(TRACK_WIDTH_X / 2.0, TRACK_WIDTH_Y / 2.0);
   public static final double MAX_ANGULAR_SPEED = MAX_LINEAR_SPEED / DRIVE_BASE_RADIUS;
 
-  //TODO: tune all this
+  // TODO: tune all this
   // -- VISION CONSTANTS --
-  
+
   // maximum distance on high fps, low res before we switch the camera to high res lower fps
   public static final double MAX_DISTANCE = 4.0;
 
@@ -76,7 +75,6 @@ public class Drive extends StateMachineSubsystemBase {
 
   // ratio for the distance scaling on the standard deviation
   private static final double APRILTAG_COEFFICIENT = 0.01; // NEEDS TO BE TUNED
-
 
   public static final Lock odometryLock = new ReentrantLock();
 
@@ -157,10 +155,11 @@ public class Drive extends StateMachineSubsystemBase {
     modules[BR] = new Module(brModuleIO, BR, Mode.SETPOINT);
 
     try {
-      aprilTagFieldLayout = AprilTagFieldLayout.loadFromResource(AprilTagFields.k2024Crescendo.m_resourceFile);
-    } catch(IOException e) {
+      aprilTagFieldLayout =
+          AprilTagFieldLayout.loadFromResource(AprilTagFields.k2024Crescendo.m_resourceFile);
+    } catch (IOException e) {
       e.printStackTrace();
-    } 
+    }
 
     // Configure AutoBuilder for PathPlanner
     AutoBuilder.configureHolonomic(
@@ -235,13 +234,13 @@ public class Drive extends StateMachineSubsystemBase {
           }
         };
     setCurrentState(DISABLED);
-       poseEstimator =
+    poseEstimator =
         new SwerveDrivePoseEstimator(
             kinematics,
             getRotation(),
             getModulePositions(),
             new Pose2d(),
-            VecBuilder.fill(0.1, 0.1, 0.05), 
+            VecBuilder.fill(0.1, 0.1, 0.05),
             VecBuilder.fill(0.5, 0.5, 0.5)); // TODO: TUNE STANDARD DEVIATIONS
   }
 
@@ -304,7 +303,6 @@ public class Drive extends StateMachineSubsystemBase {
       }
       // Apply the twist (change since last sample) to the current pose
       pose = pose.exp(twist);
-
     }
 
     poseEstimator.updateWithTime(Timer.getFPGATimestamp(), getRotation(), getModulePositions());
@@ -312,36 +310,36 @@ public class Drive extends StateMachineSubsystemBase {
     // TODO: figure out if needs to be moved into 250Hz processing loop
     chassisSpeeds = kinematics.toChassisSpeeds(getModuleStates());
 
+    // TODO: see if this works on a bot
+    Vision vision = RobotContainer.vision;
+    if (vision.hasTagInView()) {
+      for (int i = 0; i < vision.getCameras(); i++) {
+        double tagID = vision.getTagID(i);
+        double timestamp = vision.getTimestamp(i);
+        int pipelineID = vision.getPipeline(i);
 
-    //TODO: see if this works on a bot
-    Vision vision = Vision.getInstance();
-      if(vision.hasTagInView()) {
-        for(int i = 0; i < vision.getCameras(); i++) {
-          double tagID = vision.getTagID(i);
-          double timestamp = vision.getTimestamp(i);
-          int pipelineID = vision.getPipeline(i);
-        
-          // where the ACTUAL tag is 
-          Pose2d tagPose2d = aprilTagFieldLayout.getTagPose((int) tagID).get().toPose2d();
+        // where the ACTUAL tag is
+        Pose2d tagPose2d = aprilTagFieldLayout.getTagPose((int) tagID).get().toPose2d();
 
-          // where this camera thinks it is
-          Pose2d estimatedPose = vision.getPose(i);
-        
-          // adding to the pose estimator with the timestamp
-          poseEstimator.addVisionMeasurement(estimatedPose, timestamp);
+        // where this camera thinks it is
+        Pose2d estimatedPose = vision.getPose(i);
 
-          // distance between tag and estimated pose
-          double translationDistance = tagPose2d.getTranslation().getDistance(estimatedPose.getTranslation());
+        // adding to the pose estimator with the timestamp
+        poseEstimator.addVisionMeasurement(estimatedPose, timestamp);
 
-          // check distance and increase res if bigger (only if the pipeline isnt already switched)
-          if(translationDistance > MAX_DISTANCE && pipelineID != HIGH_RES_PIPELINE_ID) {
-            vision.setPipeline(i, HIGH_RES_PIPELINE_ID);
-          } else if(translationDistance < MAX_DISTANCE && pipelineID != HIGH_FPS_PIPELINE_ID) {
-            vision.setPipeline(i, HIGH_FPS_PIPELINE_ID);
-          }
+        // distance between tag and estimated pose
+        double translationDistance =
+            tagPose2d.getTranslation().getDistance(estimatedPose.getTranslation());
+
+        // check distance and increase res if bigger (only if the pipeline isnt already switched)
+        if (translationDistance > MAX_DISTANCE && pipelineID != HIGH_RES_PIPELINE_ID) {
+          vision.setPipeline(i, HIGH_RES_PIPELINE_ID);
+        } else if (translationDistance < MAX_DISTANCE && pipelineID != HIGH_FPS_PIPELINE_ID) {
+          vision.setPipeline(i, HIGH_FPS_PIPELINE_ID);
         }
       }
     }
+  }
 
   public void drive(double x, double y, double w, double throttle) {
     // Apply deadband

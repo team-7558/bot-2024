@@ -22,7 +22,6 @@ import frc.robot.commands.FeedForwardCharacterization;
 import frc.robot.commands.RobotTeleop;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.vision.Vision;
-
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 import org.littletonrobotics.junction.networktables.LoggedDashboardNumber;
 

@@ -1,12 +1,10 @@
-
 package frc.robot.subsystems.vision;
-
-import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import org.littletonrobotics.junction.Logger;
 
 public class Vision extends SubsystemBase {
 
@@ -24,7 +22,7 @@ public class Vision extends SubsystemBase {
 
   public Pose2d[] getPoses() {
     Pose2d[] poses = new Pose2d[cameras.length];
-    for(int i = 0; i < cameras.length;i++) {
+    for (int i = 0; i < cameras.length; i++) {
       poses[i] = visionInputs[i].pose;
     }
     return poses;
@@ -63,39 +61,45 @@ public class Vision extends SubsystemBase {
   }
 
   public boolean hasTagInView() {
-    for(VisionIOInputsAutoLogged input : visionInputs) {
-      if(input.pipelineID != 1) {
+    for (int i = 0; i < visionInputs.length; i++) {
+      VisionIOInputsAutoLogged input = visionInputs[i];
+      if (input.pipelineID != 1) {
         return true;
       }
     }
     return false;
   }
-  
+
   public static Vision getInstance() {
-    switch(Constants.currentMode) {
+    switch (Constants.currentMode) {
       case REAL:
-        VisionIO cam0 = new VisionIOPhoton("camera1", new Transform3d()); // TODO: update transform & name
-        VisionIO cam1 = new VisionIOPhoton("camera2", new Transform3d()); // TODO: update transform & name
-        VisionIO cam2 = new VisionIOPhoton("camera3", new Transform3d()); // TODO: update transform & name
-        VisionIO cam3 = new VisionIOPhoton("camera4", new Transform3d()); // TODO: update transform & name
+        VisionIO cam0 =
+            new VisionIOPhoton("camera1", new Transform3d()); // TODO: update transform & name
+        VisionIO cam1 =
+            new VisionIOPhoton("camera2", new Transform3d()); // TODO: update transform & name
+        VisionIO cam2 =
+            new VisionIOPhoton("camera3", new Transform3d()); // TODO: update transform & name
+        VisionIO cam3 =
+            new VisionIOPhoton("camera4", new Transform3d()); // TODO: update transform & name
         VisionIO limelight = new VisionIOLimelight("limelight"); // TODO: update name
-        Vision v = new Vision(cam0,cam1,cam2,cam3,limelight);
-        return v; 
-      case SIM: 
+        Vision v = new Vision(cam0, cam1, cam2, cam3, limelight);
+        return v;
+      case SIM:
+        return new Vision();
         // add sim implementation maybe
 
       case REPLAY:
         // idk yet
-      
+
       default:
         // nothing yet
-        return null;
+        return new Vision();
     }
   }
 
   @Override
   public void periodic() {
-    for(int i = 0; i < cameras.length;i++) {
+    for (int i = 0; i < cameras.length; i++) {
       cameras[i].updateInputs(visionInputs[i]);
       Logger.processInputs("Vision/Inputs", visionInputs[i]);
     }
