@@ -315,27 +315,29 @@ public class Drive extends StateMachineSubsystemBase {
     if (vision.hasTagInView()) {
       for (int i = 0; i < vision.getCameras(); i++) {
         double tagID = vision.getTagID(i);
-        double timestamp = vision.getTimestamp(i);
-        int pipelineID = vision.getPipeline(i);
+        if (tagID != -1) {
+          double timestamp = vision.getTimestamp(i);
+          int pipelineID = vision.getPipeline(i);
 
-        // where the ACTUAL tag is
-        Pose2d tagPose2d = aprilTagFieldLayout.getTagPose((int) tagID).get().toPose2d();
+          // where the ACTUAL tag is
+          Pose2d tagPose2d = aprilTagFieldLayout.getTagPose((int) tagID).get().toPose2d();
 
-        // where this camera thinks it is
-        Pose2d estimatedPose = vision.getPose(i);
+          // where this camera thinks it is
+          Pose2d estimatedPose = vision.getPose(i);
 
-        // adding to the pose estimator with the timestamp
-        poseEstimator.addVisionMeasurement(estimatedPose, timestamp);
+          // adding to the pose estimator with the timestamp
+          poseEstimator.addVisionMeasurement(estimatedPose, timestamp);
 
-        // distance between tag and estimated pose
-        double translationDistance =
-            tagPose2d.getTranslation().getDistance(estimatedPose.getTranslation());
+          // distance between tag and estimated pose
+          double translationDistance =
+              tagPose2d.getTranslation().getDistance(getPose().getTranslation());
 
-        // check distance and increase res if bigger (only if the pipeline isnt already switched)
-        if (translationDistance > MAX_DISTANCE && pipelineID != HIGH_RES_PIPELINE_ID) {
-          vision.setPipeline(i, HIGH_RES_PIPELINE_ID);
-        } else if (translationDistance < MAX_DISTANCE && pipelineID != HIGH_FPS_PIPELINE_ID) {
-          vision.setPipeline(i, HIGH_FPS_PIPELINE_ID);
+          // check distance and increase res if bigger (only if the pipeline isnt already switched)
+          if (translationDistance > MAX_DISTANCE && pipelineID != HIGH_RES_PIPELINE_ID) {
+            vision.setPipeline(i, HIGH_RES_PIPELINE_ID);
+          } else if (translationDistance < MAX_DISTANCE && pipelineID != HIGH_FPS_PIPELINE_ID) {
+            vision.setPipeline(i, HIGH_FPS_PIPELINE_ID);
+          }
         }
       }
     }

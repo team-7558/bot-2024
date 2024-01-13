@@ -1,6 +1,7 @@
 package frc.robot.subsystems.vision;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
@@ -13,7 +14,13 @@ public class Vision extends SubsystemBase {
 
   public Vision(VisionIO... cameras) {
     this.cameras = cameras;
-    this.visionInputs = new VisionIOInputsAutoLogged[cameras.length];
+    this.visionInputs =
+        new VisionIOInputsAutoLogged[] {
+          new VisionIOInputsAutoLogged(),
+          new VisionIOInputsAutoLogged(),
+          new VisionIOInputsAutoLogged(),
+          new VisionIOInputsAutoLogged()
+        };
   }
 
   public int getCameras() {
@@ -85,8 +92,15 @@ public class Vision extends SubsystemBase {
         Vision v = new Vision(cam0, cam1, cam2, cam3, limelight);
         return v;
       case SIM:
-        return new Vision();
-        // add sim implementation maybe
+        VisionIOSim camzero =
+            new VisionIOSim("camera1", new Transform3d(0.3, 0.1, 0.3, new Rotation3d(0, 90, 90)));
+        VisionIOSim camone =
+            new VisionIOSim("camera1", new Transform3d(-0.3, 0.1, 0.3, new Rotation3d(0, 90, 90)));
+        VisionIOSim camtwo =
+            new VisionIOSim("camera1", new Transform3d(0.3, 0.1, -0.3, new Rotation3d(0, 90, 0)));
+        VisionIOSim camthree =
+            new VisionIOSim("camera1", new Transform3d(-0.3, 0.1, -0.3, new Rotation3d(0, 90, 0)));
+        return new Vision(camzero, camone, camtwo, camthree);
 
       case REPLAY:
         // idk yet
@@ -101,7 +115,7 @@ public class Vision extends SubsystemBase {
   public void periodic() {
     for (int i = 0; i < cameras.length; i++) {
       cameras[i].updateInputs(visionInputs[i]);
-      Logger.processInputs("Vision/Inputs", visionInputs[i]);
+      Logger.processInputs("Vision/Camera" + i + "/Inputs", visionInputs[i]);
     }
   }
 }
