@@ -331,14 +331,18 @@ public class Drive extends StateMachineSubsystemBase {
           // where this camera thinks it is
           Pose2d estimatedPose = vision.getPose(i);
 
+          // distance between tag and estimated pose
+          double translationDistance =
+            tagPose2d.getTranslation().getDistance(getPose().getTranslation());
+
+          // implementing cutoff
+          if(translationDistance > CUTOFF_DISTANCE) continue;
+
           // adding to the pose estimator with the timestamp
           poseEstimator.addVisionMeasurement(estimatedPose, timestamp);
 
-          // distance between tag and estimated pose
-          double translationDistance =
-              tagPose2d.getTranslation().getDistance(getPose().getTranslation());
+
           
-          if(translationDistance > CUTOFF_DISTANCE) continue;
 
           // check distance and increase res if bigger (only if the pipeline isnt already switched)
           if (translationDistance > MIN_DISTANCE &&  pipelineID != HIGH_RES_PIPELINE_ID) {
