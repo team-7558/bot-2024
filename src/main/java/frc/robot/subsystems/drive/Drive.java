@@ -345,9 +345,9 @@ public class Drive extends StateMachineSubsystemBase {
           
 
           // check distance and increase res if bigger (only if the pipeline isnt already switched)
-          if (translationDistance > MIN_DISTANCE &&  pipelineID != HIGH_RES_PIPELINE_ID) {
+          if (translationDistance >= MIN_DISTANCE &&  pipelineID != HIGH_RES_PIPELINE_ID) {
             vision.setPipeline(i, HIGH_RES_PIPELINE_ID);
-          } else if (translationDistance < MAX_DISTANCE && pipelineID != HIGH_FPS_PIPELINE_ID) {
+          } else if (translationDistance <= MAX_DISTANCE && pipelineID != HIGH_FPS_PIPELINE_ID) {
             vision.setPipeline(i, HIGH_FPS_PIPELINE_ID);
           }
         }
