@@ -67,6 +67,12 @@ public class Drive extends StateMachineSubsystemBase {
   // maximum distance on high fps, low res before we switch the camera to high res lower fps
   public static final double MAX_DISTANCE = 4.0;
 
+  // minimum distance to be on low fps high res before we switch the camera to high fps low res
+  public static final double MIN_DISTANCE = 4.1;
+
+  // distance to cut off all pose estimation because its too inaccurate
+  public static final double CUTOFF_DISTANCE = 7.0;
+
   // default pipeline, tracking apriltags at high FPS.
   public static final int HIGH_FPS_PIPELINE_ID = 0;
 
@@ -331,9 +337,11 @@ public class Drive extends StateMachineSubsystemBase {
           // distance between tag and estimated pose
           double translationDistance =
               tagPose2d.getTranslation().getDistance(getPose().getTranslation());
+          
+          if(translationDistance > CUTOFF_DISTANCE) continue;
 
           // check distance and increase res if bigger (only if the pipeline isnt already switched)
-          if (translationDistance > MAX_DISTANCE && pipelineID != HIGH_RES_PIPELINE_ID) {
+          if (translationDistance > MIN_DISTANCE &&  pipelineID != HIGH_RES_PIPELINE_ID) {
             vision.setPipeline(i, HIGH_RES_PIPELINE_ID);
           } else if (translationDistance < MAX_DISTANCE && pipelineID != HIGH_FPS_PIPELINE_ID) {
             vision.setPipeline(i, HIGH_FPS_PIPELINE_ID);

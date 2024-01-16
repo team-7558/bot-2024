@@ -70,7 +70,7 @@ public class Vision extends SubsystemBase {
   public boolean hasTagInView() {
     for (int i = 0; i < visionInputs.length; i++) {
       VisionIOInputsAutoLogged input = visionInputs[i];
-      if (input.pipelineID != 1) {
+      if (input.tagID != 1) {
         return true;
       }
     }
