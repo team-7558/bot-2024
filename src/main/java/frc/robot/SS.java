@@ -22,7 +22,6 @@ public class SS {
         SHOOTING,
         CLIMBING,
         ENDGAME
-
     }
 
     private static SS instance;
@@ -54,7 +53,7 @@ public class SS {
         nextState = s;
     }
 
-    private void sateInfoLog(){
+    private void stateInfoLog(){
         Logger.recordOutput("SS/lastState", lastState);
         Logger.recordOutput("SS/currState", lastState);
         Logger.recordOutput("SS/nextState", lastState);
@@ -87,6 +86,8 @@ public class SS {
             default:
                 System.out.println(currState + " unimplemented state");
         }
+
+        stateInfoLog();
 
         // Figure out if its better to do this before or after the switch statement
         if(last){ 
