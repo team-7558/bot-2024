@@ -6,16 +6,20 @@ package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.OI;
+import frc.robot.SS;
+import frc.robot.SS.State;
 import frc.robot.subsystems.drive.Drive;
 
 public class RobotTeleop extends Command {
 
   private final Drive drive;
+  private final SS ss;
 
   /** Creates a new DriveTeleop. */
   public RobotTeleop() {
     // Use addRequirements() here to declare subsystem dependencies.
     drive = Drive.getInstance();
+    ss = SS.getInstance();
 
     addRequirements(drive);
   }
@@ -24,6 +28,7 @@ public class RobotTeleop extends Command {
   @Override
   public void initialize() {
     drive.setCurrentState(drive.STRAFE_N_TURN);
+    ss.queueState(State.IDLE);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -54,6 +59,12 @@ public class RobotTeleop extends Command {
         drive.setCurrentState(drive.STRAFE_N_TURN);
       }
 
+      if (OI.DR.getRightBumperPressed()){
+        ss.action(State.TEST_2);
+      } else if (OI.DR.getLeftBumperPressed()){
+        ss.action(State.IDLE);
+      }
+
       // if (OI.XK.get(0, 0)) {
       //   drive.setModuleModes(Mode.VOLTAGE);
       // } else if (OI.XK.get(0, 1)) {
@@ -66,6 +77,7 @@ public class RobotTeleop extends Command {
   @Override
   public void end(boolean interrupted) {
     drive.setCurrentState(drive.DISABLED);
+    ss.queueState(State.DISABLED);
   }
 
   // Returns true when the command should end.
