@@ -76,10 +76,10 @@ public class Drive extends StateMachineSubsystemBase {
           instance =
               new Drive(
                   new GyroIO() {},
-                  new ModuleIOSim(0),
-                  new ModuleIOSim(1),
-                  new ModuleIOSim(2),
-                  new ModuleIOSim(3));
+                  new ModuleIOIdeal(0),
+                  new ModuleIOIdeal(1),
+                  new ModuleIOIdeal(2),
+                  new ModuleIOIdeal(3));
           break;
 
         default:
@@ -176,7 +176,7 @@ public class Drive extends StateMachineSubsystemBase {
           public void periodic() {
             double throttle = 1.0;
             throttle = Util.lerp(1, 0.2, OI.DR.getRightTriggerAxis());
-            drive(-OI.DR.getLeftY(), -OI.DR.getLeftX(), -OI.DR.getRightX() * 0.5, throttle);
+            drive(-OI.DR.getLeftY(), -OI.DR.getLeftX(), -OI.DR.getRightX() * 0.75, throttle);
           }
         };
 

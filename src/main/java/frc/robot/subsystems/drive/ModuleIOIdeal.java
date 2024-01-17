@@ -82,7 +82,7 @@ public class ModuleIOIdeal implements ModuleIO {
   @Override
   public void setTurnAngle(double rad) {
     double lastTurnPos_rad = turnPos_rad;
-    turnPos_rad = rad;
+    turnPos_rad = rad - turnAbsoluteInitPosition.getRadians();
     turnVel_radps = (turnPos_rad - lastTurnPos_rad) / LOOP_PERIOD_SECS;
   }
 }
