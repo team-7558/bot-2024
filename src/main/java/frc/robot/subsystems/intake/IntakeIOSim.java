@@ -8,9 +8,7 @@ import frc.robot.Constants;
 
 public class IntakeIOSim implements IntakeIO {
 
-  private FlywheelSim sim = new FlywheelSim(DCMotor.getFalcon500(1), 1.5, 0.004);
-
-  private PIDController pid = new PIDController(0.0, 0.0, 0.0);
+  private FlywheelSim sim = new FlywheelSim(DCMotor.getFalcon500(3), 1.5, 0.004);
 
   // private boolean closedLoop = false;
   private double appliedVolts = 0.0;
@@ -39,15 +37,15 @@ public class IntakeIOSim implements IntakeIO {
   }
 
   /** Run closed loop at the specified velocity. */
-  public void setVelocity(double velocityRadPerSec, double ffVolts) {
+  public void setVelocity(double velocityRadPerSec) {
     //closedLoop = false;
     appliedVolts = 0;
-    pid.setSetpoint(velocityRadPerSec);
+    sim.setState(1);
   }
 
   /** Stop in open loop. */
   public void stop() {
-    setVelocity(0, 0);
+    setVelocity(0);
   }
 
   /** Set velocity PID constants. */

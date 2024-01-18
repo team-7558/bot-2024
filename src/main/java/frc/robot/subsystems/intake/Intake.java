@@ -38,7 +38,7 @@ public class Intake extends StateMachineSubsystemBase {
     return instance;
   }
 
-  public final State DISABLED, IDLE, INTAKING, SPITTING;
+  public final State DISABLED, IDLE, INTAKING, SHOOTER_SIDE, AMP_SIDE, SPITTING;
 
   private final IntakeIO io;
   private final IntakeIOInputsAutoLogged inputs = new IntakeIOInputsAutoLogged();
@@ -82,7 +82,7 @@ public class Intake extends StateMachineSubsystemBase {
 
         @Override
         public void periodic() {
-          if(inputs.beamBreakActivated) {
+          if(inputs.beamBreakActivatedBottom) {
             setCurrentState(INTAKING);
           }
         }
@@ -92,21 +92,53 @@ public class Intake extends StateMachineSubsystemBase {
       };
     INTAKING = 
       new State("INTAKING") {
+        boolean isPassedSensor;
         @Override
         public void init() {
           io.setIntakeVelocity(1);
+          io.setElevatorVelocity(1);
+          io.setDirectionVelocity(0);
+          isPassedSensor = false;
         }
 
         @Override
         public void periodic() {
-          
-          //TODO: Add the after, before alpha thingyt
+          if(inputs.beamBreakActivatedTop) {
+            isPassedSensor = true;
+          }
 
-          if(!inputs.beamBreakActivated) {
-            setCurrentState(IDLE);
+          if(!inputs.beamBreakActivatedTop && isPassedSensor) {
+            io.stop();
           }
         }
 
+        @Override
+        public void exit() {}
+      };
+    AMP_SIDE =
+      new State("AMP_SIDE"){
+         @Override
+        public void init() {
+          io.setDirectionVelocity(-1);
+        }
+
+        @Override
+        public void periodic() {
+        }
+        @Override
+        public void exit() {}
+      };
+
+    SHOOTER_SIDE =
+      new State("SHOOTER_SIDE"){
+         @Override
+        public void init() {
+          io.setDirectionVelocity(1);
+        }
+
+        @Override
+        public void periodic() {
+        }
         @Override
         public void exit() {}
       };
@@ -119,15 +151,10 @@ public class Intake extends StateMachineSubsystemBase {
 
         @Override
         public void periodic() {
-          if(!inputs.beamBreakActivated) {
-            setCurrentState(IDLE);
-          }
         }
-
         @Override
         public void exit() {}
       };
-      setCurrentState(DISABLED);
   }
 
   public void stop() {

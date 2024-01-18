@@ -23,13 +23,16 @@ import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.DigitalInput;
 
 public class IntakeIOTalonFX implements IntakeIO {
   private static final double GEAR_RATIO = 0;
 
-  private final TalonFX topMotor = new TalonFX(2);
+  private final TalonFX topMotor = new TalonFX(2); // Not gunna be 0 1 (cameron told me to add that)
   private final TalonFX middleMotor = new TalonFX(1);
   private final TalonFX bottomMotor = new TalonFX(0);
+  private final DigitalInput bottomSensor = new DigitalInput(0);
+  private final DigitalInput topSensor = new DigitalInput(1);
 
   private final StatusSignal<Double> bottomPosition = bottomMotor.getPosition();
   private final StatusSignal<Double> bottomVelocity = bottomMotor.getVelocity();
