@@ -21,15 +21,19 @@ public interface IntakeIO {
     public double intakeVelocityRadPerSec = 0.0;
     public double intakeAppliedVolts = 0.0;
     public double[] intakeCurrentAmps = new double[] {};
-    
+    public boolean beamBreakActivated = false;
   }
+
+  int intakeVelocityRadPerSec = 0;
 
   /** Updates the set of loggable inputs. */
   public default void updateInputs(IntakeIOInputs inputs) {}
 
   /** Run the drive motor at the specified voltage. */
-  public default void setDriveVoltage(double volts) {}
+  public default void setIntakeVoltage(double volts) {}
   
   /** Run the drive motor at the specified velocity. */
-  public default void setDriveVelocity(double velocity) {}
+  public default void setIntakeVelocity(double velocity) {}
+
+  public default void stop() {}
 }

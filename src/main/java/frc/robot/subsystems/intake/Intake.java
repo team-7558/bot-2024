@@ -38,7 +38,7 @@ public class Intake extends StateMachineSubsystemBase {
     return instance;
   }
 
-  public final State DISABLED, IDLE, INDEXING, CORRECTING;
+  public final State DISABLED, IDLE, INTAKING, SPITTING;
 
   private final IntakeIO io;
   private final IntakeIOInputsAutoLogged inputs = new IntakeIOInputsAutoLogged();
@@ -47,20 +47,15 @@ public class Intake extends StateMachineSubsystemBase {
     super("Indexer");
     this.io = io;
 
-    switch (Constants.currentMode) {
-      case REAL:
-      case REPLAY:
-        ffModel = new SimpleMotorFeedforward(0,0);
-        io.configurePID(0, 0, 0);
-        break;
-      case SIM:
-        ffModel = new SimpleMotorFeedforward(0, 0);
-        io.configurePID(0, 0, 0);
-        break;
-      default:
-        ffModel = new SimpleMotorFeedforward(0, 0);
-        break;
-    }
+    // switch (Constants.currentMode) {
+    //   case REAL:
+    //   case REPLAY:
+    //     break;
+    //   case SIM:
+    //     break;
+    //   default:
+    //     break;
+    // }
 
     DISABLED =
       new State("DISABLED") {
@@ -87,30 +82,27 @@ public class Intake extends StateMachineSubsystemBase {
 
         @Override
         public void periodic() {
-          if(inputs.ballSensor) {
-            setCurrentState(INDEXING);
+          if(inputs.beamBreakActivated) {
+            setCurrentState(INTAKING);
           }
         }
 
         @Override
         public void exit() {}
       };
-    INDEXING = 
-      new State("INDEXING") {
+    INTAKING = 
+      new State("INTAKING") {
         @Override
         public void init() {
-          io.configurePID(0.01,0,0);
-          io.configurePID2(0.01,0,0);
+          io.setIntakeVelocity(1);
         }
 
         @Override
         public void periodic() {
-          io.setVelocity(0.1, 1);
-          io.setVelocity2(0.1, 1);
           
           //TODO: Add the after, before alpha thingyt
 
-          if(!inputs.ballSensor) {
+          if(!inputs.beamBreakActivated) {
             setCurrentState(IDLE);
           }
         }
@@ -118,18 +110,18 @@ public class Intake extends StateMachineSubsystemBase {
         @Override
         public void exit() {}
       };
-    CORRECTING =
-      new State("CORRECTING"){
+    SPITTING =
+      new State("SPITTING"){
          @Override
         public void init() {
-          io.configurePID(-0.01, 0, 0);
-          io.configurePID2(-0.01, 0, 0);
+          io.setIntakeVelocity(-1);
         }
 
         @Override
         public void periodic() {
-          io.setVelocity(0.1, 1);
-          io.setVelocity2(0.1, 1);
+          if(!inputs.beamBreakActivated) {
+            setCurrentState(IDLE);
+          }
         }
 
         @Override
@@ -140,7 +132,6 @@ public class Intake extends StateMachineSubsystemBase {
 
   public void stop() {
     io.stop();
-    io.stop2();
   }
 
   @Override
@@ -156,21 +147,20 @@ public class Intake extends StateMachineSubsystemBase {
 
   public void runVelocity(double velocityRPM) {
     var velocityRadPerSec = Units.rotationsPerMinuteToRadiansPerSecond(velocityRPM);
-    io.setVelocity(velocityRadPerSec, ffModel.calculate(velocityRadPerSec));
-
-    Logger.recordOutput("IndexerWheelSetpointRPM", velocityRPM);
+    io.setIntakeVelocity(velocityRadPerSec);
+    Logger.recordOutput("IntakeWheelSetpointRPM", velocityRPM);
   }
 
   public double getVelocityRPM() {
-    return Units.radiansPerSecondToRotationsPerMinute(inputs.velocityRadPerSec);
+    return Units.radiansPerSecondToRotationsPerMinute(inputs.intakeVelocityRadPerSec);
   }
 
   public void runCharacterizationVolts(double volts) {
-    io.setVoltage(volts);
+    io.setIntakeVoltage(volts);
   }
 
   public double getCharacterizationVelocity() {
-    return inputs.velocityRadPerSec;
+    return inputs.intakeVelocityRadPerSec;
   }
 
 }
