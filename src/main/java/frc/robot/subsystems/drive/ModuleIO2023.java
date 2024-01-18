@@ -44,7 +44,7 @@ import java.util.function.DoubleSupplier;
 public class ModuleIO2023 implements ModuleIO {
   private final TalonFX driveTalon;
   private final TalonFX turnTalon;
-  private final DutyCycleEncoder encoder;
+  private final DutyCycleEncoder absEncoder;
 
   private final StatusSignal<Double> drivePosition;
   private final Queue<Double> drivePositionQueue;
@@ -71,15 +71,14 @@ public class ModuleIO2023 implements ModuleIO {
       case Drive.FL:
         driveTalon = new TalonFX(2);
         turnTalon = new TalonFX(6);
-        turnTalon.setInverted(true);
-        encoder = new DutyCycleEncoder(0);
+        absEncoder = new DutyCycleEncoder(0);
         // absoluteEncoderOffset = Rotation2d.fromRadians(0); // TODO: TUNE
         absoluteEncoderOffset = Rotation2d.fromRadians(-2.701); // TODO: TUNE
         break;
       case Drive.FR:
         driveTalon = new TalonFX(3);
         turnTalon = new TalonFX(7);
-        encoder = new DutyCycleEncoder(2);
+        absEncoder = new DutyCycleEncoder(2);
         // absoluteEncoderOffset = Rotation2d.fromRadians(0); // TODO: TUNE
         absoluteEncoderOffset = Rotation2d.fromRadians(0.294); // TODO: TUNE
 
@@ -87,7 +86,7 @@ public class ModuleIO2023 implements ModuleIO {
       case Drive.BL:
         driveTalon = new TalonFX(1);
         turnTalon = new TalonFX(5);
-        encoder = new DutyCycleEncoder(1);
+        absEncoder = new DutyCycleEncoder(1);
         // absoluteEncoderOffset = Rotation2d.fromRadians(0); // TODO: TUNE
         absoluteEncoderOffset = Rotation2d.fromRadians(2.743); // TODO: TUNE
 
@@ -95,7 +94,7 @@ public class ModuleIO2023 implements ModuleIO {
       case Drive.BR:
         driveTalon = new TalonFX(4);
         turnTalon = new TalonFX(8);
-        encoder = new DutyCycleEncoder(3);
+        absEncoder = new DutyCycleEncoder(3);
         // absoluteEncoderOffset = Rotation2d.fromRadians(0); // TODO: TUNE
         absoluteEncoderOffset = Rotation2d.fromRadians(-2.129); // TODO: TUNE
 
@@ -104,7 +103,8 @@ public class ModuleIO2023 implements ModuleIO {
         throw new RuntimeException("Invalid module index");
     }
 
-    encoder.setDutyCycleRange(1.0 / 4096.0, 4095.0 / 4096.0);
+    absEncoder.setDutyCycleRange(1.0 / 4096.0, 4095.0 / 4096.0);
+    
 
     var driveConfig = new TalonFXConfiguration();
     driveConfig.CurrentLimits.StatorCurrentLimit = 40.0;
@@ -126,7 +126,7 @@ public class ModuleIO2023 implements ModuleIO {
     turnConfig.Slot0.kD = 12.0;
     turnConfig.Slot0.kS = 0.0;
     turnTalon.getConfigurator().apply(turnConfig);
-    turnTalon.setPosition(encoder.getAbsolutePosition() - absoluteEncoderOffset.getRadians());
+    //turnTalon.setPosition(absEncoder.getAbsolutePosition() - absoluteEncoderOffset.getRadians());
     setTurnBrakeMode(true);
 
     drivePosition = driveTalon.getPosition();
@@ -136,7 +136,7 @@ public class ModuleIO2023 implements ModuleIO {
     driveAppliedVolts = driveTalon.getMotorVoltage();
     driveCurrent = driveTalon.getStatorCurrent();
 
-    turnAbsolutePosition = () -> encoder.getAbsolutePosition();
+    turnAbsolutePosition = () -> absEncoder.getAbsolutePosition();
     turnPosition = turnTalon.getPosition();
     turnPositionQueue =
         PhoenixOdometryThread.getInstance().registerSignal(turnTalon, turnTalon.getPosition());
