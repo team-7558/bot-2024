@@ -25,7 +25,7 @@ import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
-import frc.robot.util.MagEncoderDIO;
+import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import java.util.Queue;
 import java.util.function.DoubleSupplier;
 
@@ -44,7 +44,7 @@ import java.util.function.DoubleSupplier;
 public class ModuleIO2023 implements ModuleIO {
   private final TalonFX driveTalon;
   private final TalonFX turnTalon;
-  private final MagEncoderDIO encoder;
+  private final DutyCycleEncoder encoder;
 
   private final StatusSignal<Double> drivePosition;
   private final Queue<Double> drivePositionQueue;
@@ -71,30 +71,40 @@ public class ModuleIO2023 implements ModuleIO {
       case Drive.FL:
         driveTalon = new TalonFX(2);
         turnTalon = new TalonFX(6);
-        encoder = new MagEncoderDIO(0);
-        absoluteEncoderOffset = new Rotation2d(24.4); // TODO: TUNE
+        turnTalon.setInverted(true);
+        encoder = new DutyCycleEncoder(0);
+        // absoluteEncoderOffset = Rotation2d.fromRadians(0); // TODO: TUNE
+        absoluteEncoderOffset = Rotation2d.fromRadians(-2.701); // TODO: TUNE
         break;
       case Drive.FR:
         driveTalon = new TalonFX(3);
         turnTalon = new TalonFX(7);
-        encoder = new MagEncoderDIO(2);
-        absoluteEncoderOffset = new Rotation2d(197.2);// TODO: TUNE
+        encoder = new DutyCycleEncoder(2);
+        // absoluteEncoderOffset = Rotation2d.fromRadians(0); // TODO: TUNE
+        absoluteEncoderOffset = Rotation2d.fromRadians(0.294); // TODO: TUNE
+
         break;
       case Drive.BL:
         driveTalon = new TalonFX(1);
         turnTalon = new TalonFX(5);
-        encoder = new MagEncoderDIO(1);
-        absoluteEncoderOffset = new Rotation2d(336.2); // TODO: TUNE
+        encoder = new DutyCycleEncoder(1);
+        // absoluteEncoderOffset = Rotation2d.fromRadians(0); // TODO: TUNE
+        absoluteEncoderOffset = Rotation2d.fromRadians(2.743); // TODO: TUNE
+
         break;
       case Drive.BR:
         driveTalon = new TalonFX(4);
         turnTalon = new TalonFX(8);
-        encoder = new MagEncoderDIO(3);
-        absoluteEncoderOffset = new Rotation2d(59.6); // TODO: TUNE
+        encoder = new DutyCycleEncoder(3);
+        // absoluteEncoderOffset = Rotation2d.fromRadians(0); // TODO: TUNE
+        absoluteEncoderOffset = Rotation2d.fromRadians(-2.129); // TODO: TUNE
+
         break;
       default:
         throw new RuntimeException("Invalid module index");
     }
+
+    encoder.setDutyCycleRange(1.0 / 4096.0, 4095.0 / 4096.0);
 
     var driveConfig = new TalonFXConfiguration();
     driveConfig.CurrentLimits.StatorCurrentLimit = 40.0;
@@ -116,6 +126,7 @@ public class ModuleIO2023 implements ModuleIO {
     turnConfig.Slot0.kD = 12.0;
     turnConfig.Slot0.kS = 0.0;
     turnTalon.getConfigurator().apply(turnConfig);
+    turnTalon.setPosition(encoder.getAbsolutePosition() - absoluteEncoderOffset.getRadians());
     setTurnBrakeMode(true);
 
     drivePosition = driveTalon.getPosition();
