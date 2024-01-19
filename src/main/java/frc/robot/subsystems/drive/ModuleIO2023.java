@@ -60,27 +60,35 @@ public class ModuleIO2023 implements ModuleIO {
   private final StatusSignal<Double> turnCurrent;
 
   // Gear ratios for SDS MK4i L2, adjust as necessary
-  private final double DRIVE_GEAR_RATIO = (50.0 / 14.0) * (17.0 / 27.0) * (45.0 / 15.0);
-  private final double TURN_GEAR_RATIO = 150.0 / 7.0;
+  // private final double DRIVE_GEAR_RATIO = (50.0 / 14.0) * (17.0 / 27.0) * (45.0 / 15.0);
+  // private final double TURN_GEAR_RATIO = 150.0 / 7.0;
 
-  private final boolean isTurnMotorInverted = true;
+  // Gear ratios for SDS MK4i L2, adjust as necessary
+  private final double DRIVE_GEAR_RATIO = (50.0 / 14.0) * (17.0 / 27.0) * (45.0 / 15.0);
+  private final double TURN_GEAR_RATIO = 12.8 / 1.0;
+
+  private final boolean isTurnMotorInverted = false;
+  private final boolean isAbsEncoderInverted = false;
   private final Rotation2d absoluteEncoderOffset;
 
   public ModuleIO2023(int index) {
+    var driveConfig = new TalonFXConfiguration();
+    var turnConfig = new TalonFXConfiguration();
+
     switch (index) {
       case Drive.FL:
         driveTalon = new TalonFX(2);
         turnTalon = new TalonFX(6);
         absEncoder = new DutyCycleEncoder(0);
         // absoluteEncoderOffset = Rotation2d.fromRadians(0); // TODO: TUNE
-        absoluteEncoderOffset = Rotation2d.fromRadians(-2.701); // TODO: TUNE
+        absoluteEncoderOffset = Rotation2d.fromRadians(-2.710);
         break;
       case Drive.FR:
         driveTalon = new TalonFX(3);
         turnTalon = new TalonFX(7);
         absEncoder = new DutyCycleEncoder(2);
         // absoluteEncoderOffset = Rotation2d.fromRadians(0); // TODO: TUNE
-        absoluteEncoderOffset = Rotation2d.fromRadians(0.294); // TODO: TUNE
+        absoluteEncoderOffset = Rotation2d.fromRadians(0.291);
 
         break;
       case Drive.BL:
@@ -88,7 +96,7 @@ public class ModuleIO2023 implements ModuleIO {
         turnTalon = new TalonFX(5);
         absEncoder = new DutyCycleEncoder(1);
         // absoluteEncoderOffset = Rotation2d.fromRadians(0); // TODO: TUNE
-        absoluteEncoderOffset = Rotation2d.fromRadians(2.743); // TODO: TUNE
+        absoluteEncoderOffset = Rotation2d.fromRadians(2.741);
 
         break;
       case Drive.BR:
@@ -96,37 +104,36 @@ public class ModuleIO2023 implements ModuleIO {
         turnTalon = new TalonFX(8);
         absEncoder = new DutyCycleEncoder(3);
         // absoluteEncoderOffset = Rotation2d.fromRadians(0); // TODO: TUNE
-        absoluteEncoderOffset = Rotation2d.fromRadians(-2.129); // TODO: TUNE
+        absoluteEncoderOffset = Rotation2d.fromRadians(-2.124);
 
         break;
       default:
         throw new RuntimeException("Invalid module index");
     }
 
-    absEncoder.setDutyCycleRange(1.0 / 4096.0, 4095.0 / 4096.0);
-    
+    absEncoder.setDutyCycleRange(1.0 / 4096.0, 4095.0 / 4096.0); // Might need to be 0, 4096
 
-    var driveConfig = new TalonFXConfiguration();
     driveConfig.CurrentLimits.StatorCurrentLimit = 40.0;
     driveConfig.CurrentLimits.StatorCurrentLimitEnable = true;
-    driveConfig.Slot0.kP = 0.1;
+    driveConfig.Feedback.SensorToMechanismRatio = DRIVE_GEAR_RATIO;
+    driveConfig.Slot0.kP = 0.0;
     driveConfig.Slot0.kD = 0;
     driveConfig.Slot0.kI = 0;
-    driveConfig.Slot0.kS = 0.55493;
-    driveConfig.Slot0.kV = 2.3014;
-    driveConfig.Slot0.kA = 0.12872;
+    driveConfig.Slot0.kS = 0.0;
+    driveConfig.Slot0.kV = 0.0;
+    driveConfig.Slot0.kA = 0.0;
     driveTalon.getConfigurator().apply(driveConfig);
     setDriveBrakeMode(true);
 
-    var turnConfig = new TalonFXConfiguration();
     turnConfig.CurrentLimits.StatorCurrentLimit = 30.0;
     turnConfig.CurrentLimits.StatorCurrentLimitEnable = true;
-    turnConfig.Slot0.kP = 0.6;
+    turnConfig.Feedback.SensorToMechanismRatio = TURN_GEAR_RATIO;
+    turnConfig.ClosedLoopGeneral.ContinuousWrap = true;
+    turnConfig.Slot0.kP = 0.0;
     turnConfig.Slot0.kI = 0.0;
-    turnConfig.Slot0.kD = 12.0;
+    turnConfig.Slot0.kD = 0.0;
     turnConfig.Slot0.kS = 0.0;
     turnTalon.getConfigurator().apply(turnConfig);
-    //turnTalon.setPosition(absEncoder.getAbsolutePosition() - absoluteEncoderOffset.getRadians());
     setTurnBrakeMode(true);
 
     drivePosition = driveTalon.getPosition();
@@ -136,7 +143,8 @@ public class ModuleIO2023 implements ModuleIO {
     driveAppliedVolts = driveTalon.getMotorVoltage();
     driveCurrent = driveTalon.getStatorCurrent();
 
-    turnAbsolutePosition = () -> absEncoder.getAbsolutePosition();
+    turnAbsolutePosition =
+        () -> absEncoder.getAbsolutePosition() * (isAbsEncoderInverted ? -1.0 : 1.0);
     turnPosition = turnTalon.getPosition();
     turnPositionQueue =
         PhoenixOdometryThread.getInstance().registerSignal(turnTalon, turnTalon.getPosition());
@@ -171,28 +179,26 @@ public class ModuleIO2023 implements ModuleIO {
         turnCurrent);
 
     inputs.drivePositionRad =
-        Units.rotationsToRadians(drivePosition.getValueAsDouble()) / DRIVE_GEAR_RATIO;
+        Units.rotationsToRadians(drivePosition.getValueAsDouble());
     inputs.driveVelocityRadPerSec =
-        Units.rotationsToRadians(driveVelocity.getValueAsDouble()) / DRIVE_GEAR_RATIO;
+        Units.rotationsToRadians(driveVelocity.getValueAsDouble());
     inputs.driveAppliedVolts = driveAppliedVolts.getValueAsDouble();
     inputs.driveCurrentAmps = new double[] {driveCurrent.getValueAsDouble()};
 
     inputs.turnAbsolutePosition =
         Rotation2d.fromRotations(turnAbsolutePosition.getAsDouble()).minus(absoluteEncoderOffset);
-    inputs.turnPosition =
-        Rotation2d.fromRotations(turnPosition.getValueAsDouble() / TURN_GEAR_RATIO);
-    inputs.turnVelocityRadPerSec =
-        Units.rotationsToRadians(turnVelocity.getValueAsDouble()) / TURN_GEAR_RATIO;
+    inputs.turnPositionRad = Rotation2d.fromRotations(turnPosition.getValueAsDouble());
+    inputs.turnVelocityRadPerSec = Units.rotationsToRadians(turnVelocity.getValueAsDouble());
     inputs.turnAppliedVolts = turnAppliedVolts.getValueAsDouble();
     inputs.turnCurrentAmps = new double[] {turnCurrent.getValueAsDouble()};
 
     inputs.odometryDrivePositionsRad =
         drivePositionQueue.stream()
-            .mapToDouble((Double value) -> Units.rotationsToRadians(value) / DRIVE_GEAR_RATIO)
+            .mapToDouble((Double value) -> Units.rotationsToRadians(value))
             .toArray();
     inputs.odometryTurnPositions =
         turnPositionQueue.stream()
-            .map((Double value) -> Rotation2d.fromRotations(value / TURN_GEAR_RATIO))
+            .map((Double value) -> Rotation2d.fromRotations(value))
             .toArray(Rotation2d[]::new);
     drivePositionQueue.clear();
     turnPositionQueue.clear();
