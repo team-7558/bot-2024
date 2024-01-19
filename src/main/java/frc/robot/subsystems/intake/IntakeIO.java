@@ -41,12 +41,18 @@ public interface IntakeIO {
 
   /** Run the drive motor at the specified voltage. */
   public default void setIntakeVoltage(double volts) {}
+
+  /** Run the drive motor at the specified voltage. */
+  public default void setIntakeSpeed(double speed) {}
   
   /** Run the drive motor at the specified velocity. */
   public default void setIntakeVelocity(double velocity) {}
 
    /** Run the drive motor at the specified voltage. */
   public default void setElevatorVoltage(double volts) {}
+
+  /** Run the drive motor at the specified voltage. */
+  public default void setElevatorSpeed(double speed) {}
   
   /** Run the drive motor at the specified velocity. */
   public default void setElevatorVelocity(double velocity) {}
@@ -54,6 +60,9 @@ public interface IntakeIO {
    /** Run the drive motor at the specified voltage. */
   public default void setDirectionVoltage(double volts) {}
   
+  /** Run the drive motor at the specified voltage. */
+  public default void setDirectionSpeed(double speed) {}
+
   /** Run the drive motor at the specified velocity. */
   public default void setDirectionVelocity(double velocity) {}
 

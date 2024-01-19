@@ -95,9 +95,9 @@ public class Intake extends StateMachineSubsystemBase {
         boolean isPassedSensor;
         @Override
         public void init() {
-          io.setIntakeVelocity(1);
-          io.setElevatorVelocity(1);
-          io.setDirectionVelocity(0);
+          io.setIntakeSpeed(1);
+          io.setElevatorSpeed(1);
+          io.setDirectionSpeed(0);
           isPassedSensor = false;
         }
 
@@ -119,7 +119,7 @@ public class Intake extends StateMachineSubsystemBase {
       new State("AMP_SIDE"){
          @Override
         public void init() {
-          io.setDirectionVelocity(-1);
+          io.setDirectionSpeed(-1);
         }
 
         @Override
@@ -128,12 +128,11 @@ public class Intake extends StateMachineSubsystemBase {
         @Override
         public void exit() {}
       };
-
     SHOOTER_SIDE =
       new State("SHOOTER_SIDE"){
          @Override
         public void init() {
-          io.setDirectionVelocity(1);
+          io.setDirectionSpeed(1);
         }
 
         @Override
@@ -146,7 +145,7 @@ public class Intake extends StateMachineSubsystemBase {
       new State("SPITTING"){
          @Override
         public void init() {
-          io.setIntakeVelocity(-1);
+          io.setIntakeSpeed(-1);
         }
 
         @Override
