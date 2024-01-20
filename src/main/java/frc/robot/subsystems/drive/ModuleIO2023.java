@@ -23,6 +23,7 @@ import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
@@ -59,14 +60,19 @@ public class ModuleIO2023 implements ModuleIO {
   private final StatusSignal<Double> turnAppliedVolts;
   private final StatusSignal<Double> turnCurrent;
 
+  private final VoltageOut driveOut_V, turnOut_V;
+  private final VelocityVoltage driveOut_rotps;
+  private final PositionVoltage turnOut_rot;
+
   // Gear ratios for SDS MK4i L2, adjust as necessary
   // private final double DRIVE_GEAR_RATIO = (50.0 / 14.0) * (17.0 / 27.0) * (45.0 / 15.0);
   // private final double TURN_GEAR_RATIO = 150.0 / 7.0;
 
-  // Gear ratios for SDS MK4i L2, adjust as necessary
+  // Gear ratios for SDS MK4 L2, adjust as necessary
   private final double DRIVE_GEAR_RATIO = (50.0 / 14.0) * (17.0 / 27.0) * (45.0 / 15.0);
   private final double TURN_GEAR_RATIO = 12.8 / 1.0;
 
+  private boolean isDriveMotorInverted = true;
   private final boolean isTurnMotorInverted = false;
   private final boolean isAbsEncoderInverted = false;
   private final Rotation2d absoluteEncoderOffset;
@@ -81,7 +87,7 @@ public class ModuleIO2023 implements ModuleIO {
         turnTalon = new TalonFX(6);
         absEncoder = new DutyCycleEncoder(0);
         // absoluteEncoderOffset = Rotation2d.fromRadians(0); // TODO: TUNE
-        absoluteEncoderOffset = Rotation2d.fromRadians(-2.710);
+        absoluteEncoderOffset = Rotation2d.fromRadians(-2.710 + Math.PI);
         break;
       case Drive.FR:
         driveTalon = new TalonFX(3);
@@ -89,23 +95,21 @@ public class ModuleIO2023 implements ModuleIO {
         absEncoder = new DutyCycleEncoder(2);
         // absoluteEncoderOffset = Rotation2d.fromRadians(0); // TODO: TUNE
         absoluteEncoderOffset = Rotation2d.fromRadians(0.291);
-
+        isDriveMotorInverted = false;
         break;
       case Drive.BL:
         driveTalon = new TalonFX(1);
         turnTalon = new TalonFX(5);
         absEncoder = new DutyCycleEncoder(1);
         // absoluteEncoderOffset = Rotation2d.fromRadians(0); // TODO: TUNE
-        absoluteEncoderOffset = Rotation2d.fromRadians(2.741);
-
+        absoluteEncoderOffset = Rotation2d.fromRadians(2.741 - Math.PI);
         break;
       case Drive.BR:
         driveTalon = new TalonFX(4);
         turnTalon = new TalonFX(8);
         absEncoder = new DutyCycleEncoder(3);
         // absoluteEncoderOffset = Rotation2d.fromRadians(0); // TODO: TUNE
-        absoluteEncoderOffset = Rotation2d.fromRadians(-2.124);
-
+        absoluteEncoderOffset = Rotation2d.fromRadians(-2.124 + Math.PI);
         break;
       default:
         throw new RuntimeException("Invalid module index");
@@ -116,11 +120,11 @@ public class ModuleIO2023 implements ModuleIO {
     driveConfig.CurrentLimits.StatorCurrentLimit = 40.0;
     driveConfig.CurrentLimits.StatorCurrentLimitEnable = true;
     driveConfig.Feedback.SensorToMechanismRatio = DRIVE_GEAR_RATIO;
-    driveConfig.Slot0.kP = 0.0;
-    driveConfig.Slot0.kD = 0;
+    driveConfig.Slot0.kP = 0.0; // 2.402346
     driveConfig.Slot0.kI = 0;
+    driveConfig.Slot0.kD = 0;
     driveConfig.Slot0.kS = 0.0;
-    driveConfig.Slot0.kV = 0.0;
+    driveConfig.Slot0.kV = 0.5;
     driveConfig.Slot0.kA = 0.0;
     driveTalon.getConfigurator().apply(driveConfig);
     setDriveBrakeMode(true);
@@ -128,13 +132,15 @@ public class ModuleIO2023 implements ModuleIO {
     turnConfig.CurrentLimits.StatorCurrentLimit = 30.0;
     turnConfig.CurrentLimits.StatorCurrentLimitEnable = true;
     turnConfig.Feedback.SensorToMechanismRatio = TURN_GEAR_RATIO;
-    turnConfig.ClosedLoopGeneral.ContinuousWrap = true;
-    turnConfig.Slot0.kP = 0.0;
+    turnConfig.Slot0.kP = 14.41407;
     turnConfig.Slot0.kI = 0.0;
-    turnConfig.Slot0.kD = 0.0;
+    turnConfig.Slot0.kD = 0.288281;
     turnConfig.Slot0.kS = 0.0;
+    turnConfig.ClosedLoopGeneral.ContinuousWrap = true;
     turnTalon.getConfigurator().apply(turnConfig);
     setTurnBrakeMode(true);
+
+    turnTalon.setPosition(Units.radiansToRotations(absEncoder.getAbsolutePosition() * (isAbsEncoderInverted ? -1.0 : 1.0) - absoluteEncoderOffset.getRadians()));
 
     drivePosition = driveTalon.getPosition();
     drivePositionQueue =
@@ -162,8 +168,14 @@ public class ModuleIO2023 implements ModuleIO {
         turnVelocity,
         turnAppliedVolts,
         turnCurrent);
-    driveTalon.optimizeBusUtilization();
-    turnTalon.optimizeBusUtilization();
+    // driveTalon.optimizeBusUtilization();
+    // turnTalon.optimizeBusUtilization();
+
+    driveOut_V = new VoltageOut(0);
+    turnOut_V = new VoltageOut(0);
+
+    driveOut_rotps = new VelocityVoltage(0);
+    turnOut_rot = new PositionVoltage(0, 0, true, 0, 0, false, false, false);
   }
 
   @Override
@@ -178,10 +190,8 @@ public class ModuleIO2023 implements ModuleIO {
         turnAppliedVolts,
         turnCurrent);
 
-    inputs.drivePositionRad =
-        Units.rotationsToRadians(drivePosition.getValueAsDouble());
-    inputs.driveVelocityRadPerSec =
-        Units.rotationsToRadians(driveVelocity.getValueAsDouble());
+    inputs.drivePositionRad = Units.rotationsToRadians(drivePosition.getValueAsDouble());
+    inputs.driveVelocityRadPerSec = Units.rotationsToRadians(driveVelocity.getValueAsDouble());
     inputs.driveAppliedVolts = driveAppliedVolts.getValueAsDouble();
     inputs.driveCurrentAmps = new double[] {driveCurrent.getValueAsDouble()};
 
@@ -206,28 +216,37 @@ public class ModuleIO2023 implements ModuleIO {
 
   @Override
   public void setDriveVoltage(double volts) {
-    driveTalon.setControl(new VoltageOut(volts));
+    driveTalon.setControl(driveOut_V.withOutput(volts));
   }
 
   @Override
   public void setDriveVelocity(double velocity) {
-    driveTalon.setControl(new VelocityVoltage(velocity));
+    double vel_mps = MathUtil.clamp(velocity, -Drive.MAX_LINEAR_SPEED, Drive.MAX_LINEAR_SPEED);
+
+    double vel_radps = vel_mps / Module.WHEEL_RADIUS;
+    double vel_rotps = Units.radiansToRotations(vel_radps);
+
+    driveTalon.setControl(driveOut_rotps.withVelocity(vel_rotps));
   }
 
   @Override
   public void setTurnVoltage(double volts) {
-    turnTalon.setControl(new VoltageOut(volts));
+    turnTalon.setControl(turnOut_V.withOutput(volts));
   }
 
   @Override
   public void setTurnAngle(double rad) {
-    turnTalon.setControl(new PositionVoltage(rad));
+    turnTalon.setControl(
+        turnOut_rot.withPosition(Units.radiansToRotations(rad)));
   }
 
   @Override
   public void setDriveBrakeMode(boolean enable) {
     var config = new MotorOutputConfigs();
-    config.Inverted = InvertedValue.CounterClockwise_Positive;
+    config.Inverted =
+        isDriveMotorInverted
+            ? InvertedValue.Clockwise_Positive
+            : InvertedValue.CounterClockwise_Positive;
     config.NeutralMode = enable ? NeutralModeValue.Brake : NeutralModeValue.Coast;
     driveTalon.getConfigurator().apply(config);
   }

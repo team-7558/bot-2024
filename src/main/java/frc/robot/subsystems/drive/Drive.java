@@ -119,10 +119,10 @@ public class Drive extends StateMachineSubsystemBase {
 
     super("Drive");
     this.gyroIO = gyroIO;
-    modules[FL] = new Module(flModuleIO, FL, Mode.VOLTAGE);
-    modules[FR] = new Module(frModuleIO, FR, Mode.VOLTAGE);
-    modules[BL] = new Module(blModuleIO, BL, Mode.VOLTAGE);
-    modules[BR] = new Module(brModuleIO, BR, Mode.VOLTAGE);
+    modules[FL] = new Module(flModuleIO, FL, Mode.SETPOINT);
+    modules[FR] = new Module(frModuleIO, FR, Mode.SETPOINT);
+    modules[BL] = new Module(blModuleIO, BL, Mode.SETPOINT);
+    modules[BR] = new Module(brModuleIO, BR, Mode.SETPOINT);
 
     // Configure AutoBuilder for PathPlanner
     AutoBuilder.configureHolonomic(
@@ -176,7 +176,7 @@ public class Drive extends StateMachineSubsystemBase {
           public void periodic() {
             double throttle = 1.0;
             throttle = Util.lerp(1, 0.2, OI.DR.getRightTriggerAxis());
-            drive(-OI.DR.getLeftY(), -OI.DR.getLeftX() * 0.0, -OI.DR.getRightX() * 0.5, throttle);
+            drive(-OI.DR.getLeftY(), -OI.DR.getLeftX(), -OI.DR.getRightX() * 0.5, throttle);
           }
         };
 
