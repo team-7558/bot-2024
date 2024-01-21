@@ -14,12 +14,22 @@
 package frc.robot.subsystems.shooter;
 
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.util.Units;
 import frc.robot.Constants;
 import frc.robot.subsystems.StateMachineSubsystemBase;
+import frc.robot.subsystems.drive.Drive;
+
 import org.littletonrobotics.junction.Logger;
 
 public class Shooter extends StateMachineSubsystemBase {
+
+  private static double SHOOTER_HEIGHT = 0;
+
+  private static double SPEAKER_HEIGHT_DIFFERENCE = 3; // fill
+  private static Pose3d SPEAKER_POSE = new Pose3d(); // fill
 
   private static Shooter instance;
 
@@ -144,6 +154,33 @@ public class Shooter extends StateMachineSubsystemBase {
   public void runCharacterizationVolts(double volts) {
     io.setFlywheelVoltage(volts);
   }
+
+  /**
+   * Returns the required hardware states to be able to shoot in speaker
+   */
+  public ShooterState getStateToSpeaker() {
+    Pose2d pose2d = Drive.getInstance().getPose();
+    Pose3d currentPose = new Pose3d(pose2d.getX(),SHOOTER_HEIGHT,pose2d.getY(),new Rotation3d());
+
+    double distanceToSpeaker = Math.sqrt(Math.pow(currentPose.getX() - SPEAKER_POSE.getX(), 2) + Math.pow(currentPose.getY() - SPEAKER_POSE.getY(), 2) + Math.pow(currentPose.getZ() - SPEAKER_POSE.getZ(), 2));
+
+    ShooterState state = new ShooterState();
+
+    // needs to be changed if the angle to hit target at is > 0
+    double angle = Math.toDegrees(Math.atan((-2 * SPEAKER_HEIGHT_DIFFERENCE)/ -distanceToSpeaker));
+    // gravity squared
+    double velocity = (Math.sqrt(-((96.177*(1 + Math.tan(Math.toRadians(angle)))/((2 * SPEAKER_HEIGHT_DIFFERENCE) - (2*distanceToSpeaker*Math.tan(Math.toRadians(angle))))))));
+    // needs to be rotation from the thing
+    double turretPosition = SPEAKER_POSE.toPose2d().getRotation().getDegrees();
+
+    state.setHoodPosition(angle);
+    state.setShooterVelocityRadPerSec(velocity);
+    state.setTurretPosition(turretPosition);
+
+    return state;
+  }
+
+
 
 
   
