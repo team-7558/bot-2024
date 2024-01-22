@@ -12,6 +12,7 @@ public interface ShooterIO {
         public double turretAppliedVolts = 0.0;
         public double turretPositionRad = 0.0;
         public double[] currentAmps = new double[] {};
+        public boolean beamBreakActivated =  true;
 
     }
             /** Updates the set of loggable inputs. */

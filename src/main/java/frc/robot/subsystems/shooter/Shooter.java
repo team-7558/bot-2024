@@ -51,7 +51,7 @@ public class Shooter extends StateMachineSubsystemBase {
     return instance;
   }
 
-  public final State DISABLED, IDLE;
+  public final State DISABLED, IDLE, LOCKONT;
 
   private final ShooterIO io;
 
@@ -113,6 +113,22 @@ public class Shooter extends StateMachineSubsystemBase {
           @Override
           public void exit() {}
         };
+
+
+        //turent locks on to target and follow it
+      LOCKONT =
+            new State("LOCKONT"){
+              @Override
+              public void init() {
+                stop();
+              }
+
+              @Override
+              public void periodic() {}
+
+              @Override
+              public void exit() {}
+            };
 
    
   }
