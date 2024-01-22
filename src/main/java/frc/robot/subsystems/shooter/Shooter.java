@@ -45,6 +45,7 @@ public class Shooter extends StateMachineSubsystemBase {
 
   private final ShooterIO io;
 
+  
   private final SimpleMotorFeedforward ffModel;
   // hoodangle at 1 rad because angle of hood at max height is around 60 degrees, turret is 180
   // degrees turret so 90 seems like it would be ok

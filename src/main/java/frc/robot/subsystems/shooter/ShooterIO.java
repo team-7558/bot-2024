@@ -5,9 +5,9 @@ public interface ShooterIO {
     public static class ShooterIOInputs{
         public double flywheelVelocityRadPerSec = 0.0;
         public double flywheelAppliedVolts = 0.0;
-        public double hoodPositionRad = 0.0;
-        public double hoodAppliedVolts = 0.0;
-        public double hoodVelocityRadPerSec = 0.0;
+        // public double hoodPositionRad = 0.0;
+        // public double hoodAppliedVolts = 0.0;
+        // public double hoodVelocityRadPerSec = 0.0;
         public double turretVelocityRadPerSec = 0.0;
         public double turretAppliedVolts = 0.0;
         public double turretPositionRad = 0.0;
