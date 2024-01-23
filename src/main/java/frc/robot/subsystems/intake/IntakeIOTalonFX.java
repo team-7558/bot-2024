@@ -25,6 +25,7 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DigitalInput;
+import frc.robot.util.Util;
 
 public class IntakeIOTalonFX implements IntakeIO {
   private static final double GEAR_RATIO = 0;
@@ -122,9 +123,10 @@ public class IntakeIOTalonFX implements IntakeIO {
   }
 
   @Override
-  public void setDirectionSpeed(double speed) {
+  public void setDirectionSpeed(double speed) { // speed value would be -12/12
+    double result = Util.limit(speed * 12.0, -12.0, 12.0);
     topMotor.setControl(
-        new DutyCycleOut(speed));
+        new VoltageOut(result));
   }
 
   @Override

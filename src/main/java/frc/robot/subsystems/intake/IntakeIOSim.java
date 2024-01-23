@@ -10,9 +10,9 @@ import frc.robot.Constants;
 
 public class IntakeIOSim implements IntakeIO {
 
-  private FlywheelSim simIntake = new FlywheelSim(DCMotor.getFalcon500(3), 1.5, 0.004);
-  private FlywheelSim simElevator = new FlywheelSim(DCMotor.getFalcon500(3), 1.5, 0.004);
-  private FlywheelSim simDirection = new FlywheelSim(DCMotor.getFalcon500(3), 1.5, 0.004);
+  private FlywheelSim simIntake = new FlywheelSim(DCMotor.getFalcon500(1), 1.5, 0.004);
+  private FlywheelSim simElevator = new FlywheelSim(DCMotor.getFalcon500(1), 1.5, 0.004);
+  private FlywheelSim simDirection = new FlywheelSim(DCMotor.getFalcon500(1), 1.5, 0.004);
 
 
   // private boolean closedLoop = false;
