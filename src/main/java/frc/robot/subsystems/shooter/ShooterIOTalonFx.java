@@ -9,17 +9,25 @@ import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.Servo;
 
 public class ShooterIOTalonFx implements ShooterIO {
 
   private static final double GEAR_RATIO = 1.5;
   // set id to zero since we dont have them yet
-  private final TalonFX talonL = new TalonFX(0);
-  private final TalonFX talonR = new TalonFX(0);
-  private final TalonFX turrent = new TalonFX(0);
-  private final TalonFX hood = new TalonFX(0);
+  private final TalonFX talonL = new TalonFX(35);
+  private final TalonFX talonR = new TalonFX(36);
+  private final TalonFX turrent = new TalonFX(37);
+
+  // change to actual id's
+  private final Servo leftTilt = new Servo(0);
+  private final Servo rightTilt = new Servo(1);
+  
+  
 
   // getting stats from robot
   private final StatusSignal<Double> LVelocity = talonL.getVelocity();
@@ -35,14 +43,9 @@ public class ShooterIOTalonFx implements ShooterIO {
   private final StatusSignal<Double> TCurrent = turrent.getStatorCurrent();
   private final StatusSignal<Double> TPosition = turrent.getPosition();
 
-  private final StatusSignal<Double> HVelocity = hood.getVelocity();
-  private final StatusSignal<Double> HAppliedVolts = hood.getMotorVoltage();
-  private final StatusSignal<Double> HCurrent = hood.getStatorCurrent();
-  private final StatusSignal<Double> HPosition = hood.getPosition();
-
-  // sensors??? ethan told me to put but prob dont need (prob do)
-  private final DigitalInput bottomSensor = new DigitalInput(0);
-  private final DigitalInput topSensor = new DigitalInput(0);
+  // // sensors??? ethan told me to put but prob dont need (prob do)
+  // private final DigitalInput bottomSensor = new DigitalInput(0);
+  // private final DigitalInput topSensor = new DigitalInput(0);
 
   public ShooterIOTalonFx() {
     var config = new TalonFXConfiguration();
@@ -58,7 +61,9 @@ public class ShooterIOTalonFx implements ShooterIO {
     talonL.getConfigurator().apply(config);
     talonR.getConfigurator().apply(config);
     turrent.getConfigurator().apply(config);
-    hood.getConfigurator().apply(config);
+
+    leftTilt.setBoundsMicroseconds(2000, 1800, 1500, 1200, 1000);
+    rightTilt.setBoundsMicroseconds(2000, 1800, 1500, 1200, 1000);
 
     talonL.setControl(new Follower(talonR.getDeviceID(), false));
     BaseStatusSignal.setUpdateFrequencyForAll(
@@ -72,15 +77,10 @@ public class ShooterIOTalonFx implements ShooterIO {
         TVelocity,
         TAppliedVolts,
         TCurrent,
-        HVelocity,
-        HAppliedVolts,
-        HCurrent,
-        TPosition,
-        HPosition);
+        TPosition);
     talonL.optimizeBusUtilization();
     talonR.optimizeBusUtilization();
     turrent.optimizeBusUtilization();
-    hood.optimizeBusUtilization();
   }
 
   @Override
@@ -98,7 +98,6 @@ public class ShooterIOTalonFx implements ShooterIO {
     config.kP = kP;
     config.kI = kI;
     config.kD = kD;
-    hood.getConfigurator().apply(config);
   }
 
   @Override
@@ -125,15 +124,21 @@ public class ShooterIOTalonFx implements ShooterIO {
 
   @Override
   public void setTurretAngle(double angle) {
-    hood.setPosition(angle);
+    
   }
 
   @Override
   public void stop() {
     talonL.stopMotor();
     talonR.stopMotor();
-    hood.stopMotor();
     turrent.stopMotor();
+  }
+
+  @Override
+  public void setTilt(double angle) {
+    double checkedAngle = MathUtil.clamp(angle, 0, 1);
+    leftTilt.setPosition(checkedAngle);
+    leftTilt.setPosition(checkedAngle);
   }
 
   @Override
@@ -153,5 +158,8 @@ public class ShooterIOTalonFx implements ShooterIO {
         Units.rotationsToRadians(LVelocity.getValueAsDouble()) / GEAR_RATIO;
     inputs.flywheelAppliedVolts = LAppliedVolts.getValueAsDouble();
     inputs.currentAmps = new double[] {LAppliedVolts.getValueAsDouble()};
+
+    inputs.linearActuatorPositionLeft = leftTilt.getPosition();
+    inputs.linearActuatorPositionRight = rightTilt.getPosition();
   }
 }
