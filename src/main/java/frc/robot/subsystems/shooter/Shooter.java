@@ -21,7 +21,6 @@ import edu.wpi.first.math.util.Units;
 import frc.robot.Constants;
 import frc.robot.subsystems.StateMachineSubsystemBase;
 import frc.robot.subsystems.drive.Drive;
-
 import org.littletonrobotics.junction.Logger;
 
 public class Shooter extends StateMachineSubsystemBase {
@@ -51,11 +50,11 @@ public class Shooter extends StateMachineSubsystemBase {
     return instance;
   }
 
-  public final State DISABLED, IDLE, LOCKONT;
+  public final State DISABLED, IDLE, LOCKONT, SHOOTING;
+  private final ShooterIOInputsAutoLogged inputs = new ShooterIOInputsAutoLogged();
 
   private final ShooterIO io;
 
-  
   private final SimpleMotorFeedforward ffModel;
   // hoodangle at 1 rad because angle of hood at max height is around 60 degrees, turret is 180
   // degrees turret so 90 seems like it would be ok
@@ -114,28 +113,39 @@ public class Shooter extends StateMachineSubsystemBase {
           public void exit() {}
         };
 
+    // turent locks on to target and follow it
+    LOCKONT =
+        new State("LOCKONT") {
+          @Override
+          public void init() {
+            stop();
+          }
 
-        //turent locks on to target and follow it
-      LOCKONT =
-            new State("LOCKONT"){
-              @Override
-              public void init() {
-                stop();
-              }
+          @Override
+          public void periodic() {}
 
-              @Override
-              public void periodic() {}
+          @Override
+          public void exit() {}
+        };
 
-              @Override
-              public void exit() {}
-            };
+    SHOOTING =
+        new State("SHOOTING") {
+          @Override
+          public void init() {
+            stop();
+          }
 
-   
+          @Override
+          public void periodic() {}
+
+          @Override
+          public void exit() {}
+        };
   }
 
   @Override
   public void inputPeriodic() {
-    
+    io.updateInputs(inputs);
   }
 
   @Override
@@ -154,17 +164,17 @@ public class Shooter extends StateMachineSubsystemBase {
     Logger.recordOutput("FlywheelSetpointRPM", velocityRPM);
   }
 
-  /** Stops the flywheel. */
+  /** Stops Everything */
   public void stop() {
     io.stop();
   }
 
   /** Returns the current velocity in RPM. */
   public double getVelocityRPM() {
-    return 0.0;
-    //will return something different when we get the inputs
+    
+    
 
-   // return Units.radiansPerSecondToRotationsPerMinute(inputs.flywheelVelocityRadPerSec);
+    return Units.radiansPerSecondToRotationsPerMinute(inputs.flywheelVelocityRadPerSec);
   }
 
   /** Runs forwards at the commanded voltage. */
@@ -172,21 +182,28 @@ public class Shooter extends StateMachineSubsystemBase {
     io.setFlywheelVoltage(volts);
   }
 
-  /**
-   * Returns the required hardware states to be able to shoot in speaker
-   */
+  /** Returns the required hardware states to be able to shoot in speaker */
   public ShooterState getStateToSpeaker() {
     Pose2d pose2d = Drive.getInstance().getPose();
-    Pose3d currentPose = new Pose3d(pose2d.getX(),SHOOTER_HEIGHT,pose2d.getY(),new Rotation3d());
+    Pose3d currentPose = new Pose3d(pose2d.getX(), SHOOTER_HEIGHT, pose2d.getY(), new Rotation3d());
 
-    double distanceToSpeaker = Math.sqrt(Math.pow(currentPose.getX() - SPEAKER_POSE.getX(), 2) + Math.pow(currentPose.getY() - SPEAKER_POSE.getY(), 2) + Math.pow(currentPose.getZ() - SPEAKER_POSE.getZ(), 2));
+    double distanceToSpeaker =
+        Math.sqrt(
+            Math.pow(currentPose.getX() - SPEAKER_POSE.getX(), 2)
+                + Math.pow(currentPose.getY() - SPEAKER_POSE.getY(), 2)
+                + Math.pow(currentPose.getZ() - SPEAKER_POSE.getZ(), 2));
 
     ShooterState state = new ShooterState();
 
     // needs to be changed if the angle to hit target at is > 0
-    double angle = Math.toDegrees(Math.atan((-2 * SPEAKER_HEIGHT_DIFFERENCE)/ -distanceToSpeaker));
+    double angle = Math.toDegrees(Math.atan((-2 * SPEAKER_HEIGHT_DIFFERENCE) / -distanceToSpeaker));
     // gravity squared
-    double velocity = (Math.sqrt(-((96.177*(1 + Math.tan(Math.toRadians(angle)))/((2 * SPEAKER_HEIGHT_DIFFERENCE) - (2*distanceToSpeaker*Math.tan(Math.toRadians(angle))))))));
+    double velocity =
+        (Math.sqrt(
+            -((96.177
+                * (1 + Math.tan(Math.toRadians(angle)))
+                / ((2 * SPEAKER_HEIGHT_DIFFERENCE)
+                    - (2 * distanceToSpeaker * Math.tan(Math.toRadians(angle))))))));
     // needs to be rotation from the thing
     double turretPosition = SPEAKER_POSE.toPose2d().getRotation().getDegrees();
 
@@ -196,9 +213,4 @@ public class Shooter extends StateMachineSubsystemBase {
 
     return state;
   }
-
-
-
-
-  
 }

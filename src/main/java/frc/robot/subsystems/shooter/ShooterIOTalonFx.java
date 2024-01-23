@@ -13,93 +13,145 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DigitalInput;
 
 public class ShooterIOTalonFx implements ShooterIO {
-    //these talons are for testing shooter on wood thing
-     private final TalonFX talonL = new TalonFX(31);
-     private final TalonFX talonR = new TalonFX(32);
 
-        //getting stuff
-        private final StatusSignal<Double> LVelocity = talonL.getVelocity();
-        private final StatusSignal<Double> LAppliedVolts = talonL.getMotorVoltage();
-        private final StatusSignal<Double> LCurrent = talonL.getStatorCurrent();
-        
-        private final StatusSignal<Double> RVelocity = talonR.getVelocity();
-        private final StatusSignal<Double> RAppliedVolts = talonR.getMotorVoltage();
-        private final StatusSignal<Double> RCurrent = talonR.getStatorCurrent();
+  private static final double GEAR_RATIO = 1.5;
+  // set id to zero since we dont have them yet
+  private final TalonFX talonL = new TalonFX(0);
+  private final TalonFX talonR = new TalonFX(0);
+  private final TalonFX turrent = new TalonFX(0);
+  private final TalonFX hood = new TalonFX(0);
 
+  // getting stats from robot
+  private final StatusSignal<Double> LVelocity = talonL.getVelocity();
+  private final StatusSignal<Double> LAppliedVolts = talonL.getMotorVoltage();
+  private final StatusSignal<Double> LCurrent = talonL.getStatorCurrent();
 
+  private final StatusSignal<Double> RVelocity = talonR.getVelocity();
+  private final StatusSignal<Double> RAppliedVolts = talonR.getMotorVoltage();
+  private final StatusSignal<Double> RCurrent = talonR.getStatorCurrent();
 
-        //sensors??? ethan told me to put but prob dont need (prob do)
-       private final DigitalInput bottomSensor = new DigitalInput(0);
-        private final DigitalInput topSensor = new DigitalInput(1);
-    public ShooterIOTalonFx(){
-        var config = new TalonFXConfiguration();
-        config.CurrentLimits.StatorCurrentLimit = 30.0;
-        config.CurrentLimits.StatorCurrentLimitEnable = true;
-        config.MotorOutput.NeutralMode = NeutralModeValue.Coast;
-        config.Slot0.kP = 0;
-        config.Slot0.kI = 0;
-        config.Slot0.kD = 0;
-        config.Slot0.kS = 0;
-        config.Slot0.kV = 0;
-        config.Slot0.kA = 0;
-        talonL.getConfigurator().apply(config);
-        talonR.getConfigurator().apply(config);
+  private final StatusSignal<Double> TVelocity = turrent.getVelocity();
+  private final StatusSignal<Double> TAppliedVolts = turrent.getMotorVoltage();
+  private final StatusSignal<Double> TCurrent = turrent.getStatorCurrent();
+  private final StatusSignal<Double> TPosition = turrent.getPosition();
 
-        talonL.setControl(new Follower(talonR.getDeviceID(), false));
-        BaseStatusSignal.setUpdateFrequencyForAll(50.0, LVelocity, LAppliedVolts, LCurrent, RVelocity, RAppliedVolts, RCurrent);
-        talonL.optimizeBusUtilization();
-        talonR.optimizeBusUtilization();
-        
-    }
+  private final StatusSignal<Double> HVelocity = hood.getVelocity();
+  private final StatusSignal<Double> HAppliedVolts = hood.getMotorVoltage();
+  private final StatusSignal<Double> HCurrent = hood.getStatorCurrent();
+  private final StatusSignal<Double> HPosition = hood.getPosition();
 
-    @Override
-    public void flywheelConfigurePID(double kP, double kI, double kD) {
-       var config = new Slot0Configs();
-        config.kP = kP;
-        config.kI = kI;
-        config.kD = kD;
-        talonL.getConfigurator().apply(config);
-        
-    }
+  // sensors??? ethan told me to put but prob dont need (prob do)
+  private final DigitalInput bottomSensor = new DigitalInput(0);
+  private final DigitalInput topSensor = new DigitalInput(0);
 
-    @Override
-    public void hoodConfigurePID(double kP, double kI, double kD) {
-        
-    }
+  public ShooterIOTalonFx() {
+    var config = new TalonFXConfiguration();
+    config.CurrentLimits.StatorCurrentLimit = 30.0;
+    config.CurrentLimits.StatorCurrentLimitEnable = true;
+    config.MotorOutput.NeutralMode = NeutralModeValue.Coast;
+    config.Slot0.kP = 0;
+    config.Slot0.kI = 0;
+    config.Slot0.kD = 0;
+    config.Slot0.kS = 0;
+    config.Slot0.kV = 0;
+    config.Slot0.kA = 0;
+    talonL.getConfigurator().apply(config);
+    talonR.getConfigurator().apply(config);
+    turrent.getConfigurator().apply(config);
+    hood.getConfigurator().apply(config);
 
-    @Override
-    public void setFlywheelVelocity(double velocityRadPerSec, double ffVolts) {
-         double ACCLERATION = 2.0;
-     talonL.setControl(
+    talonL.setControl(new Follower(talonR.getDeviceID(), false));
+    BaseStatusSignal.setUpdateFrequencyForAll(
+        50.0,
+        LVelocity,
+        LAppliedVolts,
+        LCurrent,
+        RVelocity,
+        RAppliedVolts,
+        RCurrent,
+        TVelocity,
+        TAppliedVolts,
+        TCurrent,
+        HVelocity,
+        HAppliedVolts,
+        HCurrent,
+        TPosition,
+        HPosition);
+    talonL.optimizeBusUtilization();
+    talonR.optimizeBusUtilization();
+    turrent.optimizeBusUtilization();
+    hood.optimizeBusUtilization();
+  }
+
+  @Override
+  public void flywheelConfigurePID(double kP, double kI, double kD) {
+    var config = new Slot0Configs();
+    config.kP = kP;
+    config.kI = kI;
+    config.kD = kD;
+    talonL.getConfigurator().apply(config);
+  }
+
+  @Override
+  public void hoodConfigurePID(double kP, double kI, double kD) {
+    var config = new Slot0Configs();
+    config.kP = kP;
+    config.kI = kI;
+    config.kD = kD;
+    hood.getConfigurator().apply(config);
+  }
+
+  @Override
+  public void setFlywheelVelocity(double velocityRadPerSec, double ffVolts) {
+    double ACCLERATION = 2.0;
+    talonL.setControl(
         new VelocityVoltage(
-            Units.radiansToRotations(velocityRadPerSec), ACCLERATION, true, ffVolts, 0, false, false, false));
+            Units.radiansToRotations(velocityRadPerSec),
+            ACCLERATION,
+            true,
+            ffVolts,
+            0,
+            false,
+            false,
+            false));
 
-    }
-
-    @Override
-    public void setFlywheelVoltage(double volts) {
-        talonL.setControl(new VoltageOut(volts));
-    }
-
-    @Override
-    public void setTurretAngle() {
-   
-    }
-
-    @Override
-    public void stop() {
-        talonL.stopMotor();
-        
-    }
-
-    @Override
-    public void turretConfigurePID(double kP, double kI, double kD) {
-     
-    }
-
-    @Override
-    public void updateInputs(ShooterIOInputs inputs) {
-      
-    }
     
+  }
+
+  @Override
+  public void setFlywheelVoltage(double volts) {
+    talonL.setControl(new VoltageOut(volts));
+  }
+
+  @Override
+  public void setTurretAngle(double angle) {
+    hood.setPosition(angle);
+  }
+
+  @Override
+  public void stop() {
+    talonL.stopMotor();
+    talonR.stopMotor();
+    hood.stopMotor();
+    turrent.stopMotor();
+  }
+
+  @Override
+  public void turretConfigurePID(double kP, double kI, double kD) {
+    var config = new Slot0Configs();
+    config.kP = kP;
+    config.kI = kI;
+    config.kD = kD;
+    turrent.getConfigurator().apply(config);
+  }
+
+  @Override
+  public void updateInputs(ShooterIOInputs inputs) {
+    BaseStatusSignal.refreshAll(LVelocity, LAppliedVolts, LCurrent);
+
+    inputs.flywheelVelocityRadPerSec =
+        Units.rotationsToRadians(LVelocity.getValueAsDouble()) / GEAR_RATIO;
+    inputs.flywheelAppliedVolts = LAppliedVolts.getValueAsDouble();
+    inputs.currentAmps = new double[] {LAppliedVolts.getValueAsDouble()};
+  }
 }
