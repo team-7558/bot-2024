@@ -65,19 +65,19 @@ public class Drive extends StateMachineSubsystemBase {
   // -- VISION CONSTANTS --
 
   // maximum distance on high fps, low res before we switch the camera to high res lower fps
-  public static final double MAX_DISTANCE = 4.0;
+  public static final double MAX_DISTANCE = 3.0;
 
   // minimum distance to be on low fps high res before we switch the camera to high fps low res
-  public static final double MIN_DISTANCE = 4.1;
+  public static final double MIN_DISTANCE = 3.1;
 
   // distance to cut off all pose estimation because its too inaccurate
   public static final double CUTOFF_DISTANCE = 7.0;
 
   // default pipeline, tracking apriltags at high FPS.
-  public static final int HIGH_FPS_PIPELINE_ID = 0;
+  public static final int HIGH_FPS_PIPELINE_ID = 1;
 
   // secondary pipeline, tracking apriltags at high res and low FPS.
-  public static final int HIGH_RES_PIPELINE_ID = 1;
+  public static final int HIGH_RES_PIPELINE_ID = 0;
 
   // ratio for the distance scaling on the standard deviation
   private static final double APRILTAG_COEFFICIENT = 0.01; // NEEDS TO BE TUNED
@@ -93,12 +93,18 @@ public class Drive extends StateMachineSubsystemBase {
         case REAL:
           // Real robot, instantiate hardware IO implementations
           instance =
+              // new Drive(
+              //     new GyroIOPigeon2(),
+              //     new ModuleIO2023(0),
+              //     new ModuleIO2023(1),
+              //     new ModuleIO2023(2),
+              //     new ModuleIO2023(3));
               new Drive(
-                  new GyroIOPigeon2(),
-                  new ModuleIO2023(0),
-                  new ModuleIO2023(1),
-                  new ModuleIO2023(2),
-                  new ModuleIO2023(3));
+                  new GyroIO() {},
+                  new ModuleIO() {},
+                  new ModuleIO() {},
+                  new ModuleIO() {},
+                  new ModuleIO() {});
           break;
 
         case SIM:
@@ -321,7 +327,7 @@ public class Drive extends StateMachineSubsystemBase {
     if (vision.hasTagInView()) {
       for (int i = 0; i < vision.getCameras(); i++) {
         double tagID = vision.getTagID(i);
-        if (tagID != -1) {
+        if (tagID > 0) {
           double timestamp = vision.getTimestamp(i);
           int pipelineID = vision.getPipeline(i);
 
@@ -333,21 +339,20 @@ public class Drive extends StateMachineSubsystemBase {
 
           // distance between tag and estimated pose
           double translationDistance =
-            tagPose2d.getTranslation().getDistance(getPose().getTranslation());
+              tagPose2d.getTranslation().getDistance(getPose().getTranslation());
 
           // implementing cutoff
-          if(translationDistance > CUTOFF_DISTANCE) continue;
+          if (translationDistance > CUTOFF_DISTANCE) continue;
 
           // adding to the pose estimator with the timestamp
           poseEstimator.addVisionMeasurement(estimatedPose, timestamp);
 
-
-          
-
           // check distance and increase res if bigger (only if the pipeline isnt already switched)
-          if (translationDistance >= MIN_DISTANCE &&  pipelineID != HIGH_RES_PIPELINE_ID) {
+          if (translationDistance >= MIN_DISTANCE && pipelineID != HIGH_RES_PIPELINE_ID) {
+            System.out.println("should switch to high res");
             vision.setPipeline(i, HIGH_RES_PIPELINE_ID);
           } else if (translationDistance <= MAX_DISTANCE && pipelineID != HIGH_FPS_PIPELINE_ID) {
+            System.out.println("should switch to low fps");
             vision.setPipeline(i, HIGH_FPS_PIPELINE_ID);
           }
         }

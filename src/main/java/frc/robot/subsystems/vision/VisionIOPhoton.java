@@ -4,6 +4,8 @@ import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Transform3d;
 import java.io.IOException;
+import java.util.Optional;
+import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonPoseEstimator;
 import org.photonvision.PhotonPoseEstimator.PoseStrategy;
@@ -22,10 +24,11 @@ public class VisionIOPhoton implements VisionIO {
       fieldLayout =
           AprilTagFieldLayout.loadFromResource(AprilTagFields.k2024Crescendo.m_resourceFile);
     } catch (IOException e) {
+      System.out.println("exception");
       e.printStackTrace();
     }
     this.poseEstimator =
-        new PhotonPoseEstimator(fieldLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, robotToCam);
+        new PhotonPoseEstimator(fieldLayout, PoseStrategy.LOWEST_AMBIGUITY, robotToCam);
   }
 
   @Override
@@ -36,12 +39,11 @@ public class VisionIOPhoton implements VisionIO {
       inputs.tagID = target.getFiducialId();
       inputs.xOffset = target.getYaw();
       inputs.yOffset = target.getPitch();
-      poseEstimator
-          .update(latestResult)
-          .ifPresent(
-              (pose) -> {
-                inputs.pose = pose.estimatedPose.toPose2d();
-              });
+      Optional<EstimatedRobotPose> poseOptional = poseEstimator.update(latestResult);
+      if (!poseOptional.isEmpty()) {
+        System.out.println("its not null");
+        inputs.pose = poseOptional.get().estimatedPose.toPose2d();
+      }
       inputs.pipelineID = camera.getPipelineIndex();
       inputs.timestamp = latestResult.getTimestampSeconds();
       inputs.latency = latestResult.getLatencyMillis();

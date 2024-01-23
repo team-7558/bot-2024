@@ -82,14 +82,14 @@ public class Vision extends SubsystemBase {
       case REAL:
         VisionIO cam0 =
             new VisionIOPhoton("camera1", new Transform3d()); // TODO: update transform & name
-        VisionIO cam1 =
-            new VisionIOPhoton("camera2", new Transform3d()); // TODO: update transform & name
-        VisionIO cam2 =
-            new VisionIOPhoton("camera3", new Transform3d()); // TODO: update transform & name
-        VisionIO cam3 =
-            new VisionIOPhoton("camera4", new Transform3d()); // TODO: update transform & name
-        VisionIO limelight = new VisionIOLimelight("limelight"); // TODO: update name
-        Vision v = new Vision(cam0, cam1, cam2, cam3, limelight);
+        // VisionIO cam1 =
+        //     new VisionIOPhoton("camera2", new Transform3d()); // TODO: update transform & name
+        // VisionIO cam2 =
+        //     new VisionIOPhoton("camera3", new Transform3d()); // TODO: update transform & name
+        // VisionIO cam3 =
+        //     new VisionIOPhoton("camera4", new Transform3d()); // TODO: update transform & name
+        // VisionIO limelight = new VisionIOLimelight("limelight"); // TODO: update name
+        Vision v = new Vision(cam0);
         return v;
       case SIM:
         VisionIOSim camzero =
