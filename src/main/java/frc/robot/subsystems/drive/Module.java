@@ -37,7 +37,7 @@ public class Module {
 
   private final SimpleMotorFeedforward driveFeedforward;
   private final PIDController driveFeedback;
-  private final PIDController turnFeedback;  
+  private final PIDController turnFeedback;
   public Mode mode = Mode.VOLTAGE;
   private Rotation2d angleSetpoint = null; // Setpoint for closed loop control, null for open loop
   private Double speedSetpoint = null; // Setpoint for closed loop control, null for open loop

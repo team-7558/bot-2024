@@ -18,7 +18,6 @@ import com.pathplanner.lib.pathfinding.Pathfinding;
 import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
 import com.pathplanner.lib.util.PathPlannerLogging;
 import com.pathplanner.lib.util.ReplanningConfig;
-
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -32,14 +31,12 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.OI;
 import frc.robot.subsystems.StateMachineSubsystemBase;
 import frc.robot.subsystems.drive.Module.Mode;
 import frc.robot.util.LocalADStarAK;
 import frc.robot.util.Util;
-
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import org.littletonrobotics.junction.AutoLogOutput;
@@ -52,57 +49,57 @@ public class Drive extends StateMachineSubsystemBase {
   private static final double TRACK_WIDTH_Y = Units.inchesToMeters(25.0);
   private static final double SKEW_CONSTANT = 0.06;
   private static final double DRIVE_BASE_RADIUS =
-  Math.hypot(TRACK_WIDTH_X / 2.0, TRACK_WIDTH_Y / 2.0);
+      Math.hypot(TRACK_WIDTH_X / 2.0, TRACK_WIDTH_Y / 2.0);
   public static final double MAX_ANGULAR_SPEED = MAX_LINEAR_SPEED / DRIVE_BASE_RADIUS;
 
   public static final Lock odometryLock = new ReentrantLock();
-  
+
   private static Drive instance;
-  
+
   public static Drive getInstance() {
-    
+
     if (instance == null) {
       switch (Constants.currentMode) {
         case REAL:
-        // Real robot, instantiate hardware IO implementations
-        instance =
-        new Drive(
-          new GyroIOPigeon2(),
-          new ModuleIO2023(0),
-          new ModuleIO2023(1),
-          new ModuleIO2023(2),
-          new ModuleIO2023(3));
+          // Real robot, instantiate hardware IO implementations
+          instance =
+              new Drive(
+                  new GyroIOPigeon2(),
+                  new ModuleIO2023(0),
+                  new ModuleIO2023(1),
+                  new ModuleIO2023(2),
+                  new ModuleIO2023(3));
           break;
 
-          case SIM:
+        case SIM:
           // Sim robot, instantiate physics sim IO implementations
           instance =
-          new Drive(
-            new GyroIO() {},
-            new ModuleIOSim(0),
-            new ModuleIOSim(1),
-            new ModuleIOSim(2),
-            new ModuleIOSim(3));
-            break;
-            
-            default:
-            // Replayed robot, disable IO implementations
-            instance =
-            new Drive(
-              new GyroIO() {},
-              new ModuleIO() {},
-              new ModuleIO() {},
-              new ModuleIO() {},
-              new ModuleIO() {});
-              break;
-            }
-          }
-          
+              new Drive(
+                  new GyroIO() {},
+                  new ModuleIOSim(0),
+                  new ModuleIOSim(1),
+                  new ModuleIOSim(2),
+                  new ModuleIOSim(3));
+          break;
+
+        default:
+          // Replayed robot, disable IO implementations
+          instance =
+              new Drive(
+                  new GyroIO() {},
+                  new ModuleIO() {},
+                  new ModuleIO() {},
+                  new ModuleIO() {},
+                  new ModuleIO() {});
+          break;
+      }
+    }
+
     return instance;
   }
 
   public final State DISABLED, SHOOTING, STRAFE_N_TURN, STRAFE_AUTOLOCK;
-  
+
   private final GyroIO gyroIO;
   private final GyroIOInputsAutoLogged gyroInputs = new GyroIOInputsAutoLogged();
   private final Module[] modules = new Module[4]; // FL, FR, BL, BR
@@ -110,7 +107,7 @@ public class Drive extends StateMachineSubsystemBase {
   private SwerveDriveKinematics kinematics = new SwerveDriveKinematics(getModuleTranslations());
   private double autolockSetpoint = 0;
   private Pose2d pose = new Pose2d();
-  private Rotation2d lastGyroRotation = new Rotation2d();  
+  private Rotation2d lastGyroRotation = new Rotation2d();
   private ChassisSpeeds chassisSpeeds = new ChassisSpeeds(0, 0, 0);
 
   private Drive(
@@ -150,7 +147,6 @@ public class Drive extends StateMachineSubsystemBase {
           Logger.recordOutput("Odometry/TrajectorySetpoint", targetPose);
         });
 
-        
     DISABLED =
         new State("DISABLED") {
 
@@ -158,22 +154,22 @@ public class Drive extends StateMachineSubsystemBase {
           public void init() {
             stop();
           }
-          
+
           @Override
           public void periodic() {}
-          
+
           @Override
           public void exit() {}
         };
-        
+
     SHOOTING =
-      new State("SHOOTING") {
+        new State("SHOOTING") {
           @Override
           public void periodic() {
             stopWithX();
           }
         };
-        
+
     STRAFE_N_TURN =
         new State("STRAFE N TURN") {
           @Override
@@ -183,7 +179,7 @@ public class Drive extends StateMachineSubsystemBase {
             drive(-OI.DR.getLeftY(), -OI.DR.getLeftX(), -OI.DR.getRightX() * 0.5, throttle);
           }
         };
-        
+
     STRAFE_AUTOLOCK =
         new State("STRAFE AUTOLOCK") {
           @Override
@@ -200,7 +196,7 @@ public class Drive extends StateMachineSubsystemBase {
             drive(-OI.DR.getLeftY(), -OI.DR.getLeftX(), -con, throttle);
           }
         };
-        setCurrentState(DISABLED);    
+    setCurrentState(DISABLED);
   }
 
   @Override
@@ -212,7 +208,7 @@ public class Drive extends StateMachineSubsystemBase {
     }
     odometryLock.unlock();
     Logger.processInputs("Drive/Gyro", gyroInputs);
-    for (var module : modules){
+    for (var module : modules) {
       module.inputPeriodic();
     }
   }
@@ -263,7 +259,7 @@ public class Drive extends StateMachineSubsystemBase {
       pose = pose.exp(twist);
     }
 
-    //TODO: figure out if needs to be moved into 250Hz processing loop    
+    // TODO: figure out if needs to be moved into 250Hz processing loop
     chassisSpeeds = kinematics.toChassisSpeeds(getModuleStates());
   }
 
@@ -384,7 +380,7 @@ public class Drive extends StateMachineSubsystemBase {
 
   /** Returns the current odometry rotation. */
   public Rotation2d getRotation() {
-    //TODO: figure out if this is good enough or instead use gyroInputs if it exists
+    // TODO: figure out if this is good enough or instead use gyroInputs if it exists
     return pose.getRotation();
   }
 
