@@ -38,11 +38,9 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Timer;
 import frc.robot.Constants;
 import frc.robot.OI;
-import frc.robot.RobotContainer;
 import frc.robot.subsystems.StateMachineSubsystemBase;
 import frc.robot.subsystems.drive.Module.Mode;
 import frc.robot.subsystems.vision.Vision;
-import frc.robot.subsystems.vision.VisionIOInputsAutoLogged;
 import frc.robot.util.LocalADStarAK;
 import frc.robot.util.Util;
 import java.io.IOException;
@@ -72,12 +70,6 @@ public class Drive extends StateMachineSubsystemBase {
 
   // distance to cut off all pose estimation because its too inaccurate
   public static final double CUTOFF_DISTANCE = 7.0;
-
-  // default pipeline, tracking apriltags at high FPS.
-  public static final int HIGH_FPS_PIPELINE_ID = 1;
-
-  // secondary pipeline, tracking apriltags at high res and low FPS.
-  public static final int HIGH_RES_PIPELINE_ID = 0;
 
   // ratio for the distance scaling on the standard deviation
   private static final double APRILTAG_COEFFICIENT = 0.01; // NEEDS TO BE TUNED
@@ -140,8 +132,6 @@ public class Drive extends StateMachineSubsystemBase {
   // IO
   private final GyroIO gyroIO;
   private final GyroIOInputsAutoLogged gyroInputs = new GyroIOInputsAutoLogged();
-
-  private final VisionIOInputsAutoLogged visionInputs = new VisionIOInputsAutoLogged();
 
   private final Module[] modules = new Module[4]; // FL, FR, BL, BR
 
@@ -270,7 +260,6 @@ public class Drive extends StateMachineSubsystemBase {
     }
     odometryLock.unlock();
     Logger.processInputs("Drive/Gyro", gyroInputs);
-    Logger.processInputs("Vision/Inputs", visionInputs);
     for (var module : modules) {
       module.inputPeriodic();
     }
@@ -327,8 +316,9 @@ public class Drive extends StateMachineSubsystemBase {
     // TODO: figure out if needs to be moved into 250Hz processing loop
     chassisSpeeds = kinematics.toChassisSpeeds(getModuleStates());
 
-    // TODO: see if this works on a bot
-    Vision vision = RobotContainer.vision;
+    // TODO: see if this works on a bot, also clean up, Vision should provide poses with timestamp
+    // to Drive
+    Vision vision = Vision.getInstance();
     if (vision.hasTagInView()) {
       for (int i = 0; i < vision.getCameras(); i++) {
         double tagID = vision.getTagID(i);
@@ -352,15 +342,10 @@ public class Drive extends StateMachineSubsystemBase {
           poseEstimator.addVisionMeasurement(estimatedPose, timestamp);
 
         } else {
-          if (vision.shouldUseHighRes(i, getPose())) {
-            highRes = true;
-          } else {
-            highRes = false;
-          }
+
         }
       }
     }
-    Logger.recordOutput("Vision/HighRes", highRes);
   }
 
   public void drive(double x, double y, double w, double throttle) {

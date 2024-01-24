@@ -25,11 +25,11 @@ import org.photonvision.targeting.PhotonTrackedTarget;
 public class VisionIOSim implements VisionIO {
   private final PhotonCameraSim camera;
   private final PhotonPoseEstimator poseEstimator;
-  private final Transform3d robotToCam;
+  private final Transform3d camToRobot;
   private AprilTagFieldLayout fieldLayout = null;
   private final List<VisionTargetSim> apriltags;
 
-  public VisionIOSim(String camname, Transform3d robotToCam) {
+  public VisionIOSim(String camname, Transform3d camToRobot) {
     try {
       fieldLayout =
           AprilTagFieldLayout.loadFromResource(AprilTagFields.k2024Crescendo.m_resourceFile);
@@ -56,10 +56,10 @@ public class VisionIOSim implements VisionIO {
     }
     this.apriltags = targets;
 
-    this.robotToCam = robotToCam;
+    this.camToRobot = camToRobot;
 
     this.poseEstimator =
-        new PhotonPoseEstimator(fieldLayout, PoseStrategy.MULTI_TAG_PNP_ON_RIO, robotToCam);
+        new PhotonPoseEstimator(fieldLayout, PoseStrategy.MULTI_TAG_PNP_ON_RIO, camToRobot);
   }
 
   @Override
@@ -67,13 +67,13 @@ public class VisionIOSim implements VisionIO {
     Pose2d odometryPose = Drive.getInstance().getPose();
     Pose3d cameraPose =
         new Pose3d(
-            odometryPose.getX() + robotToCam.getX(),
-            0 + robotToCam.getY(),
-            odometryPose.getY() + robotToCam.getZ(),
+            odometryPose.getX() + camToRobot.getX(),
+            0 + camToRobot.getY(),
+            odometryPose.getY() + camToRobot.getZ(),
             new Rotation3d(
-                robotToCam.getRotation().getX(),
-                odometryPose.getRotation().getTan() + robotToCam.getRotation().getY(),
-                odometryPose.getRotation().getSin() + robotToCam.getRotation().getZ()));
+                camToRobot.getRotation().getX(),
+                odometryPose.getRotation().getTan() + camToRobot.getRotation().getY(),
+                odometryPose.getRotation().getSin() + camToRobot.getRotation().getZ()));
     PhotonPipelineResult latestResult =
         camera.process(camera.prop.getAvgLatencyMs(), cameraPose, this.apriltags);
     if (latestResult.hasTargets()) {
@@ -104,5 +104,10 @@ public class VisionIOSim implements VisionIO {
       this.camera.setMaxSightRange(5.5);
       this.camera.prop.setCalibration(1920, 480, Rotation2d.fromDegrees(100));
     }
+  }
+
+  @Override
+  public Transform3d getTransform() {
+    return camToRobot;
   }
 }

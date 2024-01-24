@@ -19,7 +19,7 @@ public class VisionIOPhoton implements VisionIO {
   private AprilTagFieldLayout fieldLayout = null;
   private final Transform3d transform;
 
-  public VisionIOPhoton(String camname, Transform3d robotToCam) {
+  public VisionIOPhoton(String camname, Transform3d camToRobot) {
     this.camera = new PhotonCamera(camname);
     try {
       fieldLayout =
@@ -29,8 +29,8 @@ public class VisionIOPhoton implements VisionIO {
       e.printStackTrace();
     }
     this.poseEstimator =
-        new PhotonPoseEstimator(fieldLayout, PoseStrategy.LOWEST_AMBIGUITY, robotToCam);
-    this.transform = robotToCam;
+        new PhotonPoseEstimator(fieldLayout, PoseStrategy.LOWEST_AMBIGUITY, camToRobot);
+    this.transform = camToRobot;
   }
 
   @Override
