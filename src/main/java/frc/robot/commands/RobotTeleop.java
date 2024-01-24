@@ -4,6 +4,8 @@
 
 package frc.robot.commands;
 
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.OI;
 import frc.robot.subsystems.drive.Drive;
@@ -59,6 +61,13 @@ public class RobotTeleop extends Command {
       // } else if (OI.XK.get(0, 1)) {
       //   drive.setModuleModes(Mode.SETPOINT);
       // }
+
+      // HAPTIC FEEDBACk
+      if (DriverStation.getMatchTime() <= 30 && DriverStation.getMatchTime() > 29) {
+        OI.DR.setRumble(RumbleType.kBothRumble, 1);
+      } else {
+        OI.DR.setRumble(RumbleType.kBothRumble, 0);
+      }
     }
   }
 
