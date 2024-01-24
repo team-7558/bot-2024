@@ -78,7 +78,6 @@ public class Vision extends SubsystemBase {
       boolean canSee =
           canSeeTarget(currentPose, new Transform2d(0, 0, new Rotation2d()), tagpose, 4.0);
       canSeeAnyTags = canSee;
-      System.out.println(canSee);
       if (canSee) return false;
     }
     // cant see any so raise
@@ -117,7 +116,9 @@ public class Vision extends SubsystemBase {
         -((determinate(targetPose.getTranslation(), v2) - determinate(vo.getTranslation(), v2))
             / determinate(v2, v1));
 
-    return a > 0 && b > 0 && (a + b) < 1;
+    System.out.println(a + " A : " + b);
+
+    return a > 0 && b < 0 && (a + b) < 1;
   }
 
   private static double determinate(Translation2d i, Translation2d j) {
