@@ -1,12 +1,15 @@
 package frc.robot.subsystems.shooter;
 
+import com.ctre.phoenix.led.CANdle;
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.Follower;
+import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
+import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
@@ -19,9 +22,11 @@ public class ShooterIOTalonFx implements ShooterIO {
 
   private static final double GEAR_RATIO = 2;
   // set id to zero since we dont have them yet
-  private final TalonFX talonL = new TalonFX(35);
-  private final TalonFX talonR = new TalonFX(36);
-  private final TalonFX turrent = new TalonFX(37);
+  private final TalonFX talonL = new TalonFX(31);
+  private final TalonFX talonR = new TalonFX(32);
+  private final TalonFX turret = new TalonFX(37); //TODO: update
+
+  private final CANcoder turretCancoder = new CANcoder(38); // TODO: update
 
   // change to actual id's
   private final Servo leftTilt = new Servo(0);
@@ -38,14 +43,12 @@ public class ShooterIOTalonFx implements ShooterIO {
   private final StatusSignal<Double> RAppliedVolts = talonR.getMotorVoltage();
   private final StatusSignal<Double> RCurrent = talonR.getStatorCurrent();
 
-  private final StatusSignal<Double> TVelocity = turrent.getVelocity();
-  private final StatusSignal<Double> TAppliedVolts = turrent.getMotorVoltage();
-  private final StatusSignal<Double> TCurrent = turrent.getStatorCurrent();
-  private final StatusSignal<Double> TPosition = turrent.getPosition();
+  private final StatusSignal<Double> TVelocity = turret.getVelocity();
+  private final StatusSignal<Double> TAppliedVolts = turret.getMotorVoltage();
+  private final StatusSignal<Double> TCurrent = turret.getStatorCurrent();
+  private final StatusSignal<Double> TPosition = turret.getPosition();
 
-  // // sensors??? ethan told me to put but prob dont need (prob do)
-  // private final DigitalInput bottomSensor = new DigitalInput(0);
-  // private final DigitalInput topSensor = new DigitalInput(0);
+  private final StatusSignal<Double> TAbsolutePosition = turretCancoder.getAbsolutePosition();
 
   public ShooterIOTalonFx() {
     var config = new TalonFXConfiguration();
@@ -61,7 +64,21 @@ public class ShooterIOTalonFx implements ShooterIO {
     config.Slot0.kA = 0;
     talonL.getConfigurator().apply(config);
     talonR.getConfigurator().apply(config);
-    turrent.getConfigurator().apply(config);
+
+    var turretConfig = new TalonFXConfiguration();
+    config.Feedback.RotorToSensorRatio = GEAR_RATIO;
+    config.CurrentLimits.StatorCurrentLimit = 30.0; //TODO: tune
+    config.CurrentLimits.StatorCurrentLimitEnable = true; 
+    config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
+    config.Slot0.kP = 0;
+    config.Slot0.kI = 0;
+    config.Slot0.kD = 0;
+
+    //TODO: tune all of that & use absolute encoder
+
+    turret.getConfigurator().apply(turretConfig);
+
+    //TODO: tune
 
     leftTilt.setBoundsMicroseconds(2000, 1800, 1500, 1200, 1000);
     rightTilt.setBoundsMicroseconds(2000, 1800, 1500, 1200, 1000);
@@ -78,10 +95,13 @@ public class ShooterIOTalonFx implements ShooterIO {
         TVelocity,
         TAppliedVolts,
         TCurrent,
-        TPosition);
+        TPosition,
+        TAbsolutePosition);
     talonL.optimizeBusUtilization();
     talonR.optimizeBusUtilization();
-    turrent.optimizeBusUtilization();
+    turret.optimizeBusUtilization();
+
+    turret.setPosition(TAbsolutePosition.getValueAsDouble());
   }
 
   @Override
@@ -91,30 +111,31 @@ public class ShooterIOTalonFx implements ShooterIO {
     config.kI = kI;
     config.kD = kD;
     talonL.getConfigurator().apply(config);
-  }
-
-  @Override
-  public void hoodConfigurePID(double kP, double kI, double kD) {
-    var config = new Slot0Configs();
-    config.kP = kP;
-    config.kI = kI;
-    config.kD = kD;
+    talonR.getConfigurator().apply(config);
   }
 
   @Override
   public void setFlywheelVelocity(double velocityRadPerSec, double ffVolts) {
-    double ACCLERATION = 2.0;
     talonL.setControl(
         new VelocityVoltage(
             Units.radiansToRotations(velocityRadPerSec),
-            ACCLERATION,
+            Shooter.ACCELERATION,
             true,
             ffVolts,
             0,
             false,
             false,
             false));
-
+    talonR.setControl(
+        new VelocityVoltage(
+            Units.radiansToRotations(velocityRadPerSec),
+            Shooter.ACCELERATION,
+            true,
+            ffVolts,
+            0,
+            false,
+            false,
+            false));
     
   }
 
@@ -125,18 +146,20 @@ public class ShooterIOTalonFx implements ShooterIO {
 
   @Override
   public void setTurretAngle(double angle) {
-    
+    turret.setControl(new PositionVoltage(angle));
   }
 
   @Override
   public void stop() {
     talonL.stopMotor();
     talonR.stopMotor();
-    turrent.stopMotor();
+    turret.stopMotor();
   }
 
   @Override
-  public void setTilt(double angle) {
+  public void setAngle(double angle) {
+
+    // todo make it an actual irl angle
     double checkedAngle = MathUtil.clamp(angle, 0, 1);
     leftTilt.setPosition(checkedAngle);
     leftTilt.setPosition(checkedAngle);
@@ -148,7 +171,7 @@ public class ShooterIOTalonFx implements ShooterIO {
     config.kP = kP;
     config.kI = kI;
     config.kD = kD;
-    turrent.getConfigurator().apply(config);
+    turret.getConfigurator().apply(config);
   }
 
   @Override
@@ -162,5 +185,9 @@ public class ShooterIOTalonFx implements ShooterIO {
 
     inputs.linearActuatorPositionLeft = leftTilt.getPosition();
     inputs.linearActuatorPositionRight = rightTilt.getPosition();
+
+    inputs.turretPositionDeg = TPosition.getValueAsDouble();
+    inputs.turretAppliedVolts = TAppliedVolts.getValueAsDouble();
+    inputs.turretVelocityRadPerSec = TVelocity.getValueAsDouble();
   }
 }

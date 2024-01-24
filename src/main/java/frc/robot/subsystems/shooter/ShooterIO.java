@@ -12,7 +12,7 @@ public interface ShooterIO {
         public double linearActuatorPositionRight = 0.0;
         public double turretVelocityRadPerSec = 0.0;
         public double turretAppliedVolts = 0.0;
-        public double turretPositionRad = 0.0;
+        public double turretPositionDeg = 0.0;
         public double[] currentAmps = new double[] {};
         public boolean beamBreakActivated =  true;
 
@@ -37,7 +37,7 @@ public interface ShooterIO {
         public default void setRightLinearActuatorPosition (double position) {}
 
         
-        public default void setTilt(double angle) {}
+        public default void setAngle(double angle) {}
 
         /** Stop in open loop. */
         public default void stop() {}
@@ -46,8 +46,6 @@ public interface ShooterIO {
         public default void flywheelConfigurePID(double kP, double kI, double kD) {}
 
         public default void turretConfigurePID(double kP, double kI, double kD) {}
-
-        public default void hoodConfigurePID(double kP, double kI, double kD) {}
 
         public default void setTurretAngle(double angle) {}
 } 

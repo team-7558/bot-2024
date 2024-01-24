@@ -27,12 +27,14 @@ public class Shooter extends StateMachineSubsystemBase {
 
   private static double SHOOTER_HEIGHT = 0;
 
-  private static double FLYWHEEL_RADIUS = 0.05; // meter
-  private static double FLYWHEEL_MAX_RPM = 7200;
-  private static double FLYWHEEL_SPEED = 0.75; // -1 - 1
+  public static double ACCELERATION = 5.0; //TODO: tune
+  private static double FEEDFORWARD_VOLTS = 0; //TODO: tune
+  private static double GEAR_RATIO = 2; // 2:1
+  private static double FLYWHEEL_MAX_RPM = 7200 * GEAR_RATIO; //TODO: tune
+  private static double FLYWHEEL_SPEED = 0.75; // -1 - 1 //TODO: tune
 
   private static double FLYWHEEL_RAD_PER_SEC = (FLYWHEEL_MAX_RPM * FLYWHEEL_SPEED) * (2* Math.PI) / 60;
-  private static double FLYWHEEL_RPM = FLYWHEEL_MAX_RPM * FLYWHEEL_SPEED;
+  private static double FLYWHEEL_RPM = FLYWHEEL_MAX_RPM * FLYWHEEL_SPEED; // remove if unused
 
   private static Pose3d SPEAKER_POSE = new Pose3d(); // fill
   private static double HEIGHT_DIFFERENCE = SPEAKER_POSE.getZ() - SHOOTER_HEIGHT;
@@ -94,8 +96,6 @@ public class Shooter extends StateMachineSubsystemBase {
           @Override
           public void init() {
             stop();
-            // stop hood
-            // stop target angle spining
           }
 
           @Override
@@ -125,14 +125,19 @@ public class Shooter extends StateMachineSubsystemBase {
         new State("LOCKONT") {
           @Override
           public void init() {
-            stop();
           }
 
           @Override
-          public void periodic() {}
+          public void periodic() {
+            ShooterState shooterState = getStateToSpeaker();
+            io.setTurretAngle(shooterState.getHoodPosition());
+            io.setAngle(FLYWHEEL_MAX_RPM);
+          }
 
           @Override
-          public void exit() {}
+          public void exit() {
+
+          }
         };
 
     SHOOTING =
@@ -143,7 +148,12 @@ public class Shooter extends StateMachineSubsystemBase {
           }
 
           @Override
-          public void periodic() {}
+          public void periodic() {
+            ShooterState shooterState = getStateToSpeaker();
+            io.setFlywheelVelocity(FLYWHEEL_RAD_PER_SEC,FEEDFORWARD_VOLTS);
+            io.setTurretAngle(shooterState.getHoodPosition());
+            io.setAngle(FLYWHEEL_MAX_RPM);
+          }
 
           @Override
           public void exit() {}
@@ -204,9 +214,8 @@ public class Shooter extends StateMachineSubsystemBase {
     double turretPosition = Math.atan((SPEAKER_POSE.getY() - pose2d.getY()) / (SPEAKER_POSE.getX() - pose2d.getX()));
 
     state.setHoodPosition(angle);
-    state.setShooterVelocityRadPerSec(FLYWHEEL_RAD_PER_SEC); // 75% of 7200 RPM assuming radius is 
+    state.setShooterVelocityRadPerSec(FLYWHEEL_RAD_PER_SEC);
     state.setTurretPosition(turretPosition);
-
     return state;
   }
 }
