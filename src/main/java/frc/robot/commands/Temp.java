@@ -72,17 +72,17 @@ public class Temp extends Command {
     }
 
     if (OI.DR.getAButton()) {
-      lout.withOutput(0.25);
-      rout.withOutput(0.25);
+      lout.withOutput(-0.20);
+      rout.withOutput(-0.25);
     } else if (OI.DR.getBButton()) {
-      lout.withOutput(0.5);
-      rout.withOutput(0.5);
+      lout.withOutput(-0.40);
+      rout.withOutput(-0.5);
     } else if (OI.DR.getYButton()) {
-      lout.withOutput(0.75);
-      rout.withOutput(0.75);
+      lout.withOutput(-0.60);
+      rout.withOutput(-0.60);
     } else if (OI.DR.getXButton()) {
-      lout.withOutput(1.0);
-      rout.withOutput(1.0);
+      lout.withOutput(-0.8);
+      rout.withOutput(-0.8);
     } else {
       lout.withOutput(0);
       rout.withOutput(0);

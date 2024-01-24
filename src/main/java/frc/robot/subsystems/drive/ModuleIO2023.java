@@ -140,7 +140,10 @@ public class ModuleIO2023 implements ModuleIO {
     turnTalon.getConfigurator().apply(turnConfig);
     setTurnBrakeMode(true);
 
-    turnTalon.setPosition(Units.radiansToRotations(absEncoder.getAbsolutePosition() * (isAbsEncoderInverted ? -1.0 : 1.0) - absoluteEncoderOffset.getRadians()));
+    turnTalon.setPosition(
+        Units.radiansToRotations(
+            absEncoder.getAbsolutePosition() * (isAbsEncoderInverted ? -1.0 : 1.0)
+                - absoluteEncoderOffset.getRadians()));
 
     drivePosition = driveTalon.getPosition();
     drivePositionQueue =
@@ -236,8 +239,7 @@ public class ModuleIO2023 implements ModuleIO {
 
   @Override
   public void setTurnAngle(double rad) {
-    turnTalon.setControl(
-        turnOut_rot.withPosition(Units.radiansToRotations(rad)));
+    turnTalon.setControl(turnOut_rot.withPosition(Units.radiansToRotations(rad)));
   }
 
   @Override
