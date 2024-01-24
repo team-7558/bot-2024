@@ -136,6 +136,7 @@ public class Drive extends StateMachineSubsystemBase {
 
   public final State DISABLED, SHOOTING, STRAFE_N_TURN, STRAFE_AUTOLOCK;
 
+  boolean highRes = false;
   // IO
   private final GyroIO gyroIO;
   private final GyroIOInputsAutoLogged gyroInputs = new GyroIOInputsAutoLogged();
@@ -256,6 +257,10 @@ public class Drive extends StateMachineSubsystemBase {
             VecBuilder.fill(0.5, 0.5, 0.5)); // TODO: TUNE STANDARD DEVIATIONS
   }
 
+  public AprilTagFieldLayout getFieldLayout() {
+    return aprilTagFieldLayout;
+  }
+
   @Override
   public void inputPeriodic() {
     odometryLock.lock(); // Prevents odometry updates while reading data
@@ -329,7 +334,6 @@ public class Drive extends StateMachineSubsystemBase {
         double tagID = vision.getTagID(i);
         if (tagID > 0) {
           double timestamp = vision.getTimestamp(i);
-          int pipelineID = vision.getPipeline(i);
 
           // where the ACTUAL tag is
           Pose2d tagPose2d = aprilTagFieldLayout.getTagPose((int) tagID).get().toPose2d();
@@ -347,17 +351,16 @@ public class Drive extends StateMachineSubsystemBase {
           // adding to the pose estimator with the timestamp
           poseEstimator.addVisionMeasurement(estimatedPose, timestamp);
 
-          // check distance and increase res if bigger (only if the pipeline isnt already switched)
-          if (translationDistance >= MIN_DISTANCE && pipelineID != HIGH_RES_PIPELINE_ID) {
-            System.out.println("should switch to high res");
-            vision.setPipeline(i, HIGH_RES_PIPELINE_ID);
-          } else if (translationDistance <= MAX_DISTANCE && pipelineID != HIGH_FPS_PIPELINE_ID) {
-            System.out.println("should switch to low fps");
-            vision.setPipeline(i, HIGH_FPS_PIPELINE_ID);
+        } else {
+          if (vision.shouldUseHighRes(i, getPose())) {
+            highRes = true;
+          } else {
+            highRes = false;
           }
         }
       }
     }
+    Logger.recordOutput("Vision/HighRes", highRes);
   }
 
   public void drive(double x, double y, double w, double throttle) {

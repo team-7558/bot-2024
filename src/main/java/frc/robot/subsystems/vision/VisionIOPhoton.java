@@ -17,6 +17,7 @@ public class VisionIOPhoton implements VisionIO {
   private final PhotonCamera camera;
   private final PhotonPoseEstimator poseEstimator;
   private AprilTagFieldLayout fieldLayout = null;
+  private final Transform3d transform;
 
   public VisionIOPhoton(String camname, Transform3d robotToCam) {
     this.camera = new PhotonCamera(camname);
@@ -29,6 +30,7 @@ public class VisionIOPhoton implements VisionIO {
     }
     this.poseEstimator =
         new PhotonPoseEstimator(fieldLayout, PoseStrategy.LOWEST_AMBIGUITY, robotToCam);
+    this.transform = robotToCam;
   }
 
   @Override
@@ -53,5 +55,10 @@ public class VisionIOPhoton implements VisionIO {
   @Override
   public void setPipeline(int pipelineID) {
     camera.setPipelineIndex(pipelineID);
+  }
+
+  @Override
+  public Transform3d getTransform() {
+    return transform;
   }
 }

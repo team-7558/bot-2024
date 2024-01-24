@@ -1,6 +1,7 @@
 package frc.robot.subsystems.vision;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Transform3d;
 import org.littletonrobotics.junction.AutoLog;
 
 public interface VisionIO {
@@ -25,4 +26,8 @@ public interface VisionIO {
    * @param pipelineID
    */
   public default void setPipeline(int pipelineID) {}
+
+  public default Transform3d getTransform() {
+    return null;
+  }
 }
