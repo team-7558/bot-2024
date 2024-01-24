@@ -130,8 +130,8 @@ public class Shooter extends StateMachineSubsystemBase {
           @Override
           public void periodic() {
             ShooterState shooterState = getStateToSpeaker();
-            io.setTurretAngle(shooterState.getHoodPosition());
-            io.setAngle(FLYWHEEL_MAX_RPM);
+            io.setTurretAngle(shooterState.getTurretPosition());
+            io.setAngle(shooterState.getHoodPosition());
           }
 
           @Override
@@ -151,8 +151,8 @@ public class Shooter extends StateMachineSubsystemBase {
           public void periodic() {
             ShooterState shooterState = getStateToSpeaker();
             io.setFlywheelVelocity(FLYWHEEL_RAD_PER_SEC,FEEDFORWARD_VOLTS);
-            io.setTurretAngle(shooterState.getHoodPosition());
-            io.setAngle(FLYWHEEL_MAX_RPM);
+            io.setTurretAngle(shooterState.getTurretPosition());
+            io.setAngle(shooterState.getHoodPosition());
           }
 
           @Override
