@@ -116,7 +116,6 @@ public class Vision extends SubsystemBase {
         -((determinate(targetPose.getTranslation(), v2) - determinate(vo.getTranslation(), v2))
             / determinate(v2, v1));
 
-    System.out.println(a + " A : " + b);
 
     return a > 0 && b < 0 && (a + b) < 1;
   }
