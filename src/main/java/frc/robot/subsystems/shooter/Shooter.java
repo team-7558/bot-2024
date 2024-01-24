@@ -27,8 +27,15 @@ public class Shooter extends StateMachineSubsystemBase {
 
   private static double SHOOTER_HEIGHT = 0;
 
-  private static double SPEAKER_HEIGHT_DIFFERENCE = 3; // fill
+  private static double FLYWHEEL_RADIUS = 0.05; // meter
+  private static double FLYWHEEL_MAX_RPM = 7200;
+  private static double FLYWHEEL_SPEED = 0.75; // -1 - 1
+
+  private static double FLYWHEEL_RAD_PER_SEC = (FLYWHEEL_MAX_RPM * FLYWHEEL_SPEED) * (2* Math.PI) / 60;
+  private static double FLYWHEEL_RPM = FLYWHEEL_MAX_RPM * FLYWHEEL_SPEED;
+
   private static Pose3d SPEAKER_POSE = new Pose3d(); // fill
+  private static double HEIGHT_DIFFERENCE = SPEAKER_POSE.getZ() - SHOOTER_HEIGHT;
 
   private static Shooter instance;
 
@@ -185,30 +192,19 @@ public class Shooter extends StateMachineSubsystemBase {
   /** Returns the required hardware states to be able to shoot in speaker */
   public ShooterState getStateToSpeaker() {
     Pose2d pose2d = Drive.getInstance().getPose();
-    Pose3d currentPose = new Pose3d(pose2d.getX(), SHOOTER_HEIGHT, pose2d.getY(), new Rotation3d());
 
-    double distanceToSpeaker =
-        Math.sqrt(
-            Math.pow(currentPose.getX() - SPEAKER_POSE.getX(), 2)
-                + Math.pow(currentPose.getY() - SPEAKER_POSE.getY(), 2)
-                + Math.pow(currentPose.getZ() - SPEAKER_POSE.getZ(), 2));
+    double distanceToSpeaker = pose2d.getTranslation().getDistance(SPEAKER_POSE.toPose2d().getTranslation());
 
     ShooterState state = new ShooterState();
 
     // needs to be changed if the angle to hit target at is > 0
-    double angle = Math.toDegrees(Math.atan((-2 * SPEAKER_HEIGHT_DIFFERENCE) / -distanceToSpeaker));
-    // gravity squared
-    double velocity =
-        (Math.sqrt(
-            -((96.177
-                * (1 + Math.tan(Math.toRadians(angle)))
-                / ((2 * SPEAKER_HEIGHT_DIFFERENCE)
-                    - (2 * distanceToSpeaker * Math.tan(Math.toRadians(angle))))))));
+    double angle = Math.atan((HEIGHT_DIFFERENCE) / distanceToSpeaker);
+
     // needs to be rotation from the thing
-    double turretPosition = SPEAKER_POSE.toPose2d().getRotation().getDegrees();
+    double turretPosition = Math.atan((SPEAKER_POSE.getY() - pose2d.getY()) / (SPEAKER_POSE.getX() - pose2d.getX()));
 
     state.setHoodPosition(angle);
-    state.setShooterVelocityRadPerSec(velocity);
+    state.setShooterVelocityRadPerSec(FLYWHEEL_RAD_PER_SEC); // 75% of 7200 RPM assuming radius is 
     state.setTurretPosition(turretPosition);
 
     return state;

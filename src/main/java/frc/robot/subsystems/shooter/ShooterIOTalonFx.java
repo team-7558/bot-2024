@@ -17,7 +17,7 @@ import edu.wpi.first.wpilibj.Servo;
 
 public class ShooterIOTalonFx implements ShooterIO {
 
-  private static final double GEAR_RATIO = 1.5;
+  private static final double GEAR_RATIO = 2;
   // set id to zero since we dont have them yet
   private final TalonFX talonL = new TalonFX(35);
   private final TalonFX talonR = new TalonFX(36);
@@ -49,6 +49,7 @@ public class ShooterIOTalonFx implements ShooterIO {
 
   public ShooterIOTalonFx() {
     var config = new TalonFXConfiguration();
+    config.Feedback.RotorToSensorRatio = GEAR_RATIO;
     config.CurrentLimits.StatorCurrentLimit = 30.0;
     config.CurrentLimits.StatorCurrentLimitEnable = true;
     config.MotorOutput.NeutralMode = NeutralModeValue.Coast;
