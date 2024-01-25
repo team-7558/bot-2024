@@ -59,9 +59,9 @@ public class RobotTeleop extends Command {
         drive.setCurrentState(drive.STRAFE_N_TURN);
       }
 
-      if (OI.DR.getRightBumperPressed()){
+      if (OI.DR.getRightBumperPressed()) {
         ss.action(State.TEST_2);
-      } else if (OI.DR.getLeftBumperPressed()){
+      } else if (OI.DR.getLeftBumperPressed()) {
         ss.action(State.IDLE);
       }
 
