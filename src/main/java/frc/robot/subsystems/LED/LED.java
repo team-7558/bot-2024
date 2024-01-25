@@ -68,23 +68,44 @@ public class LED{
     }
 
     public void angleToPositionRGB(int angle, int r, int b, int g) {
-        buffer[angle/10] = r;
-        buffer[angle/10+1] = g;
-        buffer[angle/10+2] = b;
+        buffer[(int)((angle+0.5)/10)] = r;
+        buffer[(int)((angle+0.5)/10)+1] = g;
+        buffer[(int)((angle+0.5)/10)+2] = b;
     }
 
-        public void angleToPositionHSV(int angle, int h, int s, int v) {
-        buffer[angle/10] = h;
-        buffer[angle/10+1] = s;
-        buffer[angle/10+2] = v;
+    public void angleToPositionHSV(int angle, int h, int s, int v) {
+        buffer[(int)((angle+0.5)/10)] = h;
+        buffer[(int)((angle+0.5)/10)+1] = s;
+        buffer[(int)((angle+0.5)/10)+2] = v;
+    }
+
+    public void angleRangesToPositionRGB(int lowAngle, int highAngle, int r, int b, int g) {
+        for(int i=(int)((lowAngle+0.5)/10); i<(int)((highAngle+0.5)/10)*3; i+=3) {
+            buffer[i] = r;
+            buffer[i+1] = g;
+            buffer[i+2] = b;
+        }
+    }
+
+    public void angleRangesToPositionHSV(int lowAngle, int highAngle, int h, int s, int v) {
+        for(int i=(int)((lowAngle+0.5)/10); i<(int)((highAngle+0.5)/10)*3; i+=3) {
+            buffer[i] = h;
+            buffer[i+1] = s;
+            buffer[i+2] = v;
+        }
     }
 
     public void setfixedPosition() {}
 
+    public void clearColours() {
+        
+    }
+
     public void render() {
         io.updateInputs(inputs);
 
-        io.setColours(buffer);
+        io.setColours(true,  buffer);
+
     }
 
 }
