@@ -25,10 +25,10 @@ public class Vision extends SubsystemBase {
   public static final int CLEAR_PIPELINE_ID = 0;
 
   // Angle of camera horizontal FOV
-  public static final int CAM_FOV_DEG = 90;
+  public static final int CAM_FOV_DEG = 120;
 
   // Distance for quick
-  public static final double QUICK_DISTANCE_M = 6.0;
+  public static final double QUICK_DISTANCE_M = 4.0;
 
   // Distance for clear
   public static final double CLEAR_DISTANCE_M = QUICK_DISTANCE_M + 0.1;
@@ -203,11 +203,23 @@ public class Vision extends SubsystemBase {
       double detvv1 = Util.det(tagpose.getTranslation(), v1);
       double detvv2 = Util.det(tagpose.getTranslation(), v2);
 
-      shouldSwitchToQuick |= Util.isInTriangle(detvv1, detvv2, detv0v1, detv0v2, detv1v2_inverted);
-      if (shouldSwitchToQuick) break;
+      double deltaX = tagpose.getX() - v0.getX();
+      double deltaY = tagpose.getY() - v0.getY();
+
+      double deltaXsquared = (deltaX) * (deltaX);
+      double deltaYsquared = (deltaY) * (deltaY);
+
+      if ((deltaXsquared + deltaYsquared) <= (QUICK_DISTANCE_M * QUICK_DISTANCE_M)) {
+        double atan2 = Math.atan2(deltaY, deltaX);
+        if (atan2 <= theta2 && atan2 >= theta1) {
+          shouldSwitchToQuick = true;
+          break;
+        }
+      }
     }
 
     if (shouldSwitchToQuick) {
+      Logger.recordOutput("Vision/Heatmap", v0);
       cam.setPipeline(QUICK_PIPELINE_ID);
       Logger.recordOutput("Vision/Camera" + camID + "/Quick?", true);
     } else {
