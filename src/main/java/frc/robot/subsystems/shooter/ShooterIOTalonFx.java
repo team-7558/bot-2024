@@ -21,7 +21,6 @@ import edu.wpi.first.wpilibj.Servo;
 public class ShooterIOTalonFx implements ShooterIO {
 
   private static final double GEAR_RATIO = 2;
-  // set id to zero since we dont have them yet
   private final TalonFX talonL = new TalonFX(31);
   private final TalonFX talonR = new TalonFX(32);
   private final TalonFX turret = new TalonFX(37); //TODO: update
@@ -66,13 +65,13 @@ public class ShooterIOTalonFx implements ShooterIO {
     talonR.getConfigurator().apply(config);
 
     var turretConfig = new TalonFXConfiguration();
-    config.Feedback.RotorToSensorRatio = GEAR_RATIO;
-    config.CurrentLimits.StatorCurrentLimit = 30.0; //TODO: tune
-    config.CurrentLimits.StatorCurrentLimitEnable = true; 
-    config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
-    config.Slot0.kP = 0;
-    config.Slot0.kI = 0;
-    config.Slot0.kD = 0;
+    turretConfig.Feedback.RotorToSensorRatio = GEAR_RATIO;
+    turretConfig.CurrentLimits.StatorCurrentLimit = 30.0; //TODO: tune
+    turretConfig.CurrentLimits.StatorCurrentLimitEnable = true; 
+    turretConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
+    turretConfig.Slot0.kP = 0;
+    turretConfig.Slot0.kI = 0;
+    turretConfig.Slot0.kD = 0;
 
     //TODO: tune all of that & use absolute encoder
 
@@ -84,6 +83,7 @@ public class ShooterIOTalonFx implements ShooterIO {
     rightTilt.setBoundsMicroseconds(2000, 1800, 1500, 1200, 1000);
 
     talonL.setControl(new Follower(talonR.getDeviceID(), false));
+    
     BaseStatusSignal.setUpdateFrequencyForAll(
         50.0,
         LVelocity,
