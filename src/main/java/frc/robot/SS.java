@@ -36,12 +36,16 @@ public class SS {
   private State currState;
   private State nextState;
 
+  private boolean hasGamePiece;
+
   private SS() {
     lastState = State.DISABLED;
     currState = State.DISABLED;
     nextState = State.DISABLED;
 
     timer = new Timer();
+
+    hasGamePiece = true;
   }
 
   public void queueState(State s) {
@@ -75,7 +79,11 @@ public class SS {
       case INTAKING:
       case INTAKING_DEEP:
       case INTAKING_CORAL:
+        hasGamePiece = true;
+        break;
       case SHOOTING:
+        hasGamePiece = false;
+        break;
       case CLIMBING:
       default:
         System.out.println(currState + " unimplemented state");
@@ -94,6 +102,10 @@ public class SS {
   public void action(State s) {
     System.out.println("Switching to state " + s);
     queueState(s);
+  }
+
+  public boolean hasGamePiece(){
+    return hasGamePiece;
   }
 
   // Timer Functions
