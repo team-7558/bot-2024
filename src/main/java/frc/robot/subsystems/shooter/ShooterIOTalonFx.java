@@ -70,13 +70,13 @@ public class ShooterIOTalonFx implements ShooterIO {
     talonR.getConfigurator().apply(config);
 
     var turretConfig = new TalonFXConfiguration();
-    config.Feedback.RotorToSensorRatio = GEAR_RATIO;
-    config.CurrentLimits.StatorCurrentLimit = 30.0; //TODO: tune
-    config.CurrentLimits.StatorCurrentLimitEnable = true; 
-    config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
-    config.Slot0.kP = 0;
-    config.Slot0.kI = 0;
-    config.Slot0.kD = 0;
+    turretConfig.Feedback.RotorToSensorRatio = GEAR_RATIO;
+    turretConfig.CurrentLimits.StatorCurrentLimit = 30.0; //TODO: tune
+    turretConfig.CurrentLimits.StatorCurrentLimitEnable = true; 
+    turretConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
+    turretConfig.Slot0.kP = 0;
+    turretConfig.Slot0.kI = 0;
+    turretConfig.Slot0.kD = 0;
 
     var feederConfig = new TalonFXConfiguration();
     feederConfig.Feedback.SensorToMechanismRatio = 1;
@@ -99,6 +99,7 @@ public class ShooterIOTalonFx implements ShooterIO {
     rightTilt.setBoundsMicroseconds(2000, 1800, 1500, 1200, 1000);
 
     talonL.setControl(new Follower(talonR.getDeviceID(), false));
+    
     BaseStatusSignal.setUpdateFrequencyForAll(
         50.0,
         LVelocity,
