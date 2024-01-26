@@ -14,6 +14,9 @@ import frc.robot.subsystems.StateMachineSubsystemBase;
 
 public class Intake extends StateMachineSubsystemBase {
 
+  private double intakeSpeed = 0;
+  private double directionSpeed = 0;
+
   private static Intake instance;
 
   public static Intake getInstance() {
@@ -94,8 +97,8 @@ public class Intake extends StateMachineSubsystemBase {
       new State("INTAKING") {
         @Override
         public void init() {
-          io.setIntakeSpeed(0.1);
-          io.setDirectionSpeed(0);
+          intakeSpeed = 0.1;
+          directionSpeed = 0;
         }
 
         @Override
@@ -113,7 +116,7 @@ public class Intake extends StateMachineSubsystemBase {
       new State("AMP_SIDE"){
          @Override
         public void init() {
-          io.setDirectionSpeed(-0.1);
+          directionSpeed = -0.1;
         }
 
         @Override
@@ -126,7 +129,7 @@ public class Intake extends StateMachineSubsystemBase {
       new State("SHOOTER_SIDE"){
          @Override
         public void init() {
-          io.setDirectionSpeed(0.1);
+          directionSpeed = 0.1;
         }
 
         @Override
@@ -139,7 +142,7 @@ public class Intake extends StateMachineSubsystemBase {
       new State("SPITTING"){
          @Override
         public void init() {
-          io.setIntakeSpeed(-0.1);
+          intakeSpeed = -0.1;
         }
 
         @Override
@@ -152,12 +155,12 @@ public class Intake extends StateMachineSubsystemBase {
       new State("ELEVATING"){
         @Override
         public void init() {
-          io.setIntakeSpeed(0.1);
+          intakeSpeed = 0.1;
         }
         @Override
         public void periodic() {
           if(after(0.05)) {
-            setCurrentState(IDLE);
+            intakeSpeed = 0.1;
           }
         }
         @Override
@@ -172,13 +175,15 @@ public class Intake extends StateMachineSubsystemBase {
   @Override
   public void inputPeriodic() {
     io.updateInputs(inputs);
-    Logger.processInputs("IndexerWheel", inputs);
+    Logger.processInputs("Intake", inputs);
   }
 
   @Override
   public void outputPeriodic() {
     Logger.recordOutput("IndexerWheelSpeedRPM", getIntakeVelocityRPM());
     Logger.recordOutput("DirectorWheelSpeedRPM", getDirectionVelocityRPM());
+    io.setDirectionSpeed(directionSpeed);
+    io.setIntakeSpeed(intakeSpeed);
   }
 
   public void runVelocity(double velocityRPM) {
