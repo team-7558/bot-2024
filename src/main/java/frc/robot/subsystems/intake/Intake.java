@@ -103,8 +103,11 @@ public class Intake extends StateMachineSubsystemBase {
 
         @Override
         public void periodic() {
+          boolean hasSeen = false;
           if(inputs.beamBreakActivatedTop) {
-            io.stop();
+            hasSeen = true;
+          } else if (hasSeen) {
+            intakeSpeed = 0;
           }
         }
 
@@ -159,9 +162,7 @@ public class Intake extends StateMachineSubsystemBase {
         }
         @Override
         public void periodic() {
-          if(after(0.05)) {
-            intakeSpeed = 0.1;
-          }
+          
         }
         @Override
         public void exit() {}
