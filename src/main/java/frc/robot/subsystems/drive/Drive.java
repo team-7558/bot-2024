@@ -135,7 +135,6 @@ public class Drive extends StateMachineSubsystemBase {
 
   private final Module[] modules = new Module[4]; // FL, FR, BL, BR
 
-  private AprilTagFieldLayout aprilTagFieldLayout = null;
   private SwerveDriveKinematics kinematics = new SwerveDriveKinematics(getModuleTranslations());
   private SwerveDrivePoseEstimator poseEstimator;
   private double autolockSetpoint = 0;
@@ -156,13 +155,6 @@ public class Drive extends StateMachineSubsystemBase {
     modules[FR] = new Module(frModuleIO, FR, Mode.SETPOINT);
     modules[BL] = new Module(blModuleIO, BL, Mode.SETPOINT);
     modules[BR] = new Module(brModuleIO, BR, Mode.SETPOINT);
-
-    try {
-      aprilTagFieldLayout =
-          AprilTagFieldLayout.loadFromResource(AprilTagFields.k2024Crescendo.m_resourceFile);
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
 
     // Configure AutoBuilder for PathPlanner
     AutoBuilder.configureHolonomic(
@@ -247,10 +239,6 @@ public class Drive extends StateMachineSubsystemBase {
             VecBuilder.fill(0.5, 0.5, 0.5)); // TODO: TUNE STANDARD DEVIATIONS
   }
 
-  public AprilTagFieldLayout getFieldLayout() {
-    return aprilTagFieldLayout;
-  }
-
   @Override
   public void inputPeriodic() {
     odometryLock.lock(); // Prevents odometry updates while reading data
@@ -321,12 +309,12 @@ public class Drive extends StateMachineSubsystemBase {
     Vision vision = Vision.getInstance();
     if (vision.hasTagInView()) {
       for (int i = 0; i < vision.getCameras(); i++) {
-        double tagID = vision.getTagID(i);
+        int tagID = (int) vision.getTagID(i);
         if (tagID > 0) {
           double timestamp = vision.getTimestamp(i);
 
           // where the ACTUAL tag is
-          Pose2d tagPose2d = aprilTagFieldLayout.getTagPose((int) tagID).get().toPose2d();
+          Pose2d tagPose2d = Vision.AT_MAP.getTagPose(tagID).get().toPose2d();
 
           // where this camera thinks it is
           Pose2d estimatedPose = vision.getPose(i);
