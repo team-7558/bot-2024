@@ -21,7 +21,7 @@ public class Intake extends StateMachineSubsystemBase {
       switch (Constants.currentMode) {
         case REAL: 
           // Real robot, instantiate hardware IO implementations
-          // instance = new Intake(new IntakeIOTalonFX()); // TODO: make IndexerIOTalonFX
+          instance = new Intake(new IntakeIOTalonFX());
           break;
 
         case SIM:
@@ -38,7 +38,7 @@ public class Intake extends StateMachineSubsystemBase {
     return instance;
   }
 
-  public final State DISABLED, IDLE, INTAKING, SHOOTER_SIDE, AMP_SIDE, SPITTING;
+  public final State DISABLED, IDLE, INTAKING, SHOOTER_SIDE, AMP_SIDE, SPITTING, ELEVATING;
 
   private final IntakeIO io;
   private final IntakeIOInputsAutoLogged inputs = new IntakeIOInputsAutoLogged();
@@ -82,9 +82,9 @@ public class Intake extends StateMachineSubsystemBase {
 
         @Override
         public void periodic() {
-          if(inputs.beamBreakActivatedBottom) {
-            setCurrentState(INTAKING);
-          }
+          // if(inputs.beamBreakActivatedBottom) {
+          //   setCurrentState(INTAKING);
+          // }
         }
 
         @Override
@@ -92,22 +92,15 @@ public class Intake extends StateMachineSubsystemBase {
       };
     INTAKING = 
       new State("INTAKING") {
-        boolean isPassedSensor;
         @Override
         public void init() {
-          io.setIntakeSpeed(1);
-          io.setElevatorSpeed(1);
+          io.setIntakeSpeed(0.1);
           io.setDirectionSpeed(0);
-          isPassedSensor = false;
         }
 
         @Override
         public void periodic() {
           if(inputs.beamBreakActivatedTop) {
-            isPassedSensor = true;
-          }
-
-          if(!inputs.beamBreakActivatedTop && isPassedSensor) {
             io.stop();
           }
         }
@@ -115,11 +108,12 @@ public class Intake extends StateMachineSubsystemBase {
         @Override
         public void exit() {}
       };
+    
     AMP_SIDE =
       new State("AMP_SIDE"){
          @Override
         public void init() {
-          io.setDirectionSpeed(-1);
+          io.setDirectionSpeed(-0.1);
         }
 
         @Override
@@ -132,7 +126,7 @@ public class Intake extends StateMachineSubsystemBase {
       new State("SHOOTER_SIDE"){
          @Override
         public void init() {
-          io.setDirectionSpeed(1);
+          io.setDirectionSpeed(0.1);
         }
 
         @Override
@@ -145,11 +139,26 @@ public class Intake extends StateMachineSubsystemBase {
       new State("SPITTING"){
          @Override
         public void init() {
-          io.setIntakeSpeed(-1);
+          io.setIntakeSpeed(-0.1);
         }
 
         @Override
         public void periodic() {
+        }
+        @Override
+        public void exit() {}
+      };
+    ELEVATING =
+      new State("ELEVATING"){
+        @Override
+        public void init() {
+          io.setIntakeSpeed(0.1);
+        }
+        @Override
+        public void periodic() {
+          if(after(0.05)) {
+            setCurrentState(IDLE);
+          }
         }
         @Override
         public void exit() {}
@@ -168,7 +177,8 @@ public class Intake extends StateMachineSubsystemBase {
 
   @Override
   public void outputPeriodic() {
-    Logger.recordOutput("IndexerWheelSpeedRPM", getVelocityRPM());
+    Logger.recordOutput("IndexerWheelSpeedRPM", getIntakeVelocityRPM());
+    Logger.recordOutput("DirectorWheelSpeedRPM", getDirectionVelocityRPM());
   }
 
   public void runVelocity(double velocityRPM) {
@@ -177,8 +187,12 @@ public class Intake extends StateMachineSubsystemBase {
     Logger.recordOutput("IntakeWheelSetpointRPM", velocityRPM);
   }
 
-  public double getVelocityRPM() {
+  public double getIntakeVelocityRPM() {
     return Units.radiansPerSecondToRotationsPerMinute(inputs.intakeVelocityRadPerSec);
+  }
+
+  public double getDirectionVelocityRPM() {
+    return Units.radiansPerSecondToRotationsPerMinute(inputs.directionVelocityRadPerSec);
   }
 
   public void runCharacterizationVolts(double volts) {
@@ -189,4 +203,4 @@ public class Intake extends StateMachineSubsystemBase {
     return inputs.intakeVelocityRadPerSec;
   }
 
-}
+} 

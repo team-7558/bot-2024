@@ -20,15 +20,10 @@ public interface IntakeIO {
   public static class IntakeIOInputs {
     public double intakeVelocityRadPerSec = 0.0;
     public double intakeAppliedVolts = 0.0;
-    public double[] intakeCurrentAmps = new double[] {};
-
-    public double elevatorVelocityRadPerSec = 0.0;
-    public double elevatorAppliedVolts = 0.0;
-    public double[] elevatorCurrentAmps = new double[] {};
+    public double[] currentAmps = new double[] {};
 
     public double directionVelocityRadPerSec = 0.0;
     public double directionAppliedVolts = 0.0;
-    public double[] directionCurrentAmps = new double[] {};
 
     public boolean beamBreakActivatedBottom = false;
     public boolean beamBreakActivatedTop = false;
@@ -47,15 +42,6 @@ public interface IntakeIO {
   
   /** Run the drive motor at the specified velocity. */
   public default void setIntakeVelocity(double velocity) {}
-
-   /** Run the drive motor at the specified voltage. */
-  public default void setElevatorVoltage(double volts) {}
-
-  /** Run the drive motor at the specified voltage. */
-  public default void setElevatorSpeed(double speed) {}
-  
-  /** Run the drive motor at the specified velocity. */
-  public default void setElevatorVelocity(double velocity) {}
 
    /** Run the drive motor at the specified voltage. */
   public default void setDirectionVoltage(double volts) {}

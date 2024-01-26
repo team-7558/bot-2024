@@ -30,23 +30,15 @@ import frc.robot.util.Util;
 public class IntakeIOTalonFX implements IntakeIO {
   private static final double GEAR_RATIO = 0;
 
-  private final TalonFX topMotor = new TalonFX(2); // Not gunna be 0 1 (cameron told me to add that)
-  private final TalonFX middleMotor = new TalonFX(1);
-  private final TalonFX bottomMotor = new TalonFX(0);
+  private final TalonFX topMotor = new TalonFX(36); // Not gunna be 0 1 (cameron told me to add that)
+  private final TalonFX bottomMotor = new TalonFX(35);
   private final DigitalInput bottomSensor = new DigitalInput(0);
   private final DigitalInput topSensor = new DigitalInput(1);
 
-  private final StatusSignal<Double> bottomPosition = bottomMotor.getPosition();
   private final StatusSignal<Double> bottomVelocity = bottomMotor.getVelocity();
   private final StatusSignal<Double> bottomAppliedVolts = bottomMotor.getMotorVoltage();
   private final StatusSignal<Double> bottomCurrent = bottomMotor.getStatorCurrent();
 
-  private final StatusSignal<Double> middlePosition = middleMotor.getPosition();
-  private final StatusSignal<Double> middleVelocity = middleMotor.getVelocity();
-  private final StatusSignal<Double> middleAppliedVolts = middleMotor.getMotorVoltage();
-  private final StatusSignal<Double> middleCurrent = middleMotor.getStatorCurrent();
-
-  private final StatusSignal<Double> topPosition = topMotor.getPosition();
   private final StatusSignal<Double> topVelocity = topMotor.getVelocity();
   private final StatusSignal<Double> topAppliedVolts = topMotor.getMotorVoltage();
   private final StatusSignal<Double> topCurrent = topMotor.getStatorCurrent();
@@ -59,31 +51,28 @@ public class IntakeIOTalonFX implements IntakeIO {
     config.CurrentLimits.StatorCurrentLimitEnable = true;
     config.MotorOutput.NeutralMode = NeutralModeValue.Coast;
     bottomMotor.getConfigurator().apply(config);
-    middleMotor.getConfigurator().apply(config);
     topMotor.getConfigurator().apply(config);
-
-    middleMotor.setControl(new Follower(bottomMotor.getDeviceID(), false));
-    topMotor.setControl(new Follower(bottomMotor.getDeviceID(), false));
-
+   
     BaseStatusSignal.setUpdateFrequencyForAll(
-        50.0, bottomPosition, bottomVelocity, bottomAppliedVolts, bottomCurrent, middlePosition, middleVelocity, middleAppliedVolts, middleCurrent, topPosition, topVelocity, topAppliedVolts, topCurrent);
+        50.0, bottomVelocity, bottomAppliedVolts, bottomCurrent, topVelocity, topAppliedVolts, topCurrent);
     topMotor.optimizeBusUtilization();
-    middleMotor.optimizeBusUtilization();
     bottomMotor.optimizeBusUtilization();
   }
 
   @Override
   public void updateInputs(IntakeIOInputs inputs) {
     BaseStatusSignal.refreshAll(
-        bottomPosition, bottomVelocity, bottomAppliedVolts, bottomCurrent, middlePosition, middleVelocity, middleAppliedVolts, middleCurrent, topPosition, topVelocity, topAppliedVolts, topCurrent);
-    // inputs.positionRad = Units.rotationsToRadians(leaderPosition.getValueAsDouble()) / GEAR_RATIO;
+        bottomVelocity, bottomAppliedVolts, bottomCurrent, topVelocity, topAppliedVolts, topCurrent);
     inputs.beamBreakActivatedBottom = bottomSensor.get();
     inputs.beamBreakActivatedTop = topSensor.get();
     inputs.intakeVelocityRadPerSec =
         Units.rotationsToRadians(bottomVelocity.getValueAsDouble()) / GEAR_RATIO;
     inputs.intakeAppliedVolts = bottomAppliedVolts.getValueAsDouble();
-    inputs.intakeCurrentAmps =
-        new double[] {bottomCurrent.getValueAsDouble(), middleCurrent.getValueAsDouble(), topCurrent.getValueAsDouble()};
+    inputs.currentAmps =
+        new double[] {bottomCurrent.getValueAsDouble(), topCurrent.getValueAsDouble()};
+    
+    inputs.directionVelocityRadPerSec = Units.rotationsToRadians(topVelocity.getValueAsDouble()) / GEAR_RATIO;
+    inputs.directionAppliedVolts = topAppliedVolts.getValueAsDouble();
   }
 
   @Override
@@ -100,24 +89,6 @@ public class IntakeIOTalonFX implements IntakeIO {
   @Override
   public void setIntakeVelocity(double velocityRadPerSec) {
     bottomMotor.setControl(
-        new VelocityVoltage(
-            Units.radiansToRotations(velocityRadPerSec)));
-  }
-
-  @Override
-  public void setElevatorSpeed(double speed) {
-    middleMotor.setControl(
-        new DutyCycleOut(speed));
-  }
-
-  @Override
-  public void setElevatorVoltage(double volts) {
-    middleMotor.setControl(new VoltageOut(volts));
-  }
-
-  @Override
-  public void setElevatorVelocity(double velocityRadPerSec) {
-    middleMotor.setControl(
         new VelocityVoltage(
             Units.radiansToRotations(velocityRadPerSec)));
   }
@@ -144,6 +115,7 @@ public class IntakeIOTalonFX implements IntakeIO {
 
   @Override
   public void stop() {
+    topMotor.stopMotor();
     bottomMotor.stopMotor();
   }
 

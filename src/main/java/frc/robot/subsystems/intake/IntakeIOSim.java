@@ -11,7 +11,6 @@ import frc.robot.Constants;
 public class IntakeIOSim implements IntakeIO {
 
   private FlywheelSim simIntake = new FlywheelSim(DCMotor.getFalcon500(1), 1.5, 0.004);
-  private FlywheelSim simElevator = new FlywheelSim(DCMotor.getFalcon500(1), 1.5, 0.004);
   private FlywheelSim simDirection = new FlywheelSim(DCMotor.getFalcon500(1), 1.5, 0.004);
 
 
@@ -27,21 +26,14 @@ public class IntakeIOSim implements IntakeIO {
     // }
 
     simIntake.update(Constants.globalDelta_sec);
-    simElevator.update(Constants.globalDelta_sec);
-    simElevator.update(Constants.globalDelta_sec);
+    simDirection.update(Constants.globalDelta_sec);
 
     inputs.intakeVelocityRadPerSec = simIntake.getAngularVelocityRadPerSec();
     inputs.intakeAppliedVolts = appliedVolts;
-    inputs.intakeCurrentAmps = new double[]{simIntake.getCurrentDrawAmps()};
-
-    inputs.elevatorVelocityRadPerSec = simElevator.getAngularVelocityRadPerSec();
-    inputs.elevatorAppliedVolts = appliedVolts;
-    inputs.elevatorCurrentAmps = new double[]{simElevator.getCurrentDrawAmps()};
+    inputs.currentAmps = new double[]{simIntake.getCurrentDrawAmps(), simDirection.getCurrentDrawAmps()};
 
     inputs.directionVelocityRadPerSec = simDirection.getAngularVelocityRadPerSec();
     inputs.directionAppliedVolts = appliedVolts;
-    inputs.directionCurrentAmps = new double[]{simDirection.getCurrentDrawAmps()};
-
   }
 
   /** Run open loop at the specified voltage. */
@@ -53,14 +45,9 @@ public class IntakeIOSim implements IntakeIO {
 
   /** Run closed loop at the specified velocity. */
   public void setIntakeVelocity(double velocity) {
-    // some goofy ahh system that works somehow 
+    simIntake.setState(velocity);
   }
 
-  public void setElevatorVoltage(double volts) {
-    // closedLoop = false;
-    appliedVolts = MathUtil.clamp(volts, -12.0, 12.0);
-    simElevator.setInputVoltage(appliedVolts);
-  }
 
   public void setDirectionVoltage(double volts) {
     // closedLoop = false;
@@ -68,10 +55,13 @@ public class IntakeIOSim implements IntakeIO {
     simDirection.setInputVoltage(appliedVolts);
   }
   
+  public void setDirectionSpeed(double velocity) {
+    simDirection.setState(velocity);
+  }
+
   /** Stop in open loop. */
   public void stop() {
     setIntakeVoltage(0);
-    setElevatorVoltage(0);
     setDirectionVoltage(0);
   }
 
