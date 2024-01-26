@@ -128,7 +128,6 @@ public class Drive extends StateMachineSubsystemBase {
 
   public final State DISABLED, SHOOTING, STRAFE_N_TURN, STRAFE_AUTOLOCK;
 
-  boolean highRes = false;
   // IO
   private final GyroIO gyroIO;
   private final GyroIOInputsAutoLogged gyroInputs = new GyroIOInputsAutoLogged();
