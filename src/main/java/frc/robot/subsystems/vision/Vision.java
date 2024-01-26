@@ -14,6 +14,8 @@ import frc.robot.Constants;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.util.Util;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import org.littletonrobotics.junction.Logger;
 
 public class Vision extends SubsystemBase {
@@ -25,10 +27,13 @@ public class Vision extends SubsystemBase {
   public static final int CLEAR_PIPELINE_ID = 0;
 
   // Angle of camera horizontal FOV
-  public static final int CAM_FOV_DEG = 120;
+  public static final double CAM_FOV_RAD = Units.degreesToRadians(120);
+
+  // Angle of apriltag view horizontal FOV
+  public static final double AT_FOV_RAD = Units.degreesToRadians(140); // TODO: TUNE
 
   // Distance for quick
-  public static final double QUICK_DISTANCE_M = 4.0;
+  public static final double QUICK_DISTANCE_M = 3.0;
 
   // Distance for clear
   public static final double CLEAR_DISTANCE_M = QUICK_DISTANCE_M + 0.1;
@@ -90,6 +95,8 @@ public class Vision extends SubsystemBase {
     return instance;
   }
 
+  private List<Pose2d> posesToLog;
+
   private VisionIO cameras[];
   private VisionIOInputsAutoLogged[] visionInputs;
 
@@ -102,6 +109,8 @@ public class Vision extends SubsystemBase {
           new VisionIOInputsAutoLogged(),
           new VisionIOInputsAutoLogged()
         };
+
+    posesToLog = new ArrayList<>();
   }
 
   public int getCameras() {
@@ -173,7 +182,7 @@ public class Vision extends SubsystemBase {
 
     Logger.recordOutput("Vision/campose", v0);
 
-    double fov = Units.degreesToRadians(CAM_FOV_DEG); // TODO: TUNE rad;
+    double fov = CAM_FOV_RAD; // TODO: TUNE rad;
 
     double theta1 = v0.getRotation().getRadians() - (fov * 0.5);
     double theta2 = v0.getRotation().getRadians() + (fov * 0.5);
@@ -194,28 +203,26 @@ public class Vision extends SubsystemBase {
         "Vision/Vectors/v2",
         new Pose2d(v2.plus(v0.getTranslation()), Rotation2d.fromRadians(theta2)));
 
-    double detv0v1 = Util.det(v0.getTranslation(), v1);
-    double detv0v2 = Util.det(v0.getTranslation(), v2);
-    double detv1v2_inverted = 1.0 / Util.det(v1, v2);
-
     for (AprilTag tag : AT_MAP.getTags()) {
       Pose2d tagpose = tag.pose.toPose2d();
-      double detvv1 = Util.det(tagpose.getTranslation(), v1);
-      double detvv2 = Util.det(tagpose.getTranslation(), v2);
 
       double deltaX = tagpose.getX() - v0.getX();
       double deltaY = tagpose.getY() - v0.getY();
 
-      double deltaXsquared = (deltaX) * (deltaX);
-      double deltaYsquared = (deltaY) * (deltaY);
+      double vTheta = Math.atan2(deltaY, deltaX);
+      double tagTheta = tagpose.getRotation().getRadians() + Math.PI;
 
-      if ((deltaXsquared + deltaYsquared) <= (QUICK_DISTANCE_M * QUICK_DISTANCE_M)) {
-        double atan2 = Math.atan2(deltaY, deltaX);
-        if (atan2 <= theta2 && atan2 >= theta1) {
-          shouldSwitchToQuick = true;
-          break;
+      if (Util.isWithinDistanceInclusive(deltaX, deltaY, QUICK_DISTANCE_M)) {
+        if (Util.isWithinAngleInclusive(v0.getRotation().getRadians(), vTheta, CAM_FOV_RAD)) {
+          if (Util.isWithinAngleInclusive(tagTheta, vTheta, AT_FOV_RAD)) {
+            posesToLog.add(tagpose);
+            shouldSwitchToQuick = true;
+            //break; //TODO: reintroduce break for efficiency
+          }
         }
       }
+
+      
     }
 
     if (shouldSwitchToQuick) {
@@ -227,18 +234,24 @@ public class Vision extends SubsystemBase {
       Logger.recordOutput("Vision/Camera" + camID + "/Quick?", false);
     }
 
-    if (shouldSwitchToClear) {
+    if (shouldSwitchToClear) { //TODO: implement for noise reduction
       // cam.setPipeline(CLEAR_PIPELINE_ID);
     }
   }
 
   @Override
   public void periodic() {
+    long time = Logger.getRealTimestamp();
     for (int i = 0; i < cameras.length; i++) {
       cameras[i].updateInputs(visionInputs[i]);
       Logger.processInputs("Vision/Camera" + i + "/Inputs", visionInputs[i]);
 
       managePipelines(i, Drive.getInstance().getPose());
     }
+
+    
+    Logger.recordOutput("Vision/TagSet", posesToLog.toArray(new Pose2d[0]));
+    posesToLog.clear();
+    Logger.recordOutput("Perf/Vision", Logger.getRealTimestamp() - time);
   }
 }
