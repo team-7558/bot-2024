@@ -252,6 +252,6 @@ public class Vision extends SubsystemBase {
     
     Logger.recordOutput("Vision/TagSet", posesToLog.toArray(new Pose2d[0]));
     posesToLog.clear();
-    Logger.recordOutput("Perf/Vision", Logger.getRealTimestamp() - time);
+    Logger.recordOutput("PerfMs/Vision", Util.FPGATimeDelta_ms(Logger.getRealTimestamp(), time));
   }
 }

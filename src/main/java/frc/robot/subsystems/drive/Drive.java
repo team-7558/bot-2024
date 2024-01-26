@@ -18,8 +18,6 @@ import com.pathplanner.lib.pathfinding.Pathfinding;
 import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
 import com.pathplanner.lib.util.PathPlannerLogging;
 import com.pathplanner.lib.util.ReplanningConfig;
-import edu.wpi.first.apriltag.AprilTagFieldLayout;
-import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
@@ -43,7 +41,6 @@ import frc.robot.subsystems.drive.Module.Mode;
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.util.LocalADStarAK;
 import frc.robot.util.Util;
-import java.io.IOException;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import org.littletonrobotics.junction.AutoLogOutput;
@@ -298,7 +295,8 @@ public class Drive extends StateMachineSubsystemBase {
       pose = pose.exp(twist);
     }
 
-    poseEstimator.updateWithTime(Timer.getFPGATimestamp(), getRotation(), getModulePositions());
+    //Be wary about using Timer.getFPGATimestamp in AK
+    poseEstimator.updateWithTime(Timer.getFPGATimestamp(), getRotation(), getModulePositions()); 
 
     // TODO: figure out if needs to be moved into 250Hz processing loop
     chassisSpeeds = kinematics.toChassisSpeeds(getModuleStates());
