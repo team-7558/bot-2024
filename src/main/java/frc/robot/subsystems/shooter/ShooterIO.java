@@ -6,6 +6,10 @@ public interface ShooterIO {
 
     @AutoLog
     public static class ShooterIOInputs{
+        public double feederVoltage = 0.0;
+        public double feederVelocity = 0.0;
+        public double[] feederCurrent = new double[] {};
+
         public double flywheelVelocityRadPerSec = 0.0;
         public double flywheelAppliedVolts = 0.0;
         public double linearActuatorPositionLeft = 0.0;
@@ -48,4 +52,6 @@ public interface ShooterIO {
         public default void turretConfigurePID(double kP, double kI, double kD) {}
 
         public default void setTurretAngle(double angle) {}
+
+        public default void setFeederVoltage(double voltage) {}
 } 

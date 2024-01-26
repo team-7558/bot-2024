@@ -21,6 +21,10 @@ import edu.wpi.first.math.util.Units;
 import frc.robot.Constants;
 import frc.robot.subsystems.StateMachineSubsystemBase;
 import frc.robot.subsystems.drive.Drive;
+import frc.robot.util.Util;
+
+import javax.swing.plaf.nimbus.State;
+
 import org.littletonrobotics.junction.Logger;
 
 public class Shooter extends StateMachineSubsystemBase {
@@ -28,6 +32,11 @@ public class Shooter extends StateMachineSubsystemBase {
   private static double SHOOTER_HEIGHT = 0;
 
   public static double ACCELERATION = 5.0; //TODO: tune
+
+  private static double FEEDING_ANGLE = 0.0; //TODO: tune
+  private static double FEEDING_ANGLE_TOLERANCE = 0.0; //TODO: tune
+  private static double FEEDING_VOLTS = 3; //TODO: tune
+
   private static double FEEDFORWARD_VOLTS = 0; //TODO: tune
   private static double GEAR_RATIO = 2; // 2:1
   private static double FLYWHEEL_MAX_RPM = 7200 * GEAR_RATIO; //TODO: tune
@@ -59,7 +68,7 @@ public class Shooter extends StateMachineSubsystemBase {
     return instance;
   }
 
-  public final State DISABLED, IDLE, LOCKONT, SHOOTING;
+  public final State DISABLED, IDLE, LOCKONT, SHOOTING,BEING_FED;
   private final ShooterIOInputsAutoLogged inputs = new ShooterIOInputsAutoLogged();
 
   private final ShooterIO io;
@@ -119,6 +128,26 @@ public class Shooter extends StateMachineSubsystemBase {
           @Override
           public void exit() {}
         };
+
+    
+    BEING_FED = new State("BEING_FED") {
+      @Override
+      public void init() {
+        io.setTurretAngle(FEEDING_ANGLE);
+      }
+
+      @Override
+      public void periodic() {
+        if(inputs.beamBreakActivated) {
+          io.stop();
+        }
+        if(Util.inRange(FEEDING_ANGLE + FEEDING_ANGLE_TOLERANCE,FEEDING_ANGLE - FEEDING_ANGLE_TOLERANCE)) {
+          io.setFeederVoltage(FEEDING_VOLTS);
+          setCurrentState(LOCKONT);
+        }
+      }
+      
+    };
 
     // turent locks on to target and follow it
     LOCKONT =
