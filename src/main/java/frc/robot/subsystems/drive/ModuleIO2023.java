@@ -230,6 +230,7 @@ public class ModuleIO2023 implements ModuleIO {
     double vel_rotps = Units.radiansToRotations(vel_radps);
 
     driveTalon.setControl(driveOut_rotps.withVelocity(vel_rotps));
+    // TODO: figure out correct control
   }
 
   @Override
@@ -240,6 +241,7 @@ public class ModuleIO2023 implements ModuleIO {
   @Override
   public void setTurnAngle(double rad) {
     turnTalon.setControl(turnOut_rot.withPosition(Units.radiansToRotations(rad)));
+    // TODO: figure out correct control
   }
 
   @Override
