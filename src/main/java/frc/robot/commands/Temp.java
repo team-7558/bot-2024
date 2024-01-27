@@ -13,19 +13,16 @@ import frc.robot.subsystems.drive.Drive;
 public class Temp extends Command {
 
   private final Drive drive;
-  private TalonFX left, right;
-  private DutyCycleOut lout, rout;
+  private TalonFX turret;
+  private DutyCycleOut out;
 
   /** Creates a new DriveTeleop. */
   public Temp() {
     // Use addRequirements() here to declare subsystem dependencies.
     drive = Drive.getInstance();
 
-    left = new TalonFX(31);
-    right = new TalonFX(32);
-
-    lout = new DutyCycleOut(0);
-    rout = new DutyCycleOut(0);
+    turret = new TalonFX(40);
+    out = new DutyCycleOut(0);
 
     addRequirements(drive);
   }
@@ -72,24 +69,14 @@ public class Temp extends Command {
     }
 
     if (OI.DR.getAButton()) {
-      lout.withOutput(-0.20);
-      rout.withOutput(-0.25);
-    } else if (OI.DR.getBButton()) {
-      lout.withOutput(-0.40);
-      rout.withOutput(-0.5);
-    } else if (OI.DR.getYButton()) {
-      lout.withOutput(-0.60);
-      rout.withOutput(-0.60);
-    } else if (OI.DR.getXButton()) {
-      lout.withOutput(-0.8);
-      rout.withOutput(-0.8);
+      out = new DutyCycleOut(0.10);
+    } else if(OI.DR.getBButton()) {
+      out = new DutyCycleOut(-0.1);
     } else {
-      lout.withOutput(0);
-      rout.withOutput(0);
+      out = new DutyCycleOut(0);
     }
 
-    left.setControl(lout);
-    right.setControl(rout);
+    turret.setControl(out);
   }
 
   // Called once the command ends or is interrupted.
