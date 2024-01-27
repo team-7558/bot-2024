@@ -4,6 +4,7 @@
 
 package frc.robot.commands;
 
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.OI;
 import frc.robot.subsystems.drive.Drive;
@@ -34,7 +35,7 @@ public class RobotTeleop extends Command {
       // slow mode
       // x stance while shooting
       if (OI.DR.getLeftTriggerAxis() > 0) {
-        drive.setCurrentState(drive.SHOOTING);
+        drive.setPose(new Pose2d());
       } else
       // autolocking
       if (OI.DR.getXButton()) {

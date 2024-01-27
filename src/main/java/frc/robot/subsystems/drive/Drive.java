@@ -82,18 +82,12 @@ public class Drive extends StateMachineSubsystemBase {
         case REAL:
           // Real robot, instantiate hardware IO implementations
           instance =
-              // new Drive(
-              //     new GyroIOPigeon2(),
-              //     new ModuleIO2023(0),
-              //     new ModuleIO2023(1),
-              //     new ModuleIO2023(2),
-              //     new ModuleIO2023(3));
               new Drive(
-                  new GyroIO() {},
-                  new ModuleIO() {},
-                  new ModuleIO() {},
-                  new ModuleIO() {},
-                  new ModuleIO() {});
+                  new GyroIOPigeon2(),
+                  new ModuleIO2023(0),
+                  new ModuleIO2023(1),
+                  new ModuleIO2023(2),
+                  new ModuleIO2023(3));
           break;
 
         case SIM:
@@ -147,10 +141,10 @@ public class Drive extends StateMachineSubsystemBase {
 
     super("Drive");
     this.gyroIO = gyroIO;
-    modules[FL] = new Module(flModuleIO, FL, Mode.SETPOINT);
-    modules[FR] = new Module(frModuleIO, FR, Mode.SETPOINT);
-    modules[BL] = new Module(blModuleIO, BL, Mode.SETPOINT);
-    modules[BR] = new Module(brModuleIO, BR, Mode.SETPOINT);
+    modules[FL] = new Module(flModuleIO, FL, Mode.VOLTAGE);
+    modules[FR] = new Module(frModuleIO, FR, Mode.VOLTAGE);
+    modules[BL] = new Module(blModuleIO, BL, Mode.VOLTAGE);
+    modules[BR] = new Module(brModuleIO, BR, Mode.VOLTAGE);
 
     // Configure AutoBuilder for PathPlanner
     AutoBuilder.configureHolonomic(
@@ -297,7 +291,6 @@ public class Drive extends StateMachineSubsystemBase {
 
     //Be wary about using Timer.getFPGATimestamp in AK
     poseEstimator.updateWithTime(Timer.getFPGATimestamp(), getRotation(), getModulePositions()); 
-
     // TODO: figure out if needs to be moved into 250Hz processing loop
     chassisSpeeds = kinematics.toChassisSpeeds(getModuleStates());
 

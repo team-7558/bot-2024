@@ -49,13 +49,14 @@ public class ModuleIOIdeal implements ModuleIO {
     inputs.driveCurrentAmps = new double[] {0};
 
     inputs.turnAbsolutePosition = new Rotation2d(turnPos_rad).plus(turnAbsoluteInitPosition);
+    inputs.turnPositionRad = new Rotation2d(turnPos_rad);
     inputs.turnPosition = new Rotation2d(turnPos_rad);
     inputs.turnVelocityRadPerSec = turnVel_radps;
     inputs.turnAppliedVolts = turnVolts_V;
     inputs.turnCurrentAmps = new double[] {Math.abs(0)};
 
     inputs.odometryDrivePositionsRad = new double[] {inputs.drivePositionRad};
-    inputs.odometryTurnPositions = new Rotation2d[] {inputs.turnPosition};
+    inputs.odometryTurnPositions = new Rotation2d[] {inputs.turnPositionRad};
   }
 
   @Override
