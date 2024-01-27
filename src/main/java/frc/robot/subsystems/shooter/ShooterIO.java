@@ -7,6 +7,7 @@ public interface ShooterIO {
     @AutoLog
     public static class ShooterIOInputs{
         public double feederVoltage = 0.0;
+        public double feederPosition = 0.0;
         public double feederVelocity = 0.0;
         public double[] feederCurrent = new double[] {};
 
@@ -53,5 +54,9 @@ public interface ShooterIO {
 
         public default void setTurretAngle(double angle) {}
 
-        public default void setFeederVoltage(double voltage) {}
+        public default void stopFeeder() {}
+
+        public default void setFeederPosition(double velocity) {}
+
+        public default void setTurretAngleMotionProfile(double angle) {}
 } 

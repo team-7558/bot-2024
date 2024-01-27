@@ -1,11 +1,14 @@
 package frc.robot.subsystems.shooter;
 
 import com.ctre.phoenix.led.CANdle;
+import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.Follower;
+import com.ctre.phoenix6.controls.MotionMagicVelocityVoltage;
+import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
@@ -19,6 +22,7 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Servo;
 
 public class ShooterIOTalonFx implements ShooterIO {
+
 
   private static final double GEAR_RATIO = 2;
   private final TalonFX talonL = new TalonFX(31);
@@ -51,6 +55,7 @@ public class ShooterIOTalonFx implements ShooterIO {
   private final StatusSignal<Double> feederVelocity = feeder.getVelocity();
   private final StatusSignal<Double> feederAppliedVolts = feeder.getMotorVoltage();
   private final StatusSignal<Double> feederCurrent = feeder.getStatorCurrent();
+  private final StatusSignal<Double> feederPosition = feeder.getPosition();
 
   private final StatusSignal<Double> TAbsolutePosition = turretCancoder.getAbsolutePosition();
 
@@ -73,10 +78,13 @@ public class ShooterIOTalonFx implements ShooterIO {
     turretConfig.Feedback.RotorToSensorRatio = GEAR_RATIO;
     turretConfig.CurrentLimits.StatorCurrentLimit = 30.0; //TODO: tune
     turretConfig.CurrentLimits.StatorCurrentLimitEnable = true; 
-    turretConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
+    turretConfig.MotorOutput.NeutralMode = NeutralModeValue.Coast;
     turretConfig.Slot0.kP = 0;
     turretConfig.Slot0.kI = 0;
     turretConfig.Slot0.kD = 0;
+    turretConfig.MotionMagic.MotionMagicAcceleration = 0;
+    turretConfig.MotionMagic.MotionMagicCruiseVelocity = 0;
+    turretConfig.MotionMagic.MotionMagicJerk = 0;
 
     var feederConfig = new TalonFXConfiguration();
     feederConfig.Feedback.SensorToMechanismRatio = 1;
@@ -87,6 +95,11 @@ public class ShooterIOTalonFx implements ShooterIO {
     feederConfig.Slot0.kS = 0;
     feederConfig.Slot0.kV = 0;
     feederConfig.Slot0.kG = 0;
+    feederConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
+    feederConfig.MotionMagic.MotionMagicAcceleration = 0;
+    feederConfig.MotionMagic.MotionMagicCruiseVelocity = 0;
+
+    
 
     //TODO: tune all of that & use absolute encoder
 
@@ -166,6 +179,11 @@ public class ShooterIOTalonFx implements ShooterIO {
   }
 
   @Override
+  public void setTurretAngleMotionProfile(double angle) {
+    turret.setControl(new MotionMagicVoltage(angle));
+  }
+
+  @Override
   public void stop() {
     talonL.stopMotor();
     talonR.stopMotor();
@@ -185,8 +203,8 @@ public class ShooterIOTalonFx implements ShooterIO {
   }
 
   @Override
-  public void setFeederVoltage(double volts) {
-    feeder.setControl(new VoltageOut(volts));
+  public void setFeederPosition(double position) {
+    feeder.setControl(new MotionMagicVoltage(position));
   }
 
   @Override
@@ -196,6 +214,11 @@ public class ShooterIOTalonFx implements ShooterIO {
     config.kI = kI;
     config.kD = kD;
     turret.getConfigurator().apply(config);
+  }
+
+  @Override
+  public void stopFeeder() {
+    feeder.setControl(new VoltageOut(0));
   }
 
   @Override
@@ -213,5 +236,10 @@ public class ShooterIOTalonFx implements ShooterIO {
     inputs.turretPositionDeg = TPosition.getValueAsDouble();
     inputs.turretAppliedVolts = TAppliedVolts.getValueAsDouble();
     inputs.turretVelocityRadPerSec = TVelocity.getValueAsDouble();
+
+    inputs.feederCurrent = new double[] {feederCurrent.getValueAsDouble()};
+    inputs.feederVelocity = feederVelocity.getValueAsDouble();
+    inputs.feederPosition = feederPosition.getValueAsDouble();
+    inputs.feederVoltage = feederAppliedVolts.getValueAsDouble();
   }
 }

@@ -16,14 +16,11 @@ package frc.robot.subsystems.shooter;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.util.Units;
 import frc.robot.Constants;
 import frc.robot.subsystems.StateMachineSubsystemBase;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.util.Util;
-
-import javax.swing.plaf.nimbus.State;
 
 import org.littletonrobotics.junction.Logger;
 
@@ -35,7 +32,7 @@ public class Shooter extends StateMachineSubsystemBase {
 
   private static double FEEDING_ANGLE = 0.0; //TODO: tune
   private static double FEEDING_ANGLE_TOLERANCE = 0.0; //TODO: tune
-  private static double FEEDING_VOLTS = 3; //TODO: tune
+  private static double FEEDING_ROTATIONS = 5; //TODO: tune
 
   private static double FEEDFORWARD_VOLTS = 0; //TODO: tune
   private static double GEAR_RATIO = 2; // 2:1
@@ -45,8 +42,15 @@ public class Shooter extends StateMachineSubsystemBase {
   private static double FLYWHEEL_RAD_PER_SEC = (FLYWHEEL_MAX_RPM * FLYWHEEL_SPEED) * (2* Math.PI) / 60;
   private static double FLYWHEEL_RPM = FLYWHEEL_MAX_RPM * FLYWHEEL_SPEED; // remove if unused
 
+  private static double TURRET_SNAP_TOLERANCE = 50;
+
   private static Pose3d SPEAKER_POSE = new Pose3d(); // fill
   private static double HEIGHT_DIFFERENCE = SPEAKER_POSE.getZ() - SHOOTER_HEIGHT;
+
+  private double feederPosition = 0;
+  private double shooterVelocity = 0;
+  private double shooterAngle = 0;
+  private double turretAngle = 0;
 
   private static Shooter instance;
 
@@ -133,17 +137,13 @@ public class Shooter extends StateMachineSubsystemBase {
     BEING_FED = new State("BEING_FED") {
       @Override
       public void init() {
-        io.setTurretAngle(FEEDING_ANGLE);
+        turretAngle = FEEDING_ANGLE;
       }
 
       @Override
       public void periodic() {
         if(inputs.beamBreakActivated) {
-          io.stop();
-        }
-        if(Util.inRange(FEEDING_ANGLE + FEEDING_ANGLE_TOLERANCE,FEEDING_ANGLE - FEEDING_ANGLE_TOLERANCE)) {
-          io.setFeederVoltage(FEEDING_VOLTS);
-          setCurrentState(LOCKONT);
+          io.stopFeeder();
         }
       }
       
@@ -159,8 +159,9 @@ public class Shooter extends StateMachineSubsystemBase {
           @Override
           public void periodic() {
             ShooterState shooterState = getStateToSpeaker();
-            io.setTurretAngle(shooterState.getTurretPosition());
-            io.setAngle(shooterState.getHoodPosition());
+            turretAngle = shooterState.getTurretPosition();
+            shooterAngle = shooterState.getHoodPosition();
+            shooterVelocity = shooterState.getShooterVelocity();
           }
 
           @Override
@@ -173,16 +174,17 @@ public class Shooter extends StateMachineSubsystemBase {
         new State("SHOOTING") {
           @Override
           public void init() {
-            stop();
           }
 
           @Override
           public void periodic() {
             ShooterState shooterState = getStateToSpeaker();
-            io.setFlywheelVelocity(FLYWHEEL_RAD_PER_SEC,FEEDFORWARD_VOLTS);
-            io.setTurretAngle(shooterState.getTurretPosition());
-            io.setAngle(shooterState.getHoodPosition());
+            shooterVelocity = shooterState.getShooterVelocity();
+            turretAngle = shooterState.getTurretPosition();
+            shooterAngle = shooterState.getHoodPosition();
+            feederPosition = inputs.feederPosition + FEEDING_ROTATIONS;
           }
+
 
           @Override
           public void exit() {}
@@ -199,6 +201,15 @@ public class Shooter extends StateMachineSubsystemBase {
 
     // Log flywheel speed in RPM
     Logger.recordOutput("FlywheelSpeedRPM", getVelocityRPM());
+
+    io.setAngle(shooterAngle);
+    if((turretAngle - inputs.turretPositionDeg) > TURRET_SNAP_TOLERANCE) {
+      io.setTurretAngleMotionProfile(turretAngle);
+    } else {
+      io.setTurretAngle(turretAngle);
+    }
+    io.setFeederPosition(feederPosition);
+    io.setFlywheelVelocity(shooterVelocity, FEEDFORWARD_VOLTS);
   }
 
   /** Run closed loop at the specified velocity. */
@@ -212,7 +223,10 @@ public class Shooter extends StateMachineSubsystemBase {
 
   /** Stops Everything */
   public void stop() {
-    io.stop();
+    shooterAngle = 0;
+    turretAngle = 0;
+    shooterVelocity = 0;
+    io.stopFeeder();
   }
 
   /** Returns the current velocity in RPM. */
