@@ -217,12 +217,10 @@ public class Vision extends SubsystemBase {
           if (Util.isWithinAngleInclusive(tagTheta, vTheta, AT_FOV_RAD)) {
             posesToLog.add(tagpose);
             shouldSwitchToQuick = true;
-            //break; //TODO: reintroduce break for efficiency
+            // break; //TODO: reintroduce break for efficiency
           }
         }
       }
-
-      
     }
 
     if (shouldSwitchToQuick) {
@@ -234,7 +232,7 @@ public class Vision extends SubsystemBase {
       Logger.recordOutput("Vision/Camera" + camID + "/Quick?", false);
     }
 
-    if (shouldSwitchToClear) { //TODO: implement for noise reduction
+    if (shouldSwitchToClear) { // TODO: implement for noise reduction
       // cam.setPipeline(CLEAR_PIPELINE_ID);
     }
   }
@@ -249,7 +247,6 @@ public class Vision extends SubsystemBase {
       managePipelines(i, Drive.getInstance().getPose());
     }
 
-    
     Logger.recordOutput("Vision/TagSet", posesToLog.toArray(new Pose2d[0]));
     posesToLog.clear();
     Logger.recordOutput("PerfMs/Vision", Util.FPGATimeDelta_ms(Logger.getRealTimestamp(), time));

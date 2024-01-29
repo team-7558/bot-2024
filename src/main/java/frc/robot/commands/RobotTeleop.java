@@ -7,6 +7,7 @@ package frc.robot.commands;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.OI;
+import frc.robot.SS2d;
 import frc.robot.subsystems.drive.Drive;
 
 public class RobotTeleop extends Command {
@@ -34,7 +35,7 @@ public class RobotTeleop extends Command {
     if (!drive.isState(drive.DISABLED)) {
       // slow mode
       // x stance while shooting
-      if (OI.DR.getLeftTriggerAxis() > 0) {
+      if (OI.DR.getPOV() == 180) {
         drive.setPose(new Pose2d());
       } else
       // autolocking
@@ -61,6 +62,16 @@ public class RobotTeleop extends Command {
       //   drive.setModuleModes(Mode.SETPOINT);
       // }
     }
+
+    if (OI.DR.getAButton()) SS2d.setElevatorHeight(0.586 + 0.594 + 0.5);
+    if (OI.DR.getBButton()) SS2d.setElevatorHeight(0.586 + 0.594);
+
+    if (OI.DR.getLeftTriggerAxis() > 0) SS2d.setIntakeMotors(1, 1);
+    else if (OI.DR.getLeftBumper()) SS2d.setIntakeMotors(1, -1);
+    else SS2d.setIntakeMotors(0, 0);
+
+    if (OI.DR.getRightBumper()) SS2d.setShooterTilt(45);
+    else SS2d.setShooterTilt(0);
   }
 
   // Called once the command ends or is interrupted.
