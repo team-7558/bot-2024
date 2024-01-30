@@ -201,7 +201,7 @@ public class Util {
     return isWithinDistanceInclusive(x1 - x0, y1 - y0, distance);
   }
 
-  public static double FPGATimeDelta_ms(long latest, long prev){
+  public static double FPGATimeDelta_ms(long latest, long prev) {
     return 0.001 * (latest - prev);
   }
 }
