@@ -16,6 +16,8 @@ package frc.robot.subsystems.shooter;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
 import frc.robot.Constants;
 import frc.robot.subsystems.StateMachineSubsystemBase;
@@ -39,6 +41,7 @@ public class Shooter extends StateMachineSubsystemBase {
   private static double FLYWHEEL_MAX_RPM = 7200 * GEAR_RATIO; //TODO: tune
   private static double FLYWHEEL_SPEED = 0.75; // -1 - 1 //TODO: tune
 
+  private static double FLYWHEEL_RADIUS = 2; // TODO: tune
   private static double FLYWHEEL_RAD_PER_SEC = (FLYWHEEL_MAX_RPM * FLYWHEEL_SPEED) * (2* Math.PI) / 60;
   private static double FLYWHEEL_RPM = FLYWHEEL_MAX_RPM * FLYWHEEL_SPEED; // remove if unused
 
@@ -244,11 +247,41 @@ public class Shooter extends StateMachineSubsystemBase {
 
   /** Returns the required hardware states to be able to shoot in speaker */
   public ShooterState getStateToSpeaker() {
+
+    // check if moving
+
+    Drive drive = Drive.getInstance();
+
+    ChassisSpeeds speeds = drive.getChassisSpeeds();
     Pose2d pose2d = Drive.getInstance().getPose();
+ 
+
 
     double distanceToSpeaker = pose2d.getTranslation().getDistance(SPEAKER_POSE.toPose2d().getTranslation());
 
     ShooterState state = new ShooterState();
+
+    // TODO: MAKE ACTUALLY WORK
+
+    if(speeds.vyMetersPerSecond > 0 || speeds.vxMetersPerSecond > 0 && speeds.omegaRadiansPerSecond == 0) {
+      double[] velocityVector = new double[]{speeds.vxMetersPerSecond,speeds.vyMetersPerSecond};
+      Transform3d difference = new Pose3d(pose2d).minus(SPEAKER_POSE);
+      double[] speakerDifferenceVector = new double[]{difference.getX(),difference.getY(),difference.getZ()};
+
+      double[] shoot_vector = new double[]{speakerDifferenceVector[0] - velocityVector[0], speakerDifferenceVector[1] - velocityVector[1]};
+
+      double shoot_heading = Math.atan(shoot_vector[1] / shoot_vector[0]); // might not work 
+      double shoot_speed = Math.sqrt(Math.pow(shoot_vector[0],2) + Math.pow(shoot_vector[1],2));
+
+      double shoot_speed_rad_per_sec = shoot_speed * FLYWHEEL_RADIUS;
+      double launch_angle = Math.atan((HEIGHT_DIFFERENCE) / distanceToSpeaker);
+      state.setHoodPosition(launch_angle);
+      state.setShooterVelocityRadPerSec(shoot_speed_rad_per_sec);
+      state.setTurretPosition(shoot_heading);
+      return state;
+    } 
+
+
 
     // needs to be changed if the angle to hit target at is > 0
     double angle = Math.atan((HEIGHT_DIFFERENCE) / distanceToSpeaker);
@@ -261,4 +294,8 @@ public class Shooter extends StateMachineSubsystemBase {
     state.setTurretPosition(turretPosition);
     return state;
   }
+
+  
+
+
 }
