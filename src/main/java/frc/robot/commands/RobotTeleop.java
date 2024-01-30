@@ -7,15 +7,18 @@ package frc.robot.commands;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.OI;
 import frc.robot.subsystems.drive.Drive;
+import frc.robot.subsystems.shooter.Shooter;
 
 public class RobotTeleop extends Command {
 
   private final Drive drive;
+  private final Shooter shooter;
 
   /** Creates a new DriveTeleop. */
   public RobotTeleop() {
     // Use addRequirements() here to declare subsystem dependencies.
     drive = Drive.getInstance();
+    shooter = Shooter.getInstance();
 
     addRequirements(drive);
   }
@@ -30,6 +33,12 @@ public class RobotTeleop extends Command {
   @Override
   public void execute() {
 
+    if(!shooter.isState(shooter.DISABLED)) {
+      if(OI.XK.get(0, 1)) { // make actually binded
+        shooter.setCurrentState(shooter.SHOOTING);
+      }
+    }
+      
     if (!drive.isState(drive.DISABLED)) {
       // slow mode
       // x stance while shooting

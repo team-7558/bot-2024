@@ -174,6 +174,7 @@ public class Shooter extends StateMachineSubsystemBase {
         new State("SHOOTING") {
           @Override
           public void init() {
+            feederPosition = inputs.feederPosition + FEEDING_ROTATIONS;
           }
 
           @Override
@@ -182,7 +183,6 @@ public class Shooter extends StateMachineSubsystemBase {
             shooterVelocity = shooterState.getShooterVelocity();
             turretAngle = shooterState.getTurretPosition();
             shooterAngle = shooterState.getHoodPosition();
-            feederPosition = inputs.feederPosition + FEEDING_ROTATIONS;
           }
 
 

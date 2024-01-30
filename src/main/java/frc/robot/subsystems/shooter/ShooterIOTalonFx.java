@@ -24,7 +24,10 @@ import edu.wpi.first.wpilibj.Servo;
 public class ShooterIOTalonFx implements ShooterIO {
 
 
-  private static final double GEAR_RATIO = 2;
+  private static final double FLYWHEEL_GEAR_RATIO = 2;
+  private static final double TURRET_GEAR_RATIO = 2;//TODO SET
+  private static final double FEEDER_GEAR_RATIO = 1; //TODO: SET
+
   private final TalonFX talonL = new TalonFX(31);
   private final TalonFX talonR = new TalonFX(32);
   private final TalonFX turret = new TalonFX(37); //TODO: update
@@ -61,7 +64,7 @@ public class ShooterIOTalonFx implements ShooterIO {
 
   public ShooterIOTalonFx() {
     var config = new TalonFXConfiguration();
-    config.Feedback.RotorToSensorRatio = GEAR_RATIO;
+    config.Feedback.RotorToSensorRatio = FLYWHEEL_GEAR_RATIO;
     config.CurrentLimits.StatorCurrentLimit = 30.0;
     config.CurrentLimits.StatorCurrentLimitEnable = true;
     config.MotorOutput.NeutralMode = NeutralModeValue.Coast;
@@ -75,7 +78,7 @@ public class ShooterIOTalonFx implements ShooterIO {
     talonR.getConfigurator().apply(config);
 
     var turretConfig = new TalonFXConfiguration();
-    turretConfig.Feedback.RotorToSensorRatio = GEAR_RATIO;
+    turretConfig.Feedback.RotorToSensorRatio = TURRET_GEAR_RATIO;
     turretConfig.CurrentLimits.StatorCurrentLimit = 30.0; //TODO: tune
     turretConfig.CurrentLimits.StatorCurrentLimitEnable = true; 
     turretConfig.MotorOutput.NeutralMode = NeutralModeValue.Coast;
@@ -87,7 +90,7 @@ public class ShooterIOTalonFx implements ShooterIO {
     turretConfig.MotionMagic.MotionMagicJerk = 0;
 
     var feederConfig = new TalonFXConfiguration();
-    feederConfig.Feedback.SensorToMechanismRatio = 1;
+    feederConfig.Feedback.SensorToMechanismRatio = FEEDER_GEAR_RATIO;
     feederConfig.Slot0.kP = 0;
     feederConfig.Slot0.kI = 0;
     feederConfig.Slot0.kD = 0;
@@ -129,6 +132,7 @@ public class ShooterIOTalonFx implements ShooterIO {
     talonL.optimizeBusUtilization();
     talonR.optimizeBusUtilization();
     turret.optimizeBusUtilization();
+    feeder.optimizeBusUtilization();
 
     turret.setPosition(TAbsolutePosition.getValueAsDouble());
   }
@@ -226,7 +230,7 @@ public class ShooterIOTalonFx implements ShooterIO {
     BaseStatusSignal.refreshAll(LVelocity, LAppliedVolts, LCurrent);
 
     inputs.flywheelVelocityRadPerSec =
-        Units.rotationsToRadians(LVelocity.getValueAsDouble()) / GEAR_RATIO;
+        Units.rotationsToRadians(LVelocity.getValueAsDouble());
     inputs.flywheelAppliedVolts = LAppliedVolts.getValueAsDouble();
     inputs.currentAmps = new double[] {LAppliedVolts.getValueAsDouble()};
 
@@ -235,10 +239,10 @@ public class ShooterIOTalonFx implements ShooterIO {
 
     inputs.turretPositionDeg = TPosition.getValueAsDouble();
     inputs.turretAppliedVolts = TAppliedVolts.getValueAsDouble();
-    inputs.turretVelocityRadPerSec = TVelocity.getValueAsDouble();
+    inputs.turretVelocityRadPerSec = Units.rotationsToRadians(TVelocity.getValueAsDouble());
 
     inputs.feederCurrent = new double[] {feederCurrent.getValueAsDouble()};
-    inputs.feederVelocity = feederVelocity.getValueAsDouble();
+    inputs.feederVelocity = Units.rotationsToRadians(inputs.feederVelocity = feederVelocity.getValueAsDouble());
     inputs.feederPosition = feederPosition.getValueAsDouble();
     inputs.feederVoltage = feederAppliedVolts.getValueAsDouble();
   }
