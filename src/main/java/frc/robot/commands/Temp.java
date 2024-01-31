@@ -70,7 +70,7 @@ public class Temp extends Command {
 
     if (OI.DR.getAButton()) {
       out = new DutyCycleOut(0.10);
-    } else if(OI.DR.getBButton()) {
+    } else if (OI.DR.getBButton()) {
       out = new DutyCycleOut(-0.1);
     } else {
       out = new DutyCycleOut(0);

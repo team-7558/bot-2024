@@ -11,6 +11,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import frc.robot.PerfTracker;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.util.Util;
 import java.io.IOException;
@@ -217,12 +218,10 @@ public class Vision extends SubsystemBase {
           if (Util.isWithinAngleInclusive(tagTheta, vTheta, AT_FOV_RAD)) {
             posesToLog.add(tagpose);
             shouldSwitchToQuick = true;
-            //break; //TODO: reintroduce break for efficiency
+            // break; //TODO: reintroduce break for efficiency
           }
         }
       }
-
-      
     }
 
     if (shouldSwitchToQuick) {
@@ -234,14 +233,14 @@ public class Vision extends SubsystemBase {
       Logger.recordOutput("Vision/Camera" + camID + "/Quick?", false);
     }
 
-    if (shouldSwitchToClear) { //TODO: implement for noise reduction
+    if (shouldSwitchToClear) { // TODO: implement for noise reduction
       // cam.setPipeline(CLEAR_PIPELINE_ID);
     }
   }
 
   @Override
   public void periodic() {
-    long time = Logger.getRealTimestamp();
+    PerfTracker.start("Vision");
     for (int i = 0; i < cameras.length; i++) {
       cameras[i].updateInputs(visionInputs[i]);
       Logger.processInputs("Vision/Camera" + i + "/Inputs", visionInputs[i]);
@@ -249,9 +248,8 @@ public class Vision extends SubsystemBase {
       managePipelines(i, Drive.getInstance().getPose());
     }
 
-    
+    PerfTracker.end("Vision");
     Logger.recordOutput("Vision/TagSet", posesToLog.toArray(new Pose2d[0]));
     posesToLog.clear();
-    Logger.recordOutput("PerfMs/Vision", Util.FPGATimeDelta_ms(Logger.getRealTimestamp(), time));
   }
 }
