@@ -95,6 +95,7 @@ Turret:
 -1 PDH
 18-22AWG:
 -1 CAN
+-CANcoder power
 
 Shooter through turret bundle: (make sure this part is easily replaceable in bulk, its most likely to have issues)
 10AWG:
@@ -102,7 +103,6 @@ Shooter through turret bundle: (make sure this part is easily replaceable in bul
 18-22AWG:
 -CAN in
 -CAN out
--CANcoder power
 PWM cables:
 -Beambreak
 -2 Linear Actuators
