@@ -263,6 +263,8 @@ public class Shooter extends StateMachineSubsystemBase {
 
     // TODO: MAKE ACTUALLY WORK
 
+
+    // check if moving
     if(speeds.vyMetersPerSecond > 0 || speeds.vxMetersPerSecond > 0 && speeds.omegaRadiansPerSecond == 0) {
       double[] velocityVector = new double[]{speeds.vxMetersPerSecond,speeds.vyMetersPerSecond};
       Transform3d difference = new Pose3d(pose2d).minus(SPEAKER_POSE);
@@ -277,7 +279,7 @@ public class Shooter extends StateMachineSubsystemBase {
       double launch_angle = Math.atan((HEIGHT_DIFFERENCE) / distanceToSpeaker);
       state.setHoodPosition(launch_angle);
       state.setShooterVelocityRadPerSec(shoot_speed_rad_per_sec);
-      state.setTurretPosition(shoot_heading);
+      state.setTurretPosition(shoot_heading); // very likely doesnt work
       return state;
     } 
 
