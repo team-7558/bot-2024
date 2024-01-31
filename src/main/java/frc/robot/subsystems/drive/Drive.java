@@ -289,8 +289,8 @@ public class Drive extends StateMachineSubsystemBase {
       pose = pose.exp(twist);
     }
 
-    //Be wary about using Timer.getFPGATimestamp in AK
-    poseEstimator.updateWithTime(Timer.getFPGATimestamp(), getRotation(), getModulePositions()); 
+    // Be wary about using Timer.getFPGATimestamp in AK
+    poseEstimator.updateWithTime(Timer.getFPGATimestamp(), getRotation(), getModulePositions());
     // TODO: figure out if needs to be moved into 250Hz processing loop
     chassisSpeeds = kinematics.toChassisSpeeds(getModuleStates());
 
