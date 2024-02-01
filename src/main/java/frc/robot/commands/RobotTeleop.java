@@ -33,12 +33,12 @@ public class RobotTeleop extends Command {
   @Override
   public void execute() {
 
-    if(!shooter.isState(shooter.DISABLED)) {
-      if(OI.XK.get(0, 1)) { // make actually binded
+    if (!shooter.isState(shooter.DISABLED)) {
+      if (OI.XK.get(0, 1)) { // make actually binded
         shooter.setCurrentState(shooter.SHOOTING);
       }
     }
-      
+
     if (!drive.isState(drive.DISABLED)) {
       // slow mode
       // x stance while shooting

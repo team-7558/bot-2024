@@ -16,34 +16,36 @@ package frc.robot.subsystems.shooter;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
 import frc.robot.Constants;
 import frc.robot.subsystems.StateMachineSubsystemBase;
 import frc.robot.subsystems.drive.Drive;
-import frc.robot.util.Util;
-
 import org.littletonrobotics.junction.Logger;
 
 public class Shooter extends StateMachineSubsystemBase {
 
   private static double SHOOTER_HEIGHT = 0;
 
-  public static double ACCELERATION = 5.0; //TODO: tune
+  public static double ACCELERATION = 5.0; // TODO: tune
 
-  private static double FEEDING_ANGLE = 0.0; //TODO: tune
-  private static double FEEDING_ANGLE_TOLERANCE = 0.0; //TODO: tune
-  private static double FEEDING_ROTATIONS = 5; //TODO: tune
+  private static double FEEDING_ANGLE = 0.0; // TODO: tune
+  private static double FEEDING_ANGLE_TOLERANCE = 0.0; // TODO: tune
+  private static double FEEDING_ROTATIONS = 5; // TODO: tune
 
-  private static double FEEDFORWARD_VOLTS = 0; //TODO: tune
+  private static double FEEDFORWARD_VOLTS = 0; // TODO: tune
   private static double GEAR_RATIO = 2; // 2:1
-  private static double FLYWHEEL_MAX_RPM = 7200 * GEAR_RATIO; //TODO: tune
+  private static double FLYWHEEL_MAX_RPM = 7200 * GEAR_RATIO; // TODO: tune
   private static double FLYWHEEL_SPEED = 0.75; // -1 - 1 //TODO: tune
 
   private static double FLYWHEEL_RADIUS = 2; // TODO: tune
-  private static double FLYWHEEL_RAD_PER_SEC = (FLYWHEEL_MAX_RPM * FLYWHEEL_SPEED) * (2* Math.PI) / 60;
+  private static double FLYWHEEL_RAD_PER_SEC =
+      (FLYWHEEL_MAX_RPM * FLYWHEEL_SPEED) * (2 * Math.PI) / 60;
   private static double FLYWHEEL_RPM = FLYWHEEL_MAX_RPM * FLYWHEEL_SPEED; // remove if unused
+
+  private static double TIME_TO_SHOOT = 0.5;
 
   private static double TURRET_SNAP_TOLERANCE = 50;
 
@@ -75,7 +77,7 @@ public class Shooter extends StateMachineSubsystemBase {
     return instance;
   }
 
-  public final State DISABLED, IDLE, LOCKONT, SHOOTING,BEING_FED;
+  public final State DISABLED, IDLE, LOCKONT, SHOOTING, BEING_FED;
   private final ShooterIOInputsAutoLogged inputs = new ShooterIOInputsAutoLogged();
 
   private final ShooterIO io;
@@ -136,28 +138,26 @@ public class Shooter extends StateMachineSubsystemBase {
           public void exit() {}
         };
 
-    
-    BEING_FED = new State("BEING_FED") {
-      @Override
-      public void init() {
-        turretAngle = FEEDING_ANGLE;
-      }
+    BEING_FED =
+        new State("BEING_FED") {
+          @Override
+          public void init() {
+            turretAngle = FEEDING_ANGLE;
+          }
 
-      @Override
-      public void periodic() {
-        if(inputs.beamBreakActivated) {
-          io.stopFeeder();
-        }
-      }
-      
-    };
+          @Override
+          public void periodic() {
+            if (inputs.beamBreakActivated) {
+              io.stopFeeder();
+            }
+          }
+        };
 
     // turent locks on to target and follow it
     LOCKONT =
         new State("LOCKONT") {
           @Override
-          public void init() {
-          }
+          public void init() {}
 
           @Override
           public void periodic() {
@@ -168,9 +168,7 @@ public class Shooter extends StateMachineSubsystemBase {
           }
 
           @Override
-          public void exit() {
-
-          }
+          public void exit() {}
         };
 
     SHOOTING =
@@ -187,7 +185,6 @@ public class Shooter extends StateMachineSubsystemBase {
             turretAngle = shooterState.getTurretPosition();
             shooterAngle = shooterState.getHoodPosition();
           }
-
 
           @Override
           public void exit() {}
@@ -206,7 +203,7 @@ public class Shooter extends StateMachineSubsystemBase {
     Logger.recordOutput("FlywheelSpeedRPM", getVelocityRPM());
 
     io.setAngle(shooterAngle);
-    if((turretAngle - inputs.turretPositionDeg) > TURRET_SNAP_TOLERANCE) {
+    if ((turretAngle - inputs.turretPositionDeg) > TURRET_SNAP_TOLERANCE) {
       io.setTurretAngleMotionProfile(turretAngle);
     } else {
       io.setTurretAngle(turretAngle);
@@ -234,8 +231,6 @@ public class Shooter extends StateMachineSubsystemBase {
 
   /** Returns the current velocity in RPM. */
   public double getVelocityRPM() {
-    
-    
 
     return Units.radiansPerSecondToRotationsPerMinute(inputs.flywheelVelocityRadPerSec);
   }
@@ -254,26 +249,37 @@ public class Shooter extends StateMachineSubsystemBase {
 
     ChassisSpeeds speeds = drive.getChassisSpeeds();
     Pose2d pose2d = Drive.getInstance().getPose();
- 
 
-
-    double distanceToSpeaker = pose2d.getTranslation().getDistance(SPEAKER_POSE.toPose2d().getTranslation());
+    double distanceToSpeaker =
+        pose2d.getTranslation().getDistance(SPEAKER_POSE.toPose2d().getTranslation());
 
     ShooterState state = new ShooterState();
 
     // TODO: MAKE ACTUALLY WORK
 
-
     // check if moving
-    if(speeds.vyMetersPerSecond > 0 || speeds.vxMetersPerSecond > 0 && speeds.omegaRadiansPerSecond == 0) {
-      double[] velocityVector = new double[]{speeds.vxMetersPerSecond,speeds.vyMetersPerSecond};
-      Transform3d difference = new Pose3d(pose2d).minus(SPEAKER_POSE);
-      double[] speakerDifferenceVector = new double[]{difference.getX(),difference.getY(),difference.getZ()};
+    if (speeds.vyMetersPerSecond > 0
+        || speeds.vxMetersPerSecond > 0 && speeds.omegaRadiansPerSecond == 0) {
+      double[] velocityVector = new double[] {speeds.vxMetersPerSecond, speeds.vyMetersPerSecond};
 
-      double[] shoot_vector = new double[]{speakerDifferenceVector[0] - velocityVector[0], speakerDifferenceVector[1] - velocityVector[1]};
+      Transform3d difference =
+          new Pose3d(
+                  pose2d.getX() + velocityVector[0] * TIME_TO_SHOOT,
+                  pose2d.getY() + velocityVector[1] * TIME_TO_SHOOT,
+                  0,
+                  new Rotation3d())
+              .minus(SPEAKER_POSE);
+      double[] speakerDifferenceVector =
+          new double[] {difference.getX(), difference.getY(), difference.getZ()};
 
-      double shoot_heading = Math.atan(shoot_vector[1] / shoot_vector[0]); // might not work 
-      double shoot_speed = Math.sqrt(Math.pow(shoot_vector[0],2) + Math.pow(shoot_vector[1],2));
+      double[] shoot_vector =
+          new double[] {
+            speakerDifferenceVector[0] - velocityVector[0],
+            speakerDifferenceVector[1] - velocityVector[1]
+          };
+
+      double shoot_heading = Math.atan(shoot_vector[1] / shoot_vector[0]); // might not work
+      double shoot_speed = Math.sqrt(Math.pow(shoot_vector[0], 2) + Math.pow(shoot_vector[1], 2));
 
       double shoot_speed_rad_per_sec = shoot_speed * FLYWHEEL_RADIUS;
       double launch_angle = Math.atan((HEIGHT_DIFFERENCE) / distanceToSpeaker);
@@ -281,23 +287,18 @@ public class Shooter extends StateMachineSubsystemBase {
       state.setShooterVelocityRadPerSec(shoot_speed_rad_per_sec);
       state.setTurretPosition(shoot_heading); // very likely doesnt work
       return state;
-    } 
-
-
+    }
 
     // needs to be changed if the angle to hit target at is > 0
     double angle = Math.atan((HEIGHT_DIFFERENCE) / distanceToSpeaker);
 
     // needs to be rotation from the thing
-    double turretPosition = Math.atan((SPEAKER_POSE.getY() - pose2d.getY()) / (SPEAKER_POSE.getX() - pose2d.getX()));
+    double turretPosition =
+        Math.atan((SPEAKER_POSE.getY() - pose2d.getY()) / (SPEAKER_POSE.getX() - pose2d.getX()));
 
     state.setHoodPosition(angle);
     state.setShooterVelocityRadPerSec(FLYWHEEL_RAD_PER_SEC);
     state.setTurretPosition(turretPosition);
     return state;
   }
-
-  
-
-
 }
