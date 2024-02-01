@@ -23,6 +23,8 @@ import edu.wpi.first.math.util.Units;
 import frc.robot.Constants;
 import frc.robot.subsystems.StateMachineSubsystemBase;
 import frc.robot.subsystems.drive.Drive;
+import frc.robot.util.LinearInterpolator;
+
 import org.littletonrobotics.junction.Logger;
 
 public class Shooter extends StateMachineSubsystemBase {
@@ -44,6 +46,9 @@ public class Shooter extends StateMachineSubsystemBase {
   private static double FLYWHEEL_RAD_PER_SEC =
       (FLYWHEEL_MAX_RPM * FLYWHEEL_SPEED) * (2 * Math.PI) / 60;
   private static double FLYWHEEL_RPM = FLYWHEEL_MAX_RPM * FLYWHEEL_SPEED; // remove if unused
+
+  private static final double[][] TABLE_DATA = new double[][]{{0,0},{0,1}}; //TODO: fill
+  private static final LinearInterpolator DISTANCE_TABLE = new LinearInterpolator(TABLE_DATA);
 
   private static double TIME_TO_SHOOT = 0.5;
 
@@ -278,7 +283,7 @@ public class Shooter extends StateMachineSubsystemBase {
             speakerDifferenceVector[1] - velocityVector[1]
           };
 
-      double shoot_heading = Math.atan(shoot_vector[1] / shoot_vector[0]); // might not work
+      double shoot_heading = Math.atan2(shoot_vector[1], shoot_vector[0]); // might not work
       double shoot_speed = Math.sqrt(Math.pow(shoot_vector[0], 2) + Math.pow(shoot_vector[1], 2));
 
       double shoot_speed_rad_per_sec = shoot_speed * FLYWHEEL_RADIUS;
