@@ -9,9 +9,13 @@ public class ElevatorIOReal implements ElevatorIO {
   private final TalonFX leftTalon;
   private final DutyCycleEncoder absEncoder;
 
-  private final VoltageOut volts_V;
-  private final VelocityVoltage velocity_V;
-  private final PositionVoltage pos_rad;
+  private boolean isRightMotorInverted = true;
+  private final boolean isLeftMotorInverted = false;
+  private final boolean isAbsEncoderInverted = false;
+
+  private final volts_V volts_V
+  private final vel_radps velocity_V;
+  private final pos_rad pos_rad;
 
   public ElevatorIOReal(int index) {
     var elevatorConfig = new TalonFXConfiguration();
@@ -32,6 +36,6 @@ public class ElevatorIOReal implements ElevatorIO {
 
     absEncoder.setDutyCycleRange(index, index);
 
-    
+    private
   }
 }
