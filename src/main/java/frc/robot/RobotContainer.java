@@ -14,12 +14,19 @@
 package frc.robot;
 
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.path.PathPlannerPath;
+import com.pathplanner.lib.path.PathPoint;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.commands.FeedForwardCharacterization;
 import frc.robot.commands.RobotTeleop;
 import frc.robot.subsystems.drive.Drive;
+import java.util.List;
+import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 import org.littletonrobotics.junction.networktables.LoggedDashboardNumber;
 
@@ -72,6 +79,27 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    return autoChooser.get();
+    PathPlannerPath path = PathPlannerPath.fromPathFile("10m");
+    List<PathPoint> points = path.getAllPathPoints();
+    PathPoint[] array = (PathPoint[]) points.toArray(new PathPoint[0]);
+    Translation2d[] translationArray = new Translation2d[array.length];
+    for (int i = 0; i < array.length; i++) {
+      translationArray[i] = array[i].position;
+    }
+    Logger.recordOutput("Drive/Path", translationArray);
+
+    List<PathPoint> pointsF = path.flipPath().getAllPathPoints();
+    PathPoint[] arrayF = pointsF.toArray(new PathPoint[0]);
+    Translation2d[] translationArrayF = new Translation2d[arrayF.length];
+    for (int i = 0; i < arrayF.length; i++) {
+      translationArrayF[i] = arrayF[i].position;
+    }
+    Logger.recordOutput("Drive/PathFlipped", translationArrayF);
+
+    drive.setPose(
+        DriverStation.getAlliance().get() == Alliance.Red
+            ? path.flipPath().getPreviewStartingHolonomicPose()
+            : path.getPreviewStartingHolonomicPose());
+    return AutoBuilder.followPath(path);
   }
 }

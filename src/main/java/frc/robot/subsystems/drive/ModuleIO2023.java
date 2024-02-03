@@ -200,7 +200,7 @@ public class ModuleIO2023 implements ModuleIO {
 
     inputs.turnAbsolutePosition =
         Rotation2d.fromRotations(turnAbsolutePosition.getAsDouble()).minus(absoluteEncoderOffset);
-    inputs.turnPositionRad = Rotation2d.fromRotations(turnPosition.getValueAsDouble());
+    inputs.turnPosition = Rotation2d.fromRotations(turnPosition.getValueAsDouble());
     inputs.turnVelocityRadPerSec = Units.rotationsToRadians(turnVelocity.getValueAsDouble());
     inputs.turnAppliedVolts = turnAppliedVolts.getValueAsDouble();
     inputs.turnCurrentAmps = new double[] {turnCurrent.getValueAsDouble()};

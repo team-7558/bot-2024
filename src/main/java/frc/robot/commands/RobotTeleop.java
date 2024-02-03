@@ -36,6 +36,7 @@ public class RobotTeleop extends Command {
       // x stance while shooting
       if (OI.DR.getLeftTriggerAxis() > 0) {
         drive.setPose(new Pose2d());
+        drive.zeroGyro();
       } else
       // autolocking
       if (OI.DR.getXButton()) {

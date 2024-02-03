@@ -13,16 +13,21 @@ import frc.robot.subsystems.drive.Drive;
 public class Temp extends Command {
 
   private final Drive drive;
-  private TalonFX turret;
+  private TalonFX left, right, feeder;
   private DutyCycleOut out;
+  private DutyCycleOut feederOut;
 
   /** Creates a new DriveTeleop. */
   public Temp() {
     // Use addRequirements() here to declare subsystem dependencies.
     drive = Drive.getInstance();
 
-    turret = new TalonFX(40);
+    left = new TalonFX(20);
+    right = new TalonFX(21);
+    feeder = new TalonFX(25);
+
     out = new DutyCycleOut(0);
+    feederOut = new DutyCycleOut(0);
 
     addRequirements(drive);
   }
@@ -37,37 +42,6 @@ public class Temp extends Command {
   @Override
   public void execute() {
 
-    if (!drive.isState(drive.DISABLED)) {
-      // slow mode
-      // x stance while shooting
-      if (OI.DR.getLeftTriggerAxis() > 0) {
-        drive.setCurrentState(drive.SHOOTING);
-      } else
-        // autolocking
-        // if (OI.DR.getXButton()) {
-        //   drive.setAutolockSetpoint(-61.19);
-        //   drive.setCurrentState(drive.STRAFE_AUTOLOCK);
-        // } else if (OI.DR.getAButton()) {
-        //   drive.setAutolockSetpoint(0);
-        //   drive.setCurrentState(drive.STRAFE_AUTOLOCK);
-        // } else if (OI.DR.getBButton()) {
-        //   drive.setAutolockSetpoint(59.04);
-        //   drive.setCurrentState(drive.STRAFE_AUTOLOCK);
-        // } else if (OI.DR.getYButton()) {
-        //   drive.setAutolockSetpoint(90);
-        //   drive.setCurrentState(drive.STRAFE_AUTOLOCK);
-        // } else {
-        // strafe and turn if not other state
-        drive.setCurrentState(drive.STRAFE_N_TURN);
-      // }
-
-      // if (OI.XK.get(0, 0)) {
-      //   drive.setModuleModes(Mode.VOLTAGE);
-      // } else if (OI.XK.get(0, 1)) {
-      //   drive.setModuleModes(Mode.SETPOINT);
-      // }
-    }
-
     if (OI.DR.getAButton()) {
       out = new DutyCycleOut(0.10);
     } else if (OI.DR.getBButton()) {
@@ -76,7 +50,18 @@ public class Temp extends Command {
       out = new DutyCycleOut(0);
     }
 
-    turret.setControl(out);
+    if (OI.DR.getRightTriggerAxis() > 0) {
+      feederOut = new DutyCycleOut(0.5);
+    } else if (OI.DR.getLeftTriggerAxis() > 0) {
+      feederOut = new DutyCycleOut(0.4);
+    } else {
+      feederOut = new DutyCycleOut(0);
+    }
+
+    left.setControl(out);
+    right.setControl(out);
+
+    feeder.setControl(feederOut);
   }
 
   // Called once the command ends or is interrupted.

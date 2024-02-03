@@ -92,7 +92,7 @@ public class Module {
     // On first cycle, reset relative turn encoder
     // Wait until absolute angle is nonzero in case it wasn't initialized yet
     if (turnRelativeOffset == null && inputs.turnAbsolutePosition.getRadians() != 0.0) {
-      turnRelativeOffset = inputs.turnAbsolutePosition.minus(inputs.turnPositionRad);
+      turnRelativeOffset = inputs.turnAbsolutePosition.minus(inputs.turnPosition);
     }
 
     if (mode == Mode.VOLTAGE) {
@@ -201,7 +201,7 @@ public class Module {
     if (turnRelativeOffset == null) {
       return new Rotation2d();
     } else {
-      return inputs.turnPositionRad.plus(turnRelativeOffset);
+      return inputs.turnPosition.plus(turnRelativeOffset);
     }
   }
 

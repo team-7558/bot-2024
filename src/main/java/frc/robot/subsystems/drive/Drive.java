@@ -84,10 +84,10 @@ public class Drive extends StateMachineSubsystemBase {
           instance =
               new Drive(
                   new GyroIOPigeon2(),
-                  new ModuleIO2023(0),
-                  new ModuleIO2023(1),
-                  new ModuleIO2023(2),
-                  new ModuleIO2023(3));
+                  new ModuleIOTalonFX(0),
+                  new ModuleIOTalonFX(1),
+                  new ModuleIOTalonFX(2),
+                  new ModuleIOTalonFX(3));
           break;
 
         case SIM:
@@ -327,6 +327,10 @@ public class Drive extends StateMachineSubsystemBase {
   }
 
   public void drive(double x, double y, double w, double throttle) {
+    if (DriverStation.getAlliance().get() == Alliance.Blue) {
+      x = -x;
+      y = -y;
+    }
     // Apply deadband
     double linearMagnitude = MathUtil.applyDeadband(Math.hypot(x, y), Constants.driveDeadband);
     Rotation2d linearDirection = new Rotation2d(x, y);
@@ -353,6 +357,10 @@ public class Drive extends StateMachineSubsystemBase {
                 .plus(
                     new Rotation2d(
                         getAngularVelocity() * SKEW_CONSTANT)))); // TODO: tune skew constant
+  }
+
+  public void zeroGyro() {
+    gyroIO.zero();
   }
 
   /**

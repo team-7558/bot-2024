@@ -50,4 +50,9 @@ public class GyroIOPigeon2 implements GyroIO {
             .toArray(Rotation2d[]::new);
     yawPositionQueue.clear();
   }
+
+  @Override
+  public void zero() {
+    pigeon.setYaw(0);
+  }
 }
