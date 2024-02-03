@@ -46,6 +46,8 @@ public class Module {
   private double lastPositionMeters = 0.0; // Used for delta calculation
   private SwerveModulePosition[] positionDeltas = new SwerveModulePosition[] {};
 
+  private boolean isBrake;
+
   public Module(ModuleIO io, int index, Mode mode) {
     this.io = io;
     this.index = index;
@@ -192,8 +194,13 @@ public class Module {
 
   /** Sets whether brake mode is enabled. */
   public void setBrakeMode(boolean enabled) {
-    io.setDriveBrakeMode(enabled);
-    io.setTurnBrakeMode(enabled);
+    isBrake = enabled;
+    io.setDriveBrakeMode(isBrake);
+    io.setTurnBrakeMode(isBrake);
+  }
+
+  public boolean getBrakeMode() {
+    return isBrake;
   }
 
   /** Returns the current turn angle of the module. */

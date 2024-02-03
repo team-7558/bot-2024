@@ -84,10 +84,10 @@ public class Drive extends StateMachineSubsystemBase {
           instance =
               new Drive(
                   new GyroIOPigeon2(),
-                  new ModuleIOTalonFX(0),
-                  new ModuleIOTalonFX(1),
-                  new ModuleIOTalonFX(2),
-                  new ModuleIOTalonFX(3));
+                  new ModuleIO2024(0),
+                  new ModuleIO2024(1),
+                  new ModuleIO2024(2),
+                  new ModuleIO2024(3));
           break;
 
         case SIM:
@@ -359,9 +359,7 @@ public class Drive extends StateMachineSubsystemBase {
                         getAngularVelocity() * SKEW_CONSTANT)))); // TODO: tune skew constant
   }
 
-  public void zeroGyro() {
-    gyroIO.zero();
-  }
+  public void zeroGyro() {}
 
   /**
    * Runs the drive at the desired velocity.
@@ -384,6 +382,16 @@ public class Drive extends StateMachineSubsystemBase {
     // Log setpoint states
     Logger.recordOutput("SwerveStates/Setpoints", setpointStates);
     Logger.recordOutput("SwerveStates/SetpointsOptimized", optimizedSetpointStates);
+  }
+
+  public void setBrakeMode(boolean brake) {
+    for (var module : modules) {
+      module.setBrakeMode(brake);
+    }
+  }
+
+  public boolean getBrakeMode() {
+    return modules[FL].getBrakeMode();
   }
 
   /** Stops the drive. */

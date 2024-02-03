@@ -218,7 +218,7 @@ public class Vision extends SubsystemBase {
           if (Util.isWithinAngleInclusive(tagTheta, vTheta, AT_FOV_RAD)) {
             posesToLog.add(tagpose);
             shouldSwitchToQuick = true;
-            //break; //TODO: reintroduce break for efficiency
+            // break; //TODO: reintroduce break for efficiency
           }
         }
       }
@@ -248,7 +248,6 @@ public class Vision extends SubsystemBase {
       managePipelines(i, Drive.getInstance().getPose());
     }
 
-    
     Logger.recordOutput("Vision/TagSet", posesToLog.toArray(new Pose2d[0]));
     posesToLog.clear();
   }
