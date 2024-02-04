@@ -25,8 +25,7 @@ public interface IntakeIO {
     public double directionVelocityRadPerSec = 0.0;
     public double directionAppliedVolts = 0.0;
 
-    public boolean beamBreakActivatedBottom = false;
-    public boolean beamBreakActivatedTop = false;
+    public boolean beamBreakActivated = false;
   }
 
   int intakeVelocityRadPerSec = 0;
@@ -39,13 +38,13 @@ public interface IntakeIO {
 
   /** Run the drive motor at the specified voltage. */
   public default void setIntakeSpeed(double speed) {}
-  
+
   /** Run the drive motor at the specified velocity. */
   public default void setIntakeVelocity(double velocity) {}
 
-   /** Run the drive motor at the specified voltage. */
+  /** Run the drive motor at the specified voltage. */
   public default void setDirectionVoltage(double volts) {}
-  
+
   /** Run the drive motor at the specified voltage. */
   public default void setDirectionSpeed(double speed) {}
 

@@ -4,15 +4,14 @@
 
 package frc.robot.subsystems.intake;
 
-import org.littletonrobotics.junction.Logger;
-import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.Encoder.IndexingType;
 import frc.robot.Constants;
 import frc.robot.subsystems.StateMachineSubsystemBase;
-
+import org.littletonrobotics.junction.Logger;
 
 public class Intake extends StateMachineSubsystemBase {
+
+  // Convention: towards amp is positive, towards shooter is negative
 
   private double intakeSpeed = 0;
   private double directionSpeed = 0;
@@ -20,9 +19,9 @@ public class Intake extends StateMachineSubsystemBase {
   private static Intake instance;
 
   public static Intake getInstance() {
-    if(instance == null) {
+    if (instance == null) {
       switch (Constants.currentMode) {
-        case REAL: 
+        case REAL:
           // Real robot, instantiate hardware IO implementations
           instance = new Intake(new IntakeIOTalonFX());
           break;
@@ -36,18 +35,18 @@ public class Intake extends StateMachineSubsystemBase {
           // Replayed robot, disable IO implementations
           instance = new Intake(new IntakeIO() {});
           break;
-      } 
+      }
     }
     return instance;
   }
 
-  public final State DISABLED, IDLE, INTAKING, SHOOTER_SIDE, AMP_SIDE, SPITTING, ELEVATING;
+  public final State DISABLED, IDLE, INTAKING, SHOOTER_SIDE, AMP_SIDE_1, AMP_SIDE_2, SPITTING;
 
   private final IntakeIO io;
   private final IntakeIOInputsAutoLogged inputs = new IntakeIOInputsAutoLogged();
 
   private Intake(IntakeIO io) {
-    super("Indexer");
+    super("Intake");
     this.io = io;
 
     // switch (Constants.currentMode) {
@@ -61,116 +60,75 @@ public class Intake extends StateMachineSubsystemBase {
     // }
 
     DISABLED =
-      new State("DISABLED") {
+        new State("DISABLED") {
 
-        @Override
-        public void init() {
-          stop();
-        }
-        
-        @Override
-        public void periodic() {}
-
-        @Override
-        public void exit() {}
-      };
-
-    IDLE = 
-      new State("IDLE") {
-
-        @Override
-        public void init() {
-          stop();
-        }
-
-        @Override
-        public void periodic() {
-          // if(inputs.beamBreakActivatedBottom) {
-          //   setCurrentState(INTAKING);
-          // }
-        }
-
-        @Override
-        public void exit() {}
-      };
-    INTAKING = 
-      new State("INTAKING") {
-        @Override
-        public void init() {
-          intakeSpeed = 0.1;
-          directionSpeed = 0;
-        }
-
-        @Override
-        public void periodic() {
-          boolean hasSeen = false;
-          if(inputs.beamBreakActivatedTop) {
-            hasSeen = true;
-          } else if (hasSeen) {
-            intakeSpeed = 0;
+          @Override
+          public void init() {
+            stop();
           }
-        }
+        };
 
-        @Override
-        public void exit() {}
-      };
-    
-    AMP_SIDE =
-      new State("AMP_SIDE"){
-         @Override
-        public void init() {
-          directionSpeed = -0.1;
-        }
+    IDLE =
+        new State("IDLE") {
 
-        @Override
-        public void periodic() {
-        }
-        @Override
-        public void exit() {}
-      };
+          @Override
+          public void init() {
+            stop();
+          }
+        };
+    INTAKING =
+        new State("INTAKING") {
+          @Override
+          public void init() {
+            intakeSpeed = 0.1;
+            directionSpeed = 0;
+          }
+        };
+
+    AMP_SIDE_1 =
+        new State("AMP_SIDE_1") {
+          @Override
+          public void init() {
+            directionSpeed = 0;
+            intakeSpeed = 0.1;
+          }
+        };
+    AMP_SIDE_2 =
+        new State("AMP_SIDE_2") {
+          @Override
+          public void init() {
+            directionSpeed = 0.1;
+            intakeSpeed = 0.1;
+          }
+        };
     SHOOTER_SIDE =
-      new State("SHOOTER_SIDE"){
-         @Override
-        public void init() {
-          directionSpeed = 0.1;
-        }
-
-        @Override
-        public void periodic() {
-        }
-        @Override
-        public void exit() {}
-      };
+        new State("SHOOTER_SIDE") {
+          @Override
+          public void init() {
+            directionSpeed = -0.1;
+            intakeSpeed = 0.1;
+          }
+        };
     SPITTING =
-      new State("SPITTING"){
-         @Override
-        public void init() {
-          intakeSpeed = -0.1;
-        }
+        new State("SPITTING") {
+          @Override
+          public void init() {
+            intakeSpeed = -0.1;
+            directionSpeed = 0.0;
+          }
+        };
 
-        @Override
-        public void periodic() {
-        }
-        @Override
-        public void exit() {}
-      };
-    ELEVATING =
-      new State("ELEVATING"){
-        @Override
-        public void init() {
-          intakeSpeed = 0.1;
-        }
-        @Override
-        public void periodic() {
-          
-        }
-        @Override
-        public void exit() {}
-      };
+    setCurrentState(DISABLED);
   }
 
   public void stop() {
+    intakeSpeed = 0;
+    directionSpeed = 0;
     io.stop();
+  }
+
+  public boolean beamBroken() {
+    return inputs.beamBreakActivated; // TODO: determine if this needs a debouncer
   }
 
   @Override
@@ -181,16 +139,12 @@ public class Intake extends StateMachineSubsystemBase {
 
   @Override
   public void outputPeriodic() {
-    Logger.recordOutput("IndexerWheelSpeedRPM", getIntakeVelocityRPM());
-    Logger.recordOutput("DirectorWheelSpeedRPM", getDirectionVelocityRPM());
     io.setDirectionSpeed(directionSpeed);
-    io.setIntakeSpeed(intakeSpeed);
-  }
-
-  public void runVelocity(double velocityRPM) {
-    var velocityRadPerSec = Units.rotationsPerMinuteToRadiansPerSecond(velocityRPM);
-    io.setIntakeVelocity(velocityRadPerSec);
-    Logger.recordOutput("IntakeWheelSetpointRPM", velocityRPM);
+    io.setIntakeSpeed(intakeSpeed);    
+    Logger.recordOutput("Intake/TargetBottomSpeed", intakeSpeed);
+    Logger.recordOutput("Intake/TargetTopSpeed", directionSpeed);
+    Logger.recordOutput("Intake/DirectorWheelSpeedRPM", getDirectionVelocityRPM());
+    Logger.recordOutput("Intake/IntakeWheelSpeedRPM", getIntakeVelocityRPM());
   }
 
   public double getIntakeVelocityRPM() {
@@ -208,5 +162,4 @@ public class Intake extends StateMachineSubsystemBase {
   public double getCharacterizationVelocity() {
     return inputs.intakeVelocityRadPerSec;
   }
-
-} 
+}

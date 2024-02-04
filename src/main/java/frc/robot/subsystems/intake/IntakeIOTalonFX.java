@@ -15,25 +15,22 @@ package frc.robot.subsystems.intake;
 
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
-import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.DutyCycleOut;
-import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DigitalInput;
-import frc.robot.util.Util;
 
 public class IntakeIOTalonFX implements IntakeIO {
-  private static final double GEAR_RATIO = 0;
+  private static final double GEAR_RATIO = 1;
 
-  private final TalonFX topMotor = new TalonFX(36); // Not gunna be 0 1 (cameron told me to add that)
+  private final TalonFX topMotor =
+      new TalonFX(36); // Not gunna be 0 1 (cameron told me to add that)
   private final TalonFX bottomMotor = new TalonFX(35);
-  private final DigitalInput bottomSensor = new DigitalInput(0);
-  private final DigitalInput topSensor = new DigitalInput(1);
+  private final DigitalInput beambreak = new DigitalInput(0);
 
   private final StatusSignal<Double> bottomVelocity = bottomMotor.getVelocity();
   private final StatusSignal<Double> bottomAppliedVolts = bottomMotor.getMotorVoltage();
@@ -43,7 +40,12 @@ public class IntakeIOTalonFX implements IntakeIO {
   private final StatusSignal<Double> topAppliedVolts = topMotor.getMotorVoltage();
   private final StatusSignal<Double> topCurrent = topMotor.getStatorCurrent();
 
-
+  private final DutyCycleOut bottomDCOut = new DutyCycleOut(0);
+  private final VoltageOut bottomVOut = new VoltageOut(0);
+  private final VelocityVoltage bottomVelOut = new VelocityVoltage(0);
+  private final DutyCycleOut topDCOut = new DutyCycleOut(0);
+  private final VoltageOut topVOut = new VoltageOut(0);
+  private final VelocityVoltage topVelOut = new VelocityVoltage(0);
 
   public IntakeIOTalonFX() {
     var config = new TalonFXConfiguration();
@@ -52,9 +54,15 @@ public class IntakeIOTalonFX implements IntakeIO {
     config.MotorOutput.NeutralMode = NeutralModeValue.Coast;
     bottomMotor.getConfigurator().apply(config);
     topMotor.getConfigurator().apply(config);
-   
+
     BaseStatusSignal.setUpdateFrequencyForAll(
-        50.0, bottomVelocity, bottomAppliedVolts, bottomCurrent, topVelocity, topAppliedVolts, topCurrent);
+        50.0,
+        bottomVelocity,
+        bottomAppliedVolts,
+        bottomCurrent,
+        topVelocity,
+        topAppliedVolts,
+        topCurrent);
     topMotor.optimizeBusUtilization();
     bottomMotor.optimizeBusUtilization();
   }
@@ -62,62 +70,57 @@ public class IntakeIOTalonFX implements IntakeIO {
   @Override
   public void updateInputs(IntakeIOInputs inputs) {
     BaseStatusSignal.refreshAll(
-        bottomVelocity, bottomAppliedVolts, bottomCurrent, topVelocity, topAppliedVolts, topCurrent);
-    inputs.beamBreakActivatedBottom = bottomSensor.get();
-    inputs.beamBreakActivatedTop = topSensor.get();
+        bottomVelocity,
+        bottomAppliedVolts,
+        bottomCurrent,
+        topVelocity,
+        topAppliedVolts,
+        topCurrent);
+    inputs.beamBreakActivated = beambreak.get();
     inputs.intakeVelocityRadPerSec =
         Units.rotationsToRadians(bottomVelocity.getValueAsDouble()) / GEAR_RATIO;
     inputs.intakeAppliedVolts = bottomAppliedVolts.getValueAsDouble();
     inputs.currentAmps =
         new double[] {bottomCurrent.getValueAsDouble(), topCurrent.getValueAsDouble()};
-    
-    inputs.directionVelocityRadPerSec = Units.rotationsToRadians(topVelocity.getValueAsDouble()) / GEAR_RATIO;
+
+    inputs.directionVelocityRadPerSec =
+        Units.rotationsToRadians(topVelocity.getValueAsDouble()) / GEAR_RATIO;
     inputs.directionAppliedVolts = topAppliedVolts.getValueAsDouble();
   }
 
   @Override
   public void setIntakeSpeed(double speed) {
-    bottomMotor.setControl(
-        new DutyCycleOut(speed));
+    bottomMotor.setControl(bottomDCOut.withOutput(speed));
   }
 
   @Override
   public void setIntakeVoltage(double volts) {
-    bottomMotor.setControl(new VoltageOut(volts));
+    bottomMotor.setControl(bottomVOut.withOutput(volts));
   }
 
   @Override
   public void setIntakeVelocity(double velocityRadPerSec) {
-    bottomMotor.setControl(
-        new VelocityVoltage(
-            Units.radiansToRotations(velocityRadPerSec)));
+    bottomMotor.setControl(bottomVelOut.withVelocity(Units.radiansToRotations(velocityRadPerSec)));
   }
 
   @Override
-  public void setDirectionSpeed(double speed) { // speed value would be -12/12
-    double result = Util.limit(speed * 12.0, -12.0, 12.0);
-    topMotor.setControl(
-        new VoltageOut(result));
+  public void setDirectionSpeed(double speed) { // speed value would be -1 to 1
+    topMotor.setControl(topDCOut.withOutput(speed));
   }
 
   @Override
   public void setDirectionVoltage(double volts) {
-    topMotor.setControl(new VoltageOut(volts));
+    topMotor.setControl(topVOut.withOutput(volts));
   }
 
   @Override
   public void setDirectionVelocity(double velocityRadPerSec) {
-    topMotor.setControl(
-        new VelocityVoltage(
-            Units.radiansToRotations(velocityRadPerSec)));
+    topMotor.setControl(topVelOut.withVelocity(Units.radiansToRotations(velocityRadPerSec)));
   }
-
 
   @Override
   public void stop() {
     topMotor.stopMotor();
     bottomMotor.stopMotor();
   }
-
- 
 }

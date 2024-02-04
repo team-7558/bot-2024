@@ -1,9 +1,6 @@
 package frc.robot.subsystems.intake;
 
-import com.ctre.phoenix6.controls.DutyCycleOut;
-
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.simulation.FlywheelSim;
 import frc.robot.Constants;
@@ -13,7 +10,6 @@ public class IntakeIOSim implements IntakeIO {
   private FlywheelSim simIntake = new FlywheelSim(DCMotor.getFalcon500(1), 1.5, 0.004);
   private FlywheelSim simDirection = new FlywheelSim(DCMotor.getFalcon500(1), 1.5, 0.004);
 
-
   // private boolean closedLoop = false;
   private double appliedVolts = 0.0;
 
@@ -21,7 +17,8 @@ public class IntakeIOSim implements IntakeIO {
   public void updateInputs(IntakeIOInputs inputs) {
     // if (closedLoop) {
     //   appliedVolts =
-    //       MathUtil.clamp(pid.calculate(sim.getAngularVelocityRadPerSec()) + ffVolts, -12.0, 12.0);
+    //       MathUtil.clamp(pid.calculate(sim.getAngularVelocityRadPerSec()) + ffVolts, -12.0,
+    // 12.0);
     //   sim.setInputVoltage(appliedVolts);
     // }
 
@@ -30,7 +27,8 @@ public class IntakeIOSim implements IntakeIO {
 
     inputs.intakeVelocityRadPerSec = simIntake.getAngularVelocityRadPerSec();
     inputs.intakeAppliedVolts = appliedVolts;
-    inputs.currentAmps = new double[]{simIntake.getCurrentDrawAmps(), simDirection.getCurrentDrawAmps()};
+    inputs.currentAmps =
+        new double[] {simIntake.getCurrentDrawAmps(), simDirection.getCurrentDrawAmps()};
 
     inputs.directionVelocityRadPerSec = simDirection.getAngularVelocityRadPerSec();
     inputs.directionAppliedVolts = appliedVolts;
@@ -48,13 +46,12 @@ public class IntakeIOSim implements IntakeIO {
     simIntake.setState(velocity);
   }
 
-
   public void setDirectionVoltage(double volts) {
     // closedLoop = false;
     appliedVolts = MathUtil.clamp(volts, -12.0, 12.0);
     simDirection.setInputVoltage(appliedVolts);
   }
-  
+
   public void setDirectionSpeed(double velocity) {
     simDirection.setState(velocity);
   }
@@ -66,8 +63,8 @@ public class IntakeIOSim implements IntakeIO {
   }
 
   /** Set velocity PID constants. */
-//   public void configurePID(double kP, double kI, double kD) {
-//     pid.setPID(kP, kI, kD);
-//   }
+  //   public void configurePID(double kP, double kI, double kD) {
+  //     pid.setPID(kP, kI, kD);
+  //   }
 
 }
