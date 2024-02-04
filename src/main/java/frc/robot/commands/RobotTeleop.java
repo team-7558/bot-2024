@@ -4,6 +4,7 @@
 
 package frc.robot.commands;
 
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.OI;
 import frc.robot.subsystems.drive.Drive;
@@ -36,23 +37,44 @@ public class RobotTeleop extends Command {
     if (!drive.isState(drive.DISABLED)) {
       // slow mode
       // x stance while shooting
-      if (OI.DR.getLeftTriggerAxis() > 0) {
-        drive.setCurrentState(drive.SHOOTING);
+      if (OI.DR.getLeftTriggerAxis() > 0) {  //remove 
+        drive.setPose(new Pose2d());
       } else
       // autolocking
-      if (OI.DR.getXButton()) {
-        drive.setAutolockSetpoint(-61.19);
+      if (OI.DR.getXButton()) { 
+        drive.setAutolockSetpoint(-61.19); //TODO: make source
         drive.setCurrentState(drive.STRAFE_AUTOLOCK);
-      } else if (OI.DR.getAButton()) {
+      } else if (OI.DR.getAButton()) { // TODO: make speaker
         drive.setAutolockSetpoint(0);
         drive.setCurrentState(drive.STRAFE_AUTOLOCK);
-      } else if (OI.DR.getBButton()) {
+      } else if (OI.DR.getBButton()) { // TOOD: make amp
         drive.setAutolockSetpoint(59.04);
         drive.setCurrentState(drive.STRAFE_AUTOLOCK);
-      } else if (OI.DR.getYButton()) {
+      } else if (OI.DR.getYButton()) { //TODO: make trap
         drive.setAutolockSetpoint(90);
         drive.setCurrentState(drive.STRAFE_AUTOLOCK);
-      } else {
+      } else if(OI.DR.getLeftTriggerAxis() > 0) {        // TODO: auto drive to set location
+
+
+      } else if(OI.XK.get(0, 7)) { // zero gyro bottom left of xkeys
+        drive.zeroGyro();
+      } else if(OI.XK.get(2, 5)) { // INTAKE SPEAKER
+
+      } else if(OI.XK.get(0,5)) { // INTAKE AMP
+
+      } else if(OI.XK.get(2,1)) { // SHOOT AT TARGET
+
+      } else if(OI.XK.get(5,0)) { // TRAP SCORING
+
+      } else if(OI.XK.get(0,0)) { // HANG UP
+
+      } else if(OI.XK.get(0,1)) { // HANG DOWn
+
+      }
+
+      // according to marco and lucca's wants
+
+      else {
         // strafe and turn if not other state
         drive.setCurrentState(drive.STRAFE_N_TURN);
       }
