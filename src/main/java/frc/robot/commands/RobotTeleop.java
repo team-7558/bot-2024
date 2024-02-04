@@ -8,16 +8,18 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.OI;
 import frc.robot.subsystems.drive.Drive;
+import frc.robot.subsystems.intake.Intake;
 
 public class RobotTeleop extends Command {
 
   private final Drive drive;
+  private final Intake intake;
 
   /** Creates a new DriveTeleop. */
   public RobotTeleop() {
     // Use addRequirements() here to declare subsystem dependencies.
     drive = Drive.getInstance();
-
+    intake = Intake.getInstance();
     addRequirements(drive);
   }
 
@@ -25,6 +27,7 @@ public class RobotTeleop extends Command {
   @Override
   public void initialize() {
     drive.setCurrentState(drive.STRAFE_N_TURN);
+    intake.setCurrentState(intake.IDLE);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -76,8 +79,6 @@ public class RobotTeleop extends Command {
         drive.setCurrentState(drive.STRAFE_N_TURN);
       }
 
-
-
       // if (OI.XK.get(0, 0)) {
       //   drive.setModuleModes(Mode.VOLTAGE);
       // } else if (OI.XK.get(0, 1)) {
@@ -85,7 +86,15 @@ public class RobotTeleop extends Command {
       // }
     }
 
-    
+    if (!intake.isState(intake.DISABLED)) {
+      if (OI.DR.getRightBumper()) {
+        intake.setCurrentState(intake.INTAKING);
+      } else if (OI.DR.getLeftBumper()) {
+        intake.setCurrentState(intake.SHOOTER_SIDE);
+      } else {
+        intake.setCurrentState(intake.IDLE);
+      }
+    }
   }
 
   // Called once the command ends or is interrupted.
