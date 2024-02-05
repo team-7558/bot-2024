@@ -38,8 +38,4 @@ public final class Constants {
   public static final double globalDelta_sec = 0.02;
   public static final double driveDeadband = 0.05;
 
-  public static final double ELEVATOR_MIN_HEIGHT_M = 0.5;
-  public static final double ELEVATOR_MAX_HEIGHT_M = 1.0;
-  public static final double ELEVATOR_STROKE_M = ELEVATOR_MAX_HEIGHT_M - ELEVATOR_MIN_HEIGHT_M;
-
 }
