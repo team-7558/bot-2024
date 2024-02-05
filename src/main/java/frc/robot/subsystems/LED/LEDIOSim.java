@@ -15,6 +15,8 @@ public class LEDIOSim implements LEDIO {
 
   @Override
   public void updateInputs(LEDIOInputs inputs) {}
+  @Override
+  public void updateInputs(LEDIOInputs inputs) {}
 
   @Override
   public void setColours(boolean isRGB, int[] leds) {
@@ -23,5 +25,6 @@ public class LEDIOSim implements LEDIO {
       System.out.println(m_ledBuffer[i]);
     }
     m_led.setData(m_ledBuffer);
+  }
   }
 }
