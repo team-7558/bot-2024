@@ -12,5 +12,4 @@ public interface LEDIO {
   public default void updateInputs(LEDIOInputs inputs) {}
 
   public default void setColours(boolean isRGB, int[] led) {}
-  public default void setColours(boolean isRGB, int[] led) {}
 }
