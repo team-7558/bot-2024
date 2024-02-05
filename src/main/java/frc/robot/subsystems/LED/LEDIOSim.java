@@ -19,7 +19,8 @@ public class LEDIOSim implements LEDIO {
   @Override
   public void setColours(boolean isRGB, int[] leds) {
     for (int i = 0; i < leds.length; i++) {
-        m_ledBuffer[i] = (byte) leds[i];
+      m_ledBuffer[i] = (byte) leds[i];
+      System.out.println(m_ledBuffer[i]);
     }
     m_led.setData(m_ledBuffer);
   }
