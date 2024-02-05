@@ -1,29 +1,27 @@
-package frc.robot.subsystems.Elevator;
+package frc.robot.subsystems.elevator;
 
 import frc.robot.Constants;
 
 public class ElevatorIOIdeal implements ElevatorIO {
-  private static final double LOOP_PERIOD_SECS = Constants.globalDelta_sec;
-  private double vel_radps = 0.0;
+  private double vel_mps = 0.0;
   private double volts_V = 0.0;
-  private double pos_rad = 0.0;
+  private double pos_m = 0.0;
 
-  private int index;
 
-  public ElevatorIOIdeal(int index) {
-    this.index = index;
+  public ElevatorIOIdeal() {
   }
 
   @Override
   public void updateInputs(ElevatorIOInputs inputs) {
     inputs.volts_V = volts_V;
-    inputs.vel_radps = vel_radps;
-    inputs.pos_rad = pos_rad;
+    inputs.vel_mps = vel_mps;
+    inputs.pos_m = pos_m;
   }
 
   @Override
-  public void setVel_radps(double velocity_v) {
-    this.velocity_v = velocity_v;
+  public void setVel(double velocity_mps) {
+    this.vel_mps = velocity_mps;
+    this.pos_m += velocity_mps * Constants.globalDelta_sec;
   }
 
   @Override
@@ -32,7 +30,9 @@ public class ElevatorIOIdeal implements ElevatorIO {
   }
 
   @Override
-  public void setPos_rad(double pos_rad) {
-    this.pos_rad = pos_rad;
+  public void setPos(double pos_rad) {
+    this.vel_mps = 0;
+    this.volts_V = 0;
+    this.pos_m = pos_m;
   }
 }

@@ -1,52 +1,47 @@
-package frc.robot.subsystems.Elevator;
+package frc.robot.subsystems.elevator;
 
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.PIDController;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.simulation.ElevatorSim;
 import frc.robot.Constants;
 
 public class ElevatorIOSim implements ElevatorIO {
   private ElevatorSim sim =
-      new ElevatorSim(DCMotor.getKrakenX60Foc(2), 0, 0, 0, 0, 0, false, 0, null);
-  private edu.wpi.first.math.controller.PIDController pid = new PIDController(0.0, 0.0, 0.0);
-  private boolean closedLoop = false;
-  private double ffVolts = 0.0;
+      new ElevatorSim(DCMotor.getFalcon500Foc(2), 1, 0, 0, 0, 0, false, 0, null);
+  private PIDController velPid = new PIDController(0.0, 0.0, 0.0);
+  private PIDController posPid = new PIDController(0.0, 0.0, 0.0);
   private double appliedVolts = 0.0;
 
   @Override
   public void updateInputs(ElevatorIOInputs inputs) {
-    if (closedLoop) {
-      appliedVolts = MathUtil.clamp(appliedVolts, ffVolts, appliedVolts);
-      sim.setInputVoltage(appliedVolts);
-    }
     sim.update(Constants.globalDelta_sec);
-    inputs.vel_radps = sim.getVelocityMetersPerSecond();
+    inputs.pos_m = sim.getPositionMeters();
+    inputs.vel_mps = sim.getVelocityMetersPerSecond();
     inputs.volts_V = appliedVolts;
     inputs.currents_A = new double[] {sim.getCurrentDrawAmps()};
   }
 
   @Override
   public void setVoltage(double volts) {
-    closedLoop = false;
-    appliedVolts = 0.0;
+    appliedVolts = volts;
     sim.setInputVoltage(volts);
   }
 
   @Override
-  public void setVel_radps(double velocity_v, double ffVolts) {
-    closedLoop = true;
-    pid.setSetpoint(velocity_v);
-    this.ffVolts = ffVolts;
+  public void setVel(double velocity_mps) {
+    velPid.setSetpoint(velocity_mps);
+    setVoltage(velPid.calculate(sim.getVelocityMetersPerSecond()));
+  }
+
+  @Override
+  public void setPos(double pos_m) {
+    posPid.setSetpoint(pos_m);
+    setVoltage(posPid.calculate(sim.getPositionMeters()));
   }
 
   @Override
   public void stop() {
     setVoltage(0.0);
-  }
-
-  @Override
-  public void configurePID(double kP, double kI, double kD) {
-    pid.setPID(kP, kI, kD);
   }
 }

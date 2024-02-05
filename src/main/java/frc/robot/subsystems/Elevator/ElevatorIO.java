@@ -1,13 +1,15 @@
-package frc.robot.subsystems.Elevator;
+package frc.robot.subsystems.elevator;
 
 import org.littletonrobotics.junction.AutoLog;
+
+import frc.robot.Constants;
 
 public interface ElevatorIO {
 
   @AutoLog
   public static class ElevatorIOInputs {
-    public double pos_rad = 0.0;
-    public double vel_radps = 0.0;
+    public double pos_m = Constants.ELEVATOR_MIN_HEIGHT_M;
+    public double vel_mps = 0.0;
     public double volts_V = 0.0;
     public double[] currents_A = new double[] {};
   }
@@ -16,9 +18,9 @@ public interface ElevatorIO {
 
   public default void setVoltage(double volts_V) {}
 
-  public default void setVel_radps(double velocity_v) {}
+  public default void setVel(double vel_mps) {}
 
-  public default void setPos_rad(double pos_rad) {}
+  public default void setPos(double pos_m) {}
 
   public default void configurePID(double kP, double kI, double kD) {}
 
