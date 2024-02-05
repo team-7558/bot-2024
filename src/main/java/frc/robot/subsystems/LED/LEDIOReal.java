@@ -5,7 +5,7 @@ import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 
 public class LEDIOReal implements LEDIO {
   public AddressableLED m_led = new AddressableLED(14);
-  public AddressableLEDBuffer m_ledBuffer = new AddressableLEDBuffer(36);
+  public AddressableLEDBuffer m_ledBuffer = new AddressableLEDBuffer(LED.NUM_LEDS);
 
   public LEDIOReal() {
     m_led.setLength(m_ledBuffer.getLength());

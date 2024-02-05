@@ -13,8 +13,10 @@
 
 package frc.robot;
 
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.robot.subsystems.LED.LED;
 import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
 import org.littletonrobotics.junction.Logger;
@@ -31,6 +33,8 @@ import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 public class Robot extends LoggedRobot {
   private Command autonomousCommand;
   private RobotContainer robotContainer;
+
+  private Timer t = new Timer();
 
   protected Robot() {
     super(Constants.globalDelta_sec);
@@ -88,6 +92,7 @@ public class Robot extends LoggedRobot {
 
     // Start AdvantageKit logger
     Logger.start();
+    t.start();
 
     // Instantiate our RobotContainer. This will perform all our button bindings,
     // and put our autonomous chooser on the dashboard.
@@ -102,6 +107,12 @@ public class Robot extends LoggedRobot {
     // finished or interrupted commands, and running subsystem periodic() methods.
     // This must be called from the robot's periodic block in order for anything in
     // the Command-based framework to work.
+
+    LED.getInstance().setRGB((int) ((0.5 + 0.5 * Math.sin(t.get())) * (LED.NUM_LEDS)), 1, 0, 0);
+    LED.getInstance().setRGB((int) ((0.5 + 0.5 * Math.cos(t.get())) * (LED.NUM_LEDS)), 1, 1, 1);
+
+
+    LED.getInstance().render();
     CommandScheduler.getInstance().run();
   }
 
