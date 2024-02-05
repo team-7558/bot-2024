@@ -20,7 +20,7 @@ public class Elevator extends StateMachineSubsystemBase {
     return instance;
   }
 
-  public final State DISABLED, IDLING, HOLDING, HOMING;
+  public final State DISABLED, IDLING, HOLDING, CLIMBING, HOMING;
 
   private final ElevatorIO io;
   private final ElevatorIOInputsAutoLogged inputs = new ElevatorIOInputsAutoLogged();
@@ -51,6 +51,13 @@ public class Elevator extends StateMachineSubsystemBase {
     
     HOLDING =
     new State("HOLDING") {
+      @Override
+      public void periodic() {
+        io.setPos(targetHeight_m);
+      }
+    };
+    CLIMBING =
+    new State("CLIMBING") {
       @Override
       public void periodic() {
         io.setPos(targetHeight_m);
