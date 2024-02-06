@@ -63,15 +63,24 @@ public class RobotTeleop extends Command {
       // }
     }
 
-    if (OI.DR.getAButton()) SS2d.setElevatorHeight(0.586 + 0.594 + 0.5);
-    if (OI.DR.getBButton()) SS2d.setElevatorHeight(0.586 + 0.594);
+    if (OI.DR.getAButton()) SS2d.S.setElevatorHeight(0.586 + 0.594 + 0.5);
+    if (OI.DR.getBButton()) SS2d.S.setElevatorHeight(0.586 + 0.594);
 
-    if (OI.DR.getLeftTriggerAxis() > 0) SS2d.setIntakeMotors(1, 1);
-    else if (OI.DR.getLeftBumper()) SS2d.setIntakeMotors(1, -1);
-    else SS2d.setIntakeMotors(0, 0);
+    if (OI.DR.getLeftTriggerAxis() > 0) SS2d.S.setIntakeMotors(1, 1);
+    else if (OI.DR.getLeftBumper()) SS2d.S.setIntakeMotors(1, -1);
+    else SS2d.S.setIntakeMotors(0, 0);
 
-    if (OI.DR.getRightBumper()) SS2d.setShooterTilt(45);
-    else SS2d.setShooterTilt(0);
+    if (OI.DR.getRightBumper()) SS2d.S.setShooterTilt(45);
+    else SS2d.S.setShooterTilt(0);
+
+    if(OI.DR.getPOV() != -1) SS2d.S.setTurretAngle(OI.DR.getPOV()*0.5-90);
+
+
+    SS2d.S.setTurretBaseAngle(drive.getRotation());
+    SS2d.S.setDistance(drive.getPose().getX());
+
+
+
   }
 
   // Called once the command ends or is interrupted.
