@@ -63,8 +63,8 @@ public class RobotTeleop extends Command {
       // }
     }
 
-    if (OI.DR.getAButton()) SS2d.S.setElevatorHeight(0.586 + 0.594 + 0.5);
-    if (OI.DR.getBButton()) SS2d.S.setElevatorHeight(0.586 + 0.594);
+    if (OI.DR.getAButton()) SS2d.S.setElevatorHeight(0.8763);
+    if (OI.DR.getBButton()) SS2d.S.setElevatorHeight(0.64135);
 
     if (OI.DR.getLeftTriggerAxis() > 0) SS2d.S.setIntakeMotors(1, 1);
     else if (OI.DR.getLeftBumper()) SS2d.S.setIntakeMotors(1, -1);

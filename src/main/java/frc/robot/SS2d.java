@@ -22,7 +22,7 @@ public class SS2d {
   public static final double CENTER_TO_INTAKE_M = 0.611 * 0.5;
 
   public static final double GROUND_TO_ELEVATOR_BASE_M = 0.64135;
-  public static final double ELEVATOR_BASE_TO_ELEVATOR_TOP_M = 0.695325;
+  public static final double ELEVATOR_BASE_TO_ELEVATOR_TOP_M = 0.8763 - GROUND_TO_ELEVATOR_BASE_M;
 
   public static final double GROUND_TO_SHOOTER_PIVOT = 0.254;
   public static final double SHOOTER_PIVOT_TO_TIP = 0.3683;
