@@ -104,6 +104,7 @@ public class Robot extends LoggedRobot {
     // the Command-based framework to work.
     SS2d.periodic();
     CommandScheduler.getInstance().run();
+    PerfTracker.periodic();
   }
 
   /** This function is called once when the robot is disabled. */

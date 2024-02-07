@@ -204,4 +204,8 @@ public class Util {
   public static double FPGATimeDelta_ms(long latest, long prev) {
     return 0.001 * (latest - prev);
   }
+
+  public static double FPGATimeDelta_ms(long delta) {
+    return 0.001 * (delta);
+  }
 }

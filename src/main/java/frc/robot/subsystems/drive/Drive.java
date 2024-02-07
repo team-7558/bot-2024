@@ -229,6 +229,12 @@ public class Drive extends StateMachineSubsystemBase {
             VecBuilder.fill(0.5, 0.5, 0.5)); // TODO: TUNE STANDARD DEVIATIONS
   }
 
+
+
+  public void zeroGyro() { //TODO: make work
+
+  }
+
   @Override
   public void inputPeriodic() {
     odometryLock.lock(); // Prevents odometry updates while reading data

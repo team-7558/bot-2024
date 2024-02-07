@@ -1,0 +1,112 @@
+Connections list:::
+
+PDH:
+6AWG:
+-Main breaker/Battery
+10AWG:
+-8 Swerve motors
+-2 Elevator motors
+-2 Intake motors
+-2 Shooter motors
+-1 Turret motor
+-1 Feeder motor
+-2 mini power modules
+18-22AWG:
+-Rio power
+-CAN termination
+-Brainbox power
+-Pigeon2 power
+-Radio power module
+
+Mini power modules: (split this amongts the two based on what is closer)
+18-22AWG:
+-2 oPi power
+-LL power
+-5 CANcoders
+-2 Beambreak power
+
+Rio:
+18-22AWG:
+-Rio power
+-CAN start
+-RSL
+USB cable:
+-CANivore data
+Ethernet:
+-Radio Power module
+PWM cable:
+-Intake Beambreak
+-Shooter Beambreak
+-2 Shooter linear actuators
+-LEDs
+
+Brainbox:
+18-22AWG:
+-Brainbox power
+Ethernet:
+-Radio
+-2 oPi
+-LL
+
+2x oPi:
+18-22AWG:
+-Mini power module
+USB cable:
+-2 Cameras
+Ethernet:
+-Brainbox
+
+LL:
+POE:
+-Brainbox and mini power module
+USB cable:
+-Coral
+
+Pigeon2:
+18-22AWG:
+-CAN (CANivore bus)
+-Power from PDH
+
+4 Mk4i Modules:
+10AWG:
+-2 PDH
+18-22AWG:
+-CANcoder power from mini power module
+-1 CAN in  (CANivore bus)
+-1 CAN out (daisy chain internally)
+
+Elevator:
+10AWG:
+-2 PDH before carriage (elevator motors)
+-1 PDH in carriage (indexer motor)
+18-22AWG:
+-CAN for all motors
+
+Intake:
+10AWG:
+-1 PDH
+18-22AWG:
+-CAN in/out
+PWM cable:
+-Beambreak
+
+Turret:
+10AWG:
+-1 PDH
+18-22AWG:
+-1 CAN
+-CANcoder power
+
+Shooter through turret bundle: (make sure this part is easily replaceable in bulk, its most likely to have issues)
+10AWG:
+-3 PDH
+18-22AWG:
+-CAN in
+-CAN out
+PWM cables:
+-Beambreak
+-2 Linear Actuators
+
+LEDs:
+PWM Cables:
+-PWM from rio

@@ -9,16 +9,18 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.OI;
 import frc.robot.SS2d;
 import frc.robot.subsystems.drive.Drive;
+import frc.robot.subsystems.intake.Intake;
 
 public class RobotTeleop extends Command {
 
   private final Drive drive;
+  private final Intake intake;
 
   /** Creates a new DriveTeleop. */
   public RobotTeleop() {
     // Use addRequirements() here to declare subsystem dependencies.
     drive = Drive.getInstance();
-
+    intake = Intake.getInstance();
     addRequirements(drive);
   }
 
@@ -26,6 +28,7 @@ public class RobotTeleop extends Command {
   @Override
   public void initialize() {
     drive.setCurrentState(drive.STRAFE_N_TURN);
+    intake.setCurrentState(intake.IDLE);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -39,19 +42,40 @@ public class RobotTeleop extends Command {
         drive.setPose(new Pose2d());
       } else
       // autolocking
-      if (OI.DR.getXButton()) {
-        drive.setAutolockSetpoint(-61.19);
+      if (OI.DR.getXButton()) { 
+        drive.setAutolockSetpoint(-61.19); //TODO: make source
         drive.setCurrentState(drive.STRAFE_AUTOLOCK);
-      } else if (OI.DR.getAButton()) {
+      } else if (OI.DR.getAButton()) { // TODO: make speaker
         drive.setAutolockSetpoint(0);
         drive.setCurrentState(drive.STRAFE_AUTOLOCK);
-      } else if (OI.DR.getBButton()) {
+      } else if (OI.DR.getBButton()) { // TOOD: make amp
         drive.setAutolockSetpoint(59.04);
         drive.setCurrentState(drive.STRAFE_AUTOLOCK);
-      } else if (OI.DR.getYButton()) {
+      } else if (OI.DR.getYButton()) { //TODO: make trap
         drive.setAutolockSetpoint(90);
         drive.setCurrentState(drive.STRAFE_AUTOLOCK);
-      } else {
+      } else if(OI.DR.getLeftTriggerAxis() > 0) {        // TODO: auto drive to set location
+
+
+      } else if(OI.XK.get(0, 7)) { // zero gyro bottom left of xkeys
+        drive.zeroGyro();
+      } else if(OI.XK.get(2, 5)) { // INTAKE SPEAKER
+
+      } else if(OI.XK.get(0,5)) { // INTAKE AMP
+
+      } else if(OI.XK.get(2,1)) { // SHOOT AT TARGET
+
+      } else if(OI.XK.get(5,0)) { // TRAP SCORING
+
+      } else if(OI.XK.get(0,0)) { // HANG UP
+
+      } else if(OI.XK.get(0,1)) { // HANG DOWn
+
+      }
+
+      // according to marco and lucca's wants
+
+      else {
         // strafe and turn if not other state
         drive.setCurrentState(drive.STRAFE_N_TURN);
       }
@@ -77,6 +101,15 @@ public class RobotTeleop extends Command {
 
     SS2d.S.setTurretBaseAngle(drive.getRotation());
     SS2d.S.setDistance(drive.getPose().getX());
+    if (!intake.isState(intake.DISABLED)) {
+      if (OI.DR.getRightBumper()) {
+        intake.setCurrentState(intake.INTAKING);
+      } else if (OI.DR.getLeftBumper()) {
+        intake.setCurrentState(intake.SHOOTER_SIDE);
+      } else {
+        intake.setCurrentState(intake.IDLE);
+      }
+    }
   }
 
   // Called once the command ends or is interrupted.
