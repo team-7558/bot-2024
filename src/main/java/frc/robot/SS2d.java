@@ -17,15 +17,15 @@ public class SS2d {
   public static final double TARGET_HEIGHT = 2.105025 - TARGET_HEIGHT_FROM_GROUND_M;
   public static final double TARGET_SLOPE = 14;
 
-  public static final double CENTER_TO_TURRET = 0.023;
-  public static final double CENTER_TO_SHOOTER = 0.1;
-  public static final double CENTER_TO_INTAKE = 0.611 * 0.5;
+  public static final double CENTER_TO_TURRET_M = 0.1016;
+  public static final double TURRET_TO_PIVOT_M = 0.0508;
+  public static final double CENTER_TO_INTAKE_M = 0.611 * 0.5;
 
-  public static final double GROUND_TO_ELEVATOR_BASE_M = 0.594;
-  public static final double ELEVATOR_BASE_TO_ELEVATOR_TOP_M = 0.586;
+  public static final double GROUND_TO_ELEVATOR_BASE_M = 0.64135;
+  public static final double ELEVATOR_BASE_TO_ELEVATOR_TOP_M = 0.695325;
 
-  public static final double GROUND_TO_SHOOTER_PIVOT = 0.28;
-  public static final double SHOOTER_PIVOT_TO_TIP = 0.38;
+  public static final double GROUND_TO_SHOOTER_PIVOT = 0.254;
+  public static final double SHOOTER_PIVOT_TO_TIP = 0.3683;
 
   public static final double TURRET_MECH_LIMIT_A = 90.0;
   public static final double TURRET_MECH_LIMIT_B = -90.0;
@@ -51,6 +51,7 @@ public class SS2d {
   private final MechanismLigament2d xref;
   private final MechanismLigament2d intakeBase;
   private final MechanismLigament2d shooterBase;
+  private final MechanismLigament2d pivotBase;
   private final MechanismLigament2d lowerIntake;
   private final MechanismLigament2d elevatorBase;
   private final MechanismLigament2d upperIntake;
@@ -79,13 +80,16 @@ public class SS2d {
 
     intakeBase =
         xref.append(
-            new MechanismLigament2d("driveintake", CENTER_TO_INTAKE, 0.0, 1.0, COLOR_FRAME));
+            new MechanismLigament2d("driveintake", CENTER_TO_INTAKE_M, 0.0, 1.0, COLOR_FRAME));
     shooterBase =
         xref.append(
-            new MechanismLigament2d("driveshooter", CENTER_TO_SHOOTER, 0.0, 1.0, COLOR_FRAME));
+            new MechanismLigament2d("driveshooter", CENTER_TO_TURRET_M, 180.0, 1.0, COLOR_REF));
+    pivotBase =
+        shooterBase.append(
+            new MechanismLigament2d("pivot base", TURRET_TO_PIVOT_M, 180.0, 1.0, COLOR_FRAME));
 
     MechanismLigament2d shooterHeight =
-        shooterBase.append(
+        pivotBase.append(
             new MechanismLigament2d("shooter height", GROUND_TO_SHOOTER_PIVOT, 90, 1, COLOR_REF));
 
     shooter =
