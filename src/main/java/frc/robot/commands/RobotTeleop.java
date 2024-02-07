@@ -73,14 +73,10 @@ public class RobotTeleop extends Command {
     if (OI.DR.getRightBumper()) SS2d.S.setShooterTilt(45);
     else SS2d.S.setShooterTilt(0);
 
-    if(OI.DR.getPOV() != -1) SS2d.S.setTurretAngle(OI.DR.getPOV()*0.5-90);
-
+    if (OI.DR.getPOV() != -1) SS2d.S.setTurretAngle(OI.DR.getPOV() * 0.5 - 90);
 
     SS2d.S.setTurretBaseAngle(drive.getRotation());
     SS2d.S.setDistance(drive.getPose().getX());
-
-
-
   }
 
   // Called once the command ends or is interrupted.
