@@ -46,8 +46,7 @@ public class SS2d {
     M = new SS2d();
   }
 
-  private final Mechanism2d side;
-  private final Mechanism2d top;
+  private final Mechanism2d mech;
   private final MechanismLigament2d yref;
   private final MechanismLigament2d xref;
   private final MechanismLigament2d intakeBase;
@@ -60,12 +59,11 @@ public class SS2d {
   private final MechanismLigament2d turret;
 
   private SS2d() {
-    side = new Mechanism2d(SCENE_WIDTH_M, SCENE_HEIGHT_M, COLOR_BG);
-    top = new Mechanism2d(SCENE_WIDTH_M, SCENE_HEIGHT_M, COLOR_BG);
+    mech = new Mechanism2d(SCENE_WIDTH_M, SCENE_HEIGHT_M, COLOR_BG);
 
-    MechanismRoot2d side_root = side.getRoot("scene", 0, 0);
+    MechanismRoot2d root = mech.getRoot("scene", 0, 0);
 
-    yref = side_root.append(new MechanismLigament2d("yref", 0.5, 90, 1.0, COLOR_REF));
+    yref = root.append(new MechanismLigament2d("yref", 0.5, 90, 1.0, COLOR_REF));
     xref = yref.append(new MechanismLigament2d("xref", SCENE_WIDTH_M * 0.5, -90, 1.0, COLOR_REF));
 
     MechanismLigament2d target =
@@ -108,8 +106,11 @@ public class SS2d {
             new MechanismLigament2d(
                 "upper intake", ELEVATOR_BASE_TO_ELEVATOR_TOP_M, 0, 2, COLOR_NEUTRAL));
 
-    MechanismRoot2d top_root = top.getRoot("scene", SCENE_WIDTH_M * 0.5, SCENE_HEIGHT_M * 0.75);
-    turretBase = top_root.append(new MechanismLigament2d("turret base", 0.01, -90, 1, COLOR_REF));
+    MechanismLigament2d turretOffset =
+        xref.append(
+            new MechanismLigament2d("turret offset", SCENE_HEIGHT_M * 0.5, 90, 1, COLOR_BG));
+    turretBase =
+        turretOffset.append(new MechanismLigament2d("turret base", 0.01, 180, 1, COLOR_REF));
     turret = turretBase.append(new MechanismLigament2d("turret", 0.4, 0, 2.5, COLOR_NEUTRAL));
     turretBase.append(
         new MechanismLigament2d("mech limit A", 0.5, TURRET_MECH_LIMIT_A, 1, COLOR_FRAME));
@@ -143,14 +144,11 @@ public class SS2d {
   }
 
   public void setTurretBaseAngle(Rotation2d angle_r2d) {
-    turretBase.setAngle(angle_r2d.minus(Rotation2d.fromRotations(0.25)));
+    turretBase.setAngle(angle_r2d.minus(Rotation2d.fromRotations(0.5)));
   }
 
   public static void periodic() {
-    Logger.recordOutput("SS/Setpoint/TopProfile", S.top);
-    Logger.recordOutput("SS/Setpoint/SideProfile", S.side);
-
-    Logger.recordOutput("SS/Measured/TopProfile", M.top);
-    Logger.recordOutput("SS/Measured/SideProfile", M.side);
+    Logger.recordOutput("SS/Setpoint", S.mech);
+    Logger.recordOutput("SS/Measured/", M.mech);
   }
 }
