@@ -7,6 +7,7 @@ package frc.robot.commands;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.OI;
+import frc.robot.SS2d;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.intake.Intake;
 
@@ -37,7 +38,7 @@ public class RobotTeleop extends Command {
     if (!drive.isState(drive.DISABLED)) {
       // slow mode
       // x stance while shooting
-      if (OI.DR.getLeftTriggerAxis() > 0) {  //remove 
+      if (OI.DR.getPOV() == 180) {
         drive.setPose(new Pose2d());
       } else
       // autolocking
@@ -86,6 +87,20 @@ public class RobotTeleop extends Command {
       // }
     }
 
+    if (OI.DR.getAButton()) SS2d.S.setElevatorHeight(SS2d.GROUND_TO_MAX_HEIGHT);
+    if (OI.DR.getBButton()) SS2d.S.setElevatorHeight(SS2d.GROUND_TO_MIN_HEIGHT);
+
+    if (OI.DR.getLeftTriggerAxis() > 0) SS2d.S.setIntakeMotors(1, 1);
+    else if (OI.DR.getLeftBumper()) SS2d.S.setIntakeMotors(1, -1);
+    else SS2d.S.setIntakeMotors(0, 0);
+
+    if (OI.DR.getRightBumper()) SS2d.S.setShooterTilt(45);
+    else SS2d.S.setShooterTilt(0);
+
+    if (OI.DR.getPOV() != -1) SS2d.S.setTurretAngle(OI.DR.getPOV() * 0.5 - 90);
+
+    SS2d.S.setTurretBaseAngle(drive.getRotation());
+    SS2d.S.setDistance(drive.getPose().getX());
     if (!intake.isState(intake.DISABLED)) {
       if (OI.DR.getRightBumper()) {
         intake.setCurrentState(intake.INTAKING);
