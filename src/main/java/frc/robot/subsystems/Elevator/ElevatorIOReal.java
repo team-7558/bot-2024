@@ -11,7 +11,7 @@ import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
 
-import edu.wpi.first.math.util.Units;
+import edu.wpi.first.math.MathUtil;
 
 public class ElevatorIOReal implements ElevatorIO {
   private final TalonFX leftFalcon;
@@ -36,10 +36,13 @@ public class ElevatorIOReal implements ElevatorIO {
     vel_mps = new VelocityVoltage(0);
     pos_m = new PositionVoltage(Elevator.MIN_HEIGHT_M);
 
-
-
     leftFalcon = new TalonFX(25);
     rightFalcon = new TalonFX(26);
+
+    elevatorPosition = leftFalcon.getPosition();
+    elevatorVelocity = leftFalcon.getVelocity();
+    elevatorCurrent = leftFalcon.getStatorCurrent();
+    elevatorAppliedVolts = leftFalcon.getMotorVoltage();
 
     leaderConfig.CurrentLimits.StatorCurrentLimit = 40.0;
     leaderConfig.CurrentLimits.StatorCurrentLimitEnable = true;
@@ -76,19 +79,14 @@ public class ElevatorIOReal implements ElevatorIO {
   }
 
   @Override
-  public void setVoltage(double volts_V) {
-    leftFalcon.setControl(VoltageOut.withOutput(volts_V));
-  }
+  public void setVel(double vel_mps) {
+    double v = MathUtil.clamp(vel_mps, -Elevator.MAX_SPEED_V, Elevator.MAX_SPEED_V);
 
-  @Override
-  public void setVelocity(double vel_mps) {
-    double elevatorVelocity = MathUtil.clamp(vel_mps, -Elevator.MAX_SPEED, Elevator.MAX_SPEED);
-
-    leftFalcon.setControl(vel_mps.withVelocity(vel_mps));
+    leftFalcon.setControl(this.vel_mps.withVelocity(v));
   }
 
   @Override
   public void setVoltage(double volts_V) {
-    leftFalcon.setControl(volts_V.withOutput(volts_V));
+    leftFalcon.setControl(this.volts_V.withOutput(volts_V));
   }
 }

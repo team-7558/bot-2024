@@ -13,6 +13,7 @@ public class Elevator extends StateMachineSubsystemBase {
   public static final double MIN_HEIGHT_M = 0.6096;
   public static final double MAX_HEIGHT_M = 0.8763;
   public static final double STROKE_M = MAX_HEIGHT_M - MIN_HEIGHT_M;
+  public static final double MAX_SPEED_V = 12.0;
 
 
   private static Elevator instance;
