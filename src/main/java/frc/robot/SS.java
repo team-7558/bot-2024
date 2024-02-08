@@ -104,7 +104,7 @@ public class SS {
     queueState(s);
   }
 
-  public boolean hasGamePiece(){
+  public boolean hasGamePiece() {
     return hasGamePiece;
   }
 
