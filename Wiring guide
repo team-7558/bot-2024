@@ -10,6 +10,7 @@ PDH:
 -2 Shooter motors
 -1 Turret motor
 -1 Feeder motor
+-1 Pivot motor
 -2 mini power modules
 18-22AWG:
 -Rio power
@@ -37,8 +38,8 @@ Ethernet:
 PWM cable:
 -Intake Beambreak
 -Shooter Beambreak
--2 Shooter linear actuators
 -LEDs
+-4 PWM to JST-PH 6-pin
 
 Brainbox:
 18-22AWG:
@@ -99,13 +100,14 @@ Turret:
 
 Shooter through turret bundle: (make sure this part is easily replaceable in bulk, its most likely to have issues)
 10AWG:
--3 PDH
+-4 PDH
 18-22AWG:
 -CAN in
 -CAN out
+-REV throughbore power
 PWM cables:
 -Beambreak
--2 Linear Actuators
+-JST-PH 6-pin to 4 PWM
 
 LEDs:
 PWM Cables:

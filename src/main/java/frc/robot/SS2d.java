@@ -23,15 +23,14 @@ public class SS2d {
 
   public static final double GROUND_TO_ELEVATOR_BASE_M = Units.inchesToMeters(16.5);
   public static final double ELEVATOR_BASE_TO_ELEVATOR_TOP_M = Units.inchesToMeters(8.125);
-  public static final double GROUND_TO_MIN_HEIGHT = GROUND_TO_ELEVATOR_BASE_M + ELEVATOR_BASE_TO_ELEVATOR_TOP_M;
+  public static final double GROUND_TO_MIN_HEIGHT =
+      GROUND_TO_ELEVATOR_BASE_M + ELEVATOR_BASE_TO_ELEVATOR_TOP_M;
   public static final double GROUND_TO_MAX_HEIGHT = 0.8763;
 
-
-  public static final double GROUND_TO_SHOOTER_PIVOT = 0.254; //Poofs reference?
-  public static final double SHOOTER_PIVOT_TO_TIP = 0.3683; //DAVE referece?
+  public static final double GROUND_TO_SHOOTER_PIVOT = 0.254; // Poofs reference?
+  public static final double SHOOTER_PIVOT_TO_TIP = 0.3683; // DAVE referece?
   public static final double SHOOTER_TIP_TO_ROOF = Units.inchesToMeters(8.5);
   public static final double SHOOTER_ROOF_LENGTH = Units.inchesToMeters(7.75);
-
 
   public static final double TURRET_MECH_LIMIT_A = 90.0;
   public static final double TURRET_MECH_LIMIT_B = -90.0;
@@ -102,9 +101,11 @@ public class SS2d {
         shooterHeight.append(
             new MechanismLigament2d("shooter", SHOOTER_PIVOT_TO_TIP, 90, 1, COLOR_NEUTRAL));
 
-    MechanismLigament2d shooterTip = shooter.append(new MechanismLigament2d("shooter tip", SHOOTER_TIP_TO_ROOF, -90, 1.0, COLOR_FRAME));
-    shooterTip.append(new MechanismLigament2d("shooter roof", SHOOTER_ROOF_LENGTH, -90, 1.0, COLOR_FRAME));
-
+    MechanismLigament2d shooterTip =
+        shooter.append(
+            new MechanismLigament2d("shooter tip", SHOOTER_TIP_TO_ROOF, -90, 1.0, COLOR_FRAME));
+    shooterTip.append(
+        new MechanismLigament2d("shooter roof", SHOOTER_ROOF_LENGTH, -90, 1.0, COLOR_FRAME));
 
     lowerIntake =
         intakeBase.append(

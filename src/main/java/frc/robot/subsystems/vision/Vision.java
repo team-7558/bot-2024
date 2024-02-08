@@ -11,8 +11,6 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
-import frc.robot.PerfTracker;
-import frc.robot.subsystems.drive.Drive;
 import frc.robot.util.Util;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -240,16 +238,16 @@ public class Vision extends SubsystemBase {
 
   @Override
   public void periodic() {
-    PerfTracker.start("Vision");
-    for (int i = 0; i < cameras.length; i++) {
-      cameras[i].updateInputs(visionInputs[i]);
-      Logger.processInputs("Vision/Camera" + i + "/Inputs", visionInputs[i]);
+    // PerfTracker.start("Vision");
+    // for (int i = 0; i < cameras.length; i++) {
+    //   cameras[i].updateInputs(visionInputs[i]);
+    //   Logger.processInputs("Vision/Camera" + i + "/Inputs", visionInputs[i]);
 
-      managePipelines(i, Drive.getInstance().getPose());
-    }
+    //   managePipelines(i, Drive.getInstance().getPose());
+    // }
 
-    PerfTracker.end("Vision");
-    Logger.recordOutput("Vision/TagSet", posesToLog.toArray(new Pose2d[0]));
-    posesToLog.clear();
+    // PerfTracker.end("Vision");
+    // Logger.recordOutput("Vision/TagSet", posesToLog.toArray(new Pose2d[0]));
+    // posesToLog.clear();
   }
 }

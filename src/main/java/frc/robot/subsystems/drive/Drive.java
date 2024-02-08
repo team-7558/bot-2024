@@ -229,24 +229,21 @@ public class Drive extends StateMachineSubsystemBase {
             VecBuilder.fill(0.5, 0.5, 0.5)); // TODO: TUNE STANDARD DEVIATIONS
   }
 
-
-
-  public void zeroGyro() { //TODO: make work
-
+  public void zeroGyro() { // TODO: make work
   }
 
   @Override
   public void inputPeriodic() {
-    odometryLock.lock(); // Prevents odometry updates while reading data
-    gyroIO.updateInputs(gyroInputs);
-    for (var module : modules) {
-      module.updateInputs();
-    }
-    odometryLock.unlock();
-    Logger.processInputs("Drive/Gyro", gyroInputs);
-    for (var module : modules) {
-      module.inputPeriodic();
-    }
+    // odometryLock.lock(); // Prevents odometry updates while reading data
+    // gyroIO.updateInputs(gyroInputs);
+    // for (var module : modules) {
+    //   module.updateInputs();
+    // }
+    // odometryLock.unlock();
+    // Logger.processInputs("Drive/Gyro", gyroInputs);
+    // for (var module : modules) {
+    //   module.inputPeriodic();
+    // }
   }
 
   @Override
@@ -323,7 +320,7 @@ public class Drive extends StateMachineSubsystemBase {
           if (translationDistance > CUTOFF_DISTANCE) continue;
 
           // adding to the pose estimator with the timestamp
-          poseEstimator.addVisionMeasurement(estimatedPose, timestamp);
+          //poseEstimator.addVisionMeasurement(estimatedPose, timestamp);
 
         } else {
 

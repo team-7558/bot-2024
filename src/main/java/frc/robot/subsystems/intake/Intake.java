@@ -140,7 +140,7 @@ public class Intake extends StateMachineSubsystemBase {
   @Override
   public void outputPeriodic() {
     io.setDirectionSpeed(directionSpeed);
-    io.setIntakeSpeed(intakeSpeed);    
+    io.setIntakeSpeed(intakeSpeed);
     Logger.recordOutput("Intake/TargetBottomSpeed", intakeSpeed);
     Logger.recordOutput("Intake/TargetTopSpeed", directionSpeed);
     Logger.recordOutput("Intake/DirectorWheelSpeedRPM", getDirectionVelocityRPM());

@@ -42,8 +42,8 @@ public class RobotTeleop extends Command {
         drive.setPose(new Pose2d());
       } else
       // autolocking
-      if (OI.DR.getXButton()) { 
-        drive.setAutolockSetpoint(-61.19); //TODO: make source
+      if (OI.DR.getXButton()) {
+        drive.setAutolockSetpoint(-61.19); // TODO: make source
         drive.setCurrentState(drive.STRAFE_AUTOLOCK);
       } else if (OI.DR.getAButton()) { // TODO: make speaker
         drive.setAutolockSetpoint(0);
@@ -51,25 +51,24 @@ public class RobotTeleop extends Command {
       } else if (OI.DR.getBButton()) { // TOOD: make amp
         drive.setAutolockSetpoint(59.04);
         drive.setCurrentState(drive.STRAFE_AUTOLOCK);
-      } else if (OI.DR.getYButton()) { //TODO: make trap
+      } else if (OI.DR.getYButton()) { // TODO: make trap
         drive.setAutolockSetpoint(90);
         drive.setCurrentState(drive.STRAFE_AUTOLOCK);
-      } else if(OI.DR.getLeftTriggerAxis() > 0) {        // TODO: auto drive to set location
+      } else if (OI.DR.getLeftTriggerAxis() > 0) { // TODO: auto drive to set location
 
-
-      } else if(OI.XK.get(0, 7)) { // zero gyro bottom left of xkeys
+      } else if (OI.XK.get(0, 7)) { // zero gyro bottom left of xkeys
         drive.zeroGyro();
-      } else if(OI.XK.get(2, 5)) { // INTAKE SPEAKER
+      } else if (OI.XK.get(2, 5)) { // INTAKE SPEAKER
 
-      } else if(OI.XK.get(0,5)) { // INTAKE AMP
+      } else if (OI.XK.get(0, 5)) { // INTAKE AMP
 
-      } else if(OI.XK.get(2,1)) { // SHOOT AT TARGET
+      } else if (OI.XK.get(2, 1)) { // SHOOT AT TARGET
 
-      } else if(OI.XK.get(5,0)) { // TRAP SCORING
+      } else if (OI.XK.get(5, 0)) { // TRAP SCORING
 
-      } else if(OI.XK.get(0,0)) { // HANG UP
+      } else if (OI.XK.get(0, 0)) { // HANG UP
 
-      } else if(OI.XK.get(0,1)) { // HANG DOWn
+      } else if (OI.XK.get(0, 1)) { // HANG DOWn
 
       }
 

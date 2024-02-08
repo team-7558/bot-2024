@@ -48,12 +48,11 @@ public class PerfTracker {
     }
     Logger.recordOutput("PerfMs/Sum", Util.FPGATimeDelta_ms(sum));
     if (prev < 0) {
-        prev = Logger.getRealTimestamp();
+      prev = Logger.getRealTimestamp();
     } else {
-        long curr = Logger.getRealTimestamp();
-        Logger.recordOutput(
-          "PerfMs/RobotPeriodic", Util.FPGATimeDelta_ms(curr, prev));
-          prev  = curr;
+      long curr = Logger.getRealTimestamp();
+      Logger.recordOutput("PerfMs/RobotPeriodic", Util.FPGATimeDelta_ms(curr, prev));
+      prev = curr;
     }
   }
 }
