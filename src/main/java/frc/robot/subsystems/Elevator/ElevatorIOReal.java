@@ -4,20 +4,38 @@ import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
+import com.ctre.phoenix6.StatusSignal;
+import com.ctre.phoenix6.BaseStatusSignal;
 
-import frc.robot.subsystems.drive.ModuleIO.ModuleIOInputs;
+import com.ctre.phoenix6.controls.PositionVoltage;
+import com.ctre.phoenix6.controls.VelocityVoltage;
+import com.ctre.phoenix6.controls.VoltageOut;
+
+import edu.wpi.first.math.util.Units;
 
 public class ElevatorIOReal implements ElevatorIO {
   private final TalonFX leftFalcon;
   private final TalonFX rightFalcon;
 
-  private final boolean isRightMotorInverted = false;
+  private final StatusSignal<Double> elevatorPosition;
+  private final StatusSignal<Double> elevatorVelocity;
+  private final StatusSignal<Double> elevatorAppliedVolts;
+  private final StatusSignal<Double> elevatorCurrent;
+
   private final boolean isLeftMotorInverted = false;
-  private final boolean isAbsEncoderInverted = false;
+  private final VoltageOut volts_V;
+  private final VelocityVoltage vel_mps;
+  private final PositionVoltage pos_m;
+
 
   public ElevatorIOReal() {
     var leaderConfig = new TalonFXConfiguration();
     var followerConfig = new TalonFXConfiguration();
+
+    volts_V = new VoltageOut(0);
+    vel_mps = new VelocityVoltage(0);
+    pos_m = new PositionVoltage(Elevator.MIN_HEIGHT_M);
+
 
 
     leftFalcon = new TalonFX(25);
@@ -44,7 +62,33 @@ public class ElevatorIOReal implements ElevatorIO {
   }
 
   /** Updates the set of loggable inputs. */
-  public void updateInputs(ModuleIOInputs inputs) {
+  @Override
+  public void updateInputs(ElevatorIOInputs inputs) {
+    BaseStatusSignal.refreshAll(
+      elevatorPosition,
+      elevatorAppliedVolts,
+      elevatorCurrent,
+      elevatorVelocity);
+  inputs.pos_m = elevatorPosition.getValueAsDouble();
+  inputs.volts_V = elevatorAppliedVolts.getValueAsDouble();
+  inputs.vel_mps = elevatorVelocity.getValueAsDouble();
+  inputs.currents_A = new double[] {elevatorCurrent.getValueAsDouble()};
+  }
 
+  @Override
+  public void setVoltage(double volts_V) {
+    leftFalcon.setControl(VoltageOut.withOutput(volts_V));
+  }
+
+  @Override
+  public void setVelocity(double vel_mps) {
+    double elevatorVelocity = MathUtil.clamp(vel_mps, -Elevator.MAX_SPEED, Elevator.MAX_SPEED);
+
+    leftFalcon.setControl(vel_mps.withVelocity(vel_mps));
+  }
+
+  @Override
+  public void setVoltage(double volts_V) {
+    leftFalcon.setControl(volts_V.withOutput(volts_V));
   }
 }
