@@ -7,13 +7,12 @@ package frc.robot.subsystems.elevator;
 import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.math.MathUtil;
-import frc.robot.Constants;
 import frc.robot.subsystems.StateMachineSubsystemBase;
 
 public class Elevator extends StateMachineSubsystemBase {
-  public static final double ELEVATOR_MIN_HEIGHT_M = 0.5;
-  public static final double ELEVATOR_MAX_HEIGHT_M = 1.0;
-  public static final double ELEVATOR_STROKE_M = ELEVATOR_MAX_HEIGHT_M - ELEVATOR_MIN_HEIGHT_M;
+  public static final double MIN_HEIGHT_M = 0.6096;
+  public static final double MAX_HEIGHT_M = 0.8763;
+  public static final double STROKE_M = MAX_HEIGHT_M - MIN_HEIGHT_M;
 
 
   private static Elevator instance;
@@ -30,7 +29,7 @@ public class Elevator extends StateMachineSubsystemBase {
   private final ElevatorIO io;
   private final ElevatorIOInputsAutoLogged inputs = new ElevatorIOInputsAutoLogged();
 
-  private double targetHeight_m = ELEVATOR_MIN_HEIGHT_M;
+  private double targetHeight_m = MIN_HEIGHT_M;
 
   private Elevator(ElevatorIO io) {
     super("Elevator");
@@ -72,7 +71,7 @@ public class Elevator extends StateMachineSubsystemBase {
     new State("HOMING") {
       @Override
       public void init() {
-        targetHeight_m = ELEVATOR_MIN_HEIGHT_M;
+        targetHeight_m = MIN_HEIGHT_M;
       }
       @Override
       public void periodic() {
@@ -84,7 +83,7 @@ public class Elevator extends StateMachineSubsystemBase {
   }
 
   public void setTargetHeight(double height_m){
-    this.targetHeight_m = MathUtil.clamp(height_m, ELEVATOR_MIN_HEIGHT_M, ELEVATOR_MAX_HEIGHT_M);
+    this.targetHeight_m = MathUtil.clamp(height_m, MIN_HEIGHT_M, MAX_HEIGHT_M);
   }
 
   @Override

@@ -30,7 +30,7 @@ public class ElevatorIOIdeal implements ElevatorIO {
   }
 
   @Override
-  public void setPos(double pos_rad) {
+  public void setPos(double pos_m) {
     this.vel_mps = 0;
     this.volts_V = 0;
     this.pos_m = pos_m;

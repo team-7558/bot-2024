@@ -8,7 +8,7 @@ public interface ElevatorIO {
 
   @AutoLog
   public static class ElevatorIOInputs {
-    public double pos_m = Constants.ELEVATOR_MIN_HEIGHT_M;
+    public double pos_m = Elevator.MIN_HEIGHT_M;
     public double vel_mps = 0.0;
     public double volts_V = 0.0;
     public double[] currents_A = new double[] {};
