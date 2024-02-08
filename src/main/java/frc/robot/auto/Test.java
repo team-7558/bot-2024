@@ -1,20 +1,25 @@
 package frc.robot.auto;
 
+import frc.robot.SS.State;
+
 public class Test extends AltAuto {
 
   public Test() {
     super("Test");
 
-    addPath("3m Fwd", false).generate();
+    addPath("LeftStart", true).generate();
   }
 
   @Override
   public void initialize() {
-    // TODO Auto-generated method stub
+    super.initialize();
   }
 
   @Override
   public void execute() {
-    // TODO Auto-generated method stub
+    if (after(3)) {
+      System.out.println("Hmm");
+      ss.queueState(State.TEST_2);
+    }
   }
 }
