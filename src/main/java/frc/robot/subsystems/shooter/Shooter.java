@@ -51,7 +51,7 @@ public class Shooter extends StateMachineSubsystemBase {
 
   private static double TURRET_SNAP_TOLERANCE = 50;
 
-  private static Pose3d SPEAKER_POSE = new Pose3d(); // fill
+  private static Pose3d SPEAKER_POSE = new Pose3d(); // fill and make for both red and blue
   private static double HEIGHT_DIFFERENCE = SPEAKER_POSE.getZ() - SHOOTER_HEIGHT;
 
   public static class Setpoints {
@@ -263,6 +263,45 @@ public class Shooter extends StateMachineSubsystemBase {
   /** Runs forwards at the commanded voltage. */
   public void runCharacterizationVolts(double volts) {
     io.setFlywheelVolts(volts);
+  }
+
+  /**
+   * Gives pose for speaker adjusted for alliance 
+   * @return
+   */
+  private Pose3d getSpeakerPose(){
+    return new Pose3d();
+  }
+
+  /**
+   * Moves the pose of the speaker slightly based on vector to target
+   * @param botpose 3D botpose where height is shooter pivot height
+   * @param speakerPose3d 3D pose of speaker where height is bottom of speaker hole, xy is center of speaker
+   * @return
+   */
+  private Pose3d transformSpeakerPoseFromBotpose(Pose2d botpose, Pose3d speakerPose3d){
+    return new Pose3d();
+  }
+
+  /**
+   * The move and shoot code, returns the moved target to aim at
+   * @param botpose 3D botpose where height is shooter pivot height
+   * @param field_relSpeeds Field relative velocity of bot
+   * @param target 3D pose of target to shoot at
+   * @return
+   */
+  private Pose3d transformTargetPoseFromFieldRelativeVelocity(Pose3d botpose, ChassisSpeeds field_relSpeeds, Pose3d target){
+    return new Pose3d();
+  }
+
+  /**
+   * 
+   * @param botpose 3D botpose where height is shooter pivot height
+   * @param target 3D pose of target to shoot at
+   * @return
+   */
+  private Setpoints calcutateSetpointsForPose(Pose3d botpose, Pose3d target){
+    return new Setpoints(0, 0, 0);
   }
 
   /** Returns the required hardware states to be able to shoot in speaker */
