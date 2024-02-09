@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.OI;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.shooter.Shooter;
+import frc.robot.subsystems.shooter.Shooter.Setpoints;
 
 public class RobotTeleop extends Command {
 
@@ -36,7 +37,8 @@ public class RobotTeleop extends Command {
 
     if (!shooter.isState(shooter.DISABLED)) {
       if (OI.DR.getAButton()) { // make actually binded
-        shooter.setShooterState(OI.DR.getRightTriggerAxis() * 1);
+        shooter.queueSetpoints(
+            new Setpoints(OI.DR.getRightTriggerAxis() * 1, OI.DR.getRightTriggerAxis() * 1));
         shooter.setCurrentState(shooter.SHOOTING);
       } else {
         shooter.setCurrentState(shooter.IDLE);

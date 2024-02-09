@@ -54,8 +54,40 @@ public class Shooter extends StateMachineSubsystemBase {
   private static Pose3d SPEAKER_POSE = new Pose3d(); // fill
   private static double HEIGHT_DIFFERENCE = SPEAKER_POSE.getZ() - SHOOTER_HEIGHT;
 
-  private double feederVel_rps = 0;
-  private ShooterState output;
+  public static class Setpoints {
+    private static double DEFAULT =
+        -7558.0; // This way we can handle the behaviour of the setpoints specifically
+
+    public double flywheel_rps, feederVel_rps, turretPos_r, pivotPos_r;
+
+    public Setpoints(
+        double flywheel_rps, double feederVel_rps, double turretPos_r, double pivotPos_r) {
+      this.flywheel_rps = flywheel_rps;
+      this.feederVel_rps = feederVel_rps;
+      this.pivotPos_r = pivotPos_r;
+      this.turretPos_r = turretPos_r;
+    }
+
+    public Setpoints(double flywheel_rps, double turretPos_r, double pivotPos_r) {
+      this(flywheel_rps, DEFAULT, turretPos_r, pivotPos_r);
+    }
+
+    public Setpoints(double flywheel_rps, double feederVel_rps) {
+      this(flywheel_rps, feederVel_rps, DEFAULT, DEFAULT);
+    }
+
+    public Setpoints() {
+      this(DEFAULT, DEFAULT);
+    }
+
+    public Setpoints copy(Setpoints o) {
+      this.flywheel_rps = o.flywheel_rps;
+      this.feederVel_rps = o.feederVel_rps;
+      this.turretPos_r = o.turretPos_r;
+      this.pivotPos_r = o.pivotPos_r;
+      return this;
+    }
+  }
 
   private static Shooter instance;
 
@@ -85,6 +117,8 @@ public class Shooter extends StateMachineSubsystemBase {
 
   private final ShooterIO io;
 
+  private Setpoints lastSetpoints, currSetpoints;
+
   // hoodangle at 1 rad because angle of hood at max height is around 60 degrees, turret is 180
   // degrees turret so 90 seems like it would be ok
 
@@ -107,7 +141,8 @@ public class Shooter extends StateMachineSubsystemBase {
         break;
     }
 
-    output = new ShooterState();
+    lastSetpoints = new Setpoints(0, 0, 0.0, 0.0); // Default values defined here
+    currSetpoints = new Setpoints().copy(lastSetpoints);
 
     DISABLED =
         new State("DISABLED") {
@@ -141,7 +176,8 @@ public class Shooter extends StateMachineSubsystemBase {
           @Override
           public void periodic() {
             if (inputs.beamBreakActivated) {
-              feederVel_rps = 0;
+              lastSetpoints.feederVel_rps = currSetpoints.feederVel_rps;
+              currSetpoints.feederVel_rps = 0;
             }
           }
         };
@@ -166,8 +202,8 @@ public class Shooter extends StateMachineSubsystemBase {
 
           @Override
           public void periodic() {
-            //feederVel_rps = 1;
-            //output.setFlywheelVel(1);
+            // feederVel_rps = 1;
+            // output.setFlywheelVel(1);
           }
 
           @Override
@@ -188,27 +224,34 @@ public class Shooter extends StateMachineSubsystemBase {
     // Log flywheel speed in RPM
     Logger.recordOutput("Shooter/FlywheelSpeedRPM", getVelocityRPM());
 
-    Logger.recordOutput("Shooter/TargetFeed", feederVel_rps);
-    Logger.recordOutput("Shooter/TargetFly", output.getFlywheelVel());
-    Logger.recordOutput("Shooter/TargetTurr", output.getTurretPos());
-    Logger.recordOutput("Shooter/TargetPivot", output.getPivotPos());
+    Logger.recordOutput("Shooter/TargetFeed", currSetpoints.feederVel_rps);
+    Logger.recordOutput("Shooter/TargetFly", currSetpoints.flywheel_rps);
+    Logger.recordOutput("Shooter/TargetTurr", currSetpoints.turretPos_r);
+    Logger.recordOutput("Shooter/TargetPivot", currSetpoints.pivotPos_r);
 
-    io.setFeederVel(feederVel_rps);
-    io.setFlywheelVel(output.getFlywheelVel());
-    io.setTurretPos(output.getTurretPos());
-    io.setPivotPos(output.getPivotPos());
+    io.setFeederVel(currSetpoints.feederVel_rps);
+    io.setFlywheelVel(currSetpoints.flywheel_rps);
+    io.setTurretPos(currSetpoints.turretPos_r);
+    io.setPivotPos(currSetpoints.pivotPos_r);
   }
 
   /** Stops Everything */
   public void stop() {
-    output.setFlywheelVel(0);
-    feederVel_rps = 0.0;
+    queueSetpoints(new Setpoints(0, 0));
     io.stop();
   }
 
-  public void setShooterState(double s) {
-    output.setFlywheelVel(s);
-    feederVel_rps = s;
+  public void queueSetpoints(Setpoints s) {
+    Setpoints temp = new Setpoints().copy(currSetpoints);
+    currSetpoints.flywheel_rps =
+        s.flywheel_rps == Setpoints.DEFAULT ? lastSetpoints.flywheel_rps : s.flywheel_rps;
+    currSetpoints.feederVel_rps =
+        s.feederVel_rps == Setpoints.DEFAULT ? lastSetpoints.feederVel_rps : s.feederVel_rps;
+    currSetpoints.turretPos_r =
+        s.turretPos_r == Setpoints.DEFAULT ? lastSetpoints.turretPos_r : s.turretPos_r;
+    currSetpoints.pivotPos_r =
+        s.pivotPos_r == Setpoints.DEFAULT ? lastSetpoints.pivotPos_r : s.pivotPos_r;
+    lastSetpoints.copy(temp);
   }
 
   /** Returns the current velocity in RPM. */
@@ -223,7 +266,7 @@ public class Shooter extends StateMachineSubsystemBase {
   }
 
   /** Returns the required hardware states to be able to shoot in speaker */
-  public ShooterState getStateToSpeaker() {
+  public Setpoints getStateToSpeaker() {
 
     // check if moving
 
@@ -234,8 +277,6 @@ public class Shooter extends StateMachineSubsystemBase {
 
     double distanceToSpeaker =
         pose2d.getTranslation().getDistance(SPEAKER_POSE.toPose2d().getTranslation());
-
-    ShooterState state = new ShooterState();
 
     // TODO: MAKE ACTUALLY WORK
 
@@ -265,10 +306,7 @@ public class Shooter extends StateMachineSubsystemBase {
 
       double shoot_speed_rad_per_sec = shoot_speed * FLYWHEEL_RADIUS;
       double launch_angle = Math.atan((HEIGHT_DIFFERENCE) / distanceToSpeaker);
-      state.setPivotPos(launch_angle);
-      state.setTurretPos(shoot_heading); // very likely doesnt work
-      state.setFlywheelVel(shoot_speed_rad_per_sec);
-      return state;
+      return new Setpoints(shoot_speed_rad_per_sec, shoot_heading, launch_angle);
     }
 
     // needs to be changed if the angle to hit target at is > 0
@@ -278,9 +316,6 @@ public class Shooter extends StateMachineSubsystemBase {
     double turretPosition =
         Math.atan((SPEAKER_POSE.getY() - pose2d.getY()) / (SPEAKER_POSE.getX() - pose2d.getX()));
 
-    state.setPivotPos(angle);
-    state.setTurretPos(turretPosition);
-    state.setFlywheelVel(FLYWHEEL_RAD_PER_SEC);
-    return state;
+    return new Setpoints(FLYWHEEL_RAD_PER_SEC, turretPosition, angle);
   }
 }
