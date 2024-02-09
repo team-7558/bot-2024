@@ -18,6 +18,8 @@ import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import frc.robot.Constants;
 import frc.robot.subsystems.StateMachineSubsystemBase;
 import frc.robot.subsystems.drive.Drive;
@@ -51,7 +53,7 @@ public class Shooter extends StateMachineSubsystemBase {
 
   private static double TURRET_SNAP_TOLERANCE = 50;
 
-  private static Pose3d SPEAKER_POSE = new Pose3d(); // fill and make for both red and blue
+  private static Pose3d SPEAKER_POSE = getSpeakerPose();
   private static double HEIGHT_DIFFERENCE = SPEAKER_POSE.getZ() - SHOOTER_HEIGHT;
 
   public static class Setpoints {
@@ -269,8 +271,8 @@ public class Shooter extends StateMachineSubsystemBase {
    * Gives pose for speaker adjusted for alliance 
    * @return
    */
-  private Pose3d getSpeakerPose(){
-    return new Pose3d();
+  private static Pose3d getSpeakerPose(){
+    return !DriverStation.getAlliance().isEmpty() && DriverStation.getAlliance().get() == Alliance.Red ? new Pose3d(0.5,5.5,7,new Rotation3d()) : new Pose3d(0.5,5.5,7,new Rotation3d());
   }
 
   /**
@@ -279,6 +281,8 @@ public class Shooter extends StateMachineSubsystemBase {
    * @param speakerPose3d 3D pose of speaker where height is bottom of speaker hole, xy is center of speaker
    * @return
    */
+
+   //TODO: do later
   private Pose3d transformSpeakerPoseFromBotpose(Pose2d botpose, Pose3d speakerPose3d){
     return new Pose3d();
   }
@@ -291,7 +295,14 @@ public class Shooter extends StateMachineSubsystemBase {
    * @return
    */
   private Pose3d transformTargetPoseFromFieldRelativeVelocity(Pose3d botpose, ChassisSpeeds field_relSpeeds, Pose3d target){
-    return new Pose3d();
+
+    double[] velocityVector = new double[]{field_relSpeeds.vxMetersPerSecond,field_relSpeeds.vyMetersPerSecond};
+    Transform3d difference = botpose.minus(target);
+    double[] speakerDifferenceVector = new double[]{difference.getX(),difference.getY(),difference.getZ()};
+
+    double[] shoot_vector = new double[]{speakerDifferenceVector[0] - velocityVector[0], speakerDifferenceVector[1] - velocityVector[1]};
+
+    return new Pose3d(shoot_vector[0],shoot_vector[1],target.getZ(),new Rotation3d());
   }
 
   /**
@@ -301,7 +312,12 @@ public class Shooter extends StateMachineSubsystemBase {
    * @return
    */
   private Setpoints calcutateSetpointsForPose(Pose3d botpose, Pose3d target){
-    return new Setpoints(0, 0, 0);
+
+
+    // account for swerve movement
+    Pose2d pose = Drive.getInstance().getPose();
+    Pose3d transformed_pose = transformTargetPoseFromFieldRelativeVelocity(botpose, Drive.getInstance().getChassisSpeeds(), target);
+    return new Setpoints(FLYWHEEL_RAD_PER_SEC, Math.atan2(transformed_pose.getY() - pose.getY(), transformed_pose.getX() - pose.getX()), Math.atan((HEIGHT_DIFFERENCE) / transformed_pose.toPose2d().getTranslation().getDistance(SPEAKER_POSE.toPose2d().getTranslation())));
   }
 
   /** Returns the required hardware states to be able to shoot in speaker */
