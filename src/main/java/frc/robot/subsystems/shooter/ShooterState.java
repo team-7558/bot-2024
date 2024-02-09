@@ -1,43 +1,43 @@
 package frc.robot.subsystems.shooter;
 
 public class ShooterState {
-  private double hoodPosition;
-  private double turretPosition;
-  private double shooterVelocityRadPerSec;
+  private double pivotPos_r;
+  private double turretPos_r;
+  private double flywheelPos_r;
 
-  public ShooterState(double hoodPosition, double turretPosition, double shooterVelocityRadPerSec) {
-    this.hoodPosition = hoodPosition;
-    this.turretPosition = turretPosition;
-    this.shooterVelocityRadPerSec = shooterVelocityRadPerSec;
+  public ShooterState(double pivotPos_r, double turretPos_r, double flywheelPos_r) {
+    this.pivotPos_r = pivotPos_r;
+    this.turretPos_r = turretPos_r;
+    this.flywheelPos_r = flywheelPos_r;
   }
 
   public ShooterState() {
-    this.hoodPosition = 0;
-    this.turretPosition = 0;
-    this.shooterVelocityRadPerSec = 0;
+    this.pivotPos_r = 0;
+    this.turretPos_r = 0;
+    this.flywheelPos_r = 0;
   }
 
-  public double getHoodPosition() {
-    return hoodPosition;
+  public double getPivotPos() {
+    return pivotPos_r;
   }
 
-  public void setHoodPosition(double hoodPosition) {
-    this.hoodPosition = hoodPosition;
+  public void setPivotPos(double pivotPos_r) {
+    this.pivotPos_r = pivotPos_r;
   }
 
-  public double getTurretPosition() {
-    return turretPosition;
+  public double getTurretPos() {
+    return turretPos_r;
   }
 
-  public void setTurretPosition(double turretPosition) {
-    this.turretPosition = turretPosition;
+  public void setTurretPos(double turretPos_r) {
+    this.turretPos_r = turretPos_r;
   }
 
-  public double getShooterVelocity() {
-    return shooterVelocityRadPerSec;
+  public double getFlywheelVel() {
+    return flywheelPos_r;
   }
 
-  public void setShooterVelocityRadPerSec(double shooterVelocityRadPerSec) {
-    this.shooterVelocityRadPerSec = shooterVelocityRadPerSec;
+  public void setFlywheelVel(double flywheelPos_r) {
+    this.flywheelPos_r = flywheelPos_r;
   }
 }

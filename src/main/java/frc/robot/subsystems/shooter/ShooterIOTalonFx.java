@@ -4,17 +4,11 @@ import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
-import com.ctre.phoenix6.controls.Follower;
-import com.ctre.phoenix6.controls.MotionMagicVoltage;
-import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
-import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.Servo;
 
 public class ShooterIOTalonFx implements ShooterIO {
 
@@ -22,25 +16,23 @@ public class ShooterIOTalonFx implements ShooterIO {
   private static final double TURRET_GEAR_RATIO = 2; // TODO SET
   private static final double FEEDER_GEAR_RATIO = 1; // TODO: SET
 
-  private final TalonFX talonL = new TalonFX(31);
-  private final TalonFX talonR = new TalonFX(32);
+  private final TalonFX flywheelL = new TalonFX(31);
+  private final TalonFX flywheelR = new TalonFX(32);
   private final TalonFX turret = new TalonFX(37); // TODO: update
+  private final TalonFX pivot = new TalonFX(38); // TODO: update
   private final TalonFX feeder = new TalonFX(39);
 
   private final CANcoder turretCancoder = new CANcoder(38); // TODO: update
-
-  // change to actual id's
-  private final Servo leftTilt = new Servo(0);
-  private final Servo rightTilt = new Servo(1);
+  // TODO: add throughbore
 
   // getting stats from robot
-  private final StatusSignal<Double> LVelocity = talonL.getVelocity();
-  private final StatusSignal<Double> LAppliedVolts = talonL.getMotorVoltage();
-  private final StatusSignal<Double> LCurrent = talonL.getStatorCurrent();
+  private final StatusSignal<Double> LVelocity = flywheelL.getVelocity();
+  private final StatusSignal<Double> LAppliedVolts = flywheelL.getMotorVoltage();
+  private final StatusSignal<Double> LCurrent = flywheelL.getStatorCurrent();
 
-  private final StatusSignal<Double> RVelocity = talonR.getVelocity();
-  private final StatusSignal<Double> RAppliedVolts = talonR.getMotorVoltage();
-  private final StatusSignal<Double> RCurrent = talonR.getStatorCurrent();
+  private final StatusSignal<Double> RVelocity = flywheelR.getVelocity();
+  private final StatusSignal<Double> RAppliedVolts = flywheelR.getMotorVoltage();
+  private final StatusSignal<Double> RCurrent = flywheelR.getStatorCurrent();
 
   private final StatusSignal<Double> TVelocity = turret.getVelocity();
   private final StatusSignal<Double> TAppliedVolts = turret.getMotorVoltage();
@@ -64,10 +56,10 @@ public class ShooterIOTalonFx implements ShooterIO {
     config.Slot0.kI = 0;
     config.Slot0.kD = 0;
     config.Slot0.kS = 0;
-    config.Slot0.kV = 0;
+    config.Slot0.kV = 0.5;
     config.Slot0.kA = 0;
-    talonL.getConfigurator().apply(config);
-    talonR.getConfigurator().apply(config);
+    flywheelL.getConfigurator().apply(config);
+    flywheelR.getConfigurator().apply(config);
 
     var turretConfig = new TalonFXConfiguration();
     turretConfig.Feedback.RotorToSensorRatio = TURRET_GEAR_RATIO;
@@ -88,7 +80,7 @@ public class ShooterIOTalonFx implements ShooterIO {
     feederConfig.Slot0.kD = 0;
     feederConfig.Slot0.kA = 0;
     feederConfig.Slot0.kS = 0;
-    feederConfig.Slot0.kV = 0;
+    feederConfig.Slot0.kV = 0.5;
     feederConfig.Slot0.kG = 0;
     feederConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
     feederConfig.MotionMagic.MotionMagicAcceleration = 0;
@@ -101,10 +93,7 @@ public class ShooterIOTalonFx implements ShooterIO {
 
     // TODO: tune
 
-    leftTilt.setBoundsMicroseconds(2000, 1800, 1500, 1200, 1000);
-    rightTilt.setBoundsMicroseconds(2000, 1800, 1500, 1200, 1000);
-
-    talonL.setControl(new Follower(talonR.getDeviceID(), false));
+    // talonL.setControl(new Follower(talonR.getDeviceID(), false));
 
     BaseStatusSignal.setUpdateFrequencyForAll(
         50.0,
@@ -119,8 +108,8 @@ public class ShooterIOTalonFx implements ShooterIO {
         TCurrent,
         TPosition,
         TAbsolutePosition);
-    talonL.optimizeBusUtilization();
-    talonR.optimizeBusUtilization();
+    flywheelL.optimizeBusUtilization();
+    flywheelR.optimizeBusUtilization();
     turret.optimizeBusUtilization();
     feeder.optimizeBusUtilization();
 
@@ -133,70 +122,40 @@ public class ShooterIOTalonFx implements ShooterIO {
     config.kP = kP;
     config.kI = kI;
     config.kD = kD;
-    talonL.getConfigurator().apply(config);
-    talonR.getConfigurator().apply(config);
+    flywheelL.getConfigurator().apply(config);
+    flywheelR.getConfigurator().apply(config);
   }
 
   @Override
-  public void setFlywheelVelocity(double velocityRadPerSec, double ffVolts) {
-    talonL.setControl(
-        new VelocityVoltage(
-            Units.radiansToRotations(velocityRadPerSec),
-            Shooter.ACCELERATION,
-            true,
-            ffVolts,
-            0,
-            false,
-            false,
-            false));
-    talonR.setControl(
-        new VelocityVoltage(
-            Units.radiansToRotations(velocityRadPerSec),
-            Shooter.ACCELERATION,
-            true,
-            ffVolts,
-            0,
-            false,
-            false,
-            false));
+  public void setFlywheelVel(double vel_rps) {
+    flywheelL.setControl(
+        new VelocityVoltage(vel_rps, Shooter.ACCELERATION, true, 0.0, 0, false, false, false));
+    flywheelR.setControl(
+        new VelocityVoltage(vel_rps, Shooter.ACCELERATION, true, 0, 0, false, false, false));
   }
 
   @Override
-  public void setFlywheelVoltage(double volts) {
-    talonL.setControl(new VoltageOut(volts));
-  }
-
-  @Override
-  public void setTurretAngle(double angle) {
-    turret.setControl(new PositionVoltage(angle));
-  }
-
-  @Override
-  public void setTurretAngleMotionProfile(double angle) {
-    turret.setControl(new MotionMagicVoltage(angle));
+  public void setFlywheelVolts(double volts) {
+    flywheelL.setControl(new VoltageOut(volts));
+    flywheelR.setControl(new VoltageOut(volts));
   }
 
   @Override
   public void stop() {
-    talonL.stopMotor();
-    talonR.stopMotor();
+    flywheelL.stopMotor();
+    flywheelR.stopMotor();
     turret.stopMotor();
     feeder.stopMotor();
   }
 
   @Override
-  public void setAngle(double angle) {
-
-    // TODO: fix when kai tells me how it works
-
-    double checkedAngle = MathUtil.clamp(angle, 0, 1);
-    leftTilt.setPosition(checkedAngle);
-    leftTilt.setPosition(checkedAngle);
+  public void setFeederVolts(double volts) {
+    feeder.setControl(new VoltageOut(volts));
   }
 
   @Override
-  public void setFeederPosition(double position) {
-    feeder.setControl(new MotionMagicVoltage(position));
+  public void setFeederVel(double vel_rps) {
+    feeder.setControl(new VelocityVoltage(vel_rps));
   }
 
   @Override
@@ -209,29 +168,24 @@ public class ShooterIOTalonFx implements ShooterIO {
   }
 
   @Override
-  public void stopFeeder() {
-    feeder.setControl(new VoltageOut(0));
-  }
-
-  @Override
   public void updateInputs(ShooterIOInputs inputs) {
-    BaseStatusSignal.refreshAll(LVelocity, LAppliedVolts, LCurrent);
+    // BaseStatusSignal.refreshAll(LVelocity, LAppliedVolts, LCurrent);
 
-    inputs.flywheelVelocityRadPerSec = Units.rotationsToRadians(LVelocity.getValueAsDouble());
-    inputs.flywheelAppliedVolts = LAppliedVolts.getValueAsDouble();
-    inputs.currentAmps = new double[] {LAppliedVolts.getValueAsDouble()};
+    // inputs.flywheelVelocityRadPerSec = Units.rotationsToRadians(LVelocity.getValueAsDouble());
+    // inputs.flywheelAppliedVolts = LAppliedVolts.getValueAsDouble();
+    // inputs.currentAmps = new double[] {LAppliedVolts.getValueAsDouble()};
 
-    inputs.linearActuatorPositionLeft = leftTilt.getPosition();
-    inputs.linearActuatorPositionRight = rightTilt.getPosition();
+    // inputs.linearActuatorPositionLeft = leftTilt.getPosition();
+    // inputs.linearActuatorPositionRight = rightTilt.getPosition();
 
-    inputs.turretPositionDeg = TPosition.getValueAsDouble();
-    inputs.turretAppliedVolts = TAppliedVolts.getValueAsDouble();
-    inputs.turretVelocityRadPerSec = Units.rotationsToRadians(TVelocity.getValueAsDouble());
+    // inputs.turretPositionDeg = TPosition.getValueAsDouble();
+    // inputs.turretAppliedVolts = TAppliedVolts.getValueAsDouble();
+    // inputs.turretVelocityRadPerSec = Units.rotationsToRadians(TVelocity.getValueAsDouble());
 
-    inputs.feederCurrent = new double[] {feederCurrent.getValueAsDouble()};
-    inputs.feederVelocity =
-        Units.rotationsToRadians(inputs.feederVelocity = feederVelocity.getValueAsDouble());
-    inputs.feederPosition = feederPosition.getValueAsDouble();
-    inputs.feederVoltage = feederAppliedVolts.getValueAsDouble();
+    // inputs.feederCurrent = new double[] {feederCurrent.getValueAsDouble()};
+    // inputs.feederVelocity =
+    //     Units.rotationsToRadians(inputs.feederVelocity = feederVelocity.getValueAsDouble());
+    // inputs.feederPosition = feederPosition.getValueAsDouble();
+    // inputs.feederVoltage = feederAppliedVolts.getValueAsDouble();
   }
 }

@@ -20,7 +20,7 @@ import edu.wpi.first.wpilibj.simulation.FlywheelSim;
 import frc.robot.Constants;
 
 public class ShooterIOSim implements ShooterIO {
-  private FlywheelSim sim = new FlywheelSim(DCMotor.getNEO(1), 1.5, 0.004);
+  private FlywheelSim sim = new FlywheelSim(DCMotor.getKrakenX60Foc(2), 1.5, 0.004);
   private PIDController pid = new PIDController(0.0, 0.0, 0.0);
 
   private boolean closedLoop = false;
@@ -37,20 +37,20 @@ public class ShooterIOSim implements ShooterIO {
 
     sim.update(Constants.globalDelta_sec);
 
-    inputs.flywheelVelocityRadPerSec = sim.getAngularVelocityRadPerSec();
-    inputs.flywheelAppliedVolts = appliedVolts;
-    inputs.currentAmps = new double[] {sim.getCurrentDrawAmps()};
+    inputs.flywheelVel_rps = sim.getAngularVelocityRadPerSec() * 0.5 / Math.PI;
+    inputs.flywheelVolts_V = appliedVolts;
+    inputs.flywheelCurrent_A = new double[] {sim.getCurrentDrawAmps(), sim.getCurrentDrawAmps()};
   }
 
   @Override
-  public void setFlywheelVoltage(double volts) {
+  public void setFlywheelVolts(double volts) {
     closedLoop = false;
     appliedVolts = 0.0;
     sim.setInputVoltage(volts);
   }
 
   @Override
-  public void setFlywheelVelocity(double velocityRadPerSec, double ffVolts) {
+  public void setFlywheelVel(double velocityRadPerSec) {
     closedLoop = true;
     pid.setSetpoint(velocityRadPerSec);
     this.ffVolts = ffVolts;
@@ -58,7 +58,7 @@ public class ShooterIOSim implements ShooterIO {
 
   @Override
   public void stop() {
-    setFlywheelVoltage(0.0);
+    setFlywheelVolts(0.0);
   }
 
   @Override
