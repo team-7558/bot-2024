@@ -6,6 +6,7 @@ import edu.wpi.first.wpilibj.simulation.ElevatorSim;
 import frc.robot.Constants;
 
 public class ElevatorIOSim implements ElevatorIO {
+
   private ElevatorSim sim =
       new ElevatorSim(DCMotor.getFalcon500Foc(2), 1, 0, 0, 0, 0, false, 0, null);
   private PIDController velPid = new PIDController(0.0, 0.0, 0.0);

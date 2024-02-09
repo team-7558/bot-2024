@@ -33,8 +33,8 @@ public class ElevatorIOReal implements ElevatorIO {
     vel_mps = new VelocityVoltage(0);
     pos_m = new PositionVoltage(Elevator.MIN_HEIGHT_M);
 
-    leftFalcon = new TalonFX(25);
-    rightFalcon = new TalonFX(26);
+    leftFalcon = new TalonFX(1);
+    rightFalcon = new TalonFX(3);
 
     elevatorPosition = leftFalcon.getPosition();
     elevatorVelocity = leftFalcon.getVelocity();
@@ -48,16 +48,23 @@ public class ElevatorIOReal implements ElevatorIO {
 
     // Position control gains
     leaderConfig.Slot0.kP = 0.0;
+    leaderConfig.Slot0.kI = 0;
+    leaderConfig.Slot0.kD = 0;
 
     // MotionMagic gains
     leaderConfig.Slot1.kV = 0.0;
+    leaderConfig.Slot1.kS = 0.0;
+    leaderConfig.Slot1.kP = 0.0;
+    leaderConfig.Slot1.kI = 0;
+    leaderConfig.Slot1.kD = 0.0;
 
     // Velocity control
     leaderConfig.Slot2.kV = 0.0;
+    leaderConfig.Slot2.kS = 0.0;
 
     leftFalcon.getConfigurator().apply(leaderConfig);
 
-    rightFalcon.setControl(new Follower(25, true).withUpdateFreqHz(50));
+    rightFalcon.setControl(new Follower(leftFalcon.getDeviceID(), true).withUpdateFreqHz(50));
   }
 
   /** Updates the set of loggable inputs. */

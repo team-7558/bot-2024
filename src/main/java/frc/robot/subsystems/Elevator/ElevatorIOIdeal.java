@@ -3,9 +3,9 @@ package frc.robot.subsystems.elevator;
 import frc.robot.Constants;
 
 public class ElevatorIOIdeal implements ElevatorIO {
-  private double vel_mps = 0.0;
-  private double volts_V = 0.0;
-  private double pos_m = 0.0;
+  private double vel_mps = 0.6096;
+  private double volts_V = 0.6096;
+  private double pos_m = 0.6096;
 
   public ElevatorIOIdeal() {}
 
