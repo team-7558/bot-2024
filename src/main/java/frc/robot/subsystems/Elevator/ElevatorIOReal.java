@@ -58,6 +58,7 @@ public class ElevatorIOReal implements ElevatorIO {
     // MotionMagic gains
     leaderConfig.Slot1.kV = 0.0;
     leaderConfig.Slot1.kS = 0.0;
+    leaderConfig.Slot1.kA = 0.0;
     leaderConfig.Slot1.kP = 0.0;
     leaderConfig.Slot1.kI = 0;
     leaderConfig.Slot1.kD = 0.0;
