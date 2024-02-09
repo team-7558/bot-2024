@@ -55,7 +55,7 @@ public class ElevatorIOReal implements ElevatorIO {
     leaderConfig.Slot0.kI = 0;
     leaderConfig.Slot0.kD = 0;
 
-    // MotionMagic gains
+    // MotionMagic Position gains
     leaderConfig.Slot1.kV = 0.0;
     leaderConfig.Slot1.kS = 0.0;
     leaderConfig.Slot1.kA = 0.0;
@@ -63,9 +63,15 @@ public class ElevatorIOReal implements ElevatorIO {
     leaderConfig.Slot1.kI = 0;
     leaderConfig.Slot1.kD = 0.0;
 
-    // Velocity control
+    // MotionMagic Velocity control
     leaderConfig.Slot2.kV = 0.0;
     leaderConfig.Slot2.kS = 0.0;
+    leaderConfig.Slot2.kA = 0.0;
+    leaderConfig.Slot2.kP = 0.0;
+    leaderConfig.Slot2.kI = 0.0;
+    leaderConfig.Slot2.kD = 0.0;
+
+
 
     leftFalcon.getConfigurator().apply(leaderConfig);
 
