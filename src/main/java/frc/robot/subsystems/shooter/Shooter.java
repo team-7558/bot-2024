@@ -284,7 +284,7 @@ public class Shooter extends StateMachineSubsystemBase {
 
    //TODO: do later
   private Pose3d transformSpeakerPoseFromBotpose(Pose2d botpose, Pose3d speakerPose3d){
-    return new Pose3d();
+    return speakerPose3d;
   }
 
   /**
@@ -316,8 +316,7 @@ public class Shooter extends StateMachineSubsystemBase {
 
     // account for swerve movement
     Pose2d pose = Drive.getInstance().getPose();
-    Pose3d transformed_pose = transformTargetPoseFromFieldRelativeVelocity(botpose, Drive.getInstance().getChassisSpeeds(), target);
-    return new Setpoints(FLYWHEEL_RAD_PER_SEC, Math.atan2(transformed_pose.getY() - pose.getY(), transformed_pose.getX() - pose.getX()), Math.atan((HEIGHT_DIFFERENCE) / transformed_pose.toPose2d().getTranslation().getDistance(SPEAKER_POSE.toPose2d().getTranslation())));
+    return new Setpoints(FLYWHEEL_RAD_PER_SEC, Math.atan2(target.getY() - pose.getY(), target.getX() - pose.getX()), Math.atan((HEIGHT_DIFFERENCE) / target.toPose2d().getTranslation().getDistance(SPEAKER_POSE.toPose2d().getTranslation())));
   }
 
   /** Returns the required hardware states to be able to shoot in speaker */
