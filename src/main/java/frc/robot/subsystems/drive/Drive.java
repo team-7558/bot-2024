@@ -13,11 +13,6 @@
 
 package frc.robot.subsystems.drive;
 
-import com.pathplanner.lib.auto.AutoBuilder;
-import com.pathplanner.lib.pathfinding.Pathfinding;
-import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
-import com.pathplanner.lib.util.PathPlannerLogging;
-import com.pathplanner.lib.util.ReplanningConfig;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
@@ -32,14 +27,12 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Timer;
 import frc.robot.Constants;
 import frc.robot.OI;
 import frc.robot.subsystems.StateMachineSubsystemBase;
 import frc.robot.subsystems.drive.Module.Mode;
 import frc.robot.subsystems.vision.Vision;
-import frc.robot.util.LocalADStarAK;
 import frc.robot.util.Util;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -78,16 +71,24 @@ public class Drive extends StateMachineSubsystemBase {
   public static Drive getInstance() {
 
     if (instance == null) {
+      System.out.println("Drive initialized");
       switch (Constants.currentMode) {
         case REAL:
           // Real robot, instantiate hardware IO implementations
+          // instance =
+          // new Drive(
+          //     new GyroIOPigeon2(),
+          //     new ModuleIO2023(0),
+          //     new ModuleIO2023(1),
+          //     new ModuleIO2023(2),
+          //     new ModuleIO2023(3));
           instance =
               new Drive(
-                  new GyroIOPigeon2(),
-                  new ModuleIO2023(0),
-                  new ModuleIO2023(1),
-                  new ModuleIO2023(2),
-                  new ModuleIO2023(3));
+                  new GyroIO() {},
+                  new ModuleIO() {},
+                  new ModuleIO() {},
+                  new ModuleIO() {},
+                  new ModuleIO() {});
           break;
 
         case SIM:
@@ -147,27 +148,27 @@ public class Drive extends StateMachineSubsystemBase {
     modules[BR] = new Module(brModuleIO, BR, Mode.VOLTAGE);
 
     // Configure AutoBuilder for PathPlanner
-    AutoBuilder.configureHolonomic(
-        this::getPose,
-        this::setPose,
-        () -> kinematics.toChassisSpeeds(getModuleStates()),
-        this::runVelocity,
-        new HolonomicPathFollowerConfig(
-            MAX_LINEAR_SPEED, DRIVE_BASE_RADIUS, new ReplanningConfig()),
-        () ->
-            DriverStation.getAlliance().isPresent()
-                && DriverStation.getAlliance().get() == Alliance.Red,
-        this);
-    Pathfinding.setPathfinder(new LocalADStarAK());
-    PathPlannerLogging.setLogActivePathCallback(
-        (activePath) -> {
-          Logger.recordOutput(
-              "Odometry/Trajectory", activePath.toArray(new Pose2d[activePath.size()]));
-        });
-    PathPlannerLogging.setLogTargetPoseCallback(
-        (targetPose) -> {
-          Logger.recordOutput("Odometry/TrajectorySetpoint", targetPose);
-        });
+    // AutoBuilder.configureHolonomic(
+    //     this::getPose,
+    //     this::setPose,
+    //     () -> kinematics.toChassisSpeeds(getModuleStates()),
+    //     this::runVelocity,
+    //     new HolonomicPathFollowerConfig(
+    //         MAX_LINEAR_SPEED, DRIVE_BASE_RADIUS, new ReplanningConfig()),
+    //     () ->
+    //         DriverStation.getAlliance().isPresent()
+    //             && DriverStation.getAlliance().get() == Alliance.Red,
+    //     this);
+    // Pathfinding.setPathfinder(new LocalADStarAK());
+    // PathPlannerLogging.setLogActivePathCallback(
+    //     (activePath) -> {
+    //       Logger.recordOutput(
+    //           "Odometry/Trajectory", activePath.toArray(new Pose2d[activePath.size()]));
+    //     });
+    // PathPlannerLogging.setLogTargetPoseCallback(
+    //     (targetPose) -> {
+    //       Logger.recordOutput("Odometry/TrajectorySetpoint", targetPose);
+    //     });
 
     DISABLED =
         new State("DISABLED") {

@@ -27,9 +27,8 @@ import edu.wpi.first.wpilibj.DigitalInput;
 public class IntakeIOTalonFX implements IntakeIO {
   private static final double GEAR_RATIO = 1;
 
-  private final TalonFX topMotor =
-      new TalonFX(36); // Not gunna be 0 1 (cameron told me to add that)
-  private final TalonFX bottomMotor = new TalonFX(35);
+  private final TalonFX topMotor = new TalonFX(4); // Not gunna be 0 1 (cameron told me to add that)
+  private final TalonFX bottomMotor = new TalonFX(2);
   private final DigitalInput beambreak = new DigitalInput(0);
 
   private final StatusSignal<Double> bottomVelocity = bottomMotor.getVelocity();
@@ -76,7 +75,7 @@ public class IntakeIOTalonFX implements IntakeIO {
         topVelocity,
         topAppliedVolts,
         topCurrent);
-    inputs.beamBreakActivated = beambreak.get();
+    inputs.beamBreakActivated = false; // beambreak.get();
     inputs.intakeVelocityRadPerSec =
         Units.rotationsToRadians(bottomVelocity.getValueAsDouble()) / GEAR_RATIO;
     inputs.intakeAppliedVolts = bottomAppliedVolts.getValueAsDouble();

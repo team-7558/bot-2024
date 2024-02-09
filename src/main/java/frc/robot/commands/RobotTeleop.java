@@ -21,13 +21,13 @@ public class RobotTeleop extends Command {
     // Use addRequirements() here to declare subsystem dependencies.
     drive = Drive.getInstance();
     intake = Intake.getInstance();
-    addRequirements(drive);
+    addRequirements(drive, intake);
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    drive.setCurrentState(drive.STRAFE_N_TURN);
+    drive.setCurrentState(drive.DISABLED);
     intake.setCurrentState(intake.IDLE);
   }
 
@@ -100,9 +100,10 @@ public class RobotTeleop extends Command {
 
     SS2d.S.setTurretBaseAngle(drive.getRotation());
     SS2d.S.setDistance(drive.getPose().getX());
+
     if (!intake.isState(intake.DISABLED)) {
       if (OI.DR.getRightBumper()) {
-        intake.setCurrentState(intake.INTAKING);
+        intake.setCurrentState(intake.AMP_SIDE_2);
       } else if (OI.DR.getLeftBumper()) {
         intake.setCurrentState(intake.SHOOTER_SIDE);
       } else {

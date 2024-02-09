@@ -20,6 +20,7 @@ public class Intake extends StateMachineSubsystemBase {
 
   public static Intake getInstance() {
     if (instance == null) {
+      System.out.println("Intake initialized");
       switch (Constants.currentMode) {
         case REAL:
           // Real robot, instantiate hardware IO implementations
@@ -80,7 +81,7 @@ public class Intake extends StateMachineSubsystemBase {
         new State("INTAKING") {
           @Override
           public void init() {
-            intakeSpeed = 0.1;
+            intakeSpeed = 0.25;
             directionSpeed = 0;
           }
         };
@@ -90,30 +91,30 @@ public class Intake extends StateMachineSubsystemBase {
           @Override
           public void init() {
             directionSpeed = 0;
-            intakeSpeed = 0.1;
+            intakeSpeed = 0.25;
           }
         };
     AMP_SIDE_2 =
         new State("AMP_SIDE_2") {
           @Override
           public void init() {
-            directionSpeed = 0.1;
-            intakeSpeed = 0.1;
+            directionSpeed = 0.5;
+            intakeSpeed = 0.5;
           }
         };
     SHOOTER_SIDE =
         new State("SHOOTER_SIDE") {
           @Override
           public void init() {
-            directionSpeed = -0.1;
-            intakeSpeed = 0.1;
+            directionSpeed = -0.5;
+            intakeSpeed = 0.5;
           }
         };
     SPITTING =
         new State("SPITTING") {
           @Override
           public void init() {
-            intakeSpeed = -0.1;
+            intakeSpeed = -0.25;
             directionSpeed = 0.0;
           }
         };
