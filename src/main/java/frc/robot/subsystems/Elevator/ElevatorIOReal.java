@@ -89,4 +89,8 @@ public class ElevatorIOReal implements ElevatorIO {
   public void setVoltage(double volts_V) {
     leftFalcon.setControl(this.volts_V.withOutput(volts_V));
   }
+
+  public void stop() {
+    leftFalcon.stopMotor();
+  }
 }
