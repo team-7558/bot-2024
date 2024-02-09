@@ -2,8 +2,6 @@ package frc.robot.subsystems.elevator;
 
 import org.littletonrobotics.junction.AutoLog;
 
-import frc.robot.Constants;
-
 public interface ElevatorIO {
 
   @AutoLog

@@ -37,5 +37,4 @@ public final class Constants {
 
   public static final double globalDelta_sec = 0.02;
   public static final double driveDeadband = 0.05;
-
 }

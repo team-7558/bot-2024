@@ -7,9 +7,7 @@ public class ElevatorIOIdeal implements ElevatorIO {
   private double volts_V = 0.0;
   private double pos_m = 0.0;
 
-
-  public ElevatorIOIdeal() {
-  }
+  public ElevatorIOIdeal() {}
 
   @Override
   public void updateInputs(ElevatorIOInputs inputs) {
