@@ -34,6 +34,7 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants;
 import frc.robot.OI;
 import frc.robot.subsystems.StateMachineSubsystemBase;
@@ -55,6 +56,7 @@ public class Drive extends StateMachineSubsystemBase {
   private static final double DRIVE_BASE_RADIUS =
       Math.hypot(TRACK_WIDTH_X / 2.0, TRACK_WIDTH_Y / 2.0);
   public static final double MAX_ANGULAR_SPEED = MAX_LINEAR_SPEED / DRIVE_BASE_RADIUS;
+
 
   // TODO: tune all this
   // -- VISION CONSTANTS --
@@ -145,6 +147,8 @@ public class Drive extends StateMachineSubsystemBase {
     modules[FR] = new Module(frModuleIO, FR, Mode.VOLTAGE);
     modules[BL] = new Module(blModuleIO, BL, Mode.VOLTAGE);
     modules[BR] = new Module(brModuleIO, BR, Mode.VOLTAGE);
+
+    PhoenixOdometryThread.getInstance().start();
 
     // Configure AutoBuilder for PathPlanner
     AutoBuilder.configureHolonomic(
