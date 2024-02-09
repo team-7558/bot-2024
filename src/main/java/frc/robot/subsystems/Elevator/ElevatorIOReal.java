@@ -4,6 +4,7 @@ import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.Follower;
+import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
@@ -46,6 +47,9 @@ public class ElevatorIOReal implements ElevatorIO {
     leaderConfig.Feedback.SensorToMechanismRatio = 1; // Figure out how to scale this to real height
     leaderConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
 
+    leaderConfig.MotionMagic.MotionMagicAcceleration = 1;
+    leaderConfig.MotionMagic.MotionMagicJerk = 200;
+
     // Position control gains
     leaderConfig.Slot0.kP = 0.0;
 
@@ -74,8 +78,11 @@ public class ElevatorIOReal implements ElevatorIO {
   @Override
   public void setVel(double vel_mps) {
     double v = MathUtil.clamp(vel_mps, -Elevator.MAX_SPEED_V, Elevator.MAX_SPEED_V);
-
     leftFalcon.setControl(this.vel_mps.withVelocity(v));
+  }
+
+  public void setPos(double position) {
+    leftFalcon.setControl(new MotionMagicVoltage(position));
   }
 
   @Override
