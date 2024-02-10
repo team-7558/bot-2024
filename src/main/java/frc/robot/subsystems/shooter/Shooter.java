@@ -18,6 +18,7 @@ import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import frc.robot.Constants;
@@ -28,7 +29,7 @@ import org.littletonrobotics.junction.Logger;
 
 public class Shooter extends StateMachineSubsystemBase {
 
-  private static double SHOOTER_HEIGHT = 0;
+  private static double HEIGHT_M = 0;
 
   public static double ACCELERATION = 5.0; // TODO: tune
 
@@ -46,15 +47,18 @@ public class Shooter extends StateMachineSubsystemBase {
       (FLYWHEEL_MAX_RPM * FLYWHEEL_SPEED) * (2 * Math.PI) / 60;
   private static double FLYWHEEL_RPM = FLYWHEEL_MAX_RPM * FLYWHEEL_SPEED; // remove if unused
 
-  private static final double[][] TABLE_DATA = new double[][] {{0, 0}, {0, 1}}; // TODO: fill
-  private static final LinearInterpolator DISTANCE_TABLE = new LinearInterpolator(TABLE_DATA);
+  private static final double[][] TABLE_DATA = new double[][] {{-100, 0}, {100, 0}}; // TODO: fill
+  private static final LinearInterpolator shotTimesFromDistance =
+      new LinearInterpolator(TABLE_DATA);
+  private static final LinearInterpolator shotSpeedFromDistance =
+      new LinearInterpolator(TABLE_DATA);
 
   private static double TIME_TO_SHOOT = 0.5;
 
   private static double TURRET_SNAP_TOLERANCE = 50;
 
-  private static Pose3d SPEAKER_POSE = getSpeakerPose();
-  private static double HEIGHT_DIFFERENCE = SPEAKER_POSE.getZ() - SHOOTER_HEIGHT;
+  private static Pose3d SPEAKER_POSE_RED = new Pose3d(0.5, 5.5, 1.9812, new Rotation3d()); // TODO: fix
+  private static Pose3d SPEAKER_POSE_BLUE = new Pose3d(0.5, 5.5, 1.9812, new Rotation3d());
 
   public static class Setpoints {
     private static double DEFAULT =
@@ -191,7 +195,9 @@ public class Shooter extends StateMachineSubsystemBase {
           public void init() {}
 
           @Override
-          public void periodic() {}
+          public void periodic() {
+            shooterPipeline();
+          }
 
           @Override
           public void exit() {}
@@ -268,108 +274,105 @@ public class Shooter extends StateMachineSubsystemBase {
   }
 
   /**
-   * Gives pose for speaker adjusted for alliance 
+   * Gives pose for speaker adjusted for alliance
+   *
    * @return
    */
-  private static Pose3d getSpeakerPose(){
-    return !DriverStation.getAlliance().isEmpty() && DriverStation.getAlliance().get() == Alliance.Red ? new Pose3d(0.5,5.5,7,new Rotation3d()) : new Pose3d(0.5,5.5,7,new Rotation3d());
+  private static Pose3d getSpeakerPose() {
+    return !DriverStation.getAlliance().isEmpty()
+            && DriverStation.getAlliance().get() == Alliance.Red
+        ? SPEAKER_POSE_RED
+        : SPEAKER_POSE_BLUE;
   }
 
   /**
    * Moves the pose of the speaker slightly based on vector to target
+   *
    * @param botpose 3D botpose where height is shooter pivot height
-   * @param speakerPose3d 3D pose of speaker where height is bottom of speaker hole, xy is center of speaker
+   * @param speakerPose3d 3D pose of speaker where height is bottom of speaker hole, xy is center of
+   *     speaker
    * @return
    */
-
-   //TODO: do later
-  private Pose3d transformSpeakerPoseFromBotpose(Pose2d botpose, Pose3d speakerPose3d){
+  private Pose3d transformSpeakerPoseFromBotpose(Pose3d botpose, Pose3d speakerPose3d) {
+    // TODO: do later
     return speakerPose3d;
   }
 
   /**
    * The move and shoot code, returns the moved target to aim at
+   *
    * @param botpose 3D botpose where height is shooter pivot height
    * @param field_relSpeeds Field relative velocity of bot
    * @param target 3D pose of target to shoot at
    * @return
    */
-  private Pose3d transformTargetPoseFromFieldRelativeVelocity(Pose3d botpose, ChassisSpeeds field_relSpeeds, Pose3d target){
+  private Pose3d transformTargetPoseFromFieldRelativeVelocity(
+      Pose3d botpose, ChassisSpeeds field_relSpeeds, Pose3d target) {
+    Pose3d newTarget = target;
+    int iterations = 1;
+    for (int i = 0; i < iterations; i++) {
+      Transform3d delta = newTarget.minus(botpose);
+      double dist2 =
+          delta.getX() * delta.getX() + delta.getY() * delta.getY() + delta.getZ() * delta.getZ();
+      double dist = Math.sqrt(dist2);
 
-    double[] velocityVector = new double[]{field_relSpeeds.vxMetersPerSecond,field_relSpeeds.vyMetersPerSecond};
-    Transform3d difference = botpose.minus(target);
-    double[] speakerDifferenceVector = new double[]{difference.getX(),difference.getY(),difference.getZ()};
+      double shotTime_s = TIME_TO_SHOOT + shotTimesFromDistance.getInterpolatedValue(dist);
 
-    double[] shoot_vector = new double[]{speakerDifferenceVector[0] - velocityVector[0], speakerDifferenceVector[1] - velocityVector[1]};
+      Transform3d offset =
+          new Transform3d(
+              -field_relSpeeds.vxMetersPerSecond * shotTime_s,
+              -field_relSpeeds.vyMetersPerSecond * shotTime_s,
+              0.0,
+              new Rotation3d());
+      newTarget = target.plus(offset);
+    }
 
-    return new Pose3d(shoot_vector[0],shoot_vector[1],target.getZ(),new Rotation3d());
+    return newTarget;
   }
 
   /**
-   * 
    * @param botpose 3D botpose where height is shooter pivot height
    * @param target 3D pose of target to shoot at
    * @return
    */
-  private Setpoints calcutateSetpointsForPose(Pose3d botpose, Pose3d target){
+  private Setpoints calculateSetpointsForPose(Pose3d botpose, Pose3d target) {
+    Transform3d delta = target.minus(botpose);
+    double dist2 =
+        delta.getX() * delta.getX() + delta.getY() * delta.getY() + delta.getZ() * delta.getZ();
+    double dist = Math.sqrt(dist2);
 
+    double flywheel_rps = shotSpeedFromDistance.getInterpolatedValue(dist);
+    double turretPos_r = Units.radiansToRotations(Math.atan2(delta.getY(), delta.getX()));
+    double pivotPos_r = Units.radiansToRotations(Math.asin(delta.getZ() / dist));
 
-    // account for swerve movement
-    Pose2d pose = Drive.getInstance().getPose();
-    return new Setpoints(FLYWHEEL_RAD_PER_SEC, Math.atan2(target.getY() - pose.getY(), target.getX() - pose.getX()), Math.atan((HEIGHT_DIFFERENCE) / target.toPose2d().getTranslation().getDistance(SPEAKER_POSE.toPose2d().getTranslation())));
+    return new Setpoints(flywheel_rps, turretPos_r, pivotPos_r);
   }
 
-  /** Returns the required hardware states to be able to shoot in speaker */
-  public Setpoints getStateToSpeaker() {
+  private Setpoints constrainSetpoints(Setpoints s) { // TODO: constrain
+    return s;
+  }
 
-    // check if moving
+  public void shooterPipeline() {
+    Pose2d botpose2d = Drive.getInstance().getPose();
+    Pose3d botpose =
+        new Pose3d(
+            botpose2d.getX(),
+            botpose2d.getY(),
+            HEIGHT_M,
+            new Rotation3d(0, 0, botpose2d.getRotation().getRadians()));
+    ChassisSpeeds fieldRelSpeeds = Drive.getInstance().getFieldRelativeSpeeds();
 
-    Drive drive = Drive.getInstance();
+    Pose3d speaker = getSpeakerPose();
+    Pose3d positionAdjustedSpeaker = transformSpeakerPoseFromBotpose(botpose, speaker);
+    Pose3d velocityAdjustedSpeaker =
+        transformTargetPoseFromFieldRelativeVelocity(
+            botpose, fieldRelSpeeds, positionAdjustedSpeaker);
+    Setpoints newSetpoints = calculateSetpointsForPose(botpose, velocityAdjustedSpeaker);
+    Setpoints constrainedSetpoints = constrainSetpoints(newSetpoints);
+    queueSetpoints(constrainedSetpoints);
 
-    ChassisSpeeds speeds = drive.getChassisSpeeds();
-    Pose2d pose2d = Drive.getInstance().getPose();
-
-    double distanceToSpeaker =
-        pose2d.getTranslation().getDistance(SPEAKER_POSE.toPose2d().getTranslation());
-
-    // TODO: MAKE ACTUALLY WORK
-
-    // check if moving
-    if (speeds.vyMetersPerSecond > 0
-        || speeds.vxMetersPerSecond > 0 && speeds.omegaRadiansPerSecond == 0) {
-      double[] velocityVector = new double[] {speeds.vxMetersPerSecond, speeds.vyMetersPerSecond};
-
-      Transform3d difference =
-          new Pose3d(
-                  pose2d.getX() + velocityVector[0] * TIME_TO_SHOOT,
-                  pose2d.getY() + velocityVector[1] * TIME_TO_SHOOT,
-                  0,
-                  new Rotation3d())
-              .minus(SPEAKER_POSE);
-      double[] speakerDifferenceVector =
-          new double[] {difference.getX(), difference.getY(), difference.getZ()};
-
-      double[] shoot_vector =
-          new double[] {
-            speakerDifferenceVector[0] - velocityVector[0],
-            speakerDifferenceVector[1] - velocityVector[1]
-          };
-
-      double shoot_heading = Math.atan2(shoot_vector[1], shoot_vector[0]); // might not work
-      double shoot_speed = Math.sqrt(Math.pow(shoot_vector[0], 2) + Math.pow(shoot_vector[1], 2));
-
-      double shoot_speed_rad_per_sec = shoot_speed * FLYWHEEL_RADIUS;
-      double launch_angle = Math.atan((HEIGHT_DIFFERENCE) / distanceToSpeaker);
-      return new Setpoints(shoot_speed_rad_per_sec, shoot_heading, launch_angle);
-    }
-
-    // needs to be changed if the angle to hit target at is > 0
-    double angle = Math.atan((HEIGHT_DIFFERENCE) / distanceToSpeaker);
-
-    // needs to be rotation from the thing
-    double turretPosition =
-        Math.atan((SPEAKER_POSE.getY() - pose2d.getY()) / (SPEAKER_POSE.getX() - pose2d.getX()));
-
-    return new Setpoints(FLYWHEEL_RAD_PER_SEC, turretPosition, angle);
+    Logger.recordOutput("Shooter/Speaker", speaker);
+    Logger.recordOutput("Shooter/PositionAdjustedSpeaker", positionAdjustedSpeaker);
+    Logger.recordOutput("Shooter/VelocityAdjustedSpeaker", velocityAdjustedSpeaker);
   }
 }

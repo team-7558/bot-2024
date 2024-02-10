@@ -27,7 +27,7 @@ public class RobotTeleop extends Command {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    drive.setCurrentState(drive.DISABLED);
+    drive.setCurrentState(drive.STRAFE_N_TURN);
     shooter.setCurrentState(shooter.IDLE);
   }
 
@@ -41,7 +41,7 @@ public class RobotTeleop extends Command {
             new Setpoints(OI.DR.getRightTriggerAxis() * 1, OI.DR.getRightTriggerAxis() * 1));
         shooter.setCurrentState(shooter.SHOOTING);
       } else {
-        shooter.setCurrentState(shooter.IDLE);
+        shooter.setCurrentState(shooter.LOCKONT);
       }
     }
 
