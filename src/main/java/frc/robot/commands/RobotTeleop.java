@@ -27,7 +27,7 @@ public class RobotTeleop extends Command {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    drive.setCurrentState(drive.DISABLED);
+    drive.setCurrentState(drive.STRAFE_N_TURN);
     intake.setCurrentState(intake.IDLE);
   }
 
