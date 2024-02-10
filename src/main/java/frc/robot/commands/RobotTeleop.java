@@ -37,9 +37,7 @@ public class RobotTeleop extends Command {
       if (OI.DR.getLeftTriggerAxis() > 0) {
         drive.setPose(new Pose2d());
         drive.zeroGyro();
-      } else
-      // autolocking
-      if (OI.DR.getXButton()) {
+      } else if (OI.DR.getXButton()) {
         drive.setAutolockSetpoint(-61.19);
         drive.setCurrentState(drive.STRAFE_AUTOLOCK);
       } else if (OI.DR.getAButton()) {
@@ -51,9 +49,8 @@ public class RobotTeleop extends Command {
       } else if (OI.DR.getYButton()) {
         drive.setAutolockSetpoint(90);
         drive.setCurrentState(drive.STRAFE_AUTOLOCK);
-      else if(OI.DR.getRightTriggerAxis() > 0) {
+      } else if(OI.DR.getRightTriggerAxis() > 0) {
         
-      }
       } else {
         // strafe and turn if not other state
         drive.setCurrentState(drive.STRAFE_N_TURN);
