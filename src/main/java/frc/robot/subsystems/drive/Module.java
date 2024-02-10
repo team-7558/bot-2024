@@ -23,7 +23,7 @@ import frc.robot.Constants;
 import org.littletonrobotics.junction.Logger;
 
 public class Module {
-  public static final double FUDGE_FACTOR = 0.95301;
+  public static final double FUDGE_FACTOR = 1.0;
   public static final double WHEEL_RADIUS = Units.inchesToMeters(2.0 * FUDGE_FACTOR);
   public static final double ODOMETRY_FREQUENCY = 250.0;
 
@@ -42,7 +42,6 @@ public class Module {
   public Mode mode = Mode.VOLTAGE;
   private Rotation2d angleSetpoint = null; // Setpoint for closed loop control, null for open loop
   private Double speedSetpoint = null; // Setpoint for closed loop control, null for open loop
-  private Rotation2d turnRelativeOffset = null; // Relative + Offset = Absolute
   private double lastPositionMeters = 0.0; // Used for delta calculation
   private SwerveModulePosition[] positionDeltas = new SwerveModulePosition[] {};
 
@@ -93,9 +92,6 @@ public class Module {
   public void outputPeriodic() {
     // On first cycle, reset relative turn encoder
     // Wait until absolute angle is nonzero in case it wasn't initialized yet
-    if (turnRelativeOffset == null && inputs.turnAbsolutePosition.getRadians() != 0.0) {
-      turnRelativeOffset = inputs.turnAbsolutePosition.minus(inputs.turnPosition);
-    }
 
     if (mode == Mode.VOLTAGE) {
       // Run closed loop turn control
@@ -114,16 +110,17 @@ public class Module {
           double adjustSpeedSetpoint = speedSetpoint * Math.cos(turnFeedback.getPositionError());
 
           // Run drive controller
-          double velocityRadPerSec = adjustSpeedSetpoint / WHEEL_RADIUS;
+          double velocityRadPerSec = Units.radiansToRotations(adjustSpeedSetpoint / WHEEL_RADIUS);
           io.setDriveVoltage(
               driveFeedforward.calculate(velocityRadPerSec)
-                  + driveFeedback.calculate(inputs.driveVelocityRadPerSec, velocityRadPerSec));
+                  + driveFeedback.calculate(inputs.driveVel_rps, velocityRadPerSec));
         }
       }
     } else {
       // Run closed loop turn control
       if (angleSetpoint != null) {
-        io.setTurnAngle(angleSetpoint.getRadians());
+        io.setTurnAngle(angleSetpoint.getRotations());
+
         // io.setTurnVoltage(
         //    turnFeedback.calculate(getAngle().getRadians(), angleSetpoint.getRadians()));
 
@@ -137,7 +134,7 @@ public class Module {
           // taking the component of the velocity in the direction of the setpoint.
           double adjustSpeedSetpoint =
               speedSetpoint
-                  * Math.cos(turnFeedback.getPositionError()); // TODO: Fix for setpoint mode
+                  * Math.cos(angleSetpoint.getRadians() - inputs.turnPos_rot2d.getRadians());
 
           // Run drive controller
           io.setDriveVelocity(adjustSpeedSetpoint);
@@ -147,13 +144,11 @@ public class Module {
 
     // Calculate position deltas for odometry
     int deltaCount =
-        Math.min(inputs.odometryDrivePositionsRad.length, inputs.odometryTurnPositions.length);
+        Math.min(inputs.odometryDrivePos_r.length, inputs.odometryTurnPos_rot2d.length);
     positionDeltas = new SwerveModulePosition[deltaCount];
     for (int i = 0; i < deltaCount; i++) {
-      double positionMeters = inputs.odometryDrivePositionsRad[i] * WHEEL_RADIUS;
-      Rotation2d angle =
-          inputs.odometryTurnPositions[i].plus(
-              turnRelativeOffset != null ? turnRelativeOffset : new Rotation2d());
+      double positionMeters = Units.rotationsToRadians(inputs.odometryDrivePos_r[i]) * WHEEL_RADIUS;
+      Rotation2d angle = inputs.odometryTurnPos_rot2d[i];
       positionDeltas[i] = new SwerveModulePosition(positionMeters - lastPositionMeters, angle);
       lastPositionMeters = positionMeters;
     }
@@ -205,21 +200,17 @@ public class Module {
 
   /** Returns the current turn angle of the module. */
   public Rotation2d getAngle() {
-    if (turnRelativeOffset == null) {
-      return new Rotation2d();
-    } else {
-      return inputs.turnPosition.plus(turnRelativeOffset);
-    }
+    return inputs.turnPos_rot2d;
   }
 
   /** Returns the current drive position of the module in meters. */
   public double getPositionMeters() {
-    return inputs.drivePositionRad * WHEEL_RADIUS;
+    return Units.rotationsToRadians(inputs.drivePos_r) * WHEEL_RADIUS;
   }
 
   /** Returns the current drive velocity of the module in meters per second. */
   public double getVelocityMetersPerSec() {
-    return inputs.driveVelocityRadPerSec * WHEEL_RADIUS;
+    return Units.rotationsToRadians(inputs.driveVel_rps) * WHEEL_RADIUS;
   }
 
   /** Returns the module position (turn angle and drive position). */
@@ -239,6 +230,6 @@ public class Module {
 
   /** Returns the drive velocity in radians/sec. */
   public double getCharacterizationVelocity() {
-    return inputs.driveVelocityRadPerSec;
+    return Units.rotationsToRadians(inputs.driveVel_rps);
   }
 }

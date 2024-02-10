@@ -49,14 +49,12 @@ public class RobotTeleop extends Command {
       } else if (OI.DR.getYButton()) {
         drive.setAutolockSetpoint(90);
         drive.setCurrentState(drive.STRAFE_AUTOLOCK);
-      } else if(OI.DR.getRightTriggerAxis() > 0) {
-        
+      } else if (OI.DR.getRightTriggerAxis() > 0) {
+
       } else {
         // strafe and turn if not other state
         drive.setCurrentState(drive.STRAFE_N_TURN);
       }
-
-
     }
   }
 

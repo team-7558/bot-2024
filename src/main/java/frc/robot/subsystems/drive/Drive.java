@@ -34,12 +34,10 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants;
 import frc.robot.OI;
 import frc.robot.subsystems.StateMachineSubsystemBase;
 import frc.robot.subsystems.drive.Module.Mode;
-import frc.robot.subsystems.vision.Vision;
 import frc.robot.util.LocalADStarAK;
 import frc.robot.util.Util;
 import java.util.concurrent.locks.Lock;
@@ -56,7 +54,6 @@ public class Drive extends StateMachineSubsystemBase {
   private static final double DRIVE_BASE_RADIUS =
       Math.hypot(TRACK_WIDTH_X / 2.0, TRACK_WIDTH_Y / 2.0);
   public static final double MAX_ANGULAR_SPEED = MAX_LINEAR_SPEED / DRIVE_BASE_RADIUS;
-
 
   // TODO: tune all this
   // -- VISION CONSTANTS --
@@ -143,10 +140,10 @@ public class Drive extends StateMachineSubsystemBase {
 
     super("Drive");
     this.gyroIO = gyroIO;
-    modules[FL] = new Module(flModuleIO, FL, Mode.VOLTAGE);
-    modules[FR] = new Module(frModuleIO, FR, Mode.VOLTAGE);
-    modules[BL] = new Module(blModuleIO, BL, Mode.VOLTAGE);
-    modules[BR] = new Module(brModuleIO, BR, Mode.VOLTAGE);
+    modules[FL] = new Module(flModuleIO, FL, Mode.SETPOINT);
+    modules[FR] = new Module(frModuleIO, FR, Mode.SETPOINT);
+    modules[BL] = new Module(blModuleIO, BL, Mode.SETPOINT);
+    modules[BR] = new Module(brModuleIO, BR, Mode.SETPOINT);
 
     PhoenixOdometryThread.getInstance().start();
 
@@ -300,34 +297,34 @@ public class Drive extends StateMachineSubsystemBase {
 
     // TODO: see if this works on a bot, also clean up, Vision should provide poses with timestamp
     // to Drive
-    Vision vision = Vision.getInstance();
-    if (vision.hasTagInView()) {
-      for (int i = 0; i < vision.getCameras(); i++) {
-        int tagID = (int) vision.getTagID(i);
-        if (tagID > 0) {
-          double timestamp = vision.getTimestamp(i);
+    // Vision vision = Vision.getInstance();
+    // if (vision.hasTagInView()) {
+    //   for (int i = 0; i < vision.getCameras(); i++) {
+    //     int tagID = (int) vision.getTagID(i);
+    //     if (tagID > 0) {
+    //       double timestamp = vision.getTimestamp(i);
 
-          // where the ACTUAL tag is
-          Pose2d tagPose2d = Vision.AT_MAP.getTagPose(tagID).get().toPose2d();
+    //       // where the ACTUAL tag is
+    //       Pose2d tagPose2d = Vision.AT_MAP.getTagPose(tagID).get().toPose2d();
 
-          // where this camera thinks it is
-          Pose2d estimatedPose = vision.getPose(i);
+    //       // where this camera thinks it is
+    //       Pose2d estimatedPose = vision.getPose(i);
 
-          // distance between tag and estimated pose
-          double translationDistance =
-              tagPose2d.getTranslation().getDistance(getPose().getTranslation());
+    //       // distance between tag and estimated pose
+    //       double translationDistance =
+    //           tagPose2d.getTranslation().getDistance(getPose().getTranslation());
 
-          // implementing cutoff
-          if (translationDistance > CUTOFF_DISTANCE) continue;
+    //       // implementing cutoff
+    //       if (translationDistance > CUTOFF_DISTANCE) continue;
 
-          // adding to the pose estimator with the timestamp
-          poseEstimator.addVisionMeasurement(estimatedPose, timestamp);
+    //       // adding to the pose estimator with the timestamp
+    //       poseEstimator.addVisionMeasurement(estimatedPose, timestamp);
 
-        } else {
+    //     } else {
 
-        }
-      }
-    }
+    //     }
+    //   }
+    // }
   }
 
   public void drive(double x, double y, double w, double throttle) {
@@ -351,6 +348,7 @@ public class Drive extends StateMachineSubsystemBase {
             .getTranslation();
 
     // Convert to field relative speeds & send command
+
     runVelocity(
         ChassisSpeeds.fromFieldRelativeSpeeds(
             (linearVelocity.getX() * MAX_LINEAR_SPEED) * throttle,
