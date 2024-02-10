@@ -25,6 +25,8 @@ import frc.robot.Constants;
 import frc.robot.subsystems.StateMachineSubsystemBase;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.util.LinearInterpolator;
+import frc.robot.util.Util;
+
 import org.littletonrobotics.junction.Logger;
 
 public class Shooter extends StateMachineSubsystemBase {
@@ -32,20 +34,14 @@ public class Shooter extends StateMachineSubsystemBase {
   private static double HEIGHT_M = 0;
 
   public static double ACCELERATION = 5.0; // TODO: tune
-
-  private static double FEEDING_ANGLE = 0.0; // TODO: tune
-  private static double FEEDING_ANGLE_TOLERANCE = 0.0; // TODO: tune
-  private static double FEEDING_ROTATIONS = 5; // TODO: tune
-
-  private static double FEEDFORWARD_VOLTS = 0; // TODO: tune
-  private static double GEAR_RATIO = 2; // 2:1
-  private static double FLYWHEEL_MAX_RPM = 7200 * GEAR_RATIO; // TODO: tune
-  private static double FLYWHEEL_SPEED = 0.75; // -1 - 1 //TODO: tune
-
-  private static double FLYWHEEL_RADIUS = 2; // TODO: tune
-  private static double FLYWHEEL_RAD_PER_SEC =
-      (FLYWHEEL_MAX_RPM * FLYWHEEL_SPEED) * (2 * Math.PI) / 60;
-  private static double FLYWHEEL_RPM = FLYWHEEL_MAX_RPM * FLYWHEEL_SPEED; // remove if unused
+  
+  public static final double FLYWHEEL_MIN_VEL_rps=0, FLYWHEEL_MAX_VEL_rps=100;
+  public static final double TURRET_MIN_POS_r=-0.25, TURRET_MAX_POS_r=0.25;
+  public static final double PIVOT_MIN_POS_r=0, PIVOT_MAX_POS_r=0.2;
+  
+  public static final double FLYWHEEL_MIN_FEED_VEL_rps=0, FLYWHEEL_MAX_FEED_VEL_rps=100;
+  public static final double TURRET_MIN_FEED_POS_r=-0.02, TURRET_MAX_FEED_POS_r=0.02;
+  public static final double PIVOT_MIN_FEED_POS_r=0, PIVOT_MAX_FEED_POS_r=0.1;
 
   private static final double[][] TABLE_DATA = new double[][] {{-100, 0}, {100, 0}}; // TODO: fill
   private static final LinearInterpolator shotTimesFromDistance =
@@ -53,12 +49,13 @@ public class Shooter extends StateMachineSubsystemBase {
   private static final LinearInterpolator shotSpeedFromDistance =
       new LinearInterpolator(TABLE_DATA);
 
-  private static double TIME_TO_SHOOT = 0.5;
+  private static double TIME_TO_SHOOT = 0.25;
 
   private static double TURRET_SNAP_TOLERANCE = 50;
 
-  private static Pose3d SPEAKER_POSE_RED = new Pose3d(0.5, 5.5, 1.9812, new Rotation3d()); // TODO: fix
-  private static Pose3d SPEAKER_POSE_BLUE = new Pose3d(0.5, 5.5, 1.9812, new Rotation3d());
+  private static Pose3d SPEAKER_POSE_RED =
+      new Pose3d(16.28, 5.53, 1.987, new Rotation3d()); // TODO: fix
+  private static Pose3d SPEAKER_POSE_BLUE = new Pose3d(0.28, 5.53, 1.987, new Rotation3d());
 
   public static class Setpoints {
     private static double DEFAULT =
@@ -80,6 +77,10 @@ public class Shooter extends StateMachineSubsystemBase {
 
     public Setpoints(double flywheel_rps, double feederVel_rps) {
       this(flywheel_rps, feederVel_rps, DEFAULT, DEFAULT);
+    }
+
+    public Setpoints(double feederVel_rps) {
+      this(DEFAULT, feederVel_rps, DEFAULT, DEFAULT);
     }
 
     public Setpoints() {
@@ -181,10 +182,7 @@ public class Shooter extends StateMachineSubsystemBase {
 
           @Override
           public void periodic() {
-            if (inputs.beamBreakActivated) {
-              lastSetpoints.feederVel_rps = currSetpoints.feederVel_rps;
-              currSetpoints.feederVel_rps = 0;
-            }
+            queueSetpoints(constrainSetpoints(shooterPipeline(), !inputs.beamBreakActivated));
           }
         };
 
@@ -196,7 +194,8 @@ public class Shooter extends StateMachineSubsystemBase {
 
           @Override
           public void periodic() {
-            shooterPipeline();
+            Setpoints s = shooterPipeline();
+            queueSetpoints(constrainSetpoints(s, false));
           }
 
           @Override
@@ -210,6 +209,7 @@ public class Shooter extends StateMachineSubsystemBase {
 
           @Override
           public void periodic() {
+            queueSetpoints(new Setpoints(0.2));
             // feederVel_rps = 1;
             // output.setFlywheelVel(1);
           }
@@ -342,17 +342,31 @@ public class Shooter extends StateMachineSubsystemBase {
     double dist = Math.sqrt(dist2);
 
     double flywheel_rps = shotSpeedFromDistance.getInterpolatedValue(dist);
-    double turretPos_r = Units.radiansToRotations(Math.atan2(delta.getY(), delta.getX()));
+
+    double theta = Math.IEEEremainder(Math.atan2(delta.getY(), delta.getX()) + Math.PI, 2*Math.PI);
+    double turretPos_r = Units.radiansToRotations(theta);
     double pivotPos_r = Units.radiansToRotations(Math.asin(delta.getZ() / dist));
 
     return new Setpoints(flywheel_rps, turretPos_r, pivotPos_r);
   }
 
-  private Setpoints constrainSetpoints(Setpoints s) { // TODO: constrain
+  private Setpoints constrainSetpoints(Setpoints s, boolean isFeeding) { // TODO: constrain
+    if(isFeeding){
+      s.feederVel_rps = 0.25;      
+      s.flywheel_rps = Util.limit(s.flywheel_rps, FLYWHEEL_MIN_FEED_VEL_rps, FLYWHEEL_MAX_FEED_VEL_rps);
+      s.turretPos_r = Util.limit(s.turretPos_r, TURRET_MIN_FEED_POS_r, TURRET_MAX_FEED_POS_r);
+      s.pivotPos_r = Util.limit(s.pivotPos_r, PIVOT_MIN_FEED_POS_r, PIVOT_MAX_FEED_POS_r);
+    } else {
+      s.feederVel_rps = 0;
+      s.flywheel_rps = Util.limit(s.flywheel_rps, FLYWHEEL_MIN_VEL_rps, FLYWHEEL_MAX_VEL_rps);
+      s.turretPos_r = Util.limit(s.turretPos_r, TURRET_MIN_POS_r, TURRET_MAX_POS_r);
+      s.pivotPos_r = Util.limit(s.pivotPos_r, PIVOT_MIN_POS_r, PIVOT_MAX_POS_r);
+
+    }
     return s;
   }
 
-  public void shooterPipeline() {
+  public Setpoints shooterPipeline() {
     Pose2d botpose2d = Drive.getInstance().getPose();
     Pose3d botpose =
         new Pose3d(
@@ -368,11 +382,10 @@ public class Shooter extends StateMachineSubsystemBase {
         transformTargetPoseFromFieldRelativeVelocity(
             botpose, fieldRelSpeeds, positionAdjustedSpeaker);
     Setpoints newSetpoints = calculateSetpointsForPose(botpose, velocityAdjustedSpeaker);
-    Setpoints constrainedSetpoints = constrainSetpoints(newSetpoints);
-    queueSetpoints(constrainedSetpoints);
-
+    
     Logger.recordOutput("Shooter/Speaker", speaker);
     Logger.recordOutput("Shooter/PositionAdjustedSpeaker", positionAdjustedSpeaker);
     Logger.recordOutput("Shooter/VelocityAdjustedSpeaker", velocityAdjustedSpeaker);
+    return newSetpoints;
   }
 }
