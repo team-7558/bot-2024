@@ -9,19 +9,23 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.OI;
 import frc.robot.SS2d;
 import frc.robot.subsystems.drive.Drive;
+import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.intake.Intake;
+import frc.robot.util.Util;
 
 public class RobotTeleop extends Command {
 
   private final Drive drive;
   private final Intake intake;
+  private final Elevator elevator;
 
   /** Creates a new DriveTeleop. */
   public RobotTeleop() {
     // Use addRequirements() here to declare subsystem dependencies.
     drive = Drive.getInstance();
     intake = Intake.getInstance();
-    addRequirements(drive, intake);
+    elevator = Elevator.getInstance();
+    addRequirements(drive, intake, elevator);
   }
 
   // Called when the command is initially scheduled.
@@ -29,6 +33,7 @@ public class RobotTeleop extends Command {
   public void initialize() {
     drive.setCurrentState(drive.STRAFE_N_TURN);
     intake.setCurrentState(intake.IDLE);
+    elevator.setCurrentState(elevator.HOLDING);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -86,8 +91,12 @@ public class RobotTeleop extends Command {
       // }
     }
 
-    if (OI.DR.getAButton()) SS2d.S.setElevatorHeight(SS2d.GROUND_TO_MAX_HEIGHT);
-    if (OI.DR.getBButton()) SS2d.S.setElevatorHeight(SS2d.GROUND_TO_MIN_HEIGHT);
+    if (!elevator.isState(elevator.DISABLED)) {
+      if (OI.DR.getYButton()) elevator.setTargetHeight(Elevator.MAX_HEIGHT_M);
+      if (OI.DR.getBButton())
+        elevator.setTargetHeight(Util.lerp(Elevator.MIN_HEIGHT_M, Elevator.MAX_HEIGHT_M, 0.5));
+      if (OI.DR.getAButton()) elevator.setTargetHeight(Elevator.MIN_HEIGHT_M);
+    }
 
     if (OI.DR.getLeftTriggerAxis() > 0) SS2d.S.setIntakeMotors(1, 1);
     else if (OI.DR.getLeftBumper()) SS2d.S.setIntakeMotors(1, -1);

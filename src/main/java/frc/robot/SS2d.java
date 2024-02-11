@@ -114,7 +114,7 @@ public class SS2d {
 
     elevatorBase =
         intakeBase.append(
-            new MechanismLigament2d("elevator base", GROUND_TO_ELEVATOR_BASE_M, 90, 1, COLOR_REF));
+            new MechanismLigament2d("elevator base", GROUND_TO_MIN_HEIGHT, 90, 1, COLOR_REF));
 
     upperIntake =
         elevatorBase.append(
