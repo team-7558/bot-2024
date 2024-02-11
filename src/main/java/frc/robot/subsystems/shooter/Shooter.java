@@ -22,6 +22,7 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import frc.robot.Constants;
+import frc.robot.SS2d;
 import frc.robot.subsystems.StateMachineSubsystemBase;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.util.LinearInterpolator;
@@ -236,6 +237,18 @@ public class Shooter extends StateMachineSubsystemBase {
 
   @Override
   public void outputPeriodic() {
+    io.setFeederVel(currSetpoints.feederVel_rps);
+    io.setFlywheelVel(currSetpoints.flywheel_rps);
+    io.setTurretPos(currSetpoints.turretPos_r);
+    io.setPivotPos(currSetpoints.pivotPos_r);
+
+
+    
+    SS2d.M.setShooterTilt(inputs.pivotPos_r * 360);
+    SS2d.M.setTurretAngle(inputs.turretPos_r * 360);
+
+    SS2d.S.setShooterTilt(currSetpoints.pivotPos_r * 360);
+    SS2d.S.setTurretAngle(currSetpoints.turretPos_r * 360);
 
     // Log flywheel speed in RPM
     Logger.recordOutput("Shooter/FlywheelSpeedRPM", getVelocityRPM());
@@ -244,11 +257,6 @@ public class Shooter extends StateMachineSubsystemBase {
     Logger.recordOutput("Shooter/TargetFly", currSetpoints.flywheel_rps);
     Logger.recordOutput("Shooter/TargetTurr", currSetpoints.turretPos_r);
     Logger.recordOutput("Shooter/TargetPivot", currSetpoints.pivotPos_r);
-
-    io.setFeederVel(currSetpoints.feederVel_rps);
-    io.setFlywheelVel(currSetpoints.flywheel_rps);
-    io.setTurretPos(currSetpoints.turretPos_r);
-    io.setPivotPos(currSetpoints.pivotPos_r);
   }
 
   /** Stops Everything */

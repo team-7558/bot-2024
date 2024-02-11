@@ -23,7 +23,8 @@ import frc.robot.Constants;
 import org.littletonrobotics.junction.Logger;
 
 public class Module {
-  public static final double WHEEL_RADIUS = Units.inchesToMeters(2.0);
+  public static final double FUDGE_FACTOR = 0.95301;
+  public static final double WHEEL_RADIUS = Units.inchesToMeters(2.0 * FUDGE_FACTOR);
   public static final double ODOMETRY_FREQUENCY = 250.0;
 
   public enum Mode {
@@ -91,7 +92,7 @@ public class Module {
     // On first cycle, reset relative turn encoder
     // Wait until absolute angle is nonzero in case it wasn't initialized yet
     if (turnRelativeOffset == null && inputs.turnAbsolutePosition.getRadians() != 0.0) {
-      turnRelativeOffset = inputs.turnAbsolutePosition.minus(inputs.turnPosition);
+      turnRelativeOffset = inputs.turnAbsolutePosition.minus(inputs.turnPositionRad);
     }
 
     if (mode == Mode.VOLTAGE) {
@@ -132,7 +133,9 @@ public class Module {
           // When the error is 90°, the velocity setpoint should be 0. As the wheel turns
           // towards the setpoint, its velocity should increase. This is achieved by
           // taking the component of the velocity in the direction of the setpoint.
-          double adjustSpeedSetpoint = speedSetpoint * Math.cos(turnFeedback.getPositionError());
+          double adjustSpeedSetpoint =
+              speedSetpoint
+                  * Math.cos(turnFeedback.getPositionError()); // TODO: Fix for setpoint mode
 
           // Run drive controller
           io.setDriveVelocity(adjustSpeedSetpoint);
@@ -198,7 +201,7 @@ public class Module {
     if (turnRelativeOffset == null) {
       return new Rotation2d();
     } else {
-      return inputs.turnPosition.plus(turnRelativeOffset);
+      return inputs.turnPositionRad.plus(turnRelativeOffset);
     }
   }
 

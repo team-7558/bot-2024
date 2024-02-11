@@ -19,6 +19,8 @@ import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
 import com.pathplanner.lib.util.PathPlannerLogging;
 import com.pathplanner.lib.util.ReplanningConfig;
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
@@ -31,10 +33,12 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.Timer;
 import frc.robot.Constants;
 import frc.robot.OI;
 import frc.robot.subsystems.StateMachineSubsystemBase;
 import frc.robot.subsystems.drive.Module.Mode;
+import frc.robot.subsystems.vision.Vision;
 import frc.robot.util.LocalADStarAK;
 import frc.robot.util.Util;
 import java.util.concurrent.locks.Lock;
@@ -52,6 +56,21 @@ public class Drive extends StateMachineSubsystemBase {
       Math.hypot(TRACK_WIDTH_X / 2.0, TRACK_WIDTH_Y / 2.0);
   public static final double MAX_ANGULAR_SPEED = MAX_LINEAR_SPEED / DRIVE_BASE_RADIUS;
 
+  // TODO: tune all this
+  // -- VISION CONSTANTS --
+
+  // maximum distance on high fps, low res before we switch the camera to high res lower fps
+  public static final double MAX_DISTANCE = 3.0;
+
+  // minimum distance to be on low fps high res before we switch the camera to high fps low res
+  public static final double MIN_DISTANCE = 3.1;
+
+  // distance to cut off all pose estimation because its too inaccurate
+  public static final double CUTOFF_DISTANCE = 7.0;
+
+  // ratio for the distance scaling on the standard deviation
+  private static final double APRILTAG_COEFFICIENT = 0.01; // NEEDS TO BE TUNED
+
   public static final Lock odometryLock = new ReentrantLock();
 
   private static Drive instance;
@@ -59,16 +78,24 @@ public class Drive extends StateMachineSubsystemBase {
   public static Drive getInstance() {
 
     if (instance == null) {
+      System.out.println("Drive initialized");
       switch (Constants.currentMode) {
         case REAL:
           // Real robot, instantiate hardware IO implementations
+          // instance =
+          // new Drive(
+          //     new GyroIOPigeon2(),
+          //     new ModuleIO2023(0),
+          //     new ModuleIO2023(1),
+          //     new ModuleIO2023(2),
+          //     new ModuleIO2023(3));
           instance =
               new Drive(
-                  new GyroIOPigeon2(),
-                  new ModuleIO2023(0),
-                  new ModuleIO2023(1),
-                  new ModuleIO2023(2),
-                  new ModuleIO2023(3));
+                  new GyroIO() {},
+                  new ModuleIO() {},
+                  new ModuleIO() {},
+                  new ModuleIO() {},
+                  new ModuleIO() {});
           break;
 
         case SIM:
@@ -100,11 +127,14 @@ public class Drive extends StateMachineSubsystemBase {
 
   public final State DISABLED, SHOOTING, STRAFE_N_TURN, STRAFE_AUTOLOCK;
 
+  // IO
   private final GyroIO gyroIO;
   private final GyroIOInputsAutoLogged gyroInputs = new GyroIOInputsAutoLogged();
+
   private final Module[] modules = new Module[4]; // FL, FR, BL, BR
 
   private SwerveDriveKinematics kinematics = new SwerveDriveKinematics(getModuleTranslations());
+  private SwerveDrivePoseEstimator poseEstimator;
   private double autolockSetpoint = 0;
   private Pose2d pose = new Pose2d();
   private Rotation2d lastGyroRotation = new Rotation2d();
@@ -119,10 +149,10 @@ public class Drive extends StateMachineSubsystemBase {
 
     super("Drive");
     this.gyroIO = gyroIO;
-    modules[FL] = new Module(flModuleIO, FL, Mode.SETPOINT);
-    modules[FR] = new Module(frModuleIO, FR, Mode.SETPOINT);
-    modules[BL] = new Module(blModuleIO, BL, Mode.SETPOINT);
-    modules[BR] = new Module(brModuleIO, BR, Mode.SETPOINT);
+    modules[FL] = new Module(flModuleIO, FL, Mode.VOLTAGE);
+    modules[FR] = new Module(frModuleIO, FR, Mode.VOLTAGE);
+    modules[BL] = new Module(blModuleIO, BL, Mode.VOLTAGE);
+    modules[BR] = new Module(brModuleIO, BR, Mode.VOLTAGE);
 
     // Configure AutoBuilder for PathPlanner
     AutoBuilder.configureHolonomic(
@@ -197,6 +227,17 @@ public class Drive extends StateMachineSubsystemBase {
           }
         };
     setCurrentState(DISABLED);
+    poseEstimator =
+        new SwerveDrivePoseEstimator(
+            kinematics,
+            getRotation(),
+            getModulePositions(),
+            new Pose2d(),
+            VecBuilder.fill(0.1, 0.1, 0.05),
+            VecBuilder.fill(0.5, 0.5, 0.5)); // TODO: TUNE STANDARD DEVIATIONS
+  }
+
+  public void zeroGyro() { // TODO: make work
   }
 
   @Override
@@ -259,8 +300,41 @@ public class Drive extends StateMachineSubsystemBase {
       pose = pose.exp(twist);
     }
 
+    // Be wary about using Timer.getFPGATimestamp in AK
+    poseEstimator.updateWithTime(Timer.getFPGATimestamp(), getRotation(), getModulePositions());
     // TODO: figure out if needs to be moved into 250Hz processing loop
     chassisSpeeds = kinematics.toChassisSpeeds(getModuleStates());
+
+    // TODO: see if this works on a bot, also clean up, Vision should provide poses with timestamp
+    // to Drive
+    Vision vision = Vision.getInstance();
+    if (vision.hasTagInView()) {
+      for (int i = 0; i < vision.getCameras(); i++) {
+        int tagID = (int) vision.getTagID(i);
+        if (tagID > 0) {
+          double timestamp = vision.getTimestamp(i);
+
+          // where the ACTUAL tag is
+          Pose2d tagPose2d = Vision.AT_MAP.getTagPose(tagID).get().toPose2d();
+
+          // where this camera thinks it is
+          Pose2d estimatedPose = vision.getPose(i);
+
+          // distance between tag and estimated pose
+          double translationDistance =
+              tagPose2d.getTranslation().getDistance(getPose().getTranslation());
+
+          // implementing cutoff
+          if (translationDistance > CUTOFF_DISTANCE) continue;
+
+          // adding to the pose estimator with the timestamp
+          // poseEstimator.addVisionMeasurement(estimatedPose, timestamp);
+
+        } else {
+
+        }
+      }
+    }
   }
 
   public void drive(double x, double y, double w, double throttle) {
