@@ -1,4 +1,4 @@
-package frc.robot.subsystems.elevator;
+package frc.robot.subsystems.Elevator;
 
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
@@ -71,8 +71,6 @@ public class ElevatorIOReal implements ElevatorIO {
     leaderConfig.Slot2.kI = 0.0;
     leaderConfig.Slot2.kD = 0.0;
 
-
-
     leftFalcon.getConfigurator().apply(leaderConfig);
 
     rightFalcon.setControl(new Follower(leftFalcon.getDeviceID(), true).withUpdateFreqHz(50));
@@ -95,7 +93,13 @@ public class ElevatorIOReal implements ElevatorIO {
     leftFalcon.setControl(this.vel_mps.withVelocity(v));
   }
 
+  @Override
   public void setPos(double position) {
+    leftFalcon.setControl(new MotionMagicVoltage(position));
+  }
+
+  @Override
+  public void climb(double position) {
     leftFalcon.setControl(new MotionMagicVoltage(position));
   }
 
