@@ -13,8 +13,6 @@
 
 package frc.robot.subsystems.shooter;
 
-import edu.wpi.first.apriltag.AprilTagFieldLayout;
-import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
@@ -54,12 +52,12 @@ public class Shooter extends StateMachineSubsystemBase {
   private static final Pose3d SPEAKER_POSE_RED = new Pose3d(16.28, 5.53, 1.987, new Rotation3d());
   private static final Pose3d SPEAKER_POSE_BLUE = new Pose3d(0.28, 5.53, 1.987, new Rotation3d());
 
-  private static final Pose3d TRAP_LEFT_BLUE = new Pose3d(4.641, 4.498, 1.321, new Rotation3d());
-  private static final Pose3d TRAP_RIGHT_BLUE = new Pose3d(4.641, 3.713, 1.321, new Rotation3d());
-  private static final Pose3d TRAP_BACK_BLUE = new Pose3d(5.321, 4.105, 1.321, new Rotation3d());
-  private static final Pose3d TRAP_LEFT_RED = new Pose3d(11.905, 3.713, 1.321, new Rotation3d());
-  private static final Pose3d TRAP_RIGHT_RED = new Pose3d(11.905, 4.498, 1.321, new Rotation3d());
-  private static final Pose3d TRAP_BACK_RED = new Pose3d(11.220, 4.105, 1.321, new Rotation3d());
+  private static final Pose3d TRAP_LEFT_BLUE = new Pose3d(4.641, 4.498, 1.171, new Rotation3d());
+  private static final Pose3d TRAP_RIGHT_BLUE = new Pose3d(4.641, 3.713, 1.171, new Rotation3d());
+  private static final Pose3d TRAP_BACK_BLUE = new Pose3d(5.321, 4.105, 1.171, new Rotation3d());
+  private static final Pose3d TRAP_LEFT_RED = new Pose3d(11.905, 3.713, 1.171, new Rotation3d());
+  private static final Pose3d TRAP_RIGHT_RED = new Pose3d(11.905, 4.498, 1.171, new Rotation3d());
+  private static final Pose3d TRAP_BACK_RED = new Pose3d(11.220, 4.105, 1.171, new Rotation3d());
 
   public static class Setpoints {
     private static double DEFAULT =
@@ -128,7 +126,7 @@ public class Shooter extends StateMachineSubsystemBase {
 
   private final ShooterIO io;
 
-  public enum TargetMode{
+  public enum TargetMode {
     SPEAKER,
     TRAP,
     CUSTOM
@@ -259,7 +257,7 @@ public class Shooter extends StateMachineSubsystemBase {
     io.stop();
   }
 
-  public void setTargetMode(TargetMode mode){
+  public void setTargetMode(TargetMode mode) {
     targetMode = mode;
   }
 
@@ -293,32 +291,42 @@ public class Shooter extends StateMachineSubsystemBase {
    * @return
    */
   private static Pose3d getClosestTrap(Pose3d botpose) {
-    boolean red = !DriverStation.getAlliance().isEmpty()
-            && DriverStation.getAlliance().get() == Alliance.Red;
-    if(red){
-      double l = Util.dist2(botpose.getX() - TRAP_LEFT_RED.getX(), botpose.getY() - TRAP_LEFT_RED.getY());
-      double r = Util.dist2(botpose.getX() - TRAP_RIGHT_RED.getX(), botpose.getY() - TRAP_RIGHT_RED.getY());
-      double b = Util.dist2(botpose.getX() - TRAP_BACK_RED.getX(), botpose.getY() - TRAP_BACK_RED.getY());
+    boolean red =
+        !DriverStation.getAlliance().isEmpty() && DriverStation.getAlliance().get() == Alliance.Red;
+    if (red) {
+      double l =
+          Util.dist2(botpose.getX() - TRAP_LEFT_RED.getX(), botpose.getY() - TRAP_LEFT_RED.getY());
+      double r =
+          Util.dist2(
+              botpose.getX() - TRAP_RIGHT_RED.getX(), botpose.getY() - TRAP_RIGHT_RED.getY());
+      double b =
+          Util.dist2(botpose.getX() - TRAP_BACK_RED.getX(), botpose.getY() - TRAP_BACK_RED.getY());
 
-      if(l < r){
-        if(l < b) return TRAP_LEFT_RED;
-        else  return TRAP_BACK_RED;
+      if (l < r) {
+        if (l < b) return TRAP_LEFT_RED;
+        else return TRAP_BACK_RED;
       } else {
-        if(r < b) return TRAP_RIGHT_RED;
-        else  return TRAP_BACK_RED;
+        if (r < b) return TRAP_RIGHT_RED;
+        else return TRAP_BACK_RED;
       }
 
-    }else {
-      double l = Util.dist2(botpose.getX() - TRAP_LEFT_BLUE.getX(), botpose.getY() - TRAP_LEFT_BLUE.getY());
-      double r = Util.dist2(botpose.getX() - TRAP_RIGHT_BLUE.getX(), botpose.getY() - TRAP_RIGHT_BLUE.getY());
-      double b = Util.dist2(botpose.getX() - TRAP_BACK_BLUE.getX(), botpose.getY() - TRAP_BACK_BLUE.getY());
+    } else {
+      double l =
+          Util.dist2(
+              botpose.getX() - TRAP_LEFT_BLUE.getX(), botpose.getY() - TRAP_LEFT_BLUE.getY());
+      double r =
+          Util.dist2(
+              botpose.getX() - TRAP_RIGHT_BLUE.getX(), botpose.getY() - TRAP_RIGHT_BLUE.getY());
+      double b =
+          Util.dist2(
+              botpose.getX() - TRAP_BACK_BLUE.getX(), botpose.getY() - TRAP_BACK_BLUE.getY());
 
-      if(l < r){
-        if(l < b) return TRAP_LEFT_BLUE;
-        else  return TRAP_BACK_BLUE;
+      if (l < r) {
+        if (l < b) return TRAP_LEFT_BLUE;
+        else return TRAP_BACK_BLUE;
       } else {
-        if(r < b) return TRAP_RIGHT_BLUE;
-        else  return TRAP_BACK_BLUE;
+        if (r < b) return TRAP_RIGHT_BLUE;
+        else return TRAP_BACK_BLUE;
       }
     }
   }
@@ -417,8 +425,8 @@ public class Shooter extends StateMachineSubsystemBase {
     return s;
   }
 
-  public Setpoints shooterPipeline(){
-    switch(targetMode){
+  public Setpoints shooterPipeline() {
+    switch (targetMode) {
       case SPEAKER:
         return speakerPipeline();
       case TRAP:
@@ -466,8 +474,7 @@ public class Shooter extends StateMachineSubsystemBase {
 
     Pose3d trap = getClosestTrap(botpose);
     Pose3d velocityAdjustedTrap =
-        transformTargetPoseFromFieldRelativeVelocity(
-            botpose, fieldRelSpeeds, trap);
+        transformTargetPoseFromFieldRelativeVelocity(botpose, fieldRelSpeeds, trap);
     Setpoints newSetpoints = calculateSetpointsForPose(botpose, velocityAdjustedTrap);
 
     Logger.recordOutput("Shooter/Target", trap);

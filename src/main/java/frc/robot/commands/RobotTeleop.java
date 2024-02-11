@@ -8,7 +8,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.OI;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.shooter.Shooter;
-import frc.robot.subsystems.shooter.Shooter.Setpoints;
 import frc.robot.subsystems.shooter.Shooter.TargetMode;
 
 public class RobotTeleop extends Command {
