@@ -16,6 +16,7 @@ package frc.robot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.subsystems.drive.Drive;
+import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.vision.Vision;
 import org.littletonrobotics.junction.LogFileUtil;
@@ -38,6 +39,7 @@ public class Robot extends LoggedRobot {
   protected Robot() {
     super(Constants.globalDelta_sec);
 
+    Elevator.getInstance();
     Intake.getInstance();
     Drive.getInstance();
     Vision.getInstance();
