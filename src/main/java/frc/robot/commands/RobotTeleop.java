@@ -11,11 +11,14 @@ import frc.robot.SS2d;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.intake.Intake;
+import frc.robot.subsystems.shooter.Shooter;
+import frc.robot.subsystems.shooter.Shooter.TargetMode;
 import frc.robot.util.Util;
 
 public class RobotTeleop extends Command {
 
   private final Drive drive;
+  private final Shooter shooter;
   private final Intake intake;
   private final Elevator elevator;
 
@@ -23,15 +26,17 @@ public class RobotTeleop extends Command {
   public RobotTeleop() {
     // Use addRequirements() here to declare subsystem dependencies.
     drive = Drive.getInstance();
+    shooter = Shooter.getInstance();
     intake = Intake.getInstance();
     elevator = Elevator.getInstance();
-    addRequirements(drive, intake, elevator);
+    addRequirements(drive, shooter, intake, elevator);
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
     drive.setCurrentState(drive.STRAFE_N_TURN);
+    shooter.setCurrentState(shooter.LOCKONT);
     intake.setCurrentState(intake.IDLE);
     elevator.setCurrentState(elevator.HOLDING);
   }
@@ -39,6 +44,14 @@ public class RobotTeleop extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
+
+    if (!shooter.isState(shooter.DISABLED)) {
+      if (OI.DR.getAButton()) { // make actually binded
+        shooter.setTargetMode(TargetMode.TRAP);
+      } else {
+        shooter.setTargetMode(TargetMode.SPEAKER);
+      }
+    }
 
     if (!drive.isState(drive.DISABLED)) {
       // slow mode
@@ -97,18 +110,13 @@ public class RobotTeleop extends Command {
         elevator.setTargetHeight(Util.lerp(Elevator.MIN_HEIGHT_M, Elevator.MAX_HEIGHT_M, 0.5));
       if (OI.DR.getAButton()) elevator.setTargetHeight(Elevator.MIN_HEIGHT_M);
     }
-
-    if (OI.DR.getLeftTriggerAxis() > 0) SS2d.S.setIntakeMotors(1, 1);
-    else if (OI.DR.getLeftBumper()) SS2d.S.setIntakeMotors(1, -1);
-    else SS2d.S.setIntakeMotors(0, 0);
-
-    if (OI.DR.getRightBumper()) SS2d.S.setShooterTilt(45);
-    else SS2d.S.setShooterTilt(0);
-
-    if (OI.DR.getPOV() != -1) SS2d.S.setTurretAngle(OI.DR.getPOV() * 0.5 - 90);
-
+    
     SS2d.S.setTurretBaseAngle(drive.getRotation());
-    SS2d.S.setDistance(drive.getPose().getX());
+    SS2d.M.setTurretBaseAngle(drive.getRotation());
+
+    SS2d.S.setDistance(2.5);
+    SS2d.M.setDistance(5);
+
 
     if (!intake.isState(intake.DISABLED)) {
       if (OI.DR.getRightBumper()) {

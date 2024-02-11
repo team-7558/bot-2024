@@ -6,6 +6,7 @@ package frc.robot.subsystems.intake;
 
 import edu.wpi.first.math.util.Units;
 import frc.robot.Constants;
+import frc.robot.SS2d;
 import frc.robot.subsystems.StateMachineSubsystemBase;
 import org.littletonrobotics.junction.Logger;
 
@@ -142,10 +143,10 @@ public class Intake extends StateMachineSubsystemBase {
   public void outputPeriodic() {
     io.setDirectionSpeed(directionSpeed);
     io.setIntakeSpeed(intakeSpeed);
+    SS2d.M.setIntakeMotors(inputs.intakeVelocityRadPerSec, inputs.directionVelocityRadPerSec);
+    SS2d.S.setIntakeMotors(intakeSpeed, directionSpeed);
     Logger.recordOutput("Intake/TargetBottomSpeed", intakeSpeed);
     Logger.recordOutput("Intake/TargetTopSpeed", directionSpeed);
-    Logger.recordOutput("Intake/DirectorWheelSpeedRPM", getDirectionVelocityRPM());
-    Logger.recordOutput("Intake/IntakeWheelSpeedRPM", getIntakeVelocityRPM());
   }
 
   public double getIntakeVelocityRPM() {

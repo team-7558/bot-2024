@@ -52,6 +52,10 @@ public class IntakeIOSim implements IntakeIO {
     simDirection.setInputVoltage(appliedVolts);
   }
 
+  public void setIntakeSpeed(double velocity) {
+    simIntake.setState(velocity);
+  }
+
   public void setDirectionSpeed(double velocity) {
     simDirection.setState(velocity);
   }
