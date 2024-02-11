@@ -9,6 +9,7 @@ import frc.robot.OI;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.subsystems.shooter.Shooter.Setpoints;
+import frc.robot.subsystems.shooter.Shooter.TargetMode;
 
 public class RobotTeleop extends Command {
 
@@ -28,7 +29,7 @@ public class RobotTeleop extends Command {
   @Override
   public void initialize() {
     drive.setCurrentState(drive.STRAFE_N_TURN);
-    shooter.setCurrentState(shooter.IDLE);
+    shooter.setCurrentState(shooter.LOCKONT);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -37,11 +38,9 @@ public class RobotTeleop extends Command {
 
     if (!shooter.isState(shooter.DISABLED)) {
       if (OI.DR.getAButton()) { // make actually binded
-        shooter.queueSetpoints(
-            new Setpoints(OI.DR.getRightTriggerAxis() * 1, OI.DR.getRightTriggerAxis() * 1));
-        shooter.setCurrentState(shooter.SHOOTING);
+        shooter.setTargetMode(TargetMode.TRAP);
       } else {
-        shooter.setCurrentState(shooter.LOCKONT);
+        shooter.setTargetMode(TargetMode.SPEAKER);
       }
     }
 

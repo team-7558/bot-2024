@@ -86,4 +86,12 @@ public class Util {
   public static double unlerp(double a, double b, double value) {
     return (value - a) / (b - a);
   }
+
+  public static double dist2(double x, double y){
+    return x*x + y*y;
+  }
+
+  public static double dist2(double x, double y, double z){
+    return x*x + y*y + z*z;
+  }
 }
