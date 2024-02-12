@@ -45,7 +45,7 @@ public class Elevator extends StateMachineSubsystemBase {
   public final State DISABLED, IDLE, HOLDING, CLIMBING, HOMING;
 
   private final ElevatorIO io;
-  private final ElevatorIOInputsAL inputs = new ElevatorIOInputsAL(); // hacky fix
+  private final ElevatorIOInputsAutoLogged inputs = new ElevatorIOInputsAutoLogged(); // hacky fix
 
   private double targetHeight_m = MIN_HEIGHT_M;
 

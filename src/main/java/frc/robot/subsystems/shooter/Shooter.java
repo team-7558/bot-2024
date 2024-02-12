@@ -20,6 +20,7 @@ import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import frc.robot.Constants;
 import frc.robot.SS2d;
@@ -45,10 +46,10 @@ public class Shooter extends StateMachineSubsystemBase {
   public static final double PIVOT_MIN_FEED_POS_r = 0, PIVOT_MAX_FEED_POS_r = 0.1;
 
   private static LinearInterpolator shotTimesFromDistance =
-      new LinearInterpolator(getLerpTableFromFile("/U/lerptables/shottimes.txt"));
+      new LinearInterpolator(getLerpTableFromFile("shottimes.lerp"));
   ;
   private static LinearInterpolator shotSpeedFromDistance =
-      new LinearInterpolator(getLerpTableFromFile("/U/lerptables/shotspeeds.txt"));
+      new LinearInterpolator(getLerpTableFromFile("shotspeeds.lerp"));
 
   private static double TIME_TO_SHOOT = 0.25;
 
@@ -149,7 +150,6 @@ public class Shooter extends StateMachineSubsystemBase {
     this.io = io;
     // Switch constants based on mode (the physics simulator is treated as a
     // separate robot with different tuning)
-
 
     switch (Constants.currentMode) {
       case REAL:
@@ -475,8 +475,8 @@ public class Shooter extends StateMachineSubsystemBase {
     return newSetpoints;
   }
 
-  private static double[][] getLerpTableFromFile(String path) {
-    try (BufferedReader reader = new BufferedReader(new FileReader(path))) {
+  private static double[][] getLerpTableFromFile(String name) {
+    try (BufferedReader reader = new BufferedReader(new FileReader(Filesystem.getDeployDirectory().getPath() + name))) {
       String[] lines = reader.lines().toArray(String[]::new);
       double[][] lerp_array = new double[lines.length][2];
       for (int i = 0; i < lines.length; i++) {

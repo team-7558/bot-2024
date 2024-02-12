@@ -110,13 +110,12 @@ public class RobotTeleop extends Command {
         elevator.setTargetHeight(Util.lerp(Elevator.MIN_HEIGHT_M, Elevator.MAX_HEIGHT_M, 0.5));
       if (OI.DR.getAButton()) elevator.setTargetHeight(Elevator.MIN_HEIGHT_M);
     }
-    
+
     SS2d.S.setTurretBaseAngle(drive.getRotation());
     SS2d.M.setTurretBaseAngle(drive.getRotation());
 
     SS2d.S.setDistance(2.5);
     SS2d.M.setDistance(5);
-
 
     if (!intake.isState(intake.DISABLED)) {
       if (OI.DR.getRightBumper()) {
