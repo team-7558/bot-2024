@@ -78,7 +78,7 @@ public class ModuleIO2024 implements ModuleIO {
   private final Rotation2d absoluteEncoderOffset;
 
   private static final Slot0Configs steerGains =
-      new Slot0Configs().withKP(100.0).withKI(0).withKD(0.0).withKS(0).withKV(0.0).withKA(0);
+      new Slot0Configs().withKP(1.0).withKI(0).withKD(0.0).withKS(0).withKV(0.0).withKA(0);
   private static final Slot0Configs driveGains =
       new Slot0Configs().withKP(2.3).withKI(0).withKD(0).withKS(0).withKV(0.85).withKA(0);
   private static final Slot1Configs steerGainsTorque =
@@ -87,7 +87,6 @@ public class ModuleIO2024 implements ModuleIO {
       new Slot1Configs().withKP(0.0).withKI(0).withKD(0.0).withKS(0).withKV(0.0).withKA(0);
 
   public static final double kSpeedAt12VoltsMps = 4.73;
-  private static final double kWheelRadiusInches = 2;
 
   public ModuleIO2024(int index) {
     this.index = index;
@@ -127,7 +126,9 @@ public class ModuleIO2024 implements ModuleIO {
     var cancoderConfig = new CANcoderConfiguration();
     cancoderConfig.MagnetSensor.AbsoluteSensorRange = AbsoluteSensorRangeValue.Signed_PlusMinusHalf;
     cancoderConfig.MagnetSensor.MagnetOffset = -absoluteEncoderOffset.getRotations();
-    cancoderConfig.MagnetSensor.SensorDirection = SensorDirectionValue.CounterClockwise_Positive;
+    cancoderConfig.MagnetSensor.SensorDirection = isTurnMotorInverted
+            ? SensorDirectionValue.CounterClockwise_Positive
+            : SensorDirectionValue.Clockwise_Positive;
     cancoder.getConfigurator().apply(cancoderConfig);
 
     var driveConfig = new TalonFXConfiguration();
@@ -146,17 +147,16 @@ public class ModuleIO2024 implements ModuleIO {
 
     var turnConfig = new TalonFXConfiguration();
     turnConfig.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.FusedCANcoder;
-    // turnConfig.Feedback.FeedbackRotorOffset = TURN_GEAR_RATIO;
+    turnConfig.Feedback.FeedbackRotorOffset = TURN_GEAR_RATIO;
     turnConfig.Slot0 = steerGains;
     turnConfig.Slot1 = steerGainsTorque;
     turnConfig.CurrentLimits.StatorCurrentLimit = 30.0;
-    turnConfig.Feedback.SensorToMechanismRatio = 1.0;
-    turnConfig.Voltage.PeakForwardVoltage = 12;
-    turnConfig.Voltage.PeakReverseVoltage = -12;
-    turnConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
+    turnConfig.MotorOutput.Inverted = isTurnMotorInverted
+            ? InvertedValue.Clockwise_Positive
+            : InvertedValue.CounterClockwise_Positive;
     turnConfig.Feedback.RotorToSensorRatio = TURN_GEAR_RATIO;
     turnConfig.CurrentLimits.StatorCurrentLimitEnable = true;
-    turnConfig.ClosedLoopGeneral.ContinuousWrap = true;
+    // turnConfig.ClosedLoopGeneral.ContinuousWrap = true;
     turnTalon.getConfigurator().apply(turnConfig);
     setTurnBrakeMode(false);
 
@@ -191,6 +191,8 @@ public class ModuleIO2024 implements ModuleIO {
         turnCurrent);
     // driveTalon.optimizeBusUtilization();
     // turnTalon.optimizeBusUtilization();
+
+
   }
 
   @Override
@@ -278,6 +280,6 @@ public class ModuleIO2024 implements ModuleIO {
   public void setTurnAngle(double pos_r) {
     // turnTalon.setControl(turnPositionSetpoint.withPosition(0));
 
-    turnTalon.setControl(turnPositionSetpoint_v.withPosition(pos_r));
+    turnTalon.setControl(turnPositionSetpoint_v.withPosition(50));
   }
 }
