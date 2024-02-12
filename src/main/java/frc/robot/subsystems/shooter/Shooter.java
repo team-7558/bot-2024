@@ -150,10 +150,6 @@ public class Shooter extends StateMachineSubsystemBase {
     // Switch constants based on mode (the physics simulator is treated as a
     // separate robot with different tuning)
 
-    shotTimesFromDistance =
-        new LinearInterpolator(getLerpTableFromFile("/U/lerptables/shottimes.txt"));
-    shotSpeedFromDistance =
-        new LinearInterpolator(getLerpTableFromFile("/U/lerptables/shotspeeds.txt"));
 
     switch (Constants.currentMode) {
       case REAL:
