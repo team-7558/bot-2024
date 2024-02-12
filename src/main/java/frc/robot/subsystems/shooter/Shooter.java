@@ -27,6 +27,8 @@ import frc.robot.subsystems.StateMachineSubsystemBase;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.util.LinearInterpolator;
 import frc.robot.util.Util;
+import java.io.BufferedReader;
+import java.io.FileReader;
 import org.littletonrobotics.junction.Logger;
 
 public class Shooter extends StateMachineSubsystemBase {
@@ -42,11 +44,11 @@ public class Shooter extends StateMachineSubsystemBase {
   public static final double TURRET_MIN_FEED_POS_r = -0.02, TURRET_MAX_FEED_POS_r = 0.02;
   public static final double PIVOT_MIN_FEED_POS_r = 0, PIVOT_MAX_FEED_POS_r = 0.1;
 
-  private static final double[][] TABLE_DATA = new double[][] {{-100, 0}, {100, 0}}; // TODO: fill
-  private static final LinearInterpolator shotTimesFromDistance =
-      new LinearInterpolator(TABLE_DATA);
-  private static final LinearInterpolator shotSpeedFromDistance =
-      new LinearInterpolator(TABLE_DATA);
+  private static LinearInterpolator shotTimesFromDistance =
+      new LinearInterpolator(getLerpTableFromFile("/U/lerptables/shottimes.txt"));
+  ;
+  private static LinearInterpolator shotSpeedFromDistance =
+      new LinearInterpolator(getLerpTableFromFile("/U/lerptables/shotspeeds.txt"));
 
   private static double TIME_TO_SHOOT = 0.25;
 
@@ -143,9 +145,16 @@ public class Shooter extends StateMachineSubsystemBase {
   /** Creates a new Flywheel. */
   private Shooter(ShooterIO io) {
     super("Shooter");
+
     this.io = io;
     // Switch constants based on mode (the physics simulator is treated as a
     // separate robot with different tuning)
+
+    shotTimesFromDistance =
+        new LinearInterpolator(getLerpTableFromFile("/U/lerptables/shottimes.txt"));
+    shotSpeedFromDistance =
+        new LinearInterpolator(getLerpTableFromFile("/U/lerptables/shotspeeds.txt"));
+
     switch (Constants.currentMode) {
       case REAL:
       case REPLAY:
@@ -157,6 +166,8 @@ public class Shooter extends StateMachineSubsystemBase {
       default:
         break;
     }
+
+    // loading lerp tables
 
     lastSetpoints = new Setpoints(0, 0, 0.0, 0.0); // Default values defined here
     currSetpoints = new Setpoints().copy(lastSetpoints);
@@ -242,8 +253,6 @@ public class Shooter extends StateMachineSubsystemBase {
     io.setTurretPos(currSetpoints.turretPos_r);
     io.setPivotPos(currSetpoints.pivotPos_r);
 
-
-    
     SS2d.M.setShooterTilt(inputs.pivotPos_r * 360);
     SS2d.M.setTurretAngle(inputs.turretPos_r * 360);
 
@@ -468,6 +477,21 @@ public class Shooter extends StateMachineSubsystemBase {
     Logger.recordOutput("Shooter/PositionAdjustedTarget", positionAdjustedSpeaker);
     Logger.recordOutput("Shooter/VelocityAdjustedTarget", velocityAdjustedSpeaker);
     return newSetpoints;
+  }
+
+  private static double[][] getLerpTableFromFile(String path) {
+    try (BufferedReader reader = new BufferedReader(new FileReader(path))) {
+      String[] lines = reader.lines().toArray(String[]::new);
+      double[][] lerp_array = new double[lines.length][2];
+      for (int i = 0; i < lines.length; i++) {
+        String[] xy = lines[i].split(" ");
+        lerp_array[i] = new double[] {Double.parseDouble(xy[0]), Double.parseDouble(xy[1])};
+      }
+      return lerp_array;
+    } catch (Exception e) {
+      // return a default array so the whole code doesn't crash
+      return new double[][] {{0, 0}};
+    }
   }
 
   public Setpoints trapPipeline() {
