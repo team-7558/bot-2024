@@ -20,7 +20,6 @@ import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
 import edu.wpi.first.math.geometry.Rotation2d;
-import frc.robot.Constants;
 import java.util.Queue;
 import org.littletonrobotics.junction.Logger;
 
@@ -77,7 +76,6 @@ public class ModuleIO2024 implements ModuleIO {
 
   private final boolean isTurnMotorInverted = true;
   private final boolean isLeftSideDriveInverted = true;
-  private double lastVelocity = 0;
   private final Rotation2d absoluteEncoderOffset;
 
   private static final Slot0Configs steerGains =
@@ -87,7 +85,8 @@ public class ModuleIO2024 implements ModuleIO {
   private static final Slot1Configs steerGainsTorque =
       new Slot1Configs().withKP(10).withKI(0).withKD(0.2).withKS(0).withKV(0.0).withKA(0);
   private static final Slot1Configs driveGainsTorque =
-      new Slot1Configs().withKP(0).withKI(0).withKD(0.0).withKS(0).withKV(0).withKA(0);
+      new Slot1Configs().withKP(10).withKI(0).withKD(0).withKS(0).withKV(0.3
+      ).withKA(0);
 
   public static final double kSpeedAt12VoltsMps = 4.73;
 
@@ -276,12 +275,9 @@ public class ModuleIO2024 implements ModuleIO {
 
     // velocity control with foc
 
-    double a = (velocity - lastVelocity) / Constants.globalDelta_sec;
-
     // driveTalon.setControl(new PositionVoltage(velocity, 0, true, velocity, 0, false, false,
     // false));
-    driveTalon.setControl(driveVelocitySetpoint.withVelocity(velocity).withAcceleration(a));
-    this.lastVelocity = velocity;
+    driveTalon.setControl(driveVelocitySetpoint.withVelocity(velocity));
   }
 
   @Override
