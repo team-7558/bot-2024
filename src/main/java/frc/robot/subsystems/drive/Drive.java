@@ -198,7 +198,7 @@ public class Drive extends StateMachineSubsystemBase {
           @Override
           public void periodic() {
             double throttle = 1.0;
-            throttle = Util.lerp(1, 0.2, OI.DR.getRightTriggerAxis());
+            throttle = Util.lerp(1, 0.4, OI.DR.getRightTriggerAxis() * OI.DR.getRightTriggerAxis());
             drive(-OI.DR.getLeftY(), -OI.DR.getLeftX(), -OI.DR.getRightX() * 0.5, throttle);
           }
         };
@@ -208,7 +208,7 @@ public class Drive extends StateMachineSubsystemBase {
           @Override
           public void periodic() {
             double throttle = 1.0;
-            throttle = Util.lerp(1, 0.2, OI.DR.getRightTriggerAxis());
+            throttle = Util.lerp(1, 0.4, OI.DR.getRightTriggerAxis() * OI.DR.getRightTriggerAxis());
             double err =
                 Math.IEEEremainder(
                     getPose().getRotation().getRadians() - Units.degreesToRadians(autolockSetpoint),

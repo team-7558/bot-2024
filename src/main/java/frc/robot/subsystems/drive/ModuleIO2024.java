@@ -20,7 +20,9 @@ import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
 import edu.wpi.first.math.geometry.Rotation2d;
+import frc.robot.Constants;
 import java.util.Queue;
+import org.littletonrobotics.junction.Logger;
 
 /**
  * Module IO implementation for Talon FX drive motor controller, Talon FX turn motor controller, and
@@ -56,7 +58,7 @@ public class ModuleIO2024 implements ModuleIO {
 
   private final PositionTorqueCurrentFOC turnPositionSetpoint =
       new PositionTorqueCurrentFOC(0, 0, 0, 1, false, false, false);
-  private final VelocityTorqueCurrentFOC drivevVelocitySetpoint =
+  private final VelocityTorqueCurrentFOC driveVelocitySetpoint =
       new VelocityTorqueCurrentFOC(0, 0, 0, 1, false, false, false);
 
   private final VoltageOut driveVoltageSetpoint = new VoltageOut(0, true, false, false, false);
@@ -75,16 +77,17 @@ public class ModuleIO2024 implements ModuleIO {
 
   private final boolean isTurnMotorInverted = true;
   private final boolean isLeftSideDriveInverted = true;
+  private double lastVelocity = 0;
   private final Rotation2d absoluteEncoderOffset;
 
   private static final Slot0Configs steerGains =
-      new Slot0Configs().withKP(1.0).withKI(0).withKD(0.0).withKS(0).withKV(0.0).withKA(0);
+      new Slot0Configs().withKP(100.0).withKI(0).withKD(0).withKS(0).withKV(0.0).withKA(0);
   private static final Slot0Configs driveGains =
-      new Slot0Configs().withKP(2.3).withKI(0).withKD(0).withKS(0).withKV(0.85).withKA(0);
+      new Slot0Configs().withKP(3).withKI(0).withKD(0).withKS(0).withKV(0.85).withKA(0);
   private static final Slot1Configs steerGainsTorque =
-      new Slot1Configs().withKP(0.0).withKI(0).withKD(0.0).withKS(0).withKV(0.0).withKA(0);
+      new Slot1Configs().withKP(10).withKI(0).withKD(0.2).withKS(0).withKV(0.0).withKA(0);
   private static final Slot1Configs driveGainsTorque =
-      new Slot1Configs().withKP(0.0).withKI(0).withKD(0.0).withKS(0).withKV(0.0).withKA(0);
+      new Slot1Configs().withKP(0).withKI(0).withKD(0.0).withKS(0).withKV(0).withKA(0);
 
   public static final double kSpeedAt12VoltsMps = 4.73;
 
@@ -126,7 +129,8 @@ public class ModuleIO2024 implements ModuleIO {
     var cancoderConfig = new CANcoderConfiguration();
     cancoderConfig.MagnetSensor.AbsoluteSensorRange = AbsoluteSensorRangeValue.Signed_PlusMinusHalf;
     cancoderConfig.MagnetSensor.MagnetOffset = -absoluteEncoderOffset.getRotations();
-    cancoderConfig.MagnetSensor.SensorDirection = isTurnMotorInverted
+    cancoderConfig.MagnetSensor.SensorDirection =
+        isTurnMotorInverted
             ? SensorDirectionValue.CounterClockwise_Positive
             : SensorDirectionValue.Clockwise_Positive;
     cancoder.getConfigurator().apply(cancoderConfig);
@@ -146,17 +150,18 @@ public class ModuleIO2024 implements ModuleIO {
     setDriveBrakeMode(false);
 
     var turnConfig = new TalonFXConfiguration();
-    turnConfig.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.FusedCANcoder;
-    turnConfig.Feedback.FeedbackRotorOffset = TURN_GEAR_RATIO;
+    turnConfig.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RemoteCANcoder;
+    turnConfig.Feedback.FeedbackRemoteSensorID = cancoder.getDeviceID();
     turnConfig.Slot0 = steerGains;
     turnConfig.Slot1 = steerGainsTorque;
     turnConfig.CurrentLimits.StatorCurrentLimit = 30.0;
-    turnConfig.MotorOutput.Inverted = isTurnMotorInverted
+    turnConfig.MotorOutput.Inverted =
+        isTurnMotorInverted
             ? InvertedValue.Clockwise_Positive
             : InvertedValue.CounterClockwise_Positive;
     turnConfig.Feedback.RotorToSensorRatio = TURN_GEAR_RATIO;
     turnConfig.CurrentLimits.StatorCurrentLimitEnable = true;
-    // turnConfig.ClosedLoopGeneral.ContinuousWrap = true;
+    turnConfig.ClosedLoopGeneral.ContinuousWrap = true;
     turnTalon.getConfigurator().apply(turnConfig);
     setTurnBrakeMode(false);
 
@@ -191,7 +196,6 @@ public class ModuleIO2024 implements ModuleIO {
         turnCurrent);
     // driveTalon.optimizeBusUtilization();
     // turnTalon.optimizeBusUtilization();
-
 
   }
 
@@ -268,18 +272,24 @@ public class ModuleIO2024 implements ModuleIO {
 
   @Override
   public void setDriveVelocity(double velocity) {
-    // driveTalon.setControl(drivevVelocitySetpoint.withVelocity(velocity));
+    // driveTalon.setControl(drivevVelocitySetpoint_v.withVelocity(velocity));
 
     // velocity control with foc
-    //driveTalon.setControl(new PositionVoltage(velocity, 0, true, velocity, 0, false, false, false));
-    driveTalon.setControl(driveVelocitySetpoint_v.withVelocity(velocity));
 
+    double a = (velocity - lastVelocity) / Constants.globalDelta_sec;
+
+    // driveTalon.setControl(new PositionVoltage(velocity, 0, true, velocity, 0, false, false,
+    // false));
+    driveTalon.setControl(driveVelocitySetpoint.withVelocity(velocity).withAcceleration(a));
+    this.lastVelocity = velocity;
   }
 
   @Override
   public void setTurnAngle(double pos_r) {
-    // turnTalon.setControl(turnPositionSetpoint.withPosition(0));
+    turnTalon.setControl(turnPositionSetpoint_v.withPosition(pos_r));
 
-    turnTalon.setControl(turnPositionSetpoint_v.withPosition(50));
+    Logger.recordOutput("Drive/" + index + "/angleSetpoint", pos_r);
+
+    // turnTalon.setControl(turnPositionSetpoint.withPosition(pos_r));
   }
 }
