@@ -149,10 +149,10 @@ public class Drive extends StateMachineSubsystemBase {
 
     super("Drive");
     this.gyroIO = gyroIO;
-    modules[FL] = new Module(flModuleIO, FL, Mode.VOLTAGE);
-    modules[FR] = new Module(frModuleIO, FR, Mode.VOLTAGE);
-    modules[BL] = new Module(blModuleIO, BL, Mode.VOLTAGE);
-    modules[BR] = new Module(brModuleIO, BR, Mode.VOLTAGE);
+    modules[FL] = new Module(flModuleIO, FL, Mode.SETPOINT);
+    modules[FR] = new Module(frModuleIO, FR, Mode.SETPOINT);
+    modules[BL] = new Module(blModuleIO, BL, Mode.SETPOINT);
+    modules[BR] = new Module(brModuleIO, BR, Mode.SETPOINT);
 
     // Configure AutoBuilder for PathPlanner
     AutoBuilder.configureHolonomic(

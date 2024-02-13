@@ -20,8 +20,8 @@ import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.Filesystem;
 import frc.robot.Constants;
 import frc.robot.SS2d;
 import frc.robot.subsystems.StateMachineSubsystemBase;
@@ -476,7 +476,8 @@ public class Shooter extends StateMachineSubsystemBase {
   }
 
   private static double[][] getLerpTableFromFile(String name) {
-    try (BufferedReader reader = new BufferedReader(new FileReader(Filesystem.getDeployDirectory().getPath() + name))) {
+    try (BufferedReader reader =
+        new BufferedReader(new FileReader(Filesystem.getDeployDirectory().getPath() + name))) {
       String[] lines = reader.lines().toArray(String[]::new);
       double[][] lerp_array = new double[lines.length][2];
       for (int i = 0; i < lines.length; i++) {

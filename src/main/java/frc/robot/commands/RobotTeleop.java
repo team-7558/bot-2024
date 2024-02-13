@@ -64,13 +64,13 @@ public class RobotTeleop extends Command {
         drive.setAutolockSetpoint(-61.19); // TODO: make source
         drive.setCurrentState(drive.STRAFE_AUTOLOCK);
       } else if (OI.DR.getAButton()) { // TODO: make speaker
-        drive.setAutolockSetpoint(0);
+        drive.setAutolockSetpoint(1.57);
         drive.setCurrentState(drive.STRAFE_AUTOLOCK);
       } else if (OI.DR.getBButton()) { // TOOD: make amp
         drive.setAutolockSetpoint(59.04);
         drive.setCurrentState(drive.STRAFE_AUTOLOCK);
       } else if (OI.DR.getYButton()) { // TODO: make trap
-        drive.setAutolockSetpoint(90);
+        drive.setAutolockSetpoint(3.141);
         drive.setCurrentState(drive.STRAFE_AUTOLOCK);
       } else if (OI.DR.getLeftTriggerAxis() > 0) { // TODO: auto drive to set location
 
