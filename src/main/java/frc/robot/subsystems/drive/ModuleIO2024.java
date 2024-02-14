@@ -85,8 +85,7 @@ public class ModuleIO2024 implements ModuleIO {
   private static final Slot1Configs steerGainsTorque =
       new Slot1Configs().withKP(10).withKI(0).withKD(0.2).withKS(0).withKV(0.0).withKA(0);
   private static final Slot1Configs driveGainsTorque =
-      new Slot1Configs().withKP(10).withKI(0).withKD(0).withKS(0).withKV(0.3
-      ).withKA(0);
+      new Slot1Configs().withKP(10).withKI(0).withKD(0).withKS(0).withKV(0.3).withKA(0);
 
   public static final double kSpeedAt12VoltsMps = 4.73;
 
