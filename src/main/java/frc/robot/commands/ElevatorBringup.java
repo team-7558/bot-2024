@@ -28,8 +28,18 @@ public class ElevatorBringup extends Command {
     if (!elevator.isState(elevator.DISABLED)) {
       if (OI.DR.getLeftBumper()) {
         elevator.setCurrentState(elevator.HOMING);
-      } else {
-        elevator.setCurrentState(elevator.IDLE);
+      }
+
+      boolean up = OI.DR.getPOV() == 0, down = OI.DR.getPOV() == 180;
+      double manual = 2.0 * (up ? 1 : down ? -1 : 0);
+      if (up || down) {
+        elevator.setCurrentState(elevator.MANUAL);
+        elevator.setManualOutput(manual);
+      } else if (!elevator.isState(elevator.IDLE)
+          && !elevator.isState(elevator.HOMING)
+          && !elevator.isState(elevator.RESETTING)) {
+        elevator.setTargetHeight(elevator.getTargetHeight());
+        elevator.setCurrentState(elevator.HOLDING);
       }
     }
 

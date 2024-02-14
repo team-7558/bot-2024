@@ -64,7 +64,7 @@ public class ElevatorIOReal implements ElevatorIO {
     leaderConfig.Feedback.SensorToMechanismRatio =
         METERS_TO_ROTATIONS; // Figure out how to scale this to real height
     leaderConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
-    leaderConfig.MotorOutput.NeutralMode = NeutralModeValue.Coast;
+    leaderConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
 
     leaderConfig.MotionMagic.MotionMagicCruiseVelocity = 1;
     leaderConfig.MotionMagic.MotionMagicAcceleration = 1;

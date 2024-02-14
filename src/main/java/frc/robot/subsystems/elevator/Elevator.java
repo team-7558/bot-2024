@@ -44,12 +44,13 @@ public class Elevator extends StateMachineSubsystemBase {
     return instance;
   }
 
-  public final State DISABLED, IDLE, HOLDING, CLIMBING, HOMING;
+  public final State DISABLED, IDLE, HOLDING, CLIMBING, HOMING, RESETTING, MANUAL;
 
   private final ElevatorIO io;
   private final ElevatorIOInputsAutoLogged inputs = new ElevatorIOInputsAutoLogged(); // hacky fix
 
   private double targetHeight_m = MIN_HEIGHT_M;
+  private double manualOutput = 0;
 
   private Elevator(ElevatorIO io) {
     super("Elevator");
@@ -69,14 +70,6 @@ public class Elevator extends StateMachineSubsystemBase {
           @Override
           public void init() {
             stop();
-          }
-
-          @Override
-          public void periodic() {
-            // If sometime after IDLE, resetPosToMin
-            if (between(0.2, 1.2)) {
-              resetPosAsMin();
-            }
           }
         };
 
@@ -104,11 +97,46 @@ public class Elevator extends StateMachineSubsystemBase {
           @Override
           public void periodic() {
             if (isHomeStalling()) {
-              setCurrentState(IDLE);
+              setCurrentState(RESETTING);
             } else {
               // io.setVel(-0.05);
               io.setVoltage(-1.0);
             }
+          }
+        };
+
+    RESETTING =
+        new State("RESETTING") {
+          @Override
+          public void init() {
+            targetHeight_m = MIN_HEIGHT_M;
+            stop();
+          }
+
+          @Override
+          public void periodic() {
+            if (after(0.5)) {
+              resetPosAsMin();
+              setCurrentState(IDLE);
+            }
+          }
+        };
+
+    MANUAL =
+        new State("MANUAL") {
+          @Override
+          public void init() {
+            stop();
+          }
+
+          @Override
+          public void periodic() {
+            io.setVoltage(manualOutput);
+          }
+
+          @Override
+          public void exit() {
+            manualOutput = 0;
           }
         };
 
@@ -117,6 +145,14 @@ public class Elevator extends StateMachineSubsystemBase {
 
   public void setTargetHeight(double height_m) {
     this.targetHeight_m = MathUtil.clamp(height_m, MIN_HEIGHT_M, MAX_HEIGHT_M);
+  }
+
+  public double getTargetHeight() {
+    return this.targetHeight_m;
+  }
+
+  public void setManualOutput(double manualOutput) {
+    this.manualOutput = manualOutput;
   }
 
   @Override
