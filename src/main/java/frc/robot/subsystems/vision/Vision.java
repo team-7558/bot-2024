@@ -69,7 +69,7 @@ public class Vision extends SubsystemBase {
           // VisionIO cam3 =
           //     new VisionIOPhoton("camera4", new Transform3d()); // TODO: update transform & name
           // VisionIO limelight = new VisionIOLimelight("limelight"); // TODO: update name
-          instance = new Vision(cam0);
+          instance = new Vision(/*cam0*/ new VisionIOSim("camera0", new Transform3d()));
           break;
         case SIM:
           cam0 = new VisionIOSim("camera0", new Transform3d());
@@ -89,7 +89,7 @@ public class Vision extends SubsystemBase {
 
         default:
           // nothing yet
-          instance = new Vision(new VisionIO() {});
+          instance = new Vision(new VisionIOSim("camera0", new Transform3d()));
       }
     }
 

@@ -14,8 +14,8 @@ public class Intake extends StateMachineSubsystemBase {
 
   // Convention: towards amp is positive, towards shooter is negative
 
-  private double intakeSpeed = 0;
-  private double directionSpeed = 0;
+  public double intakeSpeed = 0;
+  public double directionSpeed = 0;
 
   private static Intake instance;
 
@@ -72,17 +72,22 @@ public class Intake extends StateMachineSubsystemBase {
 
     IDLE =
         new State("IDLE") {
-
           @Override
           public void init() {
-            stop();
+            directionSpeed = 0;
+          }
+
+          @Override
+          public void periodic() {
+            if (beamBroken()) stop();
+            else intakeSpeed = -0.05;
           }
         };
     INTAKING =
         new State("INTAKING") {
           @Override
-          public void init() {
-            intakeSpeed = 0.25;
+          public void periodic() {
+            intakeSpeed = beamBroken() ? 0.2 : 0.40;
             directionSpeed = 0;
           }
         };
@@ -107,8 +112,8 @@ public class Intake extends StateMachineSubsystemBase {
         new State("SHOOTER_SIDE") {
           @Override
           public void init() {
-            directionSpeed = -0.5;
-            intakeSpeed = 0.5;
+            directionSpeed = -0.2;
+            intakeSpeed = 0.2;
           }
         };
     SPITTING =
