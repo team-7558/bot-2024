@@ -9,7 +9,7 @@ import frc.robot.OI;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.intake.Intake;
 
-public class Temp extends Command {
+public class IntakeBringup extends Command {
 
   private final Drive drive;
   private final Intake intake;
@@ -17,7 +17,7 @@ public class Temp extends Command {
   boolean hasGamePiece = false;
 
   /** Creates a new DriveTeleop. */
-  public Temp() {
+  public IntakeBringup() {
     // Use addRequirements() here to declare subsystem dependencies.
     drive = Drive.getInstance();
     intake = Intake.getInstance();
