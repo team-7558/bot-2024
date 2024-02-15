@@ -10,7 +10,7 @@ public class LED {
   public static LED getInstance() {
 
     if (instance == null) {
-      instance = new LED(new LEDIOSim());
+      instance = new LED(new LEDIOReal());
     }
 
     return instance;

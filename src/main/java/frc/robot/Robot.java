@@ -112,14 +112,23 @@ public class Robot extends LoggedRobot {
     // 0);
     // LED.getInstance().setRGB((int) ((0.5 + 0.5 * Math.cos(t.get())) * (LED.NUM_LEDS)), 1, 1, 1);
 
-    // LED.getInstance().setRGB((int) ((0.5 + 0.5 * Math.sin(t.get())) * (LED.NUM_LEDS)), 128, 0,
-    // 0);
+    // LED.getInstance().setRGB((int) t.get(), 1, 0, 0);
+    // LED.getInstance().setRGB((int) ((0.5 + 0.5 * Math.sin(t.get())) * (LED.NUM_LEDS)), 128, 0, 0);
+
+    //LED.getInstance().setRGB((int) ((0.5 + 0.5 * Math.sin(t.get())) * (LED.NUM_LEDS)), 128, 0, 0);
     // if
     // LED.getInstance().setRGB((int) ((0.5 + 0.5 * Math.cos(t.get())) * (LED.NUM_LEDS)), 1, 1, 1);
 
-    for (int i = 0; i < LED.NUM_LEDS; i += 2) {
-      LED.getInstance().setRGB(i, 128, 0, 0);
+    // for (int i=0; i<LED.NUM_LEDS; i+=2) {
+    //   LED.getInstance().setRGB(i, 128, 0, 0);
+    // }
+
+    if (OI.DR.getAButton()) {
+      LED.getInstance().setRGB((int) Math.random() * LED.NUM_LEDS, 128, 0, 0);
+    } else {
+      LED.getInstance().setAllRGB(0, 0, 0);
     }
+
 
     LED.getInstance().render();
     CommandScheduler.getInstance().run();
