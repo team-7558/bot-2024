@@ -4,6 +4,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import frc.robot.subsystems.vision.Vision.TimestampedPose;
 
 public class VisionIOLimelight implements VisionIO {
 
@@ -20,11 +21,12 @@ public class VisionIOLimelight implements VisionIO {
     inputs.pipelineID = (int) limelight.getEntry("pl").getDouble(-1);
     inputs.tagID = (int) limelight.getEntry("tid").getDouble(-1);
 
+
     double[] botpose_double = limelight.getEntry("botpose").getDoubleArray(new double[7]);
-    inputs.pose =
-        new Pose2d(botpose_double[0], botpose_double[1], Rotation2d.fromDegrees(botpose_double[5]));
-    inputs.latency = botpose_double[6];
     inputs.timestamp = System.currentTimeMillis() - botpose_double[6];
+    inputs.poses.add(
+        new TimestampedPose(new Pose2d(botpose_double[0], botpose_double[1], Rotation2d.fromDegrees(botpose_double[5])),inputs.timestamp));
+    inputs.latency = botpose_double[6];
   }
 
   @Override

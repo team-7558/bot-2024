@@ -307,34 +307,34 @@ public class Drive extends StateMachineSubsystemBase {
 
     // TODO: see if this works on a bot, also clean up, Vision should provide poses with timestamp
     // to Drive
-    Vision vision = Vision.getInstance();
-    if (vision.hasTagInView()) {
-      for (int i = 0; i < vision.getCameras(); i++) {
-        int tagID = (int) vision.getTagID(i);
-        if (tagID > 0) {
-          double timestamp = vision.getTimestamp(i);
+    // Vision vision = Vision.getInstance();
+    // if (vision.hasTagInView()) {
+    //   for (int i = 0; i < vision.getCameras(); i++) {
+    //     int tagID = (int) vision.getTagID(i);
+    //     if (tagID > 0) {
+    //       double timestamp = vision.getTimestamp(i);
 
-          // where the ACTUAL tag is
-          Pose2d tagPose2d = Vision.AT_MAP.getTagPose(tagID).get().toPose2d();
+    //       // where the ACTUAL tag is
+    //       Pose2d tagPose2d = Vision.AT_MAP.getTagPose(tagID).get().toPose2d();
 
-          // where this camera thinks it is
-          Pose2d estimatedPose = vision.getPose(i);
+    //       // where this camera thinks it is
+    //       Pose2d estimatedPose = vision.getPose(i);
 
-          // distance between tag and estimated pose
-          double translationDistance =
-              tagPose2d.getTranslation().getDistance(getPose().getTranslation());
+    //       // distance between tag and estimated pose
+    //       double translationDistance =
+    //           tagPose2d.getTranslation().getDistance(getPose().getTranslation());
 
-          // implementing cutoff
-          if (translationDistance > CUTOFF_DISTANCE) continue;
+    //       // implementing cutoff
+    //       if (translationDistance > CUTOFF_DISTANCE) continue;
 
-          // adding to the pose estimator with the timestamp
-          // poseEstimator.addVisionMeasurement(estimatedPose, timestamp);
+    //       // adding to the pose estimator with the timestamp
+    //       // poseEstimator.addVisionMeasurement(estimatedPose, timestamp);
 
-        } else {
+    //     } else {
 
-        }
-      }
-    }
+    //     }
+    //   }
+    // }
   }
 
   public void drive(double x, double y, double w, double throttle) {
@@ -413,6 +413,11 @@ public class Drive extends StateMachineSubsystemBase {
       modules[i].runCharacterization(volts);
     }
   }
+
+  public void addToPoseEstimator(Pose2d pose, double timestamp) {
+    poseEstimator.addVisionMeasurement(pose, timestamp);
+  }
+
 
   /** Returns the average drive velocity in radians/sec. */
   public double getCharacterizationVelocity() {
