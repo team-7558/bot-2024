@@ -41,6 +41,9 @@ public class ElevatorBringup extends Command {
         elevator.setTargetHeight(elevator.getTargetHeight());
         elevator.setCurrentState(elevator.HOLDING);
       }
+      if (OI.DR.getXButton()) {
+        elevator.setCurrentState(elevator.CLIMBING);
+      }
     }
 
     if (OI.DR.getRightBumper()) {

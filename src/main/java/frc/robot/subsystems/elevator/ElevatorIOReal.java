@@ -17,6 +17,7 @@ import edu.wpi.first.math.MathUtil;
 import org.littletonrobotics.junction.Logger;
 
 public class ElevatorIOReal implements ElevatorIO {
+
   private final TalonFX leftFalcon;
   private final TalonFX rightFalcon;
 
@@ -64,7 +65,7 @@ public class ElevatorIOReal implements ElevatorIO {
     leaderConfig.Feedback.SensorToMechanismRatio =
         METERS_TO_ROTATIONS; // Figure out how to scale this to real height
     leaderConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
-    leaderConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
+    leaderConfig.MotorOutput.NeutralMode = NeutralModeValue.Coast;
 
     leaderConfig.MotionMagic.MotionMagicCruiseVelocity = 1;
     leaderConfig.MotionMagic.MotionMagicAcceleration = 1;
@@ -74,8 +75,8 @@ public class ElevatorIOReal implements ElevatorIO {
 
     // Position control gains
     leaderConfig.Slot0.GravityType = GravityTypeValue.Elevator_Static;
-    leaderConfig.Slot0.kG = 0;
-    leaderConfig.Slot0.kP = 0.0;
+    leaderConfig.Slot0.kG = 0.1;
+    leaderConfig.Slot0.kP = 0.9;
     leaderConfig.Slot0.kI = 0;
     leaderConfig.Slot0.kD = 0;
 
@@ -103,7 +104,6 @@ public class ElevatorIOReal implements ElevatorIO {
 
     rightFalcon.setControl(new Follower(leftFalcon.getDeviceID(), true).withUpdateFreqHz(50));
 
-    // leftFalcon.setPosition(0, 0.01);
     resetPos(Elevator.MIN_HEIGHT_M);
   }
 
@@ -127,7 +127,7 @@ public class ElevatorIOReal implements ElevatorIO {
 
   @Override
   public void setPos(double position) {
-    leftFalcon.setControl(mmPosControl.withPosition(position));
+    leftFalcon.setControl(posControl.withPosition(position).withSlot(0));
   }
 
   @Override
