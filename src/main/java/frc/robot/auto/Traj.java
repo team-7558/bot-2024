@@ -21,6 +21,8 @@ public class Traj {
     private PathPlannerTrajectory traj;
     private State initState;
 
+    private boolean generated = false;
+
     
     public Traj(String filename, boolean isChoreo, ChassisSpeeds startingSpeeds, Rotation2d startingRotation){
         type = TrajType.MOVING;
@@ -38,7 +40,14 @@ public class Traj {
         this.initState.headingAngularVelocityRps = 0;
         this.initState.holonomicAngularVelocityRps = Optional.of(0.0);
         this.initState.curvatureRadPerMeter = 0;
+    }
 
+    public void generate(){
+
+    }
+
+    public void generate(State prevState){
+        
     }
 
     public double endTime(){
