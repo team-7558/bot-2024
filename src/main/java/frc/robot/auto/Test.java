@@ -2,7 +2,7 @@ package frc.robot.auto;
 
 import frc.robot.SS.State;
 
-public class Test extends AltAuto {
+public class Test extends RunAltAutoCommand {
 
   public Test() {
     super("Test");
@@ -17,8 +17,8 @@ public class Test extends AltAuto {
 
   @Override
   public void execute() {
+    System.out.println("Hmm");
     if (after(3)) {
-      System.out.println("Hmm");
       ss.queueState(State.TEST_2);
     }
   }
