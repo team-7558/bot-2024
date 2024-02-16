@@ -3,7 +3,7 @@ package frc.robot.subsystems.LED;
 import org.littletonrobotics.junction.Logger;
 
 public class LED {
-  public static final int NUM_LEDS = 5;
+  public static final int NUM_LEDS = 256;
 
   private static LED instance;
 
@@ -49,11 +49,11 @@ public class LED {
   }
 
   public void setAllRGB(int r, int g, int b) {
-    setRangeRGB(0, NUM_LEDS - 1, r, g, b);
+    setRangeRGB(0, NUM_LEDS, r, g, b);
   }
 
   public void setAllHSV(int h, int s, int v) {
-    setRangeHSV(0, NUM_LEDS - 1, h, s, v);
+    setRangeHSV(0, NUM_LEDS, h, s, v);
   }
 
   public void angleToPositionRGB(int angle, int r, int b, int g) {

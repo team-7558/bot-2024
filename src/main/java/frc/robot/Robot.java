@@ -108,14 +108,16 @@ public class Robot extends LoggedRobot {
     // This must be called from the robot's periodic block in order for anything in
     // the Command-based framework to work.
 
-    // LED.getInstance().setRGB((int) ((0.5 + 0.5 * Math.sin(t.get())) * (LED.NUM_LEDS)), 128, 0,
-    // 0);
-    // LED.getInstance().setRGB((int) ((0.5 + 0.5 * Math.cos(t.get())) * (LED.NUM_LEDS)), 1, 1, 1);
+    LED.getInstance()
+        .setRGB((int) ((0.5 + 0.5 * Math.sin(t.get() * 5)) * (LED.NUM_LEDS)), 128, 0, 0);
+    LED.getInstance().setRGB((int) ((0.5 + 0.5 * Math.cos(t.get() * 5)) * (LED.NUM_LEDS)), 1, 1, 1);
 
     // LED.getInstance().setRGB((int) t.get(), 1, 0, 0);
-    // LED.getInstance().setRGB((int) ((0.5 + 0.5 * Math.sin(t.get())) * (LED.NUM_LEDS)), 128, 0, 0);
+    // LED.getInstance().setRGB((int) ((0.5 + 0.5 * Math.sin(t.get())) * (LED.NUM_LEDS)), 128, 0,
+    // 0);
 
-    //LED.getInstance().setRGB((int) ((0.5 + 0.5 * Math.sin(t.get())) * (LED.NUM_LEDS)), 128, 0, 0);
+    // LED.getInstance().setRGB((int) ((0.5 + 0.5 * Math.sin(t.get())) * (LED.NUM_LEDS)), 128, 0,
+    // 0);
     // if
     // LED.getInstance().setRGB((int) ((0.5 + 0.5 * Math.cos(t.get())) * (LED.NUM_LEDS)), 1, 1, 1);
 
@@ -123,12 +125,11 @@ public class Robot extends LoggedRobot {
     //   LED.getInstance().setRGB(i, 128, 0, 0);
     // }
 
-    if (OI.DR.getAButton()) {
-      LED.getInstance().setRGB((int) Math.random() * LED.NUM_LEDS, 128, 0, 0);
-    } else {
-      LED.getInstance().setAllRGB(0, 0, 0);
-    }
+    // LED.getInstance().setAllRGB(0, 0, 25);
 
+    // if (OI.DR.getAButton()) {
+    //   LED.getInstance().setRGB((int) (Math.random() * LED.NUM_LEDS), 128, 0, 0);
+    // }
 
     LED.getInstance().render();
     CommandScheduler.getInstance().run();

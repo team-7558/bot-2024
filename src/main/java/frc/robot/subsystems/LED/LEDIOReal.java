@@ -4,7 +4,7 @@ import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 
 public class LEDIOReal implements LEDIO {
-  public AddressableLED m_led = new AddressableLED(14);
+  public AddressableLED m_led = new AddressableLED(4);
   public AddressableLEDBuffer m_ledBuffer = new AddressableLEDBuffer(LED.NUM_LEDS);
 
   public LEDIOReal() {
@@ -18,9 +18,9 @@ public class LEDIOReal implements LEDIO {
 
   @Override
   public void setColours(boolean isRGB, int[] leds) {
-    for (int i = 0; i < m_ledBuffer.getLength(); i++) {
-      if (isRGB) m_ledBuffer.setHSV(i, leds[i * 3 + 0], leds[i * 3 + 1], leds[i * 3 + 2]);
-      if (!isRGB) m_ledBuffer.setRGB(i, leds[i * 3 + 0], leds[i * 3 + 1], leds[i * 3 + 2]);
+    for (int i = 0; i < m_ledBuffer.getLength() * 3; i += 3) {
+      if (isRGB) m_ledBuffer.setRGB(i / 3, leds[i + 0], leds[i + 1], leds[i + 2]);
+      else m_ledBuffer.setHSV(i / 3, leds[i + 0], leds[i + 1], leds[i + 2]);
     }
     m_led.setData(m_ledBuffer);
   }
