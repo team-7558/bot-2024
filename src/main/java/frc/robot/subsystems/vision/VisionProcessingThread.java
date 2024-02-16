@@ -33,6 +33,7 @@ public class VisionProcessingThread extends Thread {
               camera.poseTimestamps[camera.poseIndex] = estimatedPose.timestampSeconds;
               camera.poseIndex++;
               camera.recentResult = latestResult;
+              lastTimestamp = estimatedPose.timestampSeconds;
             }
           }
         }
