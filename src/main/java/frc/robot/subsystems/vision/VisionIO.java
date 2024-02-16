@@ -2,15 +2,7 @@ package frc.robot.subsystems.vision;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Transform3d;
-import frc.robot.subsystems.vision.Vision.TimestampedPose;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Queue;
-import java.util.concurrent.ArrayBlockingQueue;
-
 import org.littletonrobotics.junction.AutoLog;
-import org.photonvision.targeting.PhotonPipelineResult;
 
 public interface VisionIO {
 
@@ -21,7 +13,8 @@ public interface VisionIO {
     public double yOffset = 0;
     public int tagID = -1;
     public int pipelineID = 0;
-    public List<TimestampedPose> poses = new ArrayList<>();
+    public Pose2d[] poses = new Pose2d[0];
+    public double[] poseTimestamps = new double[0];
     public double timestamp = -1;
     public double latency = -1;
   }

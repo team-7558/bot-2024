@@ -8,10 +8,7 @@ import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
-import edu.wpi.first.wpilibj.Timer;
 import frc.robot.subsystems.drive.Drive;
-import frc.robot.subsystems.vision.Vision.TimestampedPose;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -84,12 +81,16 @@ public class VisionIOSim implements VisionIO {
       inputs.tagID = target.getFiducialId();
       inputs.xOffset = target.getYaw();
       inputs.yOffset = target.getPitch();
-      poseEstimator
-          .update(latestResult)
-          .ifPresent(
-              (pose) -> {
-                inputs.poses.add(new TimestampedPose(pose.estimatedPose.toPose2d(),Timer.getFPGATimestamp()));
-              });
+      // poseEstimator
+      //     .update(latestResult)
+      //     .ifPresent(
+      //         (pose) -> {
+      //           inputs.poses.add(
+      //               new TimestampedPose(pose.estimatedPose.toPose2d(),
+      // Timer.getFPGATimestamp()));
+      //         });
+
+      // sim doenst work anyways idc about this
       inputs.timestamp = latestResult.getTimestampSeconds();
       inputs.latency = latestResult.getLatencyMillis();
     }

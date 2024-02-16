@@ -9,8 +9,8 @@ import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.units.Time;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants.Mode;
 import frc.robot.Constants;
 import frc.robot.PerfTracker;
 import frc.robot.subsystems.drive.Drive;
@@ -19,11 +19,7 @@ import frc.robot.util.Util;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
-
 import org.littletonrobotics.junction.Logger;
-import org.photonvision.PhotonCamera;
 
 public class Vision extends SubsystemBase {
 
@@ -46,7 +42,6 @@ public class Vision extends SubsystemBase {
   public static final double CLEAR_DISTANCE_M = QUICK_DISTANCE_M + 0.1;
 
   public static final AprilTagFieldLayout AT_MAP;
-  
 
   static {
     AprilTagFieldLayout temp;
@@ -66,7 +61,7 @@ public class Vision extends SubsystemBase {
 
       VisionIO cam0, cam1, cam2, cam3;
 
-      switch (Constants.currentMode) {
+      switch (Constants.currentMode) { // TODO: SET BACK TO NORMAL
         case REAL:
           cam0 = new VisionIOPhoton("camera0", new Transform3d()); // TODO: update transform & name
           // VisionIO cam1 =
@@ -76,7 +71,7 @@ public class Vision extends SubsystemBase {
           // VisionIO cam3 =
           //     new VisionIOPhoton("camera4", new Transform3d()); // TODO: update transform & name
           // VisionIO limelight = new VisionIOLimelight("limelight"); // TODO: update name
-          instance = new Vision(/*cam0*/ new VisionIOSim("camera0", new Transform3d()));
+          instance = new Vision(cam0);
           break;
         case SIM:
           cam0 = new VisionIOSim("camera0", new Transform3d());
@@ -127,7 +122,7 @@ public class Vision extends SubsystemBase {
 
   public Pose2d[] getPoses() {
     ArrayList<Pose2d> poses = new ArrayList<>();
-    for(VisionIOInputs input : visionInputs) {
+    for (VisionIOInputs input : visionInputs) {
       poses.addAll(poses);
     }
     return poses.toArray(new Pose2d[0]);
@@ -152,7 +147,6 @@ public class Vision extends SubsystemBase {
   public int getTagID(int camera) {
     return visionInputs[camera].tagID;
   }
-
 
   public double getTimestamp(int camera) {
     return visionInputs[camera].timestamp;
@@ -245,11 +239,22 @@ public class Vision extends SubsystemBase {
   @Override
   public void periodic() {
     PerfTracker.start("Vision");
+    outer:
     for (int i = 0; i < cameras.length; i++) {
       cameras[i].updateInputs(visionInputs[i]);
       Logger.processInputs("Vision/Camera" + i + "/Inputs", visionInputs[i]);
-      for(TimestampedPose pose : visionInputs[i].poses) {
-        Drive.getInstance().addToPoseEstimator(pose.pose, pose.timestamp); // TODO: maybe make a lock so no concurrent mod exception
+      for (int j = 0;
+          j < visionInputs[i].poses.length && j < visionInputs[i].poseTimestamps.length;
+          j++) {
+        double timestamp = visionInputs[i].poseTimestamps[j];
+        if (timestamp == 0)
+          continue
+              outer; // empty array means no more inputs in the processing frame so skip to next cam
+        TimestampedPose pose = new TimestampedPose(visionInputs[i].poses[j], timestamp);
+        Drive.getInstance()
+            .addToPoseEstimator(
+                pose.pose,
+                pose.timestamp); // TODO: maybe make a lock so no concurrent mod exception
       }
       managePipelines(i, Drive.getInstance().getPose());
     }
@@ -269,6 +274,4 @@ public class Vision extends SubsystemBase {
       this.timestamp = timestamp;
     }
   }
-
-  
 }

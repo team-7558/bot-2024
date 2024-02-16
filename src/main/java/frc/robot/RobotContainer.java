@@ -16,8 +16,7 @@ package frc.robot;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.commands.IntakeBringup;
-import frc.robot.commands.Temp;
+import frc.robot.commands.RobotTeleop;
 import frc.robot.subsystems.drive.Drive;
 
 /**
@@ -47,7 +46,7 @@ public class RobotContainer {
    * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureButtonBindings() {
-    drive.setDefaultCommand(new IntakeBringup());
+    drive.setDefaultCommand(new RobotTeleop());
   }
 
   /**

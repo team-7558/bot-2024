@@ -38,7 +38,6 @@ import frc.robot.Constants;
 import frc.robot.OI;
 import frc.robot.subsystems.StateMachineSubsystemBase;
 import frc.robot.subsystems.drive.Module.Mode;
-import frc.robot.subsystems.vision.Vision;
 import frc.robot.util.LocalADStarAK;
 import frc.robot.util.Util;
 import java.util.concurrent.locks.Lock;
@@ -139,6 +138,7 @@ public class Drive extends StateMachineSubsystemBase {
   private Pose2d pose = new Pose2d();
   private Rotation2d lastGyroRotation = new Rotation2d();
   private ChassisSpeeds chassisSpeeds = new ChassisSpeeds(0, 0, 0);
+  int posesAdded = 0;
 
   private Drive(
       GyroIO gyroIO,
@@ -271,6 +271,7 @@ public class Drive extends StateMachineSubsystemBase {
       Logger.recordOutput("SwerveStates/Setpoints", new SwerveModuleState[] {});
       Logger.recordOutput("SwerveStates/SetpointsOptimized", new SwerveModuleState[] {});
     }
+    Logger.recordOutput("visionFrames", posesAdded);
 
     // Update odometry
     int deltaCount =
@@ -416,8 +417,8 @@ public class Drive extends StateMachineSubsystemBase {
 
   public void addToPoseEstimator(Pose2d pose, double timestamp) {
     poseEstimator.addVisionMeasurement(pose, timestamp);
+    posesAdded++;
   }
-
 
   /** Returns the average drive velocity in radians/sec. */
   public double getCharacterizationVelocity() {
