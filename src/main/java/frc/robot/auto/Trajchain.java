@@ -9,16 +9,16 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 
-public class Trajchain {
+public class Trajchain implements IFollowable{
     
 
     private List<Traj> trajs;
 
-    private double chainSize;
+    private int chainSize, firstPath;
 
     private Pose2d startingPose;
 
-    private List<Double> trajTimes;
+    private List<Double> startTimes;
     private double totalTime_s;
 
 
@@ -26,33 +26,64 @@ public class Trajchain {
 
     public Trajchain(){
         trajs = new ArrayList<>();
-        trajTimes = new ArrayList<>();
+        startTimes = new ArrayList<>();
         chainSize = 0;
+        firstPath = -1;
         totalTime_s = 0;
     }
 
     public Trajchain append(String filename, boolean isChoreo){
-        Traj t = new Traj(filename, isChoreo, new ChassisSpeeds(), new Rotation2d());
+        Traj t = new Traj(filename, isChoreo);
         trajs.add(t);
-        totalTime_s += t.endTime();
-        trajTimes.add(totalTime_s);
-        return this;
-    }
-
-    public Trajchain append(double delay_s){
-        Traj t = new Traj(delay_s, new State());
-        trajs.add(t);
-        totalTime_s += t.endTime();
-        trajTimes.add(totalTime_s);
         chainSize++;
         return this;
     }
 
+    public Trajchain append(double delay_s){
+        Traj t = new Traj(delay_s);
+        trajs.add(t);
+        if(firstPath == -1) firstPath = chainSize;
+        chainSize++;
+        return this;
+    }
+
+    @Override
     public void generate(){
-        int i = 0;
-        while(startingPose == null){
-            
+        if(firstPath == -1){
+            System.err.println("Path of just waits");
+        } else {
+            trajs.get(firstPath).generate();
+            State initState = trajs.get(firstPath).getInitState();
+            startingPose = new Pose2d(initState.positionMeters, initState.targetHolonomicRotation);
+            startTimes.add(0.0);
+            totalTime_s = 0;
+            for(int i = firstPath+1; i < chainSize; i++){
+                trajs.get(i).generate(trajs.get(i-1).getEndState());
+            }
+            for(int i = 0; i < firstPath; i++){
+                trajs.get(i).generate(initState);
+            }
+            for(int i = 1; i < chainSize; i++){
+                totalTime_s += trajs.get(i-1).endTime();
+                startTimes.add(totalTime_s);
+            }
+
+            generated = true;
         }
+    }
+
+    @Override
+    public boolean isGenerated(){
+        return generated;
+    }
+    
+    @Override
+    public State sample(double time_s){
+
+        int i = 0;
+        while(time_s < startTimes.get(i)) i++;
+
+        return trajs.get(i).sample(time_s - startTimes.get(i));
     }
 
 
