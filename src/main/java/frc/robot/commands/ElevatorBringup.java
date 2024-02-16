@@ -4,6 +4,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.OI;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.elevator.Elevator;
+import frc.robot.util.Util;
 
 public class ElevatorBringup extends Command {
   private final Drive drive;
@@ -19,8 +20,10 @@ public class ElevatorBringup extends Command {
   @Override
   public void initialize() {
     drive.setCurrentState(drive.DISABLED);
-    elevator.setCurrentState(elevator.IDLE);
+    elevator.setCurrentState(elevator.HOMING);
   }
+
+  boolean unlocked = true;
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
@@ -31,18 +34,24 @@ public class ElevatorBringup extends Command {
       }
 
       boolean up = OI.DR.getPOV() == 0, down = OI.DR.getPOV() == 180;
-      double manual = 2.0 * (up ? 1 : down ? -1 : 0);
+      double manual = 3.0 * (up ? 1 : down ? -1 : 0);
       if (up || down) {
         elevator.setCurrentState(elevator.MANUAL);
         elevator.setManualOutput(manual);
+      } else if (OI.DR.getXButton()) {
+        elevator.setTargetHeight(Util.lerp(Elevator.MIN_HEIGHT_M, Elevator.MAX_HEIGHT_M, 0.3333));
+        elevator.setCurrentState(elevator.CLIMBING);
+      } else if (OI.DR.getBButton()) {
+        elevator.setTargetHeight(Util.lerp(Elevator.MIN_HEIGHT_M, Elevator.MAX_HEIGHT_M, 0.6666));
+        elevator.setCurrentState(elevator.CLIMBING);
       } else if (!elevator.isState(elevator.IDLE)
           && !elevator.isState(elevator.HOMING)
           && !elevator.isState(elevator.RESETTING)) {
-        elevator.setTargetHeight(elevator.getTargetHeight());
+        if (OI.DR.getYButtonPressed()) unlocked = !unlocked;
+        if (unlocked) {
+          elevator.setTargetHeight(elevator.getHeight());
+        }
         elevator.setCurrentState(elevator.HOLDING);
-      }
-      if (OI.DR.getXButton()) {
-        elevator.setCurrentState(elevator.CLIMBING);
       }
     }
 

@@ -151,6 +151,10 @@ public class Elevator extends StateMachineSubsystemBase {
     return this.targetHeight_m;
   }
 
+  public double getHeight() {
+    return inputs.posMeters;
+  }
+
   public void setManualOutput(double manualOutput) {
     this.manualOutput = manualOutput;
   }
