@@ -80,7 +80,7 @@ public class Intake extends StateMachineSubsystemBase {
           @Override
           public void periodic() {
             if (beamBroken()) stop();
-            else intakeSpeed = -0.05;
+            else intakeSpeed = 0; // -0.05;
           }
         };
     INTAKING =
@@ -105,15 +105,15 @@ public class Intake extends StateMachineSubsystemBase {
           @Override
           public void init() {
             directionSpeed = 0.5;
-            intakeSpeed = 0.5;
+            // intakeSpeed = 0.5;
           }
         };
     SHOOTER_SIDE =
         new State("SHOOTER_SIDE") {
           @Override
           public void init() {
-            directionSpeed = -0.2;
-            intakeSpeed = 0.2;
+            directionSpeed = -0.8;
+            intakeSpeed = 0.8;
           }
         };
     SPITTING =

@@ -9,22 +9,22 @@ public class ShooterIOIdeal implements ShooterIO {
 
   @Override
   public void updateInputs(ShooterIOInputs inputs) {
-    inputs.feederVolts_V = 0.0;
-    inputs.feederVel_rps = this.feederVel_rps;
-    inputs.feederCurrent_A = 0.0;
-    inputs.flywheelVolts_V = 0.0;
-    inputs.flywheelVel_rps = this.flywheelVel_rps;
-    inputs.flywheelCurrent_A = new double[] {0.0, 0.0};
-    inputs.pivotVolts_V = 0.0;
-    inputs.pivotPos_r = this.pivotPos_r;
-    inputs.pivotAbsPos_r = this.pivotPos_r;
-    inputs.pivotVel_rps = 0.0;
-    inputs.pivotCurrent_A = 0.0;
-    inputs.turretVolts_V = 0.0;
-    inputs.turretPos_r = this.turretPos_r;
-    inputs.turretAbsPos_r = 0.0;
-    inputs.turretVel_rps = 0.0;
-    inputs.turretCurrent_A = 0.0;
+    inputs.feederVolts = 0.0;
+    inputs.feederVelRPS = this.feederVel_rps;
+    inputs.feederCurrent = 0.0;
+    inputs.flywheelVolts = 0.0;
+    inputs.flywheelVelRPS = this.flywheelVel_rps;
+    inputs.flywheelCurrent = new double[] {0.0, 0.0};
+    inputs.pivotVolts = 0.0;
+    inputs.pivotPosR = this.pivotPos_r;
+    inputs.pivotAbsPosR = this.pivotPos_r;
+    inputs.pivotVelRPS = 0.0;
+    inputs.pivotCurrent = 0.0;
+    inputs.turretVolts = 0.0;
+    inputs.turretPosR = this.turretPos_r;
+    inputs.turretAbsPosR = 0.0;
+    inputs.turretVelRPS = 0.0;
+    inputs.turretCurrent = 0.0;
     inputs.beamBreakActivated = false;
   }
 

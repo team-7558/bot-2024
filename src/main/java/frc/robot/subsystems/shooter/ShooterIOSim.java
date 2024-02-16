@@ -37,9 +37,9 @@ public class ShooterIOSim implements ShooterIO {
 
     sim.update(Constants.globalDelta_sec);
 
-    inputs.flywheelVel_rps = sim.getAngularVelocityRadPerSec() * 0.5 / Math.PI;
-    inputs.flywheelVolts_V = appliedVolts;
-    inputs.flywheelCurrent_A = new double[] {sim.getCurrentDrawAmps(), sim.getCurrentDrawAmps()};
+    inputs.flywheelVelRPS = sim.getAngularVelocityRadPerSec() * 0.5 / Math.PI;
+    inputs.flywheelVolts = appliedVolts;
+    inputs.flywheelCurrent = new double[] {sim.getCurrentDrawAmps(), sim.getCurrentDrawAmps()};
   }
 
   @Override

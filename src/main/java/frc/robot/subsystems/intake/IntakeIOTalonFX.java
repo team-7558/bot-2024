@@ -29,7 +29,7 @@ public class IntakeIOTalonFX implements IntakeIO {
 
   private final TalonFX topMotor = new TalonFX(3); // Not gunna be 0 1 (cameron told me to add that)
   private final TalonFX bottomMotor = new TalonFX(2);
-  private final DigitalInput beambreak = new DigitalInput(9);
+  private final DigitalInput beambreak = new DigitalInput(8);
 
   private final StatusSignal<Double> bottomVelocity = bottomMotor.getVelocity();
   private final StatusSignal<Double> bottomAppliedVolts = bottomMotor.getMotorVoltage();

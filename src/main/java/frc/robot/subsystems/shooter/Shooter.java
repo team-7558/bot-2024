@@ -125,7 +125,7 @@ public class Shooter extends StateMachineSubsystemBase {
     return instance;
   }
 
-  public final State DISABLED, IDLE, LOCKONT, SHOOTING, BEING_FED;
+  public final State DISABLED, IDLE, LOCKONT, SHOOTING, BEING_FED, MANUAL;
   private final ShooterIOInputsAutoLogged inputs = new ShooterIOInputsAutoLogged();
 
   private final ShooterIO io;
@@ -234,23 +234,43 @@ public class Shooter extends StateMachineSubsystemBase {
           public void exit() {}
         };
 
+    MANUAL =
+        new State("MANUAL") {
+          @Override
+          public void init() {
+            stop();
+          }
+
+          @Override
+          public void periodic() {
+            io.setFeederVolts(2);
+            io.setFlywheelVolts(2);
+          }
+
+          @Override
+          public void exit() {
+            stop();
+          }
+        };
+
     setCurrentState(DISABLED);
   }
 
   @Override
   public void inputPeriodic() {
     io.updateInputs(inputs);
+    Logger.processInputs("Shooter", inputs);
   }
 
   @Override
   public void outputPeriodic() {
-    io.setFeederVel(currSetpoints.feederVel_rps);
-    io.setFlywheelVel(currSetpoints.flywheel_rps);
-    io.setTurretPos(currSetpoints.turretPos_r);
-    io.setPivotPos(currSetpoints.pivotPos_r);
+    // io.setFeederVel(currSetpoints.feederVel_rps);
+    // io.setFlywheelVel(currSetpoints.flywheel_rps);
+    // io.setTurretPos(currSetpoints.turretPos_r);
+    // io.setPivotPos(currSetpoints.pivotPos_r);
 
-    SS2d.M.setShooterTilt(inputs.pivotPos_r * 360);
-    SS2d.M.setTurretAngle(inputs.turretPos_r * 360);
+    SS2d.M.setShooterTilt(inputs.pivotPosR * 360);
+    SS2d.M.setTurretAngle(inputs.turretPosR * 360);
 
     SS2d.S.setShooterTilt(currSetpoints.pivotPos_r * 360);
     SS2d.S.setTurretAngle(currSetpoints.turretPos_r * 360);
@@ -290,7 +310,7 @@ public class Shooter extends StateMachineSubsystemBase {
   /** Returns the current velocity in RPM. */
   public double getVelocityRPM() {
 
-    return 60 * (inputs.flywheelVel_rps);
+    return 60 * (inputs.flywheelVelRPS);
   }
 
   /** Runs forwards at the commanded voltage. */

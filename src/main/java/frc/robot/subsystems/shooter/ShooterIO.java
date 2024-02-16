@@ -6,25 +6,25 @@ public interface ShooterIO {
 
   @AutoLog
   public static class ShooterIOInputs {
-    public double feederVolts_V = 0.0;
-    public double feederVel_rps = 0.0;
-    public double feederCurrent_A = 0.0;
+    public double feederVolts = 0.0;
+    public double feederVelRPS = 0.0;
+    public double feederCurrent = 0.0;
 
-    public double flywheelVolts_V = 0.0;
-    public double flywheelVel_rps = 0.0;
-    public double[] flywheelCurrent_A = new double[] {};
+    public double flywheelVolts = 0.0;
+    public double flywheelVelRPS = 0.0;
+    public double[] flywheelCurrent = new double[] {};
 
-    public double pivotVolts_V = 0.0;
-    public double pivotPos_r = 0.0;
-    public double pivotAbsPos_r = 0.0;
-    public double pivotVel_rps = 0.0;
-    public double pivotCurrent_A = 0.0;
+    public double pivotVolts = 0.0;
+    public double pivotPosR = 0.0;
+    public double pivotAbsPosR = 0.0;
+    public double pivotVelRPS = 0.0;
+    public double pivotCurrent = 0.0;
 
-    public double turretVolts_V = 0.0;
-    public double turretPos_r = 0.0;
-    public double turretAbsPos_r = 0.0;
-    public double turretVel_rps = 0.0;
-    public double turretCurrent_A = 0.0;
+    public double turretVolts = 0.0;
+    public double turretPosR = 0.0;
+    public double turretAbsPosR = 0.0;
+    public double turretVelRPS = 0.0;
+    public double turretCurrent = 0.0;
 
     public boolean beamBreakActivated = false;
   }
