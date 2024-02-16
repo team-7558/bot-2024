@@ -31,6 +31,7 @@ public class VisionProcessingThread extends Thread {
               EstimatedRobotPose estimatedPose = poseOptional.get();
               camera.poses[camera.poseIndex] = estimatedPose.estimatedPose.toPose2d();
               camera.poseTimestamps[camera.poseIndex] = estimatedPose.timestampSeconds;
+              camera.tids[camera.poseIndex] = estimatedPose.targetsUsed.get(0).getFiducialId();
               camera.poseIndex++;
               camera.recentResult = latestResult;
               lastTimestamp = estimatedPose.timestampSeconds;

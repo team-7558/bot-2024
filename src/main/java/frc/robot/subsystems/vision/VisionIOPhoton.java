@@ -12,14 +12,16 @@ import org.photonvision.PhotonPoseEstimator.PoseStrategy;
 import org.photonvision.targeting.PhotonPipelineResult;
 import org.photonvision.targeting.PhotonTrackedTarget;
 
-public class VisionIOPhoton implements VisionIO {
+public class VisionIOPhoton implements ApriltagIO {
 
   public final PhotonCamera camera;
   public final PhotonPoseEstimator poseEstimator;
   public AprilTagFieldLayout fieldLayout = null;
   public final Transform3d transform;
-  public double[] poseTimestamps = new double[100];
+  public double[] poseTimestamps =
+      new double[100]; // TODO: figure out the max array size that we actually need
   public Pose2d[] poses = new Pose2d[100];
+  public double[] tids = new double[100];
   public PhotonPipelineResult recentResult;
   public int poseIndex = 0;
   public final double lastTimestamp = 0;
@@ -47,22 +49,22 @@ public class VisionIOPhoton implements VisionIO {
   }
 
   @Override
-  public void updateInputs(VisionIOInputs inputs) {
+  public void updateInputs(ApriltagIOInputs inputs) {
     inputs.poses = poses;
     inputs.poseTimestamps = poseTimestamps;
+    inputs.tids = tids;
     if (recentResult != null) {
       PhotonPipelineResult latestResult = recentResult;
       if (latestResult.hasTargets()) {
         PhotonTrackedTarget target = latestResult.getBestTarget();
         inputs.tagID = target.getFiducialId();
-        inputs.xOffset = target.getYaw();
-        inputs.yOffset = target.getPitch();
         inputs.pipelineID = camera.getPipelineIndex();
         inputs.timestamp = latestResult.getTimestampSeconds();
         inputs.latency = latestResult.getLatencyMillis();
       }
     }
     poseTimestamps = new double[100];
+    tids = new double[100];
     poseIndex = 0;
   }
 

@@ -14,7 +14,6 @@ import frc.robot.Constants.Mode;
 import frc.robot.Constants;
 import frc.robot.PerfTracker;
 import frc.robot.subsystems.drive.Drive;
-import frc.robot.subsystems.vision.VisionIO.VisionIOInputs;
 import frc.robot.util.Util;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -59,7 +58,7 @@ public class Vision extends SubsystemBase {
   public static Vision getInstance() {
     if (instance == null) {
 
-      VisionIO cam0, cam1, cam2, cam3;
+      ApriltagIO cam0, cam1, cam2, cam3;
 
       switch (Constants.currentMode) { // TODO: SET BACK TO NORMAL
         case REAL:
@@ -70,28 +69,18 @@ public class Vision extends SubsystemBase {
           //     new VisionIOPhoton("camera3", new Transform3d()); // TODO: update transform & name
           // VisionIO cam3 =
           //     new VisionIOPhoton("camera4", new Transform3d()); // TODO: update transform & name
-          // VisionIO limelight = new VisionIOLimelight("limelight"); // TODO: update name
-          instance = new Vision(cam0);
+          LimelightIO limelight = new LimelightIOReal("limelight");
+          instance = new Vision(limelight, cam0);
           break;
         case SIM:
-          cam0 = new VisionIOSim("camera0", new Transform3d());
-          // VisionIOSim camone =
-          //     new VisionIOSim("camera1", new Transform3d(-0.3, 0.1, 0.3, new Rotation3d(0, 90,
-          // 90)));
-          // VisionIOSim camtwo =
-          //     new VisionIOSim("camera1", new Transform3d(0.3, 0.1, -0.3, new Rotation3d(0, 90,
-          // 0)));
-          // VisionIOSim camthree =
-          //     new VisionIOSim("camera1", new Transform3d(-0.3, 0.1, -0.3, new Rotation3d(0, 90,
-          // 0)));
-          instance = new Vision(cam0);
+          // no sim
           break;
         case REPLAY:
           // idk yet
 
         default:
           // nothing yet
-          instance = new Vision(new VisionIOSim("camera0", new Transform3d()));
+          //
       }
     }
 
@@ -100,32 +89,28 @@ public class Vision extends SubsystemBase {
 
   private List<Pose2d> posesToLog;
 
-  private VisionIO cameras[];
-  private VisionIOInputsAutoLogged[] visionInputs;
+  private LimelightIO limelight;
+  public LimelightIOInputsAutoLogged limelightInputs;
 
-  private Vision(VisionIO... cameras) {
+  private ApriltagIO cameras[];
+  private ApriltagIOInputsAutoLogged[] visionInputs;
+
+  private Vision(LimelightIO limelight, ApriltagIO... cameras) {
     this.cameras = cameras;
     this.visionInputs =
-        new VisionIOInputsAutoLogged[] {
-          new VisionIOInputsAutoLogged(),
-          new VisionIOInputsAutoLogged(),
-          new VisionIOInputsAutoLogged(),
-          new VisionIOInputsAutoLogged()
+        new ApriltagIOInputsAutoLogged[] {
+          new ApriltagIOInputsAutoLogged(),
+          new ApriltagIOInputsAutoLogged(),
+          new ApriltagIOInputsAutoLogged(),
+          new ApriltagIOInputsAutoLogged()
         };
-
+    this.limelight = limelight;
+    this.limelightInputs = new LimelightIOInputsAutoLogged();
     posesToLog = new ArrayList<>();
   }
 
   public int getCameras() {
     return cameras.length;
-  }
-
-  public Pose2d[] getPoses() {
-    ArrayList<Pose2d> poses = new ArrayList<>();
-    for (VisionIOInputs input : visionInputs) {
-      poses.addAll(poses);
-    }
-    return poses.toArray(new Pose2d[0]);
   }
 
   public void setPipeline(int camera, int pipeline) {
@@ -134,14 +119,6 @@ public class Vision extends SubsystemBase {
 
   public int getPipeline(int camera) {
     return visionInputs[camera].pipelineID;
-  }
-
-  public double getXOffset(int camera) {
-    return visionInputs[camera].xOffset;
-  }
-
-  public double getYOffset(int camera) {
-    return visionInputs[camera].yOffset;
   }
 
   public int getTagID(int camera) {
@@ -158,7 +135,7 @@ public class Vision extends SubsystemBase {
 
   public boolean hasTagInView() {
     for (int i = 0; i < visionInputs.length; i++) {
-      VisionIOInputsAutoLogged input = visionInputs[i];
+      ApriltagIOInputsAutoLogged input = visionInputs[i];
       if (input.tagID != 1) {
         return true;
       }
@@ -167,7 +144,7 @@ public class Vision extends SubsystemBase {
   }
 
   public void managePipelines(int camID, Pose2d botpose) {
-    VisionIO cam = cameras[camID];
+    ApriltagIO cam = cameras[camID];
     boolean shouldSwitchToQuick = false;
     boolean shouldSwitchToClear = false;
 
@@ -232,13 +209,11 @@ public class Vision extends SubsystemBase {
     }
 
     if (shouldSwitchToClear) { // TODO: implement for noise reduction
-      // cam.setPipeline(CLEAR_PIPELINE_ID);
+      cam.setPipeline(CLEAR_PIPELINE_ID);
     }
   }
 
-  @Override
-  public void periodic() {
-    PerfTracker.start("Vision");
+  public void handleFrameData() {
     outer:
     for (int i = 0; i < cameras.length; i++) {
       cameras[i].updateInputs(visionInputs[i]);
@@ -247,18 +222,23 @@ public class Vision extends SubsystemBase {
           j < visionInputs[i].poses.length && j < visionInputs[i].poseTimestamps.length;
           j++) {
         double timestamp = visionInputs[i].poseTimestamps[j];
-        if (timestamp == 0)
+        if (timestamp == 0) {
+          managePipelines(i, Drive.getInstance().getPose());
           continue
               outer; // empty array means no more inputs in the processing frame so skip to next cam
+        }
         TimestampedPose pose = new TimestampedPose(visionInputs[i].poses[j], timestamp);
-        Drive.getInstance()
-            .addToPoseEstimator(
-                pose.pose,
-                pose.timestamp); // TODO: maybe make a lock so no concurrent mod exception
+        Drive.getInstance().addToPoseEstimator(pose.pose, pose.timestamp);
       }
       managePipelines(i, Drive.getInstance().getPose());
     }
+  }
 
+  @Override
+  public void periodic() {
+    PerfTracker.start("Vision");
+    Logger.processInputs("Vision/Limelight", limelightInputs);
+    handleFrameData();
     PerfTracker.end("Vision");
     Logger.recordOutput("Vision/TagSet", posesToLog.toArray(new Pose2d[0]));
     posesToLog.clear();
