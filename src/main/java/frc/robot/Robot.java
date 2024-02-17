@@ -108,9 +108,12 @@ public class Robot extends LoggedRobot {
     // This must be called from the robot's periodic block in order for anything in
     // the Command-based framework to work.
 
-    LED.getInstance()
-        .setRGB((int) ((0.5 + 0.5 * Math.sin(t.get() * 5)) * (LED.NUM_LEDS)), 128, 0, 0);
-    LED.getInstance().setRGB((int) ((0.5 + 0.5 * Math.cos(t.get() * 5)) * (LED.NUM_LEDS)), 1, 1, 1);
+    int r = (int) ((0.5 + 0.5 * Math.sin(t.get() * 10)) * (LED.HEIGHT));
+    int b = (int) ((0.5 + 0.5 * Math.cos(t.get() * 2.5)) * (LED.WIDTH));
+
+    LED.getInstance().drawCircle(15, 3, 3, 2, 2, 2);
+    LED.getInstance().drawRow(r, 64, 0, 0);
+    LED.getInstance().drawCol(b, 0, 0, 64);
 
     // LED.getInstance().setRGB((int) t.get(), 1, 0, 0);
     // LED.getInstance().setRGB((int) ((0.5 + 0.5 * Math.sin(t.get())) * (LED.NUM_LEDS)), 128, 0,

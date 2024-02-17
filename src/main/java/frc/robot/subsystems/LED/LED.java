@@ -1,9 +1,12 @@
 package frc.robot.subsystems.LED;
 
+import edu.wpi.first.math.util.Units;
 import org.littletonrobotics.junction.Logger;
 
 public class LED {
-  public static final int NUM_LEDS = 256;
+  public static final int WIDTH = 32;
+  public static final int HEIGHT = 8;
+  public static final int NUM_LEDS = WIDTH * HEIGHT;
 
   private static LED instance;
 
@@ -56,35 +59,44 @@ public class LED {
     setRangeHSV(0, NUM_LEDS, h, s, v);
   }
 
-  public void angleToPositionRGB(int angle, int r, int b, int g) {
-    buffer[(int) ((angle + 0.5) / 10)] = r;
-    buffer[(int) ((angle + 0.5) / 10) + 1] = g;
-    buffer[(int) ((angle + 0.5) / 10) + 2] = b;
-  }
-
-  public void angleToPositionHSV(int angle, int h, int s, int v) {
-    buffer[(int) ((angle + 0.5) / 10)] = h;
-    buffer[(int) ((angle + 0.5) / 10) + 1] = s;
-    buffer[(int) ((angle + 0.5) / 10) + 2] = v;
-  }
-
-  public void angleRangesToPositionRGB(int lowAngle, int highAngle, int r, int b, int g) {
-    for (int i = (int) ((lowAngle + 0.5) / 10); i < (int) ((highAngle + 0.5) / 10) * 3; i += 3) {
-      buffer[i] = r;
-      buffer[i + 1] = g;
-      buffer[i + 2] = b;
+  public void drawPoint(int x, int y, int r, int g, int b) {
+    if (x >= 0 && x < WIDTH && y >= 0 && y < HEIGHT) {
+      int i = (x * HEIGHT) + (x % 2 == 1 ? HEIGHT - 1 - y : y);
+      setRGB(i, r, g, b);
     }
   }
 
-  public void angleRangesToPositionHSV(int lowAngle, int highAngle, int h, int s, int v) {
-    for (int i = (int) ((lowAngle + 0.5) / 10); i < (int) ((highAngle + 0.5) / 10) * 3; i += 3) {
-      buffer[i] = h;
-      buffer[i + 1] = s;
-      buffer[i + 2] = v;
+  public void drawRow(int row, int r, int g, int b) {
+    for (int i = 0; i < WIDTH; i++) {
+      drawPoint(i, row, r, g, b);
     }
   }
 
-  public void setfixedPosition() {}
+  public void drawCol(int col, int r, int g, int b) {
+    for (int i = 0; i < HEIGHT; i++) {
+      drawPoint(col, i, r, g, b);
+    }
+  }
+
+  public void drawRect(int x0, int y0, int x1, int y1, int r, int g, int b) {
+    int minX = Math.min(x0, x1);
+    int maxX = Math.max(x0, x1);
+    int minY = Math.min(y0, y1);
+    int maxY = Math.min(y0, y1);
+
+    for (int x = minX; x < maxX; x++) {
+      for (int y = minY; y < maxY; y++) {
+        drawPoint(x, y, r, g, b);
+      }
+    }
+  }
+
+  public void drawCircle(int x, int y, int rad, int r, int g, int b) {
+    for (int t = 0; t < 360; t++) {
+      double tr = Units.degreesToRadians(t);
+      drawPoint(x + (int) (rad * Math.cos(tr)), y + (int) (rad * Math.sin(tr)), r, g, b);
+    }
+  }
 
   public void clearBuffer() {
     for (int i = 0; i < buffer.length; i++) {
