@@ -11,6 +11,7 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.DutyCycleEncoder;
 
 public class ShooterIOTalonFx implements ShooterIO {
 
@@ -25,7 +26,8 @@ public class ShooterIOTalonFx implements ShooterIO {
   private final TalonFX pivot = new TalonFX(7); // TODO: update
   private final TalonFX feeder = new TalonFX(8);
 
-  private final CANcoder turretCancoder = new CANcoder(6); // TODO: update
+  private final DutyCycleEncoder tAbsEnc = new DutyCycleEncoder(2); // TODO: update
+  private final DutyCycleEncoder pAbsEnc = new DutyCycleEncoder(3); // TODO: update
   // TODO: add throughbores
 
   private final DigitalInput beambreak = new DigitalInput(0);
@@ -103,7 +105,7 @@ public class ShooterIOTalonFx implements ShooterIO {
     pivotConfig.Slot0.kI = 0;
     pivotConfig.Slot0.kD = 0;
     pivotConfig.Slot0.kS = 0;
-    pivotConfig.Slot0.kV = 0.5;
+    pivotConfig.Slot0.kV = 0;
     pivotConfig.Slot0.kA = 0;
 
     // TODO: tune all of that & use absolute encoder
@@ -111,6 +113,11 @@ public class ShooterIOTalonFx implements ShooterIO {
     turret.getConfigurator().apply(turretConfig);
     feeder.getConfigurator().apply(feederConfig);
     pivot.getConfigurator().apply(pivotConfig);
+
+    tAbsEnc.setPositionOffset(0);
+    tAbsEnc.setDistancePerRotation(1);
+    pAbsEnc.setPositionOffset(0);
+    pAbsEnc.setDistancePerRotation(1);
 
     // TODO: tune
 
