@@ -108,12 +108,25 @@ public class Robot extends LoggedRobot {
     // This must be called from the robot's periodic block in order for anything in
     // the Command-based framework to work.
 
-    int r = (int) ((0.5 + 0.5 * Math.sin(t.get() * 10)) * (LED.HEIGHT));
-    int b = (int) ((0.5 + 0.5 * Math.cos(t.get() * 2.5)) * (LED.WIDTH));
+    int r = (int) ((0.5 + 0.5 * Math.sin(t.get() * 2)) * (LED.NUM_LEDS));
+    int g = (int) ((0.5 + 0.5 * Math.cos(t.get() * 3.14)) * (LED.NUM_LEDS));
+    int b = (int) ((0.5 + 0.5 * Math.cos(t.get() * 5)) * (LED.NUM_LEDS));
+    int i = (int) (t.get() * 20) % 64;
 
-    LED.getInstance().drawCircle(15, 3, 3, 2, 2, 2);
-    LED.getInstance().drawRow(r, 64, 0, 0);
-    LED.getInstance().drawCol(b, 0, 0, 64);
+    LED.getInstance().draw0(-i, 16, 16, 16);
+    LED.getInstance().draw1(-i + 8, 16, 16, 16);
+    LED.getInstance().draw2(-i + 16, 16, 16, 16);
+    LED.getInstance().draw3(-i + 24, 16, 16, 16);
+    LED.getInstance().draw4(-i + 32, 16, 16, 16);
+    LED.getInstance().draw5(-i + 40, 16, 16, 16);
+    LED.getInstance().draw6(-i + 48, 16, 16, 16);
+    LED.getInstance().draw7(-i + 56, 16, 16, 16);
+    LED.getInstance().draw8(-i + 64, 16, 16, 16);
+    LED.getInstance().draw9(-i + 72, 16, 16, 16);
+
+    LED.getInstance().scaleRangeRGB(r, g, 8, 0, 0);
+    LED.getInstance().scaleRangeRGB(g, b, 0, 0, 8);
+    // LED.getInstance().scaleRangeRGB(b, r, 1, 1, 1);
 
     // LED.getInstance().setRGB((int) t.get(), 1, 0, 0);
     // LED.getInstance().setRGB((int) ((0.5 + 0.5 * Math.sin(t.get())) * (LED.NUM_LEDS)), 128, 0,

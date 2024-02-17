@@ -33,6 +33,12 @@ public class LED {
     buffer[i * 3 + 2] += b;
   }
 
+  public void scaleRGB(int i, int r, int g, int b) {
+    buffer[i * 3] *= r;
+    buffer[i * 3 + 1] *= g;
+    buffer[i * 3 + 2] *= b;
+  }
+
   public void setHSV(int i, int h, int s, int v) {
     buffer[i * 3] += h;
     buffer[i * 3 + 1] += s;
@@ -42,6 +48,12 @@ public class LED {
   public void setRangeRGB(int low, int high, int r, int g, int b) {
     for (int i = low; i < high; i++) {
       setRGB(i, r, g, b);
+    }
+  }
+
+  public void scaleRangeRGB(int low, int high, int r, int g, int b) {
+    for (int i = low; i < high; i++) {
+      scaleRGB(i, r, g, b);
     }
   }
 
@@ -92,10 +104,283 @@ public class LED {
   }
 
   public void drawCircle(int x, int y, int rad, int r, int g, int b) {
-    for (int t = 0; t < 360; t++) {
-      double tr = Units.degreesToRadians(t);
+    for (int t = 0; t < 36; t++) {
+      double tr = Units.degreesToRadians(t * 10);
       drawPoint(x + (int) (rad * Math.cos(tr)), y + (int) (rad * Math.sin(tr)), r, g, b);
     }
+  }
+
+  public void draw0(int i, int r, int g, int b) {
+    drawPoint(i + 1, 2, r, g, b);
+    drawPoint(i + 1, 3, r, g, b);
+    drawPoint(i + 1, 4, r, g, b);
+    drawPoint(i + 1, 5, r, g, b);
+    drawPoint(i + 1, 6, r, g, b);
+
+    drawPoint(i + 2, 1, r, g, b);
+    drawPoint(i + 2, 6, r, g, b);
+    drawPoint(i + 2, 7, r, g, b);
+
+    drawPoint(i + 3, 1, r, g, b);
+    drawPoint(i + 3, 5, r, g, b);
+    drawPoint(i + 3, 7, r, g, b);
+
+    drawPoint(i + 4, 1, r, g, b);
+    drawPoint(i + 4, 4, r, g, b);
+    drawPoint(i + 4, 7, r, g, b);
+
+    drawPoint(i + 5, 1, r, g, b);
+    drawPoint(i + 5, 3, r, g, b);
+    drawPoint(i + 5, 7, r, g, b);
+
+    drawPoint(i + 6, 1, r, g, b);
+    drawPoint(i + 6, 2, r, g, b);
+    drawPoint(i + 6, 7, r, g, b);
+
+    drawPoint(i + 7, 2, r, g, b);
+    drawPoint(i + 7, 3, r, g, b);
+    drawPoint(i + 7, 4, r, g, b);
+    drawPoint(i + 7, 5, r, g, b);
+    drawPoint(i + 7, 6, r, g, b);
+  }
+
+  public void draw1(int i, int r, int g, int b) {
+    drawPoint(i + 6, 1, r, g, b);
+
+    drawPoint(i + 7, 1, r, g, b);
+    drawPoint(i + 7, 2, r, g, b);
+    drawPoint(i + 7, 3, r, g, b);
+    drawPoint(i + 7, 4, r, g, b);
+    drawPoint(i + 7, 5, r, g, b);
+    drawPoint(i + 7, 6, r, g, b);
+  }
+
+  public void draw2(int i, int r, int g, int b) {
+    drawPoint(i + 1, 5, r, g, b);
+    drawPoint(i + 1, 6, r, g, b);
+
+    drawPoint(i + 2, 1, r, g, b);
+    drawPoint(i + 2, 4, r, g, b);
+    drawPoint(i + 2, 7, r, g, b);
+
+    drawPoint(i + 3, 1, r, g, b);
+    drawPoint(i + 3, 4, r, g, b);
+    drawPoint(i + 3, 7, r, g, b);
+
+    drawPoint(i + 4, 1, r, g, b);
+    drawPoint(i + 4, 4, r, g, b);
+    drawPoint(i + 4, 7, r, g, b);
+
+    drawPoint(i + 5, 1, r, g, b);
+    drawPoint(i + 5, 4, r, g, b);
+    drawPoint(i + 5, 7, r, g, b);
+
+    drawPoint(i + 6, 1, r, g, b);
+    drawPoint(i + 6, 4, r, g, b);
+    drawPoint(i + 6, 7, r, g, b);
+
+    drawPoint(i + 7, 2, r, g, b);
+    drawPoint(i + 7, 3, r, g, b);
+  }
+
+  public void draw3(int i, int r, int g, int b) {
+    drawPoint(i + 2, 1, r, g, b);
+    drawPoint(i + 2, 4, r, g, b);
+    drawPoint(i + 2, 7, r, g, b);
+
+    drawPoint(i + 3, 1, r, g, b);
+    drawPoint(i + 3, 4, r, g, b);
+    drawPoint(i + 3, 7, r, g, b);
+
+    drawPoint(i + 4, 1, r, g, b);
+    drawPoint(i + 4, 4, r, g, b);
+    drawPoint(i + 4, 7, r, g, b);
+
+    drawPoint(i + 5, 1, r, g, b);
+    drawPoint(i + 5, 4, r, g, b);
+    drawPoint(i + 5, 7, r, g, b);
+
+    drawPoint(i + 6, 1, r, g, b);
+    drawPoint(i + 6, 4, r, g, b);
+    drawPoint(i + 6, 7, r, g, b);
+
+    drawPoint(i + 7, 2, r, g, b);
+    drawPoint(i + 7, 3, r, g, b);
+    drawPoint(i + 7, 5, r, g, b);
+    drawPoint(i + 7, 6, r, g, b);
+  }
+
+  public void draw4(int i, int r, int g, int b) {
+    drawPoint(i + 1, 1, r, g, b);
+    drawPoint(i + 1, 2, r, g, b);
+    drawPoint(i + 1, 3, r, g, b);
+
+    drawPoint(i + 2, 4, r, g, b);
+
+    drawPoint(i + 3, 4, r, g, b);
+
+    drawPoint(i + 4, 4, r, g, b);
+
+    drawPoint(i + 5, 4, r, g, b);
+
+    drawPoint(i + 6, 4, r, g, b);
+
+    drawPoint(i + 7, 1, r, g, b);
+    drawPoint(i + 7, 2, r, g, b);
+    drawPoint(i + 7, 3, r, g, b);
+    drawPoint(i + 7, 4, r, g, b);
+    drawPoint(i + 7, 5, r, g, b);
+    drawPoint(i + 7, 6, r, g, b);
+  }
+
+  public void draw5(int i, int r, int g, int b) {
+    drawPoint(i + 1, 2, r, g, b);
+    drawPoint(i + 1, 3, r, g, b);
+    drawPoint(i + 1, 4, r, g, b);
+
+    drawPoint(i + 2, 1, r, g, b);
+    drawPoint(i + 2, 4, r, g, b);
+    drawPoint(i + 2, 7, r, g, b);
+
+    drawPoint(i + 3, 1, r, g, b);
+    drawPoint(i + 3, 4, r, g, b);
+    drawPoint(i + 3, 7, r, g, b);
+
+    drawPoint(i + 4, 1, r, g, b);
+    drawPoint(i + 4, 4, r, g, b);
+    drawPoint(i + 4, 7, r, g, b);
+
+    drawPoint(i + 5, 1, r, g, b);
+    drawPoint(i + 5, 4, r, g, b);
+    drawPoint(i + 5, 7, r, g, b);
+
+    drawPoint(i + 6, 1, r, g, b);
+    drawPoint(i + 6, 4, r, g, b);
+    drawPoint(i + 6, 7, r, g, b);
+
+    drawPoint(i + 7, 5, r, g, b);
+    drawPoint(i + 7, 6, r, g, b);
+  }
+
+  public void draw6(int i, int r, int g, int b) {
+    drawPoint(i + 1, 2, r, g, b);
+    drawPoint(i + 1, 3, r, g, b);
+    drawPoint(i + 1, 4, r, g, b);
+    drawPoint(i + 1, 5, r, g, b);
+    drawPoint(i + 1, 6, r, g, b);
+
+    drawPoint(i + 2, 1, r, g, b);
+    drawPoint(i + 2, 4, r, g, b);
+    drawPoint(i + 2, 7, r, g, b);
+
+    drawPoint(i + 3, 1, r, g, b);
+    drawPoint(i + 3, 4, r, g, b);
+    drawPoint(i + 3, 7, r, g, b);
+
+    drawPoint(i + 4, 1, r, g, b);
+    drawPoint(i + 4, 4, r, g, b);
+    drawPoint(i + 4, 7, r, g, b);
+
+    drawPoint(i + 5, 1, r, g, b);
+    drawPoint(i + 5, 4, r, g, b);
+    drawPoint(i + 5, 7, r, g, b);
+
+    drawPoint(i + 6, 1, r, g, b);
+    drawPoint(i + 6, 4, r, g, b);
+    drawPoint(i + 6, 7, r, g, b);
+
+    drawPoint(i + 7, 5, r, g, b);
+    drawPoint(i + 7, 6, r, g, b);
+  }
+
+  public void draw7(int i, int r, int g, int b) {
+    drawPoint(i + 1, 1, r, g, b);
+
+    drawPoint(i + 2, 1, r, g, b);
+    drawPoint(i + 2, 6, r, g, b);
+    drawPoint(i + 2, 7, r, g, b);
+
+    drawPoint(i + 3, 1, r, g, b);
+    drawPoint(i + 3, 5, r, g, b);
+    drawPoint(i + 3, 6, r, g, b);
+
+    drawPoint(i + 4, 1, r, g, b);
+    drawPoint(i + 4, 4, r, g, b);
+    drawPoint(i + 4, 5, r, g, b);
+
+    drawPoint(i + 5, 1, r, g, b);
+    drawPoint(i + 5, 3, r, g, b);
+    drawPoint(i + 5, 4, r, g, b);
+
+    drawPoint(i + 6, 1, r, g, b);
+    drawPoint(i + 6, 2, r, g, b);
+    drawPoint(i + 6, 3, r, g, b);
+
+    drawPoint(i + 7, 1, r, g, b);
+    drawPoint(i + 7, 2, r, g, b);
+  }
+
+  public void draw8(int i, int r, int g, int b) {
+    drawPoint(i + 1, 2, r, g, b);
+    drawPoint(i + 1, 3, r, g, b);
+    drawPoint(i + 1, 5, r, g, b);
+    drawPoint(i + 1, 6, r, g, b);
+
+    drawPoint(i + 2, 1, r, g, b);
+    drawPoint(i + 2, 4, r, g, b);
+    drawPoint(i + 2, 7, r, g, b);
+
+    drawPoint(i + 3, 1, r, g, b);
+    drawPoint(i + 3, 4, r, g, b);
+    drawPoint(i + 3, 7, r, g, b);
+
+    drawPoint(i + 4, 1, r, g, b);
+    drawPoint(i + 4, 4, r, g, b);
+    drawPoint(i + 4, 7, r, g, b);
+
+    drawPoint(i + 5, 1, r, g, b);
+    drawPoint(i + 5, 4, r, g, b);
+    drawPoint(i + 5, 7, r, g, b);
+
+    drawPoint(i + 6, 1, r, g, b);
+    drawPoint(i + 6, 4, r, g, b);
+    drawPoint(i + 6, 7, r, g, b);
+
+    drawPoint(i + 7, 2, r, g, b);
+    drawPoint(i + 7, 3, r, g, b);
+    drawPoint(i + 7, 5, r, g, b);
+    drawPoint(i + 7, 6, r, g, b);
+  }
+
+  public void draw9(int i, int r, int g, int b) {
+    drawPoint(i + 1, 2, r, g, b);
+    drawPoint(i + 1, 3, r, g, b);
+
+    drawPoint(i + 2, 1, r, g, b);
+    drawPoint(i + 2, 4, r, g, b);
+    drawPoint(i + 2, 7, r, g, b);
+
+    drawPoint(i + 3, 1, r, g, b);
+    drawPoint(i + 3, 4, r, g, b);
+    drawPoint(i + 3, 7, r, g, b);
+
+    drawPoint(i + 4, 1, r, g, b);
+    drawPoint(i + 4, 4, r, g, b);
+    drawPoint(i + 4, 7, r, g, b);
+
+    drawPoint(i + 5, 1, r, g, b);
+    drawPoint(i + 5, 4, r, g, b);
+    drawPoint(i + 5, 7, r, g, b);
+
+    drawPoint(i + 6, 1, r, g, b);
+    drawPoint(i + 6, 4, r, g, b);
+    drawPoint(i + 6, 7, r, g, b);
+
+    drawPoint(i + 7, 2, r, g, b);
+    drawPoint(i + 7, 3, r, g, b);
+    drawPoint(i + 7, 4, r, g, b);
+    drawPoint(i + 7, 5, r, g, b);
+    drawPoint(i + 7, 6, r, g, b);
   }
 
   public void clearBuffer() {
