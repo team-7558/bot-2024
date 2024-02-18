@@ -50,6 +50,7 @@ public class Drive extends StateMachineSubsystemBase {
   public static final double MAX_LINEAR_SPEED = Units.feetToMeters(14.5);
   private static final double TRACK_WIDTH_X = Units.inchesToMeters(25.0);
   private static final double TRACK_WIDTH_Y = Units.inchesToMeters(25.0);
+  private static double ROTATION_RATIO = MAX_LINEAR_SPEED / 1.4104;
   private static final double SKEW_CONSTANT = 0.06;
   private static final double DRIVE_BASE_RADIUS =
       Math.hypot(TRACK_WIDTH_X / 2.0, TRACK_WIDTH_Y / 2.0);
@@ -199,7 +200,7 @@ public class Drive extends StateMachineSubsystemBase {
           public void periodic() {
             double throttle = 1.0;
             throttle = Util.lerp(1, 0.4, OI.DR.getRightTriggerAxis() * OI.DR.getRightTriggerAxis());
-            drive(-OI.DR.getLeftY(), -OI.DR.getLeftX(), -OI.DR.getRightX() * 0.5, throttle);
+            drive(-OI.DR.getLeftY(), -OI.DR.getLeftX(), -OI.DR.getRightX(), throttle);
           }
         };
 
@@ -349,16 +350,14 @@ public class Drive extends StateMachineSubsystemBase {
 
     // Convert to field relative speeds & send command
 
+    System.out.println();
+
     runVelocity(
         ChassisSpeeds.fromFieldRelativeSpeeds(
-            (linearVelocity.getX() * MAX_LINEAR_SPEED) * throttle,
-            (linearVelocity.getY() * MAX_LINEAR_SPEED) * throttle,
+            (linearVelocity.getX() * MAX_LINEAR_SPEED * ROTATION_RATIO) * throttle,
+            (linearVelocity.getY() * MAX_LINEAR_SPEED * ROTATION_RATIO) * throttle,
             omega * MAX_ANGULAR_SPEED,
-            getPose()
-                .getRotation()
-                .plus(
-                    new Rotation2d(
-                        getAngularVelocity() * SKEW_CONSTANT)))); // TODO: tune skew constant
+            getPose().getRotation())); // TODO: tune skew constant
   }
 
   public void zeroGyro() {}
@@ -372,7 +371,7 @@ public class Drive extends StateMachineSubsystemBase {
     // Calculate module setpoints
     ChassisSpeeds discreteSpeeds = ChassisSpeeds.discretize(speeds, 0.02);
     SwerveModuleState[] setpointStates = kinematics.toSwerveModuleStates(discreteSpeeds);
-    SwerveDriveKinematics.desaturateWheelSpeeds(setpointStates, MAX_LINEAR_SPEED);
+    SwerveDriveKinematics.desaturateWheelSpeeds(setpointStates, MAX_LINEAR_SPEED * ROTATION_RATIO);
 
     // Send setpoints to modules
     SwerveModuleState[] optimizedSetpointStates = new SwerveModuleState[4];

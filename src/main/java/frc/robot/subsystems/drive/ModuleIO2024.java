@@ -7,9 +7,7 @@ import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.Slot1Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
-import com.ctre.phoenix6.controls.PositionTorqueCurrentFOC;
 import com.ctre.phoenix6.controls.PositionVoltage;
-import com.ctre.phoenix6.controls.VelocityTorqueCurrentFOC;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.CANcoder;
@@ -54,11 +52,6 @@ public class ModuleIO2024 implements ModuleIO {
   private final StatusSignal<Double> turnVelocity;
   private final StatusSignal<Double> turnAppliedVolts;
   private final StatusSignal<Double> turnCurrent;
-
-  private final PositionTorqueCurrentFOC turnPositionSetpoint =
-      new PositionTorqueCurrentFOC(0, 0, 0, 1, false, false, false);
-  private final VelocityTorqueCurrentFOC driveVelocitySetpoint =
-      new VelocityTorqueCurrentFOC(0, 0, 0, 1, false, false, false);
 
   private final VoltageOut driveVoltageSetpoint = new VoltageOut(0, true, false, false, false);
   private final VoltageOut turnVoltageSetpoint = new VoltageOut(0);
@@ -192,9 +185,8 @@ public class ModuleIO2024 implements ModuleIO {
         turnVelocity,
         turnAppliedVolts,
         turnCurrent);
-    // driveTalon.optimizeBusUtilization();
-    // turnTalon.optimizeBusUtilization();
-
+    driveTalon.optimizeBusUtilization();
+    turnTalon.optimizeBusUtilization();
   }
 
   @Override
@@ -276,7 +268,7 @@ public class ModuleIO2024 implements ModuleIO {
 
     // driveTalon.setControl(new PositionVoltage(velocity, 0, true, velocity, 0, false, false,
     // false));
-    driveTalon.setControl(driveVelocitySetpoint.withVelocity(velocity));
+    driveTalon.setControl(driveVelocitySetpoint_v.withVelocity(velocity).withEnableFOC(true));
   }
 
   @Override
