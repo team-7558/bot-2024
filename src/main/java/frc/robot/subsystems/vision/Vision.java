@@ -62,9 +62,24 @@ public class Vision extends SubsystemBase {
 
       switch (Constants.currentMode) { // TODO: SET BACK TO NORMAL
         case REAL:
-          cam0 = new VisionIOPhoton("BL", new Transform3d(0.25,0,0.3,new Rotation3d(0,0,0))); // TODO: update transform & name
-          cam1 = new VisionIOPhoton("BR", new Transform3d(-0.25,0,0.3, new Rotation3d(0,0,0)));
-          // VisionIO cam1 =
+          cam0 =
+              new VisionIOPhoton(
+                  "BL",
+                  new Transform3d(
+                      0.56,
+                      0,
+                      0,
+                      new Rotation3d(-10, 10, -3.927))); // TODO: update transform & name
+          cam1 =
+              new VisionIOPhoton(
+                  "BR",
+                  new Transform3d(
+                      0.56,
+                      0,
+                      0,
+                      new Rotation3d(
+                          Units.degreesToRadians(10), Units.degreesToRadians(10), 3.927)));
+          // VisionIO cam1 =7
           //     new VisionIOPhoton("camera2", new Transform3d()); // TODO: update transform & name
           // VisionIO cam2 =
           //     new VisionIOPhoton("camera3", new Transform3d()); // TODO: update transform & name
