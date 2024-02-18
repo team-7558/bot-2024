@@ -58,10 +58,9 @@ public class RobotTeleop extends Command {
       // x stance while shooting
       if (OI.DR.getPOV() == 180) {
         drive.setPose(new Pose2d());
-      } else
-      // autolocking
-      if (OI.DR.getXButton()) {
-        drive.setAutolockSetpoint(-61.19); // TODO: make source
+        drive.zeroGyro();
+      } else if (OI.DR.getXButton()) {
+        drive.setAutolockSetpoint(-61.19);
         drive.setCurrentState(drive.STRAFE_AUTOLOCK);
       } else if (OI.DR.getAButton()) { // TODO: make speaker
         drive.setAutolockSetpoint(1.57);
@@ -72,36 +71,12 @@ public class RobotTeleop extends Command {
       } else if (OI.DR.getYButton()) { // TODO: make trap
         drive.setAutolockSetpoint(3.141);
         drive.setCurrentState(drive.STRAFE_AUTOLOCK);
-      } else if (OI.DR.getLeftTriggerAxis() > 0) { // TODO: auto drive to set location
+      } else if (OI.DR.getRightTriggerAxis() > 0) {
 
-      } else if (OI.XK.get(0, 7)) { // zero gyro bottom left of xkeys
-        drive.zeroGyro();
-      } else if (OI.XK.get(2, 5)) { // INTAKE SPEAKER
-
-      } else if (OI.XK.get(0, 5)) { // INTAKE AMP
-
-      } else if (OI.XK.get(2, 1)) { // SHOOT AT TARGET
-
-      } else if (OI.XK.get(5, 0)) { // TRAP SCORING
-
-      } else if (OI.XK.get(0, 0)) { // HANG UP
-
-      } else if (OI.XK.get(0, 1)) { // HANG DOWn
-
-      }
-
-      // according to marco and lucca's wants
-
-      else {
+      } else {
         // strafe and turn if not other state
         drive.setCurrentState(drive.STRAFE_N_TURN);
       }
-
-      // if (OI.XK.get(0, 0)) {
-      //   drive.setModuleModes(Mode.VOLTAGE);
-      // } else if (OI.XK.get(0, 1)) {
-      //   drive.setModuleModes(Mode.SETPOINT);
-      // }
     }
 
     if (!elevator.isState(elevator.DISABLED)) {

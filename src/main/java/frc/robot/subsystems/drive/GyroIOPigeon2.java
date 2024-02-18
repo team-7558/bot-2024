@@ -24,7 +24,7 @@ import java.util.Queue;
 
 /** IO implementation for Pigeon2 */
 public class GyroIOPigeon2 implements GyroIO {
-  private final Pigeon2 pigeon = new Pigeon2(20);
+  private final Pigeon2 pigeon = new Pigeon2(13, "Optimus");
   private final StatusSignal<Double> yaw = pigeon.getYaw();
   private final Queue<Double> yawPositionQueue;
   private final StatusSignal<Double> yawVelocity = pigeon.getAngularVelocityZWorld();
@@ -49,5 +49,10 @@ public class GyroIOPigeon2 implements GyroIO {
             .map((Double value) -> Rotation2d.fromDegrees(value))
             .toArray(Rotation2d[]::new);
     yawPositionQueue.clear();
+  }
+
+  @Override
+  public void zero() {
+    pigeon.setYaw(0);
   }
 }

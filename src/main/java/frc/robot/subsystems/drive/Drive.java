@@ -38,7 +38,6 @@ import frc.robot.Constants;
 import frc.robot.OI;
 import frc.robot.subsystems.StateMachineSubsystemBase;
 import frc.robot.subsystems.drive.Module.Mode;
-import frc.robot.subsystems.vision.Vision;
 import frc.robot.util.LocalADStarAK;
 import frc.robot.util.Util;
 import java.util.concurrent.locks.Lock;
@@ -51,6 +50,7 @@ public class Drive extends StateMachineSubsystemBase {
   public static final double MAX_LINEAR_SPEED = Units.feetToMeters(14.5);
   private static final double TRACK_WIDTH_X = Units.inchesToMeters(25.0);
   private static final double TRACK_WIDTH_Y = Units.inchesToMeters(25.0);
+  private static double ROTATION_RATIO = MAX_LINEAR_SPEED / 1.4104;
   private static final double SKEW_CONSTANT = 0.06;
   private static final double DRIVE_BASE_RADIUS =
       Math.hypot(TRACK_WIDTH_X / 2.0, TRACK_WIDTH_Y / 2.0);
@@ -91,11 +91,11 @@ public class Drive extends StateMachineSubsystemBase {
           //     new ModuleIO2023(3));
           instance =
               new Drive(
-                  new GyroIO() {},
-                  new ModuleIO() {},
-                  new ModuleIO() {},
-                  new ModuleIO() {},
-                  new ModuleIO() {});
+                  new GyroIOPigeon2(),
+                  new ModuleIO2024(0),
+                  new ModuleIO2024(1),
+                  new ModuleIO2024(2),
+                  new ModuleIO2024(3));
           break;
 
         case SIM:
@@ -154,6 +154,8 @@ public class Drive extends StateMachineSubsystemBase {
     modules[BL] = new Module(blModuleIO, BL, Mode.SETPOINT);
     modules[BR] = new Module(brModuleIO, BR, Mode.SETPOINT);
 
+    PhoenixOdometryThread.getInstance().start();
+
     // Configure AutoBuilder for PathPlanner
     AutoBuilder.configureHolonomic(
         this::getPose,
@@ -205,8 +207,8 @@ public class Drive extends StateMachineSubsystemBase {
           @Override
           public void periodic() {
             double throttle = 1.0;
-            throttle = Util.lerp(1, 0.2, OI.DR.getRightTriggerAxis());
-            drive(-OI.DR.getLeftY(), -OI.DR.getLeftX(), -OI.DR.getRightX() * 0.5, throttle);
+            throttle = Util.lerp(1, 0.4, OI.DR.getRightTriggerAxis() * OI.DR.getRightTriggerAxis());
+            drive(-OI.DR.getLeftY(), -OI.DR.getLeftX(), -OI.DR.getRightX(), throttle);
           }
         };
 
@@ -215,7 +217,7 @@ public class Drive extends StateMachineSubsystemBase {
           @Override
           public void periodic() {
             double throttle = 1.0;
-            throttle = Util.lerp(1, 0.2, OI.DR.getRightTriggerAxis());
+            throttle = Util.lerp(1, 0.4, OI.DR.getRightTriggerAxis() * OI.DR.getRightTriggerAxis());
             double err =
                 Math.IEEEremainder(
                     getPose().getRotation().getRadians() - Units.degreesToRadians(autolockSetpoint),
@@ -235,9 +237,6 @@ public class Drive extends StateMachineSubsystemBase {
             new Pose2d(),
             VecBuilder.fill(0.1, 0.1, 0.05),
             VecBuilder.fill(0.5, 0.5, 0.5)); // TODO: TUNE STANDARD DEVIATIONS
-  }
-
-  public void zeroGyro() { // TODO: make work
   }
 
   @Override
@@ -307,37 +306,41 @@ public class Drive extends StateMachineSubsystemBase {
 
     // TODO: see if this works on a bot, also clean up, Vision should provide poses with timestamp
     // to Drive
-    Vision vision = Vision.getInstance();
-    if (vision.hasTagInView()) {
-      for (int i = 0; i < vision.getCameras(); i++) {
-        int tagID = (int) vision.getTagID(i);
-        if (tagID > 0) {
-          double timestamp = vision.getTimestamp(i);
+    // Vision vision = Vision.getInstance();
+    // if (vision.hasTagInView()) {
+    //   for (int i = 0; i < vision.getCameras(); i++) {
+    //     int tagID = (int) vision.getTagID(i);
+    //     if (tagID > 0) {
+    //       double timestamp = vision.getTimestamp(i);
 
-          // where the ACTUAL tag is
-          Pose2d tagPose2d = Vision.AT_MAP.getTagPose(tagID).get().toPose2d();
+    //       // where the ACTUAL tag is
+    //       Pose2d tagPose2d = Vision.AT_MAP.getTagPose(tagID).get().toPose2d();
 
-          // where this camera thinks it is
-          Pose2d estimatedPose = vision.getPose(i);
+    //       // where this camera thinks it is
+    //       Pose2d estimatedPose = vision.getPose(i);
 
-          // distance between tag and estimated pose
-          double translationDistance =
-              tagPose2d.getTranslation().getDistance(getPose().getTranslation());
+    //       // distance between tag and estimated pose
+    //       double translationDistance =
+    //           tagPose2d.getTranslation().getDistance(getPose().getTranslation());
 
-          // implementing cutoff
-          if (translationDistance > CUTOFF_DISTANCE) continue;
+    //       // implementing cutoff
+    //       if (translationDistance > CUTOFF_DISTANCE) continue;
 
-          // adding to the pose estimator with the timestamp
-          // poseEstimator.addVisionMeasurement(estimatedPose, timestamp);
+    //       // adding to the pose estimator with the timestamp
+    //       poseEstimator.addVisionMeasurement(estimatedPose, timestamp);
 
-        } else {
+    //     } else {
 
-        }
-      }
-    }
+    //     }
+    //   }
+    // }
   }
 
   public void drive(double x, double y, double w, double throttle) {
+    if (DriverStation.getAlliance().get() == Alliance.Blue) {
+      x = -x;
+      y = -y;
+    }
     // Apply deadband
     double linearMagnitude = MathUtil.applyDeadband(Math.hypot(x, y), Constants.driveDeadband);
     Rotation2d linearDirection = new Rotation2d(x, y);
@@ -354,17 +357,18 @@ public class Drive extends StateMachineSubsystemBase {
             .getTranslation();
 
     // Convert to field relative speeds & send command
+
+    System.out.println();
+
     runVelocity(
         ChassisSpeeds.fromFieldRelativeSpeeds(
-            (linearVelocity.getX() * MAX_LINEAR_SPEED) * throttle,
-            (linearVelocity.getY() * MAX_LINEAR_SPEED) * throttle,
+            (linearVelocity.getX() * MAX_LINEAR_SPEED * ROTATION_RATIO) * throttle,
+            (linearVelocity.getY() * MAX_LINEAR_SPEED * ROTATION_RATIO) * throttle,
             omega * MAX_ANGULAR_SPEED,
-            getPose()
-                .getRotation()
-                .plus(
-                    new Rotation2d(
-                        getAngularVelocity() * SKEW_CONSTANT)))); // TODO: tune skew constant
+            getPose().getRotation())); // TODO: tune skew constant
   }
+
+  public void zeroGyro() {}
 
   /**
    * Runs the drive at the desired velocity.
@@ -375,7 +379,7 @@ public class Drive extends StateMachineSubsystemBase {
     // Calculate module setpoints
     ChassisSpeeds discreteSpeeds = ChassisSpeeds.discretize(speeds, 0.02);
     SwerveModuleState[] setpointStates = kinematics.toSwerveModuleStates(discreteSpeeds);
-    SwerveDriveKinematics.desaturateWheelSpeeds(setpointStates, MAX_LINEAR_SPEED);
+    SwerveDriveKinematics.desaturateWheelSpeeds(setpointStates, MAX_LINEAR_SPEED * ROTATION_RATIO);
 
     // Send setpoints to modules
     SwerveModuleState[] optimizedSetpointStates = new SwerveModuleState[4];
@@ -387,6 +391,16 @@ public class Drive extends StateMachineSubsystemBase {
     // Log setpoint states
     Logger.recordOutput("SwerveStates/Setpoints", setpointStates);
     Logger.recordOutput("SwerveStates/SetpointsOptimized", optimizedSetpointStates);
+  }
+
+  public void setBrakeMode(boolean brake) {
+    for (var module : modules) {
+      module.setBrakeMode(brake);
+    }
+  }
+
+  public boolean getBrakeMode() {
+    return modules[FL].getBrakeMode();
   }
 
   /** Stops the drive. */

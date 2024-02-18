@@ -13,12 +13,14 @@
 
 package frc.robot;
 
+import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.vision.Vision;
+
 import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
 import org.littletonrobotics.junction.Logger;
@@ -33,8 +35,11 @@ import org.littletonrobotics.junction.wpilog.WPILOGWriter;
  * project.
  */
 public class Robot extends LoggedRobot {
+
   private Command autonomousCommand;
   private RobotContainer robotContainer;
+
+  boolean lastState = false;
 
   protected Robot() {
     super(Constants.globalDelta_sec);
@@ -43,6 +48,17 @@ public class Robot extends LoggedRobot {
     Intake.getInstance();
     Drive.getInstance();
     Vision.getInstance();
+  }
+
+  @Override
+  public void disabledPeriodic() {
+    boolean buttonPressed = RobotController.getUserButton();
+    if (buttonPressed && !lastState) {
+      System.out.println("AAAAAH");
+      Drive.getInstance().setBrakeMode(!Drive.getInstance().getBrakeMode());
+    }
+
+    lastState = buttonPressed;
   }
 
   /**
@@ -73,7 +89,7 @@ public class Robot extends LoggedRobot {
     switch (Constants.currentMode) {
       case REAL:
         // Running on a real robot, log to a USB stick ("/U/logs")
-        Logger.addDataReceiver(new WPILOGWriter());
+        Logger.addDataReceiver(new WPILOGWriter("/media/sda1/"));
         Logger.addDataReceiver(new NT4Publisher());
         break;
 
@@ -119,10 +135,6 @@ public class Robot extends LoggedRobot {
   /** This function is called once when the robot is disabled. */
   @Override
   public void disabledInit() {}
-
-  /** This function is called periodically when disabled. */
-  @Override
-  public void disabledPeriodic() {}
 
   /** This autonomous runs the autonomous command selected by your {@link RobotContainer} class. */
   @Override

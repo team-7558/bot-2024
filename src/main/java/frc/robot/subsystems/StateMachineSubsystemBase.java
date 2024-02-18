@@ -172,7 +172,9 @@ public abstract class StateMachineSubsystemBase extends SubsystemBase {
     inputPeriodic();
     currentState.basePeriodic();
     outputPeriodic();
-    PerfTracker.end(this.getName());
+    Logger.recordOutput(
+        "PerfMs/" + this.getName(),
+        Util.FPGATimeDelta_ms(Logger.getRealTimestamp(), Logger.getRealTimestamp()));
     Logger.recordOutput(this.getName() + "/State", currentState.name);
   }
 

@@ -193,23 +193,23 @@ public class ModuleIO2023 implements ModuleIO {
         turnAppliedVolts,
         turnCurrent);
 
-    inputs.drivePositionRad = Units.rotationsToRadians(drivePosition.getValueAsDouble());
-    inputs.driveVelocityRadPerSec = Units.rotationsToRadians(driveVelocity.getValueAsDouble());
-    inputs.driveAppliedVolts = driveAppliedVolts.getValueAsDouble();
-    inputs.driveCurrentAmps = new double[] {driveCurrent.getValueAsDouble()};
+    inputs.drivePos_r = drivePosition.getValueAsDouble();
+    inputs.driveVel_rps = driveVelocity.getValueAsDouble();
+    inputs.driveVolts_V = driveAppliedVolts.getValueAsDouble();
+    inputs.driveCurrent_A = new double[] {driveCurrent.getValueAsDouble()};
 
-    inputs.turnAbsolutePosition =
+    inputs.turnAbsPos_rot2d =
         Rotation2d.fromRotations(turnAbsolutePosition.getAsDouble()).minus(absoluteEncoderOffset);
-    inputs.turnPositionRad = Rotation2d.fromRotations(turnPosition.getValueAsDouble());
-    inputs.turnVelocityRadPerSec = Units.rotationsToRadians(turnVelocity.getValueAsDouble());
-    inputs.turnAppliedVolts = turnAppliedVolts.getValueAsDouble();
-    inputs.turnCurrentAmps = new double[] {turnCurrent.getValueAsDouble()};
+    inputs.turnPos_rot2d = Rotation2d.fromRotations(turnPosition.getValueAsDouble());
+    inputs.turnVel_rps = turnVelocity.getValueAsDouble();
+    inputs.turnVolts_V = turnAppliedVolts.getValueAsDouble();
+    inputs.turnCurrent_A = new double[] {turnCurrent.getValueAsDouble()};
 
-    inputs.odometryDrivePositionsRad =
+    inputs.odometryDrivePos_r =
         drivePositionQueue.stream()
             .mapToDouble((Double value) -> Units.rotationsToRadians(value))
             .toArray();
-    inputs.odometryTurnPositions =
+    inputs.odometryTurnPos_rot2d =
         turnPositionQueue.stream()
             .map((Double value) -> Rotation2d.fromRotations(value))
             .toArray(Rotation2d[]::new);

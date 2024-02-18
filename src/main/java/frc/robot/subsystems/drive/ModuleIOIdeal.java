@@ -43,19 +43,19 @@ public class ModuleIOIdeal implements ModuleIO {
 
   @Override
   public void updateInputs(ModuleIOInputs inputs) {
-    inputs.drivePositionRad = drivePos_rad;
-    inputs.driveVelocityRadPerSec = driveVel_radps;
-    inputs.driveAppliedVolts = driveVolts_V;
-    inputs.driveCurrentAmps = new double[] {0};
+    inputs.drivePos_r = drivePos_rad;
+    inputs.driveVel_rps = driveVel_radps;
+    inputs.driveVolts_V = driveVolts_V;
+    inputs.driveCurrent_A = new double[] {0};
 
-    inputs.turnAbsolutePosition = new Rotation2d(turnPos_rad).plus(turnAbsoluteInitPosition);
-    inputs.turnPositionRad = new Rotation2d(turnPos_rad);
-    inputs.turnVelocityRadPerSec = turnVel_radps;
-    inputs.turnAppliedVolts = turnVolts_V;
-    inputs.turnCurrentAmps = new double[] {Math.abs(0)};
+    inputs.turnAbsPos_rot2d = new Rotation2d(turnPos_rad).plus(turnAbsoluteInitPosition);
+    inputs.turnPos_rot2d = new Rotation2d(turnPos_rad);
+    inputs.turnVel_rps = turnVel_radps;
+    inputs.turnVel_rps = turnVolts_V;
+    inputs.turnCurrent_A = new double[] {Math.abs(0)};
 
-    inputs.odometryDrivePositionsRad = new double[] {inputs.drivePositionRad};
-    inputs.odometryTurnPositions = new Rotation2d[] {inputs.turnPositionRad};
+    inputs.odometryDrivePos_r = new double[] {inputs.drivePos_r};
+    inputs.odometryTurnPos_rot2d = new Rotation2d[] {inputs.turnPos_rot2d};
   }
 
   @Override

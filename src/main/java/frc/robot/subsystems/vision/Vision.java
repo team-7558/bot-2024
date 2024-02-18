@@ -61,13 +61,17 @@ public class Vision extends SubsystemBase {
 
       switch (Constants.currentMode) {
         case REAL:
-          cam0 = new VisionIOPhoton("camera0", new Transform3d()); // TODO: update transform & name
+          cam0 = new VisionIOPhoton("camera0", new Transform3d()); // TODO: update transform &
+          // name
           // VisionIO cam1 =
-          //     new VisionIOPhoton("camera2", new Transform3d()); // TODO: update transform & name
+          //     new VisionIOPhoton("camera2", new Transform3d()); // TODO: update transform &
+          // name
           // VisionIO cam2 =
-          //     new VisionIOPhoton("camera3", new Transform3d()); // TODO: update transform & name
+          //     new VisionIOPhoton("camera3", new Transform3d()); // TODO: update transform &
+          // name
           // VisionIO cam3 =
-          //     new VisionIOPhoton("camera4", new Transform3d()); // TODO: update transform & name
+          //     new VisionIOPhoton("camera4", new Transform3d()); // TODO: update transform &
+          // name
           // VisionIO limelight = new VisionIOLimelight("limelight"); // TODO: update name
           instance = new Vision(/*cam0*/ new VisionIOSim("camera0", new Transform3d()));
           break;
@@ -248,7 +252,6 @@ public class Vision extends SubsystemBase {
       managePipelines(i, Drive.getInstance().getPose());
     }
 
-    PerfTracker.end("Vision");
     Logger.recordOutput("Vision/TagSet", posesToLog.toArray(new Pose2d[0]));
     posesToLog.clear();
   }
