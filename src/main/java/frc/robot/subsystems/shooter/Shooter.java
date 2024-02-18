@@ -243,8 +243,6 @@ public class Shooter extends StateMachineSubsystemBase {
 
           @Override
           public void periodic() {
-            io.setFeederVolts(2);
-            io.setFlywheelVolts(2);
           }
 
           @Override

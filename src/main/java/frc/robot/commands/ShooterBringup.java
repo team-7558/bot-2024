@@ -33,7 +33,7 @@ public class ShooterBringup extends Command {
   public void initialize() {
     drive.setCurrentState(drive.DISABLED);
     intake.setCurrentState(intake.IDLE);
-    shooter.setCurrentState(shooter.DISABLED);
+    shooter.setCurrentState(shooter.MANUAL);
   }
 
   // Called every time the scheduler runs while the command is scheduled.

@@ -105,7 +105,7 @@ public class Intake extends StateMachineSubsystemBase {
           @Override
           public void init() {
             directionSpeed = 0.5;
-            // intakeSpeed = 0.5;
+            intakeSpeed = 0.5;
           }
         };
     SHOOTER_SIDE =
