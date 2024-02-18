@@ -89,6 +89,14 @@ public class Util {
     return (value - a) / (b - a);
   }
 
+  public static double dist2(double x, double y) {
+    return x * x + y * y;
+  }
+
+  public static double dist2(double x, double y, double z) {
+    return x * x + y * y + z * z;
+  }
+
   /**
    * 2x2 Matrix determinant
    *
