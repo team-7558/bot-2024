@@ -5,12 +5,12 @@ import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants.Mode;
 import frc.robot.Constants;
 import frc.robot.PerfTracker;
 import frc.robot.subsystems.drive.Drive;
@@ -62,15 +62,16 @@ public class Vision extends SubsystemBase {
 
       switch (Constants.currentMode) { // TODO: SET BACK TO NORMAL
         case REAL:
-          cam0 = new VisionIOPhoton("camera0", new Transform3d()); // TODO: update transform & name
+          cam0 = new VisionIOPhoton("BL", new Transform3d(0.25,0,0.3,new Rotation3d(0,0,0))); // TODO: update transform & name
+          cam1 = new VisionIOPhoton("BR", new Transform3d(-0.25,0,0.3, new Rotation3d(0,0,0)));
           // VisionIO cam1 =
           //     new VisionIOPhoton("camera2", new Transform3d()); // TODO: update transform & name
           // VisionIO cam2 =
           //     new VisionIOPhoton("camera3", new Transform3d()); // TODO: update transform & name
           // VisionIO cam3 =
           //     new VisionIOPhoton("camera4", new Transform3d()); // TODO: update transform & name
-          LimelightIO limelight = new LimelightIOReal("limelight");
-          instance = new Vision(limelight, cam0);
+          // LimelightIO limelight = new LimelightIOReal("limelight");
+          instance = new Vision(new LimelightIO() {}, cam0, cam1);
           break;
         case SIM:
           // no sim
@@ -237,7 +238,7 @@ public class Vision extends SubsystemBase {
   @Override
   public void periodic() {
     PerfTracker.start("Vision");
-    Logger.processInputs("Vision/Limelight", limelightInputs);
+    // Logger.processInputs("Vision/Limelight", limelightInputs);
     handleFrameData();
     PerfTracker.end("Vision");
     Logger.recordOutput("Vision/TagSet", posesToLog.toArray(new Pose2d[0]));
