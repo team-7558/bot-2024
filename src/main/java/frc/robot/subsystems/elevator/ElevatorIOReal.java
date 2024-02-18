@@ -65,26 +65,26 @@ public class ElevatorIOReal implements ElevatorIO {
     leaderConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
     leaderConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
 
-    leaderConfig.MotionMagic.MotionMagicCruiseVelocity = 2.0;
-    leaderConfig.MotionMagic.MotionMagicAcceleration = 2;
-    leaderConfig.MotionMagic.MotionMagicJerk = 0;
+    leaderConfig.MotionMagic.MotionMagicCruiseVelocity = 0.5;
+    leaderConfig.MotionMagic.MotionMagicAcceleration = 0.75;
+    leaderConfig.MotionMagic.MotionMagicJerk = 0.1;
     leaderConfig.MotionMagic.MotionMagicExpo_kV = 1;
     leaderConfig.MotionMagic.MotionMagicExpo_kA = 1;
 
     // Position control gains
     leaderConfig.Slot0.GravityType = GravityTypeValue.Elevator_Static;
     leaderConfig.Slot0.kG = 1;
-    leaderConfig.Slot0.kP = 1000;
+    leaderConfig.Slot0.kP = 1323;
     leaderConfig.Slot0.kI = 0;
     leaderConfig.Slot0.kD = 0;
 
     // MotionMagic Position gains
     leaderConfig.Slot1.GravityType = GravityTypeValue.Elevator_Static;
     leaderConfig.Slot1.kG = 0.05;
-    leaderConfig.Slot1.kV = 54;
+    leaderConfig.Slot1.kV = 46;
     leaderConfig.Slot1.kS = 0.0;
-    leaderConfig.Slot1.kA = 0;
-    leaderConfig.Slot1.kP = 0.0;
+    leaderConfig.Slot1.kA = 2.4;
+    leaderConfig.Slot1.kP = 1678;
     leaderConfig.Slot1.kI = 0;
     leaderConfig.Slot1.kD = 0.0;
 
