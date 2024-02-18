@@ -23,6 +23,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Filesystem;
 import frc.robot.Constants;
+import frc.robot.OI;
 import frc.robot.SS2d;
 import frc.robot.subsystems.StateMachineSubsystemBase;
 import frc.robot.subsystems.drive.Drive;
@@ -243,6 +244,8 @@ public class Shooter extends StateMachineSubsystemBase {
 
           @Override
           public void periodic() {
+            io.setFeederVolts(OI.DR.getLeftTriggerAxis() * 0.4 * 12);
+            io.setFlywheelVolts(OI.DR.getRightTriggerAxis() * 0.6 * 12);
           }
 
           @Override
