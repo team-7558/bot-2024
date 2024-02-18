@@ -23,7 +23,7 @@ public class ElevatorBringup extends Command {
     elevator.setCurrentState(elevator.HOMING);
   }
 
-  boolean unlocked = true;
+  boolean unlocked = false;
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override

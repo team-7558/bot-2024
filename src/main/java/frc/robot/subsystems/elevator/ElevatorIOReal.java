@@ -21,8 +21,8 @@ public class ElevatorIOReal implements ElevatorIO {
   private final TalonFX leftFalcon;
   private final TalonFX rightFalcon;
 
-  private static final double MIN_HEIGHT_R = -60.79736328125;
-  private static final double MAX_HEIGHT_R = 44.56005859375;
+  private static final double MIN_HEIGHT_R = -0.59;
+  private static final double MAX_HEIGHT_R = 84.22;
   private static final double STROKE_R = MAX_HEIGHT_R - MIN_HEIGHT_R;
   private static final double METERS_TO_ROTATIONS = STROKE_R / Elevator.STROKE_M;
   private static final double ROTATIONS_TO_METERS = 1.0 / METERS_TO_ROTATIONS;
@@ -65,26 +65,26 @@ public class ElevatorIOReal implements ElevatorIO {
     leaderConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
     leaderConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
 
-    leaderConfig.MotionMagic.MotionMagicCruiseVelocity = 0.5;
-    leaderConfig.MotionMagic.MotionMagicAcceleration = 0.75;
-    leaderConfig.MotionMagic.MotionMagicJerk = 0.1;
-    leaderConfig.MotionMagic.MotionMagicExpo_kV = 1;
-    leaderConfig.MotionMagic.MotionMagicExpo_kA = 1;
+    leaderConfig.MotionMagic.MotionMagicCruiseVelocity = 3.5;
+    leaderConfig.MotionMagic.MotionMagicAcceleration = 3.5;
+    leaderConfig.MotionMagic.MotionMagicJerk = 0.2;
+    leaderConfig.MotionMagic.MotionMagicExpo_kV = 0.5;
+    leaderConfig.MotionMagic.MotionMagicExpo_kA = 0.5;
 
     // Position control gains
     leaderConfig.Slot0.GravityType = GravityTypeValue.Elevator_Static;
-    leaderConfig.Slot0.kG = 1;
-    leaderConfig.Slot0.kP = 1323;
+    leaderConfig.Slot0.kG = 0.5;
+    leaderConfig.Slot0.kP = 661;
     leaderConfig.Slot0.kI = 0;
     leaderConfig.Slot0.kD = 0;
 
     // MotionMagic Position gains
     leaderConfig.Slot1.GravityType = GravityTypeValue.Elevator_Static;
-    leaderConfig.Slot1.kG = 0.05;
-    leaderConfig.Slot1.kV = 46;
+    leaderConfig.Slot1.kG = 0.6;
+    leaderConfig.Slot1.kV = 120;
     leaderConfig.Slot1.kS = 0.0;
-    leaderConfig.Slot1.kA = 2.4;
-    leaderConfig.Slot1.kP = 1678;
+    leaderConfig.Slot1.kA = 6;
+    leaderConfig.Slot1.kP = 1200;
     leaderConfig.Slot1.kI = 0;
     leaderConfig.Slot1.kD = 0.0;
 
