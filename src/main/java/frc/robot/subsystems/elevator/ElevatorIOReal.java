@@ -5,8 +5,8 @@ import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.Follower;
-import com.ctre.phoenix6.controls.MotionMagicTorqueCurrentFOC;
-import com.ctre.phoenix6.controls.MotionMagicVelocityTorqueCurrentFOC;
+import com.ctre.phoenix6.controls.MotionMagicVelocityVoltage;
+import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
@@ -21,8 +21,8 @@ public class ElevatorIOReal implements ElevatorIO {
   private final TalonFX leftFalcon;
   private final TalonFX rightFalcon;
 
-  private static final double MIN_HEIGHT_R = -86.379;
-  private static final double MAX_HEIGHT_R = -28.326;
+  private static final double MIN_HEIGHT_R = -60.79736328125;
+  private static final double MAX_HEIGHT_R = 44.56005859375;
   private static final double STROKE_R = MAX_HEIGHT_R - MIN_HEIGHT_R;
   private static final double METERS_TO_ROTATIONS = STROKE_R / Elevator.STROKE_M;
   private static final double ROTATIONS_TO_METERS = 1.0 / METERS_TO_ROTATIONS;
@@ -34,9 +34,9 @@ public class ElevatorIOReal implements ElevatorIO {
 
   private final boolean isLeftMotorInverted = false;
   private final VoltageOut voltageControl;
-  private final MotionMagicVelocityTorqueCurrentFOC mmVelControl;
+  private final MotionMagicVelocityVoltage mmVelControl;
   private final PositionVoltage posControl;
-  private final MotionMagicTorqueCurrentFOC mmPosControl;
+  private final MotionMagicVoltage mmPosControl;
 
   private double posOffset_m = 0.0;
 
@@ -45,10 +45,9 @@ public class ElevatorIOReal implements ElevatorIO {
     var followerConfig = new TalonFXConfiguration();
 
     voltageControl = new VoltageOut(0);
-    mmVelControl = new MotionMagicVelocityTorqueCurrentFOC(0, 0, true, 0, 2, false, false, false);
+    mmVelControl = new MotionMagicVelocityVoltage(0, 0, true, 0, 2, false, false, false);
     posControl = new PositionVoltage(Elevator.MIN_HEIGHT_M, 0, true, 0, 0, false, false, false);
-    mmPosControl =
-        new MotionMagicTorqueCurrentFOC(Elevator.MIN_HEIGHT_M, 0, 1, false, false, false);
+    mmPosControl = new MotionMagicVoltage(Elevator.MIN_HEIGHT_M, true, 0, 1, false, false, false);
 
     leftFalcon = new TalonFX(1);
     rightFalcon = new TalonFX(4);
@@ -62,28 +61,27 @@ public class ElevatorIOReal implements ElevatorIO {
 
     leaderConfig.CurrentLimits.StatorCurrentLimit = 40.0;
     leaderConfig.CurrentLimits.StatorCurrentLimitEnable = true;
-    leaderConfig.Feedback.SensorToMechanismRatio =
-        METERS_TO_ROTATIONS; // Figure out how to scale this to real height
+    leaderConfig.Feedback.SensorToMechanismRatio = METERS_TO_ROTATIONS;
     leaderConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
     leaderConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
 
-    leaderConfig.MotionMagic.MotionMagicCruiseVelocity = 1;
-    leaderConfig.MotionMagic.MotionMagicAcceleration = 1;
-    leaderConfig.MotionMagic.MotionMagicJerk = 1;
+    leaderConfig.MotionMagic.MotionMagicCruiseVelocity = 0.05;
+    leaderConfig.MotionMagic.MotionMagicAcceleration = 100;
+    leaderConfig.MotionMagic.MotionMagicJerk = 0;
     leaderConfig.MotionMagic.MotionMagicExpo_kV = 1;
     leaderConfig.MotionMagic.MotionMagicExpo_kA = 1;
 
     // Position control gains
     leaderConfig.Slot0.GravityType = GravityTypeValue.Elevator_Static;
-    leaderConfig.Slot0.kG = 0.1;
-    leaderConfig.Slot0.kP = 30;
+    leaderConfig.Slot0.kG = 0.47;
+    leaderConfig.Slot0.kP = 1000;
     leaderConfig.Slot0.kI = 0;
     leaderConfig.Slot0.kD = 0;
 
     // MotionMagic Position gains
     leaderConfig.Slot1.GravityType = GravityTypeValue.Elevator_Static;
-    leaderConfig.Slot1.kG = 0;
-    leaderConfig.Slot1.kV = 0.0;
+    leaderConfig.Slot1.kG = 0.05;
+    leaderConfig.Slot1.kV = 47;
     leaderConfig.Slot1.kS = 0.0;
     leaderConfig.Slot1.kA = 0.0;
     leaderConfig.Slot1.kP = 0.0;
@@ -102,7 +100,7 @@ public class ElevatorIOReal implements ElevatorIO {
 
     leftFalcon.getConfigurator().apply(leaderConfig);
 
-    rightFalcon.setControl(new Follower(leftFalcon.getDeviceID(), true).withUpdateFreqHz(50));
+    rightFalcon.setControl(new Follower(leftFalcon.getDeviceID(), true).withUpdateFreqHz(200));
 
     resetPos(Elevator.MIN_HEIGHT_M);
   }

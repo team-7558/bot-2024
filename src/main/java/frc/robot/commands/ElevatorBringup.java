@@ -39,10 +39,10 @@ public class ElevatorBringup extends Command {
         elevator.setCurrentState(elevator.MANUAL);
         elevator.setManualOutput(manual);
       } else if (OI.DR.getXButton()) {
-        elevator.setTargetHeight(Util.lerp(Elevator.MIN_HEIGHT_M, Elevator.MAX_HEIGHT_M, 0.3333));
+        elevator.setTargetHeight(Util.lerp(Elevator.MIN_HEIGHT_M, Elevator.MAX_HEIGHT_M, 0.2));
         elevator.setCurrentState(elevator.CLIMBING);
       } else if (OI.DR.getBButton()) {
-        elevator.setTargetHeight(Util.lerp(Elevator.MIN_HEIGHT_M, Elevator.MAX_HEIGHT_M, 0.6666));
+        elevator.setTargetHeight(Util.lerp(Elevator.MIN_HEIGHT_M, Elevator.MAX_HEIGHT_M, 0.8));
         elevator.setCurrentState(elevator.CLIMBING);
       } else if (!elevator.isState(elevator.IDLE)
           && !elevator.isState(elevator.HOMING)
