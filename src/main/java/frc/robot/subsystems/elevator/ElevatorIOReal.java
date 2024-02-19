@@ -65,26 +65,26 @@ public class ElevatorIOReal implements ElevatorIO {
     leaderConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
     leaderConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
 
-    leaderConfig.MotionMagic.MotionMagicCruiseVelocity = 3.5;
-    leaderConfig.MotionMagic.MotionMagicAcceleration = 3.5;
-    leaderConfig.MotionMagic.MotionMagicJerk = 0.2;
+    leaderConfig.MotionMagic.MotionMagicCruiseVelocity = 1.3;
+    leaderConfig.MotionMagic.MotionMagicAcceleration = 1.5;
+    leaderConfig.MotionMagic.MotionMagicJerk = 5;
     leaderConfig.MotionMagic.MotionMagicExpo_kV = 0.5;
     leaderConfig.MotionMagic.MotionMagicExpo_kA = 0.5;
 
     // Position control gains
     leaderConfig.Slot0.GravityType = GravityTypeValue.Elevator_Static;
-    leaderConfig.Slot0.kG = 0.5;
-    leaderConfig.Slot0.kP = 661;
+    leaderConfig.Slot0.kG = 0.78;
+    leaderConfig.Slot0.kP = 971;
     leaderConfig.Slot0.kI = 0;
     leaderConfig.Slot0.kD = 0;
 
     // MotionMagic Position gains
     leaderConfig.Slot1.GravityType = GravityTypeValue.Elevator_Static;
-    leaderConfig.Slot1.kG = 0.6;
-    leaderConfig.Slot1.kV = 120;
+    leaderConfig.Slot1.kG = 0.05;
+    leaderConfig.Slot1.kV = 57.5;
     leaderConfig.Slot1.kS = 0.0;
-    leaderConfig.Slot1.kA = 6;
-    leaderConfig.Slot1.kP = 1200;
+    leaderConfig.Slot1.kA = 5;
+    leaderConfig.Slot1.kP = 971;
     leaderConfig.Slot1.kI = 0;
     leaderConfig.Slot1.kD = 0.0;
 
