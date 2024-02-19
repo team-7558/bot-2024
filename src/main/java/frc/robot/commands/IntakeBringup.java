@@ -39,6 +39,7 @@ public class IntakeBringup extends Command {
     if (!intake.isState(intake.DISABLED)) {
 
       if (intake.beamBroken()) {
+        System.out.println("broken");
         hasGamePiece = true;
       } else if (OI.DR.getRightTriggerAxis() > 0) {
         hasGamePiece = false;

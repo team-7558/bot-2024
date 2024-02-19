@@ -74,7 +74,7 @@ public class ModuleIO2024 implements ModuleIO {
   private static final Slot0Configs steerGains =
       new Slot0Configs().withKP(100.0).withKI(0).withKD(0).withKS(0).withKV(0.0).withKA(0);
   private static final Slot0Configs driveGains =
-      new Slot0Configs().withKP(3).withKI(0).withKD(0).withKS(0).withKV(0.85).withKA(0);
+      new Slot0Configs().withKP(2.3).withKI(0).withKD(0).withKS(0).withKV(0.85).withKA(0);
   private static final Slot1Configs steerGainsTorque =
       new Slot1Configs().withKP(10).withKI(0).withKD(0.2).withKS(0).withKV(0.0).withKA(0);
   private static final Slot1Configs driveGainsTorque =
@@ -203,7 +203,7 @@ public class ModuleIO2024 implements ModuleIO {
         turnCurrent);
 
     inputs.drivePos_r = drivePosition.getValueAsDouble();
-    inputs.driveVel_rps = driveVelocity.getValueAsDouble();
+    inputs.driveVel_mps = driveVelocity.getValueAsDouble() / Drive.ROTATION_RATIO;
     inputs.driveVolts_V = driveAppliedVolts.getValueAsDouble();
     inputs.driveCurrent_A = new double[] {driveCurrent.getValueAsDouble()};
 
@@ -268,12 +268,16 @@ public class ModuleIO2024 implements ModuleIO {
 
     // driveTalon.setControl(new PositionVoltage(velocity, 0, true, velocity, 0, false, false,
     // false));
-    driveTalon.setControl(driveVelocitySetpoint_v.withVelocity(velocity).withEnableFOC(true));
+    driveTalon.setControl(
+        driveVelocitySetpoint_v
+            .withVelocity(velocity * Drive.ROTATION_RATIO)
+            .withEnableFOC(true)
+            .withSlot(0));
   }
 
   @Override
   public void setTurnAngle(double pos_r) {
-    turnTalon.setControl(turnPositionSetpoint_v.withPosition(pos_r));
+    turnTalon.setControl(turnPositionSetpoint_v.withPosition(pos_r).withSlot(0));
 
     Logger.recordOutput("Drive/" + index + "/angleSetpoint", pos_r);
 

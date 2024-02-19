@@ -194,7 +194,7 @@ public class ModuleIO2023 implements ModuleIO {
         turnCurrent);
 
     inputs.drivePos_r = drivePosition.getValueAsDouble();
-    inputs.driveVel_rps = driveVelocity.getValueAsDouble();
+    inputs.driveVel_mps = driveVelocity.getValueAsDouble();
     inputs.driveVolts_V = driveAppliedVolts.getValueAsDouble();
     inputs.driveCurrent_A = new double[] {driveCurrent.getValueAsDouble()};
 

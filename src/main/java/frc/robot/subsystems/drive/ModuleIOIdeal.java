@@ -44,7 +44,7 @@ public class ModuleIOIdeal implements ModuleIO {
   @Override
   public void updateInputs(ModuleIOInputs inputs) {
     inputs.drivePos_r = drivePos_rad;
-    inputs.driveVel_rps = driveVel_radps;
+    inputs.driveVel_mps = driveVel_radps;
     inputs.driveVolts_V = driveVolts_V;
     inputs.driveCurrent_A = new double[] {0};
 

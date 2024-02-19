@@ -50,7 +50,7 @@ public class Drive extends StateMachineSubsystemBase {
   public static final double MAX_LINEAR_SPEED = Units.feetToMeters(14.5);
   private static final double TRACK_WIDTH_X = Units.inchesToMeters(25.0);
   private static final double TRACK_WIDTH_Y = Units.inchesToMeters(25.0);
-  private static double ROTATION_RATIO = MAX_LINEAR_SPEED / 1.4104;
+  public static double ROTATION_RATIO = MAX_LINEAR_SPEED / 1.4104;
   private static final double SKEW_CONSTANT = 0.06;
   private static final double DRIVE_BASE_RADIUS =
       Math.hypot(TRACK_WIDTH_X / 2.0, TRACK_WIDTH_Y / 2.0);
@@ -160,7 +160,7 @@ public class Drive extends StateMachineSubsystemBase {
     AutoBuilder.configureHolonomic(
         this::getPose,
         this::setPose,
-        () -> kinematics.toChassisSpeeds(getModuleStates()),
+        () -> getChassisSpeeds(),
         this::runVelocity,
         new HolonomicPathFollowerConfig(
             MAX_LINEAR_SPEED, DRIVE_BASE_RADIUS, new ReplanningConfig()),
@@ -358,12 +358,10 @@ public class Drive extends StateMachineSubsystemBase {
 
     // Convert to field relative speeds & send command
 
-    System.out.println();
-
     runVelocity(
         ChassisSpeeds.fromFieldRelativeSpeeds(
-            (linearVelocity.getX() * MAX_LINEAR_SPEED * ROTATION_RATIO) * throttle,
-            (linearVelocity.getY() * MAX_LINEAR_SPEED * ROTATION_RATIO) * throttle,
+            (linearVelocity.getX() * MAX_LINEAR_SPEED) * throttle,
+            (linearVelocity.getY() * MAX_LINEAR_SPEED) * throttle,
             omega * MAX_ANGULAR_SPEED,
             getPose().getRotation())); // TODO: tune skew constant
   }
@@ -379,7 +377,7 @@ public class Drive extends StateMachineSubsystemBase {
     // Calculate module setpoints
     ChassisSpeeds discreteSpeeds = ChassisSpeeds.discretize(speeds, 0.02);
     SwerveModuleState[] setpointStates = kinematics.toSwerveModuleStates(discreteSpeeds);
-    SwerveDriveKinematics.desaturateWheelSpeeds(setpointStates, MAX_LINEAR_SPEED * ROTATION_RATIO);
+    SwerveDriveKinematics.desaturateWheelSpeeds(setpointStates, MAX_LINEAR_SPEED);
 
     // Send setpoints to modules
     SwerveModuleState[] optimizedSetpointStates = new SwerveModuleState[4];

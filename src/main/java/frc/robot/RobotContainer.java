@@ -17,17 +17,13 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.path.PathPoint;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.commands.Temp;
+import frc.robot.commands.RobotTeleop;
 import frc.robot.subsystems.drive.Drive;
 import java.util.List;
 import org.littletonrobotics.junction.Logger;
-import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
-import org.littletonrobotics.junction.networktables.LoggedDashboardNumber;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -56,7 +52,7 @@ public class RobotContainer {
    * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureButtonBindings() {
-    drive.setDefaultCommand(new Temp());
+    drive.setDefaultCommand(new RobotTeleop());
   }
 
   /**
@@ -65,7 +61,7 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    PathPlannerPath path = PathPlannerPath.fromPathFile("10m");
+    PathPlannerPath path = PathPlannerPath.fromChoreoTrajectory("4note");
     List<PathPoint> points = path.getAllPathPoints();
     PathPoint[] array = (PathPoint[]) points.toArray(new PathPoint[0]);
     Translation2d[] translationArray = new Translation2d[array.length];
@@ -82,10 +78,7 @@ public class RobotContainer {
     }
     Logger.recordOutput("Drive/PathFlipped", translationArrayF);
 
-    drive.setPose(
-        DriverStation.getAlliance().get() == Alliance.Red
-            ? path.flipPath().getPreviewStartingHolonomicPose()
-            : path.getPreviewStartingHolonomicPose());
-    return AutoBuilder.followPath(path);
+    drive.setPose(path.getPreviewStartingHolonomicPose());
+    return AutoBuilder.followPath(path.flipPath());
   }
 }

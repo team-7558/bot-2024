@@ -20,7 +20,7 @@ public interface ModuleIO {
   @AutoLog
   public static class ModuleIOInputs {
     public double drivePos_r = 0.0;
-    public double driveVel_rps = 0.0;
+    public double driveVel_mps = 0.0;
     public double driveVolts_V = 0.0;
     public double[] driveCurrent_A = new double[] {};
 

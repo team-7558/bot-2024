@@ -9,49 +9,29 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.OI;
 import frc.robot.SS2d;
 import frc.robot.subsystems.drive.Drive;
-import frc.robot.subsystems.elevator.Elevator;
-import frc.robot.subsystems.intake.Intake;
-import frc.robot.subsystems.shooter.Shooter;
-import frc.robot.subsystems.shooter.Shooter.TargetMode;
-import frc.robot.util.Util;
 
 public class RobotTeleop extends Command {
 
   private final Drive drive;
-  private final Shooter shooter;
-  private final Intake intake;
-  private final Elevator elevator;
+  boolean hasGamePiece = false;
 
   /** Creates a new DriveTeleop. */
   public RobotTeleop() {
     // Use addRequirements() here to declare subsystem dependencies.
     drive = Drive.getInstance();
-    shooter = Shooter.getInstance();
-    intake = Intake.getInstance();
-    elevator = Elevator.getInstance();
-    addRequirements(drive, shooter, intake, elevator);
+    addRequirements(drive);
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
     drive.setCurrentState(drive.STRAFE_N_TURN);
-    shooter.setCurrentState(shooter.LOCKONT);
-    intake.setCurrentState(intake.IDLE);
-    elevator.setCurrentState(elevator.HOLDING);
+    // intake.setCurrentState(intake.IDLE);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-
-    if (!shooter.isState(shooter.DISABLED)) {
-      if (OI.DR.getAButton()) { // make actually binded
-        shooter.setTargetMode(TargetMode.TRAP);
-      } else {
-        shooter.setTargetMode(TargetMode.SPEAKER);
-      }
-    }
 
     if (!drive.isState(drive.DISABLED)) {
       // slow mode
@@ -60,18 +40,6 @@ public class RobotTeleop extends Command {
         drive.setPose(new Pose2d());
         drive.zeroGyro();
       } else if (OI.DR.getXButton()) {
-        drive.setAutolockSetpoint(-61.19);
-        drive.setCurrentState(drive.STRAFE_AUTOLOCK);
-      } else if (OI.DR.getAButton()) { // TODO: make speaker
-        drive.setAutolockSetpoint(1.57);
-        drive.setCurrentState(drive.STRAFE_AUTOLOCK);
-      } else if (OI.DR.getBButton()) { // TOOD: make amp
-        drive.setAutolockSetpoint(59.04);
-        drive.setCurrentState(drive.STRAFE_AUTOLOCK);
-      } else if (OI.DR.getYButton()) { // TODO: make trap
-        drive.setAutolockSetpoint(3.141);
-        drive.setCurrentState(drive.STRAFE_AUTOLOCK);
-      } else if (OI.DR.getRightTriggerAxis() > 0) {
 
       } else {
         // strafe and turn if not other state
@@ -79,12 +47,28 @@ public class RobotTeleop extends Command {
       }
     }
 
-    if (!elevator.isState(elevator.DISABLED)) {
-      if (OI.DR.getYButton()) elevator.setTargetHeight(Elevator.MAX_HEIGHT_M);
-      if (OI.DR.getBButton())
-        elevator.setTargetHeight(Util.lerp(Elevator.MIN_HEIGHT_M, Elevator.MAX_HEIGHT_M, 0.5));
-      if (OI.DR.getAButton()) elevator.setTargetHeight(Elevator.MIN_HEIGHT_M);
-    }
+    // if (!intake.isState(intake.DISABLED)) {
+
+    //   if (intake.beamBroken()) {
+    //     hasGamePiece = true;
+    //   } else if (OI.TMP.getRightTriggerAxis() > 0) {
+    //     hasGamePiece = false;
+    //   }
+
+    //   if (OI.TMP.getAButton()) {
+    //     if (hasGamePiece && !intake.beamBroken()) {
+    //       intake.setCurrentState(intake.IDLE);
+    //     } else if (!hasGamePiece) {
+    //       intake.setCurrentState(intake.INTAKING);
+    //     }
+    //   } else if (OI.TMP.getBButton()) {
+    //     intake.setCurrentState(intake.AMP_SIDE_2);
+    //   } else if (OI.TMP.getXButton()) {
+    //     intake.setCurrentState(intake.SHOOTER_SIDE);
+    //   } else {
+    //     intake.setCurrentState(intake.IDLE);
+    //   }
+    // }
 
     SS2d.S.setTurretBaseAngle(drive.getRotation());
     SS2d.M.setTurretBaseAngle(drive.getRotation());
@@ -92,15 +76,15 @@ public class RobotTeleop extends Command {
     SS2d.S.setDistance(2.5);
     SS2d.M.setDistance(5);
 
-    if (!intake.isState(intake.DISABLED)) {
-      if (OI.DR.getRightBumper()) {
-        intake.setCurrentState(intake.AMP_SIDE_2);
-      } else if (OI.DR.getLeftBumper()) {
-        intake.setCurrentState(intake.SHOOTER_SIDE);
-      } else {
-        intake.setCurrentState(intake.IDLE);
-      }
-    }
+    // if (!intake.isState(intake.DISABLED)) {
+    //   if (OI.DR.getRightBumper()) {
+    //     intake.setCurrentState(intake.AMP_SIDE_2);
+    //   } else if (OI.DR.getLeftBumper()) {
+    //     intake.setCurrentState(intake.SHOOTER_SIDE);
+    //   } else {
+    //     intake.setCurrentState(intake.IDLE);
+    //   }
+    // }
   }
 
   // Called once the command ends or is interrupted.
