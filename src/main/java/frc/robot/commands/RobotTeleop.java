@@ -9,16 +9,22 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.OI;
 import frc.robot.SS2d;
 import frc.robot.subsystems.drive.Drive;
+import frc.robot.subsystems.intake.Intake;
+import frc.robot.subsystems.shooter.Shooter;
 
 public class RobotTeleop extends Command {
 
   private final Drive drive;
+  private final Intake intake;
+  private final Shooter shooter;
   boolean hasGamePiece = false;
 
   /** Creates a new DriveTeleop. */
   public RobotTeleop() {
     // Use addRequirements() here to declare subsystem dependencies.
     drive = Drive.getInstance();
+    intake = Intake.getInstance();
+    shooter = Shooter.getInstance();
     addRequirements(drive);
   }
 
@@ -26,7 +32,8 @@ public class RobotTeleop extends Command {
   @Override
   public void initialize() {
     drive.setCurrentState(drive.STRAFE_N_TURN);
-    // intake.setCurrentState(intake.IDLE);
+    intake.setCurrentState(intake.IDLE);
+    shooter.setCurrentState(shooter.IDLE);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -47,28 +54,34 @@ public class RobotTeleop extends Command {
       }
     }
 
-    // if (!intake.isState(intake.DISABLED)) {
+    if (!intake.isState(intake.DISABLED)) {
 
-    //   if (intake.beamBroken()) {
-    //     hasGamePiece = true;
-    //   } else if (OI.TMP.getRightTriggerAxis() > 0) {
-    //     hasGamePiece = false;
-    //   }
+      if (intake.beamBroken()) {
+        hasGamePiece = true;
+      } else if (OI.DR.getRightBumper()) {
+        hasGamePiece = false;
+      }
 
-    //   if (OI.TMP.getAButton()) {
-    //     if (hasGamePiece && !intake.beamBroken()) {
-    //       intake.setCurrentState(intake.IDLE);
-    //     } else if (!hasGamePiece) {
-    //       intake.setCurrentState(intake.INTAKING);
-    //     }
-    //   } else if (OI.TMP.getBButton()) {
-    //     intake.setCurrentState(intake.AMP_SIDE_2);
-    //   } else if (OI.TMP.getXButton()) {
-    //     intake.setCurrentState(intake.SHOOTER_SIDE);
-    //   } else {
-    //     intake.setCurrentState(intake.IDLE);
-    //   }
-    // }
+      if (OI.DR.getAButton()) {
+        if (hasGamePiece && !intake.beamBroken()) {
+          intake.setCurrentState(intake.IDLE);
+        } else if (!hasGamePiece) {
+          intake.setCurrentState(intake.INTAKING);
+        }
+      } else if (OI.DR.getBButton()) {
+        intake.setCurrentState(intake.SHOOTER_SIDE);
+      } else {
+        intake.setCurrentState(intake.IDLE);
+      }
+    }
+
+    if (!shooter.isState(shooter.DISABLED)) {
+      // if (OI.DR.getLeftTriggerAxis() > 0) {
+      //   shooter.setCurrentState(shooter.MANUAL);
+      // } else {
+      //   shooter.setCurrentState(shooter.IDLE);
+      // }
+    }
 
     SS2d.S.setTurretBaseAngle(drive.getRotation());
     SS2d.M.setTurretBaseAngle(drive.getRotation());

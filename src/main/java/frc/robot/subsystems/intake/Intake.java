@@ -80,7 +80,7 @@ public class Intake extends StateMachineSubsystemBase {
           @Override
           public void periodic() {
             if (beamBroken()) stop();
-            else intakeSpeed = -0.05;
+            // else intakeSpeed = -0.05;
           }
         };
     INTAKING =

@@ -208,7 +208,7 @@ public class Drive extends StateMachineSubsystemBase {
           public void periodic() {
             double throttle = 1.0;
             throttle = Util.lerp(1, 0.4, OI.DR.getRightTriggerAxis() * OI.DR.getRightTriggerAxis());
-            drive(-OI.DR.getLeftY(), -OI.DR.getLeftX(), -OI.DR.getRightX(), throttle);
+            drive(-OI.DR.getLeftY(), -OI.DR.getLeftX(), -OI.DR.getRightX() * 0.75, throttle);
           }
         };
 

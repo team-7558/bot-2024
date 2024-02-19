@@ -16,6 +16,8 @@ package frc.robot;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.path.PathPoint;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
@@ -77,6 +79,9 @@ public class RobotContainer {
       translationArrayF[i] = arrayF[i].position;
     }
     Logger.recordOutput("Drive/PathFlipped", translationArrayF);
+
+    Pose2d pose = path.getPreviewStartingHolonomicPose();
+    pose = pose.rotateBy(Rotation2d.fromDegrees(180));
 
     drive.setPose(path.getPreviewStartingHolonomicPose());
     return AutoBuilder.followPath(path.flipPath());
