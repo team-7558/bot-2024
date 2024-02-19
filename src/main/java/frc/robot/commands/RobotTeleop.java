@@ -76,11 +76,11 @@ public class RobotTeleop extends Command {
     }
 
     if (!shooter.isState(shooter.DISABLED)) {
-      // if (OI.DR.getLeftTriggerAxis() > 0) {
-      //   shooter.setCurrentState(shooter.MANUAL);
-      // } else {
-      //   shooter.setCurrentState(shooter.IDLE);
-      // }
+      if (OI.DR.getLeftTriggerAxis() > 0) {
+        shooter.setCurrentState(shooter.MANUAL);
+      } else {
+        shooter.setCurrentState(shooter.IDLE);
+      }
     }
 
     SS2d.S.setTurretBaseAngle(drive.getRotation());
