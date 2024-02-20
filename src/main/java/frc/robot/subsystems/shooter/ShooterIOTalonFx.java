@@ -15,9 +15,9 @@ import edu.wpi.first.wpilibj.DutyCycleEncoder;
 public class ShooterIOTalonFx implements ShooterIO {
 
   private static final double FLYWHEEL_GEAR_RATIO = 1;
-  private static final double TURRET_GEAR_RATIO = 1; // TODO SET
+  private static final double TURRET_GEAR_RATIO = 12.5; // TODO SET
   private static final double FEEDER_GEAR_RATIO = 1; // TODO: SET
-  private static final double PIVOT_GEAR_RATIO = 1; // TODO: SET
+  private static final double PIVOT_GEAR_RATIO = 81; // TODO: SET
 
   private final TalonFX flywheelL = new TalonFX(9);
   private final TalonFX flywheelR = new TalonFX(10);
@@ -75,6 +75,7 @@ public class ShooterIOTalonFx implements ShooterIO {
     turretConfig.CurrentLimits.StatorCurrentLimit = 30.0; // TODO: tune
     turretConfig.CurrentLimits.StatorCurrentLimitEnable = true;
     turretConfig.MotorOutput.NeutralMode = NeutralModeValue.Coast;
+    turretConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
     turretConfig.Slot0.kP = 0;
     turretConfig.Slot0.kI = 0;
     turretConfig.Slot0.kD = 0;
@@ -100,6 +101,7 @@ public class ShooterIOTalonFx implements ShooterIO {
     pivotConfig.CurrentLimits.StatorCurrentLimit = 30.0;
     pivotConfig.CurrentLimits.StatorCurrentLimitEnable = true;
     pivotConfig.MotorOutput.NeutralMode = NeutralModeValue.Coast;
+    pivotConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
     pivotConfig.Slot0.kP = 0;
     pivotConfig.Slot0.kI = 0;
     pivotConfig.Slot0.kD = 0;
