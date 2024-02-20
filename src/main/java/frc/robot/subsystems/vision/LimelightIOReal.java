@@ -2,7 +2,6 @@ package frc.robot.subsystems.vision;
 
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
-import frc.robot.subsystems.vision.LimelightIO.LimelightIOInputs;
 
 public class LimelightIOReal implements LimelightIO {
 

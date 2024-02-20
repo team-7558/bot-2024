@@ -1,6 +1,8 @@
 package frc.robot.subsystems.vision;
 
 import java.util.Optional;
+
+import org.littletonrobotics.junction.Logger;
 import org.photonvision.EstimatedRobotPose;
 import org.photonvision.targeting.PhotonPipelineResult;
 
@@ -29,7 +31,8 @@ public class VisionProcessingThread extends Thread {
             Optional<EstimatedRobotPose> poseOptional = camera.poseEstimator.update(latestResult);
             if (poseOptional.isPresent()) {
               EstimatedRobotPose estimatedPose = poseOptional.get();
-              camera.poses[camera.poseIndex] = estimatedPose.estimatedPose.toPose2d();
+              Logger.recordOutput("Vision/3DPose",estimatedPose.estimatedPose);
+              camera.poses[camera.poseIndex] = estimatedPose.estimatedPose;
               camera.poseTimestamps[camera.poseIndex] = estimatedPose.timestampSeconds;
               camera.tids[camera.poseIndex] = estimatedPose.targetsUsed.get(0).getFiducialId();
               camera.poseIndex++;

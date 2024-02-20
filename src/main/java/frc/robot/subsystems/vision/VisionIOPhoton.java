@@ -3,6 +3,7 @@ package frc.robot.subsystems.vision;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import java.io.IOException;
 import java.util.Arrays;
@@ -20,7 +21,7 @@ public class VisionIOPhoton implements ApriltagIO {
   public final Transform3d transform;
   public double[] poseTimestamps =
       new double[100]; // TODO: figure out the max array size that we actually need
-  public Pose2d[] poses = new Pose2d[100];
+  public Pose3d[] poses = new Pose3d[100];
   public double[] tids = new double[100];
   public PhotonPipelineResult recentResult;
   public int poseIndex = 0;

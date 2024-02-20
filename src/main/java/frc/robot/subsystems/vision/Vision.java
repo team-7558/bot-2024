@@ -10,7 +10,6 @@ import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants.Mode;
 import frc.robot.Constants;
 import frc.robot.PerfTracker;
 import frc.robot.subsystems.drive.Drive;
@@ -227,7 +226,7 @@ public class Vision extends SubsystemBase {
           continue
               outer; // empty array means no more inputs in the processing frame so skip to next cam
         }
-        TimestampedPose pose = new TimestampedPose(visionInputs[i].poses[j], timestamp);
+        TimestampedPose pose = new TimestampedPose(visionInputs[i].poses[j].toPose2d(), timestamp);
         Drive.getInstance().addToPoseEstimator(pose.pose, pose.timestamp);
       }
       managePipelines(i, Drive.getInstance().getPose());
