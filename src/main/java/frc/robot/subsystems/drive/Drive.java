@@ -25,7 +25,6 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
@@ -33,7 +32,6 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
-import edu.wpi.first.wpilibj.Timer;
 import frc.robot.Constants;
 import frc.robot.OI;
 import frc.robot.subsystems.StateMachineSubsystemBase;
@@ -256,55 +254,56 @@ public class Drive extends StateMachineSubsystemBase {
 
   @Override
   public void outputPeriodic() {
-    for (var module : modules) {
-      module.outputPeriodic();
-    }
+    // for (var module : modules) {
+    //   module.outputPeriodic();
+    // }
 
-    // Stop moving when disabled
-    if (DriverStation.isDisabled()) {
-      for (var module : modules) {
-        module.stop();
-      }
-    }
-    // Log empty setpoint states when disabled
-    if (DriverStation.isDisabled()) {
-      Logger.recordOutput("SwerveStates/Setpoints", new SwerveModuleState[] {});
-      Logger.recordOutput("SwerveStates/SetpointsOptimized", new SwerveModuleState[] {});
-    }
-    Logger.recordOutput("visionFrames", posesAdded);
+    // // Stop moving when disabled
+    // if (DriverStation.isDisabled()) {
+    //   for (var module : modules) {
+    //     module.stop();
+    //   }
+    // }
+    // // Log empty setpoint states when disabled
+    // if (DriverStation.isDisabled()) {
+    //   Logger.recordOutput("SwerveStates/Setpoints", new SwerveModuleState[] {});
+    //   Logger.recordOutput("SwerveStates/SetpointsOptimized", new SwerveModuleState[] {});
+    // }
+    // Logger.recordOutput("visionFrames", posesAdded);
 
-    // Update odometry
-    int deltaCount =
-        gyroInputs.connected ? gyroInputs.odometryYawPositions.length : Integer.MAX_VALUE;
-    for (int i = 0; i < 4; i++) {
-      deltaCount = Math.min(deltaCount, modules[i].getPositionDeltas().length);
-    }
-    for (int deltaIndex = 0; deltaIndex < deltaCount; deltaIndex++) {
-      // Read wheel deltas from each module
-      SwerveModulePosition[] wheelDeltas = new SwerveModulePosition[4];
-      for (int moduleIndex = 0; moduleIndex < 4; moduleIndex++) {
-        wheelDeltas[moduleIndex] = modules[moduleIndex].getPositionDeltas()[deltaIndex];
-      }
+    // // Update odometry
+    // int deltaCount =
+    //     gyroInputs.connected ? gyroInputs.odometryYawPositions.length : Integer.MAX_VALUE;
+    // for (int i = 0; i < 4; i++) {
+    //   deltaCount = Math.min(deltaCount, modules[i].getPositionDeltas().length);
+    // }
+    // for (int deltaIndex = 0; deltaIndex < deltaCount; deltaIndex++) {
+    //   // Read wheel deltas from each module
+    //   SwerveModulePosition[] wheelDeltas = new SwerveModulePosition[4];
+    //   for (int moduleIndex = 0; moduleIndex < 4; moduleIndex++) {
+    //     wheelDeltas[moduleIndex] = modules[moduleIndex].getPositionDeltas()[deltaIndex];
+    //   }
 
-      // The twist represents the motion of the robot since the last
-      // sample in x, y, and theta based only on the modules, without
-      // the gyro. The gyro is always disconnected in simulation.
-      var twist = kinematics.toTwist2d(wheelDeltas);
-      if (gyroInputs.connected) {
-        // If the gyro is connected, replace the theta component of the twist
-        // with the change in angle since the last sample.
-        Rotation2d gyroRotation = gyroInputs.odometryYawPositions[deltaIndex];
-        twist = new Twist2d(twist.dx, twist.dy, gyroRotation.minus(lastGyroRotation).getRadians());
-        lastGyroRotation = gyroRotation;
-      }
-      // Apply the twist (change since last sample) to the current pose
-      pose = pose.exp(twist);
-    }
+    //   // The twist represents the motion of the robot since the last
+    //   // sample in x, y, and theta based only on the modules, without
+    //   // the gyro. The gyro is always disconnected in simulation.
+    //   var twist = kinematics.toTwist2d(wheelDeltas);
+    //   if (gyroInputs.connected) {
+    //     // If the gyro is connected, replace the theta component of the twist
+    //     // with the change in angle since the last sample.
+    //     Rotation2d gyroRotation = gyroInputs.odometryYawPositions[deltaIndex];
+    //     twist = new Twist2d(twist.dx, twist.dy,
+    // gyroRotation.minus(lastGyroRotation).getRadians());
+    //     lastGyroRotation = gyroRotation;
+    //   }
+    //   // Apply the twist (change since last sample) to the current pose
+    //   pose = pose.exp(twist);
+    // }
 
-    // Be wary about using Timer.getFPGATimestamp in AK
-    poseEstimator.updateWithTime(Timer.getFPGATimestamp(), getRotation(), getModulePositions());
-    // TODO: figure out if needs to be moved into 250Hz processing loop
-    chassisSpeeds = kinematics.toChassisSpeeds(getModuleStates());
+    // // Be wary about using Timer.getFPGATimestamp in AK
+    // poseEstimator.updateWithTime(Timer.getFPGATimestamp(), getRotation(), getModulePositions());
+    // // TODO: figure out if needs to be moved into 250Hz processing loop
+    // chassisSpeeds = kinematics.toChassisSpeeds(getModuleStates());
 
     // TODO: see if this works on a bot, also clean up, Vision should provide poses with timestamp
     // to Drive
