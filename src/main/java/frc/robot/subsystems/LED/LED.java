@@ -1,6 +1,7 @@
 package frc.robot.subsystems.LED;
 
 import edu.wpi.first.math.util.Units;
+import frc.robot.OI;
 import org.littletonrobotics.junction.Logger;
 
 public class LED {
@@ -381,6 +382,46 @@ public class LED {
     drawPoint(i + 7, 4, r, g, b);
     drawPoint(i + 7, 5, r, g, b);
     drawPoint(i + 7, 6, r, g, b);
+  }
+
+  public void drawJumper(int x, int y, int r, int g, int b) {
+    drawPoint(x, y, r, g, b);
+    drawPoint(x, y + 1, r, g, b);
+    drawPoint(x, y + 2, r, g, b);
+  }
+
+  public void game1(int jumperPosX, int jumperPosY, int j) {
+    drawRow(6, 128, 0, 0);
+
+    if (OI.DR.getAButton()) {
+      for (int i = 6; i > 3; i--) {
+        setRGB(i, 0, 0, 0);
+      }
+      drawJumper(jumperPosX, jumperPosY -= 3, 0, 128, 0);
+    } else {
+      drawJumper(jumperPosX, jumperPosY, 0, 128, 0);
+    }
+
+    if (jumperPosY + 2 == 5 && jumperPosX <= j) {
+      // LED.getInstance().setAllRGB(255, 0, 0);
+      int rowR = 0;
+      int rowG = 0;
+      int rowB = 0;
+      drawPoint(j, 5, rowR, rowG, rowB);
+    } else {
+      int rowR = 0;
+      int rowG = 0;
+      int rowB = 255;
+      drawPoint(j, 5, rowR, rowG, rowB);
+    }
+  }
+
+  public void game2() {
+    drawPoint((int) (Math.random() * WIDTH), (int) (Math.random() * HEIGHT), 0, 0, 255);
+
+    if (OI.DR.getAButton()) {
+      setAllRGB(0, 0, 0);
+    }
   }
 
   public void clearBuffer() {

@@ -108,24 +108,39 @@ public class Robot extends LoggedRobot {
     // This must be called from the robot's periodic block in order for anything in
     // the Command-based framework to work.
 
-    int r = (int) ((0.5 + 0.5 * Math.sin(t.get() * 2)) * (LED.NUM_LEDS));
-    int g = (int) ((0.5 + 0.5 * Math.cos(t.get() * 3.14)) * (LED.NUM_LEDS));
-    int b = (int) ((0.5 + 0.5 * Math.cos(t.get() * 5)) * (LED.NUM_LEDS));
+    // int r = (int) ((0.5 + 0.5 * Math.sin(t.get() * 2)) * (LED.NUM_LEDS));
+    // int g = (int) ((0.5 + 0.5 * Math.cos(t.get() * 3.14)) * (LED.NUM_LEDS));
+    // int b = (int) ((0.5 + 0.5 * Math.cos(t.get() * 5)) * (LED.NUM_LEDS));
     int i = (int) (t.get() * 20) % 64;
+    int jumperPosX = LED.WIDTH - 7;
+    int jumperPosY = LED.HEIGHT - 5;
 
-    LED.getInstance().draw0(-i, 16, 16, 16);
-    LED.getInstance().draw1(-i + 8, 16, 16, 16);
-    LED.getInstance().draw2(-i + 16, 16, 16, 16);
-    LED.getInstance().draw3(-i + 24, 16, 16, 16);
-    LED.getInstance().draw4(-i + 32, 16, 16, 16);
-    LED.getInstance().draw5(-i + 40, 16, 16, 16);
-    LED.getInstance().draw6(-i + 48, 16, 16, 16);
-    LED.getInstance().draw7(-i + 56, 16, 16, 16);
-    LED.getInstance().draw8(-i + 64, 16, 16, 16);
-    LED.getInstance().draw9(-i + 72, 16, 16, 16);
+    // LED.getInstance().draw0(-i, 16, 16, 16);
+    // LED.getInstance().draw1(-i + 8, 16, 16, 16);
+    // LED.getInstance().draw2(-i + 16, 16, 16, 16);
+    // LED.getInstance().draw3(-i + 24, 16, 16, 16);
+    // LED.getInstance().draw4(-i + 32, 16, 16, 16);
+    // LED.getInstance().draw5(-i + 40, 16, 16, 16);
+    // LED.getInstance().draw6(-i + 48, 16, 16, 16);
+    // LED.getInstance().draw7(-i + 56, 16, 16, 16);
+    // LED.getInstance().draw8(-i + 64, 16, 16, 16);
+    // LED.getInstance().draw9(-i + 72, 16, 16, 16);
 
-    LED.getInstance().scaleRangeRGB(r, g, 8, 0, 0);
-    LED.getInstance().scaleRangeRGB(g, b, 0, 0, 8);
+    // LED.getInstance().scaleRangeRGB(r, g, 8, 0, 0);
+    // LED.getInstance().scaleRangeRGB(g, b, 0, 0, 8);
+
+    // LED.getInstance().setRGB((int) (Math.random() * LED.NUM_LEDS), 128, 0, 0);
+
+    // if (OI.DR.getAButton()) {
+    //   LED.getInstance().setAllRGB(0, 0, 0);
+    // }
+
+    LED.getInstance().game1(jumperPosX, jumperPosY, i);
+
+    // if (jumperPosY + 2 == 5 && jumperPosX == i) {
+    //   LED.getInstance().setAllRGB(255, 0, 0);
+    // }
+
     // LED.getInstance().scaleRangeRGB(b, r, 1, 1, 1);
 
     // LED.getInstance().setRGB((int) t.get(), 1, 0, 0);
