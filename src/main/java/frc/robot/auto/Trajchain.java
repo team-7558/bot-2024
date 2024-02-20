@@ -84,6 +84,28 @@ public class Trajchain implements IFollowable{
         return trajs.get(i).sample(time_s - startTimes.get(i));
     }
 
-    
+    @Override
+    public double endTime(){
+        if(generated){
+            return trajs.get(chainSize - 1).endTime();
+        }
+        return 0.0;
+    }
+
+    @Override
+    public State getInitState(){
+        if(generated){
+            return trajs.get(0).getInitState();
+        }
+        return null;
+    }
+
+    @Override
+    public State getEndState(){
+        if(generated){
+            return trajs.get(chainSize - 1).getInitState();
+        }
+        return null;
+    }
 
 }

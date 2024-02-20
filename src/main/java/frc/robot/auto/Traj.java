@@ -49,7 +49,7 @@ public class Traj implements IFollowable{
         if(this.type == TrajType.MOVING){
             PathPlannerPath pppath = isChoreo ? PathPlannerPath.fromChoreoTrajectory(filename) : PathPlannerPath.fromPathFile(filename);
             ChassisSpeeds cs = new ChassisSpeeds();
-            
+
             this.traj = pppath.getTrajectory(cs, Rotation2d.fromRadians(0));
             initState = traj.getInitialState();
         } else {
@@ -95,6 +95,7 @@ public class Traj implements IFollowable{
         return generated;
     }
 
+    @Override
     public double endTime(){
         if(type == TrajType.MOVING){
             return traj.getTotalTimeSeconds();
@@ -112,10 +113,12 @@ public class Traj implements IFollowable{
         }
     }
 
+    @Override
     public State getInitState(){
         return initState;
     }
 
+    @Override
     public State getEndState(){
         if(type == TrajType.MOVING){
             return traj.getEndState();

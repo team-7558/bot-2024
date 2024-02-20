@@ -59,6 +59,14 @@ public class Trajstack implements IFollowable{
         return trajs.get(activeTraj).sample(time_s);
     }
 
+    @Override
+    public double endTime(){
+        if(generated){
+            return trajs.get(activeTraj).endTime();
+        }
+        return 0.0;
+    }
+
     public int getActiveIdx(){
         return activeTraj;
     }
@@ -66,6 +74,22 @@ public class Trajstack implements IFollowable{
     public int setActiveIdx(int idx){
         activeTraj = MathUtil.clamp(idx, 0, stackSize-1);
         return activeTraj;
+    }
+
+    @Override
+    public State getInitState(){
+        if(generated){
+            return trajs.get(activeTraj).getInitState();
+        }
+        return null;
+    }
+
+    @Override
+    public State getEndState(){
+        if(generated){
+            return trajs.get(activeTraj).getEndState();
+        }
+        return null;
     }
     
 }

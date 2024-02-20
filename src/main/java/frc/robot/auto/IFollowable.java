@@ -10,5 +10,10 @@ public interface IFollowable {
     
     public State sample(double time_s);
 
+    public double endTime();
+
+    public State getInitState();
+
+    public State getEndState();
 
 }

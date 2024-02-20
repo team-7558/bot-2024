@@ -131,7 +131,7 @@ public class Drive extends StateMachineSubsystemBase {
     AutoBuilder.configureHolonomic(
         this::getPose,
         this::hardSetPose,
-        () -> kinematics.toChassisSpeeds(getModuleStates()),
+        this::getChassisSpeedsFromModuleStates,
         this::runVelocity,
         HPFG,
         G::isRedAlliance,
@@ -260,7 +260,7 @@ public class Drive extends StateMachineSubsystemBase {
     }
 
     // TODO: figure out if needs to be moved into 250Hz processing loop
-    chassisSpeeds = kinematics.toChassisSpeeds(getModuleStates());
+    chassisSpeeds = getChassisSpeedsFromModuleStates();
   }
 
   public void drive(double x, double y, double w, double throttle) {
@@ -406,6 +406,11 @@ public class Drive extends StateMachineSubsystemBase {
       modules[BL].getPosition(),
       modules[BR].getPosition()
     };
+  }
+
+  /** Returns robot relative chassis speeds * */
+  public ChassisSpeeds getChassisSpeedsFromModuleStates() {
+    return kinematics.toChassisSpeeds(getModuleStates());
   }
 
   /** Returns robot relative chassis speeds * */
