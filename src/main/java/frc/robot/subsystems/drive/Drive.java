@@ -13,9 +13,9 @@
 
 package frc.robot.subsystems.drive;
 
-import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.pathfinding.Pathfinding;
 import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
+import com.pathplanner.lib.util.PIDConstants;
 import com.pathplanner.lib.util.PathPlannerLogging;
 import com.pathplanner.lib.util.ReplanningConfig;
 import edu.wpi.first.math.MathUtil;
@@ -31,7 +31,6 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import frc.robot.Constants;
-import frc.robot.G;
 import frc.robot.OI;
 import frc.robot.subsystems.StateMachineSubsystemBase;
 import frc.robot.subsystems.drive.Module.Mode;
@@ -98,14 +97,20 @@ public class Drive extends StateMachineSubsystemBase {
     return instance;
   }
 
-  public final State DISABLED, SHOOTING, STRAFE_N_TURN, STRAFE_AUTOLOCK;
+  public final State DISABLED, SHOOTING, PATHING, STRAFE_N_TURN, STRAFE_AUTOLOCK;
 
   private final GyroIO gyroIO;
   private final GyroIOInputsAutoLogged gyroInputs = new GyroIOInputsAutoLogged();
   private final Module[] modules = new Module[4]; // FL, FR, BL, BR
 
-  public static final HolonomicPathFollowerConfig HPFG = new HolonomicPathFollowerConfig(
-            MAX_LINEAR_SPEED, DRIVE_BASE_RADIUS, new ReplanningConfig());
+  public static final HolonomicPathFollowerConfig HPFG =
+      new HolonomicPathFollowerConfig(
+          new PIDConstants(5),
+          new PIDConstants(5),
+          MAX_LINEAR_SPEED,
+          DRIVE_BASE_RADIUS,
+          new ReplanningConfig(),
+          Constants.globalDelta_sec);
 
   private SwerveDriveKinematics kinematics = new SwerveDriveKinematics(getModuleTranslations());
   private double autolockSetpoint = 0;
@@ -127,15 +132,6 @@ public class Drive extends StateMachineSubsystemBase {
     modules[BL] = new Module(blModuleIO, BL, Mode.SETPOINT);
     modules[BR] = new Module(brModuleIO, BR, Mode.SETPOINT);
 
-    // Configure AutoBuilder for PathPlanner
-    AutoBuilder.configureHolonomic(
-        this::getPose,
-        this::hardSetPose,
-        this::getChassisSpeedsFromModuleStates,
-        this::runVelocity,
-        HPFG,
-        G::isRedAlliance,
-        this);
     Pathfinding.setPathfinder(new LocalADStarAK());
     PathPlannerLogging.setLogActivePathCallback(
         (activePath) -> {
@@ -167,6 +163,14 @@ public class Drive extends StateMachineSubsystemBase {
           @Override
           public void periodic() {
             stopWithX();
+          }
+        };
+
+    PATHING =
+        new State("PATHING") {
+          @Override
+          public void periodic() {
+
           }
         };
 

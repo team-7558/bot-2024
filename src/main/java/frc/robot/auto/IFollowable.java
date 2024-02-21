@@ -4,16 +4,15 @@ import com.pathplanner.lib.path.PathPlannerTrajectory.State;
 
 public interface IFollowable {
 
-    public void generate();
+  public void generate();
 
-    public boolean isGenerated();
-    
-    public State sample(double time_s);
+  public boolean isGenerated();
 
-    public double endTime();
+  public State sample(double time_s);
 
-    public State getInitState();
+  public double endTime();
 
-    public State getEndState();
+  public State getInitState();
 
+  public State getEndState();
 }

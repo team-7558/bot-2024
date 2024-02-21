@@ -1,95 +1,92 @@
 package frc.robot.auto;
 
+import com.pathplanner.lib.path.PathPlannerTrajectory.State;
+import edu.wpi.first.math.MathUtil;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.pathplanner.lib.path.PathPlannerTrajectory.State;
+public class Trajstack implements IFollowable {
 
-import edu.wpi.first.math.MathUtil;
+  List<IFollowable> trajs;
 
-public class Trajstack implements IFollowable{
+  private int stackSize, activeTraj;
 
-    List<IFollowable> trajs;
+  private boolean generated = false;
 
-    private int stackSize, activeTraj;
+  public Trajstack() {
+    trajs = new ArrayList<>();
+    stackSize = 0;
+    activeTraj = -1;
+  }
 
-    private boolean generated = false;
+  public Trajstack append(IFollowable t) {
+    trajs.add(t);
+    if (activeTraj == -1) activeTraj = stackSize;
+    stackSize++;
+    return this;
+  }
 
-    public Trajstack(){
-        trajs = new ArrayList<>();
-        stackSize = 0;
-        activeTraj = -1;
+  public Trajchain appendChain() {
+    Trajchain tc = new Trajchain();
+    trajs.add(tc);
+    if (activeTraj == -1) activeTraj = stackSize;
+    stackSize++;
+    return tc;
+  }
+
+  @Override
+  public void generate() {
+    if (activeTraj == -1) {
+      System.err.println("No active paths");
+    } else {
+      for (int i = 0; i < stackSize; i++) {
+        trajs.get(i).generate();
+      }
+      System.out.println("TrajStack generated");
+      generated = true;
     }
+  }
 
-    public Trajstack append(IFollowable t){
-        trajs.add(t);
-        if(activeTraj == -1) activeTraj = stackSize;
-        stackSize++;
-        return this;
+  @Override
+  public boolean isGenerated() {
+    return generated;
+  }
+
+  @Override
+  public State sample(double time_s) {
+    return trajs.get(activeTraj).sample(time_s);
+  }
+
+  @Override
+  public double endTime() {
+    if (generated) {
+      return trajs.get(activeTraj).endTime();
     }
+    return 0.0;
+  }
 
-    public Trajchain appendChain(){
-        Trajchain tc = new Trajchain();
-        trajs.add(tc);
-        if(activeTraj == -1) activeTraj = stackSize;
-        stackSize++;
-        return tc;
+  public int getActiveIdx() {
+    return activeTraj;
+  }
+
+  public int setActiveIdx(int idx) {
+    activeTraj = MathUtil.clamp(idx, 0, stackSize - 1);
+    return activeTraj;
+  }
+
+  @Override
+  public State getInitState() {
+    if (generated) {
+      return trajs.get(activeTraj).getInitState();
     }
+    return null;
+  }
 
-    @Override
-    public void generate() {
-        if(activeTraj == -1){
-            System.err.println("Path of just waits");
-        } else {
-            for(int i = 0; i < stackSize; i++){
-                trajs.get(i).generate();
-            }
-
-            generated = true;
-        }
+  @Override
+  public State getEndState() {
+    if (generated) {
+      return trajs.get(activeTraj).getEndState();
     }
-
-    @Override
-    public boolean isGenerated() {
-        return generated;
-    }
-
-    @Override
-    public State sample(double time_s) {
-        return trajs.get(activeTraj).sample(time_s);
-    }
-
-    @Override
-    public double endTime(){
-        if(generated){
-            return trajs.get(activeTraj).endTime();
-        }
-        return 0.0;
-    }
-
-    public int getActiveIdx(){
-        return activeTraj;
-    }
-
-    public int setActiveIdx(int idx){
-        activeTraj = MathUtil.clamp(idx, 0, stackSize-1);
-        return activeTraj;
-    }
-
-    @Override
-    public State getInitState(){
-        if(generated){
-            return trajs.get(activeTraj).getInitState();
-        }
-        return null;
-    }
-
-    @Override
-    public State getEndState(){
-        if(generated){
-            return trajs.get(activeTraj).getEndState();
-        }
-        return null;
-    }
-    
+    return null;
+  }
 }
