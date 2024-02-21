@@ -6,6 +6,7 @@ package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.PerfTracker;
 import frc.robot.util.Util;
 import org.littletonrobotics.junction.Logger;
 
@@ -167,11 +168,13 @@ public abstract class StateMachineSubsystemBase extends SubsystemBase {
 
   @Override
   public final void periodic() {
-    long time = Logger.getRealTimestamp();
+    PerfTracker.start(this.getName());
     inputPeriodic();
     currentState.basePeriodic();
     outputPeriodic();
-    Logger.recordOutput(this.getName() + "/PerfDelta", Logger.getRealTimestamp() - time);
+    Logger.recordOutput(
+        "PerfMs/" + this.getName(),
+        Util.FPGATimeDelta_ms(Logger.getRealTimestamp(), Logger.getRealTimestamp()));
     Logger.recordOutput(this.getName() + "/State", currentState.name);
   }
 

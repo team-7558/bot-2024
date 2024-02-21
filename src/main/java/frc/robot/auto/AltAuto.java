@@ -29,6 +29,7 @@ public abstract class AltAuto {
   protected abstract void onExecute();
 
   public final void init() {
+    System.out.println("Starting " + name);
     if (!trajstack.isGenerated()) {
       trajstack.generate();
     }

@@ -19,6 +19,8 @@ import com.pathplanner.lib.util.PIDConstants;
 import com.pathplanner.lib.util.PathPlannerLogging;
 import com.pathplanner.lib.util.ReplanningConfig;
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
@@ -30,7 +32,9 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Timer;
 import frc.robot.Constants;
+import frc.robot.G;
 import frc.robot.OI;
 import frc.robot.subsystems.StateMachineSubsystemBase;
 import frc.robot.subsystems.drive.Module.Mode;
@@ -43,13 +47,29 @@ import org.littletonrobotics.junction.Logger;
 
 public class Drive extends StateMachineSubsystemBase {
   public static final int FL = 0, FR = 1, BL = 2, BR = 3;
-  public static final double MAX_LINEAR_SPEED = Units.feetToMeters(14.5);
+  public static final double MAX_LINEAR_SPEED = 4.73;
   public static final double TRACK_WIDTH_X = Units.inchesToMeters(18.75);
   public static final double TRACK_WIDTH_Y = Units.inchesToMeters(18.75);
+  public static final double ROTATION_RATIO = MAX_LINEAR_SPEED / 1.4104; //TODO: check this
   private static final double SKEW_CONSTANT = 0.06;
   public static final double DRIVE_BASE_RADIUS =
       Math.hypot(TRACK_WIDTH_X / 2.0, TRACK_WIDTH_Y / 2.0);
   public static final double MAX_ANGULAR_SPEED = MAX_LINEAR_SPEED / DRIVE_BASE_RADIUS;
+
+  // TODO: tune all this
+  // -- VISION CONSTANTS --
+
+  // maximum distance on high fps, low res before we switch the camera to high res lower fps
+  public static final double MAX_DISTANCE = 3.0;
+
+  // minimum distance to be on low fps high res before we switch the camera to high fps low res
+  public static final double MIN_DISTANCE = 3.1;
+
+  // distance to cut off all pose estimation because its too inaccurate
+  public static final double CUTOFF_DISTANCE = 7.0;
+
+  // ratio for the distance scaling on the standard deviation
+  private static final double APRILTAG_COEFFICIENT = 0.01; // NEEDS TO BE TUNED
 
   public static final Lock odometryLock = new ReentrantLock();
 
@@ -58,16 +78,24 @@ public class Drive extends StateMachineSubsystemBase {
   public static Drive getInstance() {
 
     if (instance == null) {
+      System.out.println("Drive initialized");
       switch (Constants.currentMode) {
         case REAL:
           // Real robot, instantiate hardware IO implementations
+          // instance =
+          // new Drive(
+          //     new GyroIOPigeon2(),
+          //     new ModuleIO2023(0),
+          //     new ModuleIO2023(1),
+          //     new ModuleIO2023(2),
+          //     new ModuleIO2023(3));
           instance =
               new Drive(
                   new GyroIOPigeon2(),
-                  new ModuleIO2023(0),
-                  new ModuleIO2023(1),
-                  new ModuleIO2023(2),
-                  new ModuleIO2023(3));
+                  new ModuleIO2024(0),
+                  new ModuleIO2024(1),
+                  new ModuleIO2024(2),
+                  new ModuleIO2024(3));
           break;
 
         case SIM:
@@ -99,8 +127,10 @@ public class Drive extends StateMachineSubsystemBase {
 
   public final State DISABLED, SHOOTING, PATHING, STRAFE_N_TURN, STRAFE_AUTOLOCK;
 
+  // IO
   private final GyroIO gyroIO;
   private final GyroIOInputsAutoLogged gyroInputs = new GyroIOInputsAutoLogged();
+
   private final Module[] modules = new Module[4]; // FL, FR, BL, BR
 
   public static final HolonomicPathFollowerConfig HPFG =
@@ -113,6 +143,7 @@ public class Drive extends StateMachineSubsystemBase {
           Constants.globalDelta_sec);
 
   private SwerveDriveKinematics kinematics = new SwerveDriveKinematics(getModuleTranslations());
+  private SwerveDrivePoseEstimator poseEstimator;
   private double autolockSetpoint = 0;
   private Pose2d pose = new Pose2d();
   private Rotation2d lastGyroRotation = new Rotation2d();
@@ -131,6 +162,8 @@ public class Drive extends StateMachineSubsystemBase {
     modules[FR] = new Module(frModuleIO, FR, Mode.SETPOINT);
     modules[BL] = new Module(blModuleIO, BL, Mode.SETPOINT);
     modules[BR] = new Module(brModuleIO, BR, Mode.SETPOINT);
+
+    PhoenixOdometryThread.getInstance().start();
 
     Pathfinding.setPathfinder(new LocalADStarAK());
     PathPlannerLogging.setLogActivePathCallback(
@@ -179,7 +212,7 @@ public class Drive extends StateMachineSubsystemBase {
           @Override
           public void periodic() {
             double throttle = 1.0;
-            throttle = Util.lerp(1, 0.2, OI.DR.getRightTriggerAxis());
+            throttle = Util.lerp(1, 0.4, OI.DR.getRightTriggerAxis() * OI.DR.getRightTriggerAxis());
             drive(-OI.DR.getLeftY(), -OI.DR.getLeftX(), -OI.DR.getRightX() * 0.75, throttle);
           }
         };
@@ -189,7 +222,7 @@ public class Drive extends StateMachineSubsystemBase {
           @Override
           public void periodic() {
             double throttle = 1.0;
-            throttle = Util.lerp(1, 0.2, OI.DR.getRightTriggerAxis());
+            throttle = Util.lerp(1, 0.4, OI.DR.getRightTriggerAxis() * OI.DR.getRightTriggerAxis());
             double err =
                 Math.IEEEremainder(
                     getPose().getRotation().getRadians() - Units.degreesToRadians(autolockSetpoint),
@@ -201,6 +234,14 @@ public class Drive extends StateMachineSubsystemBase {
           }
         };
     setCurrentState(DISABLED);
+    poseEstimator =
+        new SwerveDrivePoseEstimator(
+            kinematics,
+            getRotation(),
+            getModulePositions(),
+            new Pose2d(),
+            VecBuilder.fill(0.1, 0.1, 0.05),
+            VecBuilder.fill(0.5, 0.5, 0.5)); // TODO: TUNE STANDARD DEVIATIONS
   }
 
   @Override
@@ -263,11 +304,17 @@ public class Drive extends StateMachineSubsystemBase {
       pose = pose.exp(twist);
     }
 
+    // Be wary about using Timer.getFPGATimestamp in AK
+    poseEstimator.updateWithTime(Timer.getFPGATimestamp(), getRotation(), getModulePositions());
     // TODO: figure out if needs to be moved into 250Hz processing loop
     chassisSpeeds = getChassisSpeedsFromModuleStates();
   }
 
   public void drive(double x, double y, double w, double throttle) {
+    if (!G.isRedAlliance()) {
+      x = -x;
+      y = -y;
+    }
     // Apply deadband
     double linearMagnitude = MathUtil.applyDeadband(Math.hypot(x, y), Constants.driveDeadband);
     Rotation2d linearDirection = new Rotation2d(x, y);
@@ -283,18 +330,19 @@ public class Drive extends StateMachineSubsystemBase {
             .transformBy(new Transform2d(linearMagnitude, 0.0, new Rotation2d()))
             .getTranslation();
 
+    //TODO: SKEW CORRECTION
+
     // Convert to field relative speeds & send command
+
     runVelocity(
         ChassisSpeeds.fromFieldRelativeSpeeds(
             (linearVelocity.getX() * MAX_LINEAR_SPEED) * throttle,
             (linearVelocity.getY() * MAX_LINEAR_SPEED) * throttle,
             omega * MAX_ANGULAR_SPEED,
-            getPose()
-                .getRotation()
-                .plus(
-                    new Rotation2d(
-                        getAngularVelocity() * SKEW_CONSTANT)))); // TODO: tune skew constant
+            getPose().getRotation())); // TODO: tune skew constant
   }
+
+  public void zeroGyro() {}
 
   /**
    * Runs the drive at the desired velocity.
@@ -317,6 +365,16 @@ public class Drive extends StateMachineSubsystemBase {
     // Log setpoint states
     Logger.recordOutput("SwerveStates/Setpoints", setpointStates);
     Logger.recordOutput("SwerveStates/SetpointsOptimized", optimizedSetpointStates);
+  }
+
+  public void setBrakeMode(boolean brake) {
+    for (var module : modules) {
+      module.setBrakeMode(brake);
+    }
+  }
+
+  public boolean getBrakeMode() {
+    return modules[FL].getBrakeMode();
   }
 
   /** Stops the drive. */

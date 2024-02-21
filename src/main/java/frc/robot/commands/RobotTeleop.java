@@ -4,11 +4,15 @@
 
 package frc.robot.commands;
 
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.OI;
+import frc.robot.SS2d;
 import frc.robot.SS;
 import frc.robot.SS.State;
 import frc.robot.subsystems.drive.Drive;
+import frc.robot.subsystems.intake.Intake;
+import frc.robot.subsystems.shooter.Shooter;
 
 public class RobotTeleop extends Command {
 
@@ -38,22 +42,11 @@ public class RobotTeleop extends Command {
     if (!drive.isState(drive.DISABLED)) {
       // slow mode
       // x stance while shooting
-      if (OI.DR.getLeftTriggerAxis() > 0) {
-        drive.setCurrentState(drive.SHOOTING);
-      } else
-      // autolocking
-      if (OI.DR.getXButton()) {
-        drive.setAutolockSetpoint(-61.19);
-        drive.setCurrentState(drive.STRAFE_AUTOLOCK);
-      } else if (OI.DR.getAButton()) {
-        drive.setAutolockSetpoint(0);
-        drive.setCurrentState(drive.STRAFE_AUTOLOCK);
-      } else if (OI.DR.getBButton()) {
-        drive.setAutolockSetpoint(59.04);
-        drive.setCurrentState(drive.STRAFE_AUTOLOCK);
-      } else if (OI.DR.getYButton()) {
-        drive.setAutolockSetpoint(90);
-        drive.setCurrentState(drive.STRAFE_AUTOLOCK);
+      if (OI.DR.getPOV() == 180) {
+        drive.hardSetPose(new Pose2d());
+        drive.zeroGyro();
+      } else if (OI.DR.getXButton()) {
+
       } else {
         // strafe and turn if not other state
         drive.setCurrentState(drive.STRAFE_N_TURN);
@@ -71,6 +64,52 @@ public class RobotTeleop extends Command {
       //   drive.setModuleModes(Mode.SETPOINT);
       // }
     }
+  
+
+    if (!intake.isState(intake.DISABLED)) {
+
+      if (intake.beamBroken()) {
+        hasGamePiece = true;
+      } else if (OI.DR.getRightBumper()) {
+        hasGamePiece = false;
+      }
+
+      if (OI.DR.getAButton()) {
+        if (hasGamePiece && !intake.beamBroken()) {
+          intake.setCurrentState(intake.IDLE);
+        } else if (!hasGamePiece) {
+          intake.setCurrentState(intake.INTAKING);
+        }
+      } else if (OI.DR.getBButton()) {
+        intake.setCurrentState(intake.SHOOTER_SIDE);
+      } else {
+        intake.setCurrentState(intake.IDLE);
+      }
+    }
+
+    if (!shooter.isState(shooter.DISABLED)) {
+      if (OI.DR.getLeftTriggerAxis() > 0) {
+        shooter.setCurrentState(shooter.MANUAL);
+      } else {
+        shooter.setCurrentState(shooter.IDLE);
+      }
+    }
+
+    SS2d.S.setTurretBaseAngle(drive.getRotation());
+    SS2d.M.setTurretBaseAngle(drive.getRotation());
+
+    SS2d.S.setDistance(2.5);
+    SS2d.M.setDistance(5);
+
+    // if (!intake.isState(intake.DISABLED)) {
+    //   if (OI.DR.getRightBumper()) {
+    //     intake.setCurrentState(intake.AMP_SIDE_2);
+    //   } else if (OI.DR.getLeftBumper()) {
+    //     intake.setCurrentState(intake.SHOOTER_SIDE);
+    //   } else {
+    //     intake.setCurrentState(intake.IDLE);
+    //   }
+    // }
   }
 
   // Called once the command ends or is interrupted.

@@ -1,0 +1,13 @@
+RIO:
+
+- rio 0
+- left elevator 1
+- lower intake 2
+- upper intake 3 
+- right elevator 4
+- turret 5
+- turret cancoder 6
+- pivot 7
+- feeder 8
+- top shooter 9
+- bottom shooter 10
