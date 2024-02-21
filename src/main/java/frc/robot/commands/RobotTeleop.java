@@ -7,12 +7,10 @@ package frc.robot.commands;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.OI;
-import frc.robot.SS2d;
 import frc.robot.SS;
 import frc.robot.SS.State;
+import frc.robot.SS2d;
 import frc.robot.subsystems.drive.Drive;
-import frc.robot.subsystems.intake.Intake;
-import frc.robot.subsystems.shooter.Shooter;
 
 public class RobotTeleop extends Command {
 
@@ -52,47 +50,28 @@ public class RobotTeleop extends Command {
         drive.setCurrentState(drive.STRAFE_N_TURN);
       }
 
-      if (OI.DR.getRightBumperPressed()) {
-        ss.action(State.TEST_2);
-      } else if (OI.DR.getLeftBumperPressed()) {
-        ss.action(State.IDLE);
-      }
-
       // if (OI.XK.get(0, 0)) {
       //   drive.setModuleModes(Mode.VOLTAGE);
       // } else if (OI.XK.get(0, 1)) {
       //   drive.setModuleModes(Mode.SETPOINT);
       // }
     }
-  
 
-    if (!intake.isState(intake.DISABLED)) {
-
-      if (intake.beamBroken()) {
-        hasGamePiece = true;
-      } else if (OI.DR.getRightBumper()) {
-        hasGamePiece = false;
-      }
+    if (!ss.intakeIsDisabled()) {
 
       if (OI.DR.getAButton()) {
-        if (hasGamePiece && !intake.beamBroken()) {
-          intake.setCurrentState(intake.IDLE);
-        } else if (!hasGamePiece) {
-          intake.setCurrentState(intake.INTAKING);
-        }
-      } else if (OI.DR.getBButton()) {
-        intake.setCurrentState(intake.SHOOTER_SIDE);
-      } else {
-        intake.setCurrentState(intake.IDLE);
+        ss.intake();
+      } else if (OI.DR.getAButtonReleased()) {
+        ss.idle();
       }
     }
 
-    if (!shooter.isState(shooter.DISABLED)) {
-      if (OI.DR.getLeftTriggerAxis() > 0) {
-        shooter.setCurrentState(shooter.MANUAL);
-      } else {
-        shooter.setCurrentState(shooter.IDLE);
-      }
+    if (!ss.shooterIsDisabled()) {
+      // if (OI.DR.getLeftTriggerAxis() > 0) {
+      //   shooter.setCurrentState(shooter.MANUAL);
+      // } else {
+      //   shooter.setCurrentState(shooter.IDLE);
+      // }
     }
 
     SS2d.S.setTurretBaseAngle(drive.getRotation());

@@ -11,7 +11,6 @@ import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.InvertedValue;
-import edu.wpi.first.math.MathUtil;
 
 public class ElevatorIOReal implements ElevatorIO {
   private final TalonFX leftFalcon;
@@ -43,11 +42,11 @@ public class ElevatorIOReal implements ElevatorIO {
 
     elevatorPosition = leftFalcon.getPosition();
     elevatorVelocity = leftFalcon.getVelocity();
-    elevatorCurrent = leftFalcon.getStatorCurrent();
+    elevatorCurrent = leftFalcon.getSupplyCurrent();
     elevatorAppliedVolts = leftFalcon.getMotorVoltage();
 
-    leaderConfig.CurrentLimits.StatorCurrentLimit = 40.0;
-    leaderConfig.CurrentLimits.StatorCurrentLimitEnable = true;
+    leaderConfig.CurrentLimits.SupplyCurrentLimit = 40.0;
+    leaderConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
     leaderConfig.Feedback.SensorToMechanismRatio = 1; // Figure out how to scale this to real height
     leaderConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
 

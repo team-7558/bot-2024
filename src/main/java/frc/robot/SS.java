@@ -19,7 +19,8 @@ public class SS {
     INTAKING,
     INTAKING_DEEP,
     INTAKING_CORAL,
-    AMP_SCORING,
+    AMP_SCORING_UP,
+    AMP_SCORING_DOWN,
     SHOOTING,
     CLIMBING,
     ENDGAME
@@ -80,14 +81,14 @@ public class SS {
     // Control Switch
     switch (currState) {
       case DISABLED:
-        if(first){
+        if (first) {
           intake.setCurrentState(intake.DISABLED);
           shooter.setCurrentState(shooter.DISABLED);
           elevator.setCurrentState(elevator.DISABLED);
         }
         break;
       case IDLE:
-        if(first){
+        if (first) {
           intake.setCurrentState(intake.IDLE);
           shooter.setCurrentState(shooter.IDLE);
           elevator.setCurrentState(elevator.IDLE);
@@ -95,7 +96,7 @@ public class SS {
 
         break;
       case MANUAL:
-        if(first){
+        if (first) {
           intake.setCurrentState(intake.IDLE);
           shooter.setCurrentState(shooter.IDLE);
           elevator.setCurrentState(elevator.IDLE);
@@ -108,30 +109,57 @@ public class SS {
         }
         break;
       case TEST_3:
+      case INTAKING_DEEP:
+      case INTAKING_CORAL:
       case INTAKING:
-        if(first){
+        if (first) {
           elevator.setTargetHeight(Elevator.INTAKE_HEIGHT_M);
           elevator.setCurrentState(elevator.TRAVELLING);
         }
 
         if (intake.beamBroken()) {
           hasGamePiece = true;
-        } 
+        }
 
         if (hasGamePiece && !intake.beamBroken()) {
+          queueState(State.IDLE);
           intake.setCurrentState(intake.IDLE);
         } else if (!hasGamePiece) {
           intake.setCurrentState(intake.INTAKING);
         }
 
         break;
-      case INTAKING_DEEP:
-      case INTAKING_CORAL:
-        hasGamePiece = false;
+      case AMP_SCORING_UP:
+        if (first) {
+          elevator.setTargetHeight(Elevator.AMP_HEIGHT_M);
+          elevator.setCurrentState(elevator.TRAVELLING);
+
+          intake.setCurrentState(intake.AMP_SIDE_1);
+        }
+        if (last) {
+          elevator.setTargetHeight(Elevator.RESET_HEIGHT_M);
+          elevator.setCurrentState(elevator.TRAVELLING);
+
+          intake.setCurrentState(intake.AMP_SIDE_2);
+        }
+        if (elevator.isState(elevator.HOLDING)) {
+          queueState(State.AMP_SCORING_DOWN);
+        }
+
+        break;
+      case AMP_SCORING_DOWN:
+        if (elevator.isState(elevator.HOLDING)) {
+          elevator.setCurrentState(elevator.HOMING);
+          hasGamePiece = false;
+        }
+
+        if (elevator.isState(elevator.IDLE)) {
+          queueState(State.IDLE);
+        }
+
         break;
       case SHOOTING:
         hasGamePiece = false;
-        break;
       case CLIMBING:
       default:
         System.out.println(currState + " unimplemented state");
@@ -152,8 +180,64 @@ public class SS {
     queueState(s);
   }
 
+  public void idle() {
+    if (currState != State.IDLE) {
+      queueState(State.IDLE);
+    }
+  }
+
+  public void intake() {
+    if (currState == State.IDLE) {
+      queueState(State.INTAKING);
+    }
+  }
+
+  public void amp() {
+    if (currState == State.IDLE) {
+      queueState(State.AMP_SCORING_UP);
+    }
+  }
+
+  public void shoot() {
+    if (currState == State.IDLE) {
+      queueState(State.INTAKING);
+    }
+  }
+
+  public void climb() {
+    if (currState == State.IDLE) {
+      queueState(State.INTAKING);
+    }
+  }
+
   public boolean hasGamePiece() {
     return hasGamePiece;
+  }
+
+  // Subsystem management
+
+  public void disableIntake() {
+    intake.setCurrentState(intake.DISABLED);
+  }
+
+  public void disableElevator() {
+    elevator.setCurrentState(elevator.DISABLED);
+  }
+
+  public void disableShooter() {
+    shooter.setCurrentState(shooter.DISABLED);
+  }
+
+  public boolean intakeIsDisabled() {
+    return intake.isState(intake.DISABLED);
+  }
+
+  public boolean elevatorIsDisabled() {
+    return elevator.isState(elevator.DISABLED);
+  }
+
+  public boolean shooterIsDisabled() {
+    return shooter.isState(shooter.DISABLED);
   }
 
   // Timer Functions

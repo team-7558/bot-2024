@@ -50,7 +50,7 @@ public class Drive extends StateMachineSubsystemBase {
   public static final double MAX_LINEAR_SPEED = 4.73;
   public static final double TRACK_WIDTH_X = Units.inchesToMeters(18.75);
   public static final double TRACK_WIDTH_Y = Units.inchesToMeters(18.75);
-  public static final double ROTATION_RATIO = MAX_LINEAR_SPEED / 1.4104; //TODO: check this
+  public static final double ROTATION_RATIO = MAX_LINEAR_SPEED / 1.4104; // TODO: check this
   private static final double SKEW_CONSTANT = 0.06;
   public static final double DRIVE_BASE_RADIUS =
       Math.hypot(TRACK_WIDTH_X / 2.0, TRACK_WIDTH_Y / 2.0);
@@ -202,9 +202,7 @@ public class Drive extends StateMachineSubsystemBase {
     PATHING =
         new State("PATHING") {
           @Override
-          public void periodic() {
-
-          }
+          public void periodic() {}
         };
 
     STRAFE_N_TURN =
@@ -330,7 +328,7 @@ public class Drive extends StateMachineSubsystemBase {
             .transformBy(new Transform2d(linearMagnitude, 0.0, new Rotation2d()))
             .getTranslation();
 
-    //TODO: SKEW CORRECTION
+    // TODO: SKEW CORRECTION
 
     // Convert to field relative speeds & send command
 

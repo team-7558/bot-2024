@@ -33,11 +33,11 @@ public class IntakeIOTalonFX implements IntakeIO {
 
   private final StatusSignal<Double> bottomVelocity = bottomMotor.getVelocity();
   private final StatusSignal<Double> bottomAppliedVolts = bottomMotor.getMotorVoltage();
-  private final StatusSignal<Double> bottomCurrent = bottomMotor.getStatorCurrent();
+  private final StatusSignal<Double> bottomCurrent = bottomMotor.getSupplyCurrent();
 
   private final StatusSignal<Double> topVelocity = topMotor.getVelocity();
   private final StatusSignal<Double> topAppliedVolts = topMotor.getMotorVoltage();
-  private final StatusSignal<Double> topCurrent = topMotor.getStatorCurrent();
+  private final StatusSignal<Double> topCurrent = topMotor.getSupplyCurrent();
 
   private final DutyCycleOut bottomDCOut = new DutyCycleOut(0);
   private final VoltageOut bottomVOut = new VoltageOut(0);
@@ -48,8 +48,8 @@ public class IntakeIOTalonFX implements IntakeIO {
 
   public IntakeIOTalonFX() {
     var config = new TalonFXConfiguration();
-    config.CurrentLimits.StatorCurrentLimit = 30.0;
-    config.CurrentLimits.StatorCurrentLimitEnable = true;
+    config.CurrentLimits.SupplyCurrentLimit = 30.0;
+    config.CurrentLimits.SupplyCurrentLimitEnable = true;
     config.MotorOutput.NeutralMode = NeutralModeValue.Coast;
     bottomMotor.getConfigurator().apply(config);
     topMotor.getConfigurator().apply(config);

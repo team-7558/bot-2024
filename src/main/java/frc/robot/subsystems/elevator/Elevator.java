@@ -9,7 +9,6 @@ import frc.robot.Constants;
 import frc.robot.SS2d;
 import frc.robot.subsystems.StateMachineSubsystemBase;
 import frc.robot.util.Util;
-
 import org.littletonrobotics.junction.Logger;
 
 public class Elevator extends StateMachineSubsystemBase {
@@ -18,9 +17,10 @@ public class Elevator extends StateMachineSubsystemBase {
   public static final double STROKE_M = MAX_HEIGHT_M - MIN_HEIGHT_M;
 
   public static final double INTAKE_HEIGHT_M = MIN_HEIGHT_M;
-  public static final double MIN_FEED_HEIGHT_M = 0.6096;
-  public static final double MAX_FEED_HEIGHT_M = 0.6096;
-  public static final double AMP_HEIGHT_M = 0.6096;
+  public static final double RESET_HEIGHT_M = MIN_HEIGHT_M + 0.04;
+  public static final double MIN_FEED_HEIGHT_M = MIN_HEIGHT_M;
+  public static final double MAX_FEED_HEIGHT_M = MIN_HEIGHT_M;
+  public static final double AMP_HEIGHT_M = MIN_HEIGHT_M;
   public static final double CLIMB_HEIGHT_M = MAX_HEIGHT_M;
 
   private static Elevator instance;
@@ -81,9 +81,9 @@ public class Elevator extends StateMachineSubsystemBase {
         new State("HOLDING") {
           @Override
           public void periodic() {
-            if(atTargetHeight()){
+            if (atTargetHeight()) {
               io.holdPos(targetHeight_m);
-            } else{
+            } else {
               setCurrentState(TRAVELLING);
             }
           }
@@ -92,9 +92,9 @@ public class Elevator extends StateMachineSubsystemBase {
         new State("TRAVELLING") {
           @Override
           public void periodic() {
-            if(!atTargetHeight()){
+            if (!atTargetHeight()) {
               io.travelToPos(targetHeight_m);
-            } else{
+            } else {
               setCurrentState(TRAVELLING);
             }
           }
@@ -115,11 +115,11 @@ public class Elevator extends StateMachineSubsystemBase {
     setCurrentState(DISABLED);
   }
 
-  public boolean atHeight(double height_m){
+  public boolean atHeight(double height_m) {
     return Util.inRange(height_m - inputs.pos_m, 0.02);
   }
 
-  public boolean atTargetHeight(){
+  public boolean atTargetHeight() {
     return atHeight(targetHeight_m);
   }
 
