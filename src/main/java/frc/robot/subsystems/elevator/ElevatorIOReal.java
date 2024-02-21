@@ -102,17 +102,16 @@ public class ElevatorIOReal implements ElevatorIO {
 
   @Override
   public void setVel(double vel_mps) {
-    double v = MathUtil.clamp(vel_mps, -Elevator.MAX_SPEED_V, Elevator.MAX_SPEED_V);
-    leftFalcon.setControl(mmVelControl.withVelocity(v));
+    leftFalcon.setControl(mmVelControl.withVelocity(vel_mps));
   }
 
   @Override
-  public void setPos(double position) {
+  public void holdPos(double position) {
     leftFalcon.setControl(mmPosControl.withPosition(position));
   }
 
   @Override
-  public void climb(double position) {
+  public void travelToPos(double position) {
     leftFalcon.setControl(mmPosControl.withPosition(position));
   }
 

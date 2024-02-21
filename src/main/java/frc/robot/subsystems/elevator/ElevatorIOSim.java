@@ -35,7 +35,13 @@ public class ElevatorIOSim implements ElevatorIO {
   }
 
   @Override
-  public void setPos(double pos_m) {
+  public void holdPos(double pos_m) {
+    posPid.setSetpoint(pos_m);
+    setVoltage(posPid.calculate(sim.getPositionMeters()));
+  }
+
+  @Override
+  public void travelToPos(double pos_m) {
     posPid.setSetpoint(pos_m);
     setVoltage(posPid.calculate(sim.getPositionMeters()));
   }

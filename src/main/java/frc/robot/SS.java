@@ -1,6 +1,9 @@
 package frc.robot;
 
 import edu.wpi.first.wpilibj.Timer;
+import frc.robot.subsystems.elevator.Elevator;
+import frc.robot.subsystems.intake.Intake;
+import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.util.Util;
 import org.littletonrobotics.junction.Logger;
 
@@ -10,11 +13,13 @@ public class SS {
   public enum State {
     DISABLED,
     IDLE,
+    MANUAL,
     TEST_2,
     TEST_3,
     INTAKING,
     INTAKING_DEEP,
     INTAKING_CORAL,
+    AMP_SCORING,
     SHOOTING,
     CLIMBING,
     ENDGAME
@@ -32,6 +37,10 @@ public class SS {
 
   private Timer timer;
 
+  private Intake intake;
+  private Shooter shooter;
+  private Elevator elevator;
+
   private State lastState;
   private State currState;
   private State nextState;
@@ -44,6 +53,10 @@ public class SS {
     nextState = State.DISABLED;
 
     timer = new Timer();
+
+    intake = Intake.getInstance();
+    shooter = Shooter.getInstance();
+    elevator = Elevator.getInstance();
 
     hasGamePiece = true;
   }
@@ -67,8 +80,27 @@ public class SS {
     // Control Switch
     switch (currState) {
       case DISABLED:
+        if(first){
+          intake.setCurrentState(intake.DISABLED);
+          shooter.setCurrentState(shooter.DISABLED);
+          elevator.setCurrentState(elevator.DISABLED);
+        }
         break;
       case IDLE:
+        if(first){
+          intake.setCurrentState(intake.IDLE);
+          shooter.setCurrentState(shooter.IDLE);
+          elevator.setCurrentState(elevator.IDLE);
+        }
+
+        break;
+      case MANUAL:
+        if(first){
+          intake.setCurrentState(intake.IDLE);
+          shooter.setCurrentState(shooter.IDLE);
+          elevator.setCurrentState(elevator.IDLE);
+        }
+
         break;
       case TEST_2:
         if (after(3)) {
@@ -77,9 +109,25 @@ public class SS {
         break;
       case TEST_3:
       case INTAKING:
+        if(first){
+          elevator.setTargetHeight(Elevator.INTAKE_HEIGHT_M);
+          elevator.setCurrentState(elevator.TRAVELLING);
+        }
+
+        if (intake.beamBroken()) {
+          hasGamePiece = true;
+        } 
+
+        if (hasGamePiece && !intake.beamBroken()) {
+          intake.setCurrentState(intake.IDLE);
+        } else if (!hasGamePiece) {
+          intake.setCurrentState(intake.INTAKING);
+        }
+
+        break;
       case INTAKING_DEEP:
       case INTAKING_CORAL:
-        hasGamePiece = true;
+        hasGamePiece = false;
         break;
       case SHOOTING:
         hasGamePiece = false;

@@ -18,9 +18,9 @@ public interface ElevatorIO {
 
   public default void setVel(double vel_mps) {}
 
-  public default void setPos(double pos_m) {}
+  public default void holdPos(double pos_m) {}
 
-  public default void climb(double pos_m) {}
+  public default void travelToPos(double pos_m) {}
 
   public default void configurePID(double kP, double kI, double kD) {}
 

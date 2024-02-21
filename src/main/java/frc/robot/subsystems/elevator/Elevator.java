@@ -8,13 +8,20 @@ import edu.wpi.first.math.MathUtil;
 import frc.robot.Constants;
 import frc.robot.SS2d;
 import frc.robot.subsystems.StateMachineSubsystemBase;
+import frc.robot.util.Util;
+
 import org.littletonrobotics.junction.Logger;
 
 public class Elevator extends StateMachineSubsystemBase {
   public static final double MIN_HEIGHT_M = 0.6096;
   public static final double MAX_HEIGHT_M = 0.8763;
   public static final double STROKE_M = MAX_HEIGHT_M - MIN_HEIGHT_M;
-  public static final double MAX_SPEED_V = 12.0;
+
+  public static final double INTAKE_HEIGHT_M = MIN_HEIGHT_M;
+  public static final double MIN_FEED_HEIGHT_M = 0.6096;
+  public static final double MAX_FEED_HEIGHT_M = 0.6096;
+  public static final double AMP_HEIGHT_M = 0.6096;
+  public static final double CLIMB_HEIGHT_M = MAX_HEIGHT_M;
 
   private static Elevator instance;
 
@@ -42,7 +49,7 @@ public class Elevator extends StateMachineSubsystemBase {
     return instance;
   }
 
-  public final State DISABLED, IDLE, HOLDING, CLIMBING, HOMING;
+  public final State DISABLED, IDLE, HOLDING, TRAVELLING, HOMING;
 
   private final ElevatorIO io;
   private final ElevatorIOInputsAutoLogged inputs = new ElevatorIOInputsAutoLogged(); // hacky fix
@@ -74,14 +81,22 @@ public class Elevator extends StateMachineSubsystemBase {
         new State("HOLDING") {
           @Override
           public void periodic() {
-            io.setPos(targetHeight_m);
+            if(atTargetHeight()){
+              io.holdPos(targetHeight_m);
+            } else{
+              setCurrentState(TRAVELLING);
+            }
           }
         };
-    CLIMBING =
-        new State("CLIMBING") {
+    TRAVELLING =
+        new State("TRAVELLING") {
           @Override
           public void periodic() {
-            io.climb(targetHeight_m);
+            if(!atTargetHeight()){
+              io.travelToPos(targetHeight_m);
+            } else{
+              setCurrentState(TRAVELLING);
+            }
           }
         };
     HOMING =
@@ -98,6 +113,14 @@ public class Elevator extends StateMachineSubsystemBase {
         };
 
     setCurrentState(DISABLED);
+  }
+
+  public boolean atHeight(double height_m){
+    return Util.inRange(height_m - inputs.pos_m, 0.02);
+  }
+
+  public boolean atTargetHeight(){
+    return atHeight(targetHeight_m);
   }
 
   public void setTargetHeight(double height_m) {

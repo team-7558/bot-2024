@@ -28,14 +28,14 @@ public class ElevatorIOIdeal implements ElevatorIO {
   }
 
   @Override
-  public void setPos(double pos_m) {
+  public void holdPos(double pos_m) {
     this.vel_mps = 0;
     this.volts_V = 0;
     this.pos_m = pos_m;
   }
 
   @Override
-  public void climb(double pos_m) {
+  public void travelToPos(double pos_m) {
     this.vel_mps = 0;
     this.volts_V = 0;
     this.pos_m = pos_m;
