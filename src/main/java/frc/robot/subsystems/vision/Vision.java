@@ -69,7 +69,7 @@ public class Vision extends SubsystemBase {
                   new Transform3d(
                       0,
                       0,
-                      0,
+                      -0.5,
                       new Rotation3d(
                           Units.degreesToRadians(10),
                           Units.degreesToRadians(10),
