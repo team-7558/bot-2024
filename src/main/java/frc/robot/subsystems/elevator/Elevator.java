@@ -16,7 +16,7 @@ public class Elevator extends StateMachineSubsystemBase {
   public static final double MAX_HEIGHT_M = Units.inchesToMeters(36.25); // 0.8763;
   public static final double STROKE_M = MAX_HEIGHT_M - MIN_HEIGHT_M;
   public static final double MAX_VEL_MPS = 1.0;
-  public static final double CURRENT_THRESHOLD_A = 500;
+  public static final double CURRENT_THRESHOLD_A = 10;
 
   private static Elevator instance;
 
@@ -101,7 +101,7 @@ public class Elevator extends StateMachineSubsystemBase {
               setCurrentState(RESETTING);
             } else {
               // io.setVel(-0.05);
-              io.setVoltage(-3.5);
+              io.setVoltage(-0.5);
             }
           }
         };
