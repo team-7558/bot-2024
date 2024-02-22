@@ -15,7 +15,7 @@ import edu.wpi.first.wpilibj.DutyCycleEncoder;
 public class ShooterIOTalonFx implements ShooterIO {
 
   private static final double FLYWHEEL_GEAR_RATIO = 1;
-  private static final double TURRET_GEAR_RATIO = 196.0 / 16.0; // TODO SET
+  private static final double TURRET_GEAR_RATIO = 196.0 / 18.0; // TODO SET
   private static final double FEEDER_GEAR_RATIO = 1; // TODO: SET
   private static final double PIVOT_GEAR_RATIO = 81; // TODO: SET
 
@@ -27,8 +27,6 @@ public class ShooterIOTalonFx implements ShooterIO {
 
   private final DutyCycleEncoder tAbsEnc = new DutyCycleEncoder(1); // TODO: update
   private final DutyCycleEncoder pAbsEnc = new DutyCycleEncoder(4); // TODO: update
-
-  // TODO: add throughbores
 
   private final DigitalInput beambreak = new DigitalInput(0);
 
@@ -55,6 +53,9 @@ public class ShooterIOTalonFx implements ShooterIO {
   private final StatusSignal<Double> FAppliedVolts = feeder.getMotorVoltage();
   private final StatusSignal<Double> FCurrent = feeder.getStatorCurrent();
 
+  private double tAbsOffset = 0;
+  private double pAbsOffset = 0;
+
   public ShooterIOTalonFx() {
     var config = new TalonFXConfiguration();
     config.Feedback.SensorToMechanismRatio = FLYWHEEL_GEAR_RATIO;
@@ -77,9 +78,20 @@ public class ShooterIOTalonFx implements ShooterIO {
     turretConfig.CurrentLimits.StatorCurrentLimitEnable = true;
     turretConfig.MotorOutput.NeutralMode = NeutralModeValue.Coast;
     turretConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
+
+    // posHold
     turretConfig.Slot0.kP = 0;
     turretConfig.Slot0.kI = 0;
     turretConfig.Slot0.kD = 0;
+
+    // mmPosMove
+    turretConfig.Slot1.kP = 0;
+    turretConfig.Slot1.kI = 0;
+    turretConfig.Slot1.kD = 0;
+    turretConfig.Slot1.kS = 0;
+    turretConfig.Slot1.kV = 0;
+    turretConfig.Slot1.kA = 0;
+
     turretConfig.MotionMagic.MotionMagicAcceleration = 0;
     turretConfig.MotionMagic.MotionMagicCruiseVelocity = 0;
     turretConfig.MotionMagic.MotionMagicJerk = 0;
@@ -116,9 +128,9 @@ public class ShooterIOTalonFx implements ShooterIO {
     feeder.getConfigurator().apply(feederConfig);
     pivot.getConfigurator().apply(pivotConfig);
 
-    tAbsEnc.setPositionOffset(0);
+    tAbsEnc.setPositionOffset(0.383);
     tAbsEnc.setDistancePerRotation(1);
-    pAbsEnc.setPositionOffset(0);
+    pAbsEnc.setPositionOffset(0.832);
     pAbsEnc.setDistancePerRotation(1);
 
     // TODO: tune
@@ -183,6 +195,14 @@ public class ShooterIOTalonFx implements ShooterIO {
   }
 
   @Override
+  public void zero() {
+    System.out.println(-(tAbsEnc.getAbsolutePosition() - tAbsEnc.getPositionOffset()));
+    System.out.println(-(pAbsEnc.getAbsolutePosition() - pAbsEnc.getPositionOffset()));
+    turret.setPosition(-(tAbsEnc.getAbsolutePosition() - tAbsEnc.getPositionOffset()));
+    pivot.setPosition(-(pAbsEnc.getAbsolutePosition() - pAbsEnc.getPositionOffset()));
+  }
+
+  @Override
   public void setFeederVolts(double volts) {
     feeder.setControl(new VoltageOut(volts));
   }
@@ -231,12 +251,12 @@ public class ShooterIOTalonFx implements ShooterIO {
         new double[] {LCurrent.getValueAsDouble(), RCurrent.getValueAsDouble()};
     inputs.pivotVolts = PAppliedVolts.getValueAsDouble();
     inputs.pivotPosR = PPosition.getValueAsDouble();
-    inputs.pivotAbsPosR = -pAbsEnc.getAbsolutePosition();
+    inputs.pivotAbsPosR = -(pAbsEnc.getAbsolutePosition() - pAbsEnc.getPositionOffset());
     inputs.pivotVelRPS = PVelocity.getValueAsDouble();
     inputs.pivotCurrent = PCurrent.getValueAsDouble();
     inputs.turretVolts = TAppliedVolts.getValueAsDouble();
     inputs.turretPosR = TPosition.getValueAsDouble();
-    inputs.turretAbsPosR = -tAbsEnc.getAbsolutePosition();
+    inputs.turretAbsPosR = -(tAbsEnc.getAbsolutePosition() - tAbsEnc.getPositionOffset());
     inputs.turretVelRPS = TVelocity.getValueAsDouble();
     inputs.turretCurrent = TCurrent.getValueAsDouble();
     inputs.beamBreakActivated = beambreak.get();

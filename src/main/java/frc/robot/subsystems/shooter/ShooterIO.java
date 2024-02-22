@@ -64,6 +64,8 @@ public interface ShooterIO {
   /** Stop in open loop. */
   public default void stop() {}
 
+  public default void zero() {}
+
   /** Set velocity PID constants. */
   public default void flywheelConfigurePID(double kP, double kI, double kD) {}
 

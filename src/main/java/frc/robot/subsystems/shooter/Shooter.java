@@ -22,6 +22,7 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Filesystem;
+import edu.wpi.first.wpilibj.Timer;
 import frc.robot.Constants;
 import frc.robot.OI;
 import frc.robot.SS2d;
@@ -255,6 +256,9 @@ public class Shooter extends StateMachineSubsystemBase {
         };
 
     setCurrentState(DISABLED);
+
+    Timer.delay(3); // TODO: periodically set this in disabled
+    io.zero();
   }
 
   @Override
