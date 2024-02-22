@@ -15,7 +15,7 @@ import edu.wpi.first.wpilibj.DutyCycleEncoder;
 public class ShooterIOTalonFx implements ShooterIO {
 
   private static final double FLYWHEEL_GEAR_RATIO = 1;
-  private static final double TURRET_GEAR_RATIO = 19; // TODO SET
+  private static final double TURRET_GEAR_RATIO = 196.0/16.0; // TODO SET
   private static final double FEEDER_GEAR_RATIO = 1; // TODO: SET
   private static final double PIVOT_GEAR_RATIO = 81; // TODO: SET
 
@@ -27,6 +27,7 @@ public class ShooterIOTalonFx implements ShooterIO {
 
   private final DutyCycleEncoder tAbsEnc = new DutyCycleEncoder(1); // TODO: update
   private final DutyCycleEncoder pAbsEnc = new DutyCycleEncoder(4); // TODO: update
+
   // TODO: add throughbores
 
   private final DigitalInput beambreak = new DigitalInput(0);
@@ -230,12 +231,12 @@ public class ShooterIOTalonFx implements ShooterIO {
         new double[] {LCurrent.getValueAsDouble(), RCurrent.getValueAsDouble()};
     inputs.pivotVolts = PAppliedVolts.getValueAsDouble();
     inputs.pivotPosR = PPosition.getValueAsDouble();
-    inputs.pivotAbsPosR = pAbsEnc.getAbsolutePosition();
+    inputs.pivotAbsPosR = -pAbsEnc.getAbsolutePosition();
     inputs.pivotVelRPS = PVelocity.getValueAsDouble();
     inputs.pivotCurrent = PCurrent.getValueAsDouble();
     inputs.turretVolts = TAppliedVolts.getValueAsDouble();
     inputs.turretPosR = TPosition.getValueAsDouble();
-    inputs.turretAbsPosR = tAbsEnc.getAbsolutePosition();
+    inputs.turretAbsPosR = -tAbsEnc.getAbsolutePosition();
     inputs.turretVelRPS = TVelocity.getValueAsDouble();
     inputs.turretCurrent = TCurrent.getValueAsDouble();
     inputs.beamBreakActivated = beambreak.get();
