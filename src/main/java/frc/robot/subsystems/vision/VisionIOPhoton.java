@@ -2,7 +2,6 @@ package frc.robot.subsystems.vision;
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
-import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import java.io.IOException;
@@ -30,7 +29,7 @@ public class VisionIOPhoton implements ApriltagIO {
 
   public VisionIOPhoton(String camname, Transform3d camToRobot) {
     this.camera = new PhotonCamera(camname);
-    Arrays.fill(poses, new Pose2d());
+    Arrays.fill(poses, new Pose3d());
     thread = new VisionProcessingThread(this);
     thread.start();
 
@@ -51,9 +50,9 @@ public class VisionIOPhoton implements ApriltagIO {
 
   @Override
   public void updateInputs(ApriltagIOInputs inputs) {
-    inputs.poses = poses;
-    inputs.poseTimestamps = poseTimestamps;
-    inputs.tids = tids;
+
+    poseTimestamps = new double[100];
+    tids = new double[100];
     if (recentResult != null) {
       PhotonPipelineResult latestResult = recentResult;
       if (latestResult.hasTargets()) {
@@ -64,9 +63,11 @@ public class VisionIOPhoton implements ApriltagIO {
         inputs.latency = latestResult.getLatencyMillis();
       }
     }
-    poseTimestamps = new double[100];
-    tids = new double[100];
+
     poseIndex = 0;
+    inputs.poses = poses;
+    inputs.poseTimestamps = poseTimestamps;
+    inputs.tids = tids;
   }
 
   @Override
