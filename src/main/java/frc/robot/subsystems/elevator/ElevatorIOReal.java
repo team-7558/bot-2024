@@ -66,7 +66,7 @@ public class ElevatorIOReal implements ElevatorIO {
     leaderConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
 
     leaderConfig.MotionMagic.MotionMagicCruiseVelocity = 1.3;
-    leaderConfig.MotionMagic.MotionMagicAcceleration = 1.5;
+    leaderConfig.MotionMagic.MotionMagicAcceleration = 2.0;
     leaderConfig.MotionMagic.MotionMagicJerk = 5;
     leaderConfig.MotionMagic.MotionMagicExpo_kV = 0.5;
     leaderConfig.MotionMagic.MotionMagicExpo_kA = 0.5;
