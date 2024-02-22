@@ -66,8 +66,4 @@ public interface ShooterIO {
 
   public default void zero() {}
 
-  /** Set velocity PID constants. */
-  public default void flywheelConfigurePID(double kP, double kI, double kD) {}
-
-  public default void turretConfigurePID(double kP, double kI, double kD) {}
 }

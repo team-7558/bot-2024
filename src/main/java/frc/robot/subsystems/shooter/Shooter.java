@@ -38,8 +38,6 @@ public class Shooter extends StateMachineSubsystemBase {
 
   private static double HEIGHT_M = 0;
 
-  public static double ACCELERATION = 5.0; // TODO: tune
-
   public static final double FLYWHEEL_MIN_VEL_rps = 0, FLYWHEEL_MAX_VEL_rps = 100;
   public static final double TURRET_MIN_POS_r = -0.25, TURRET_MAX_POS_r = 0.25;
   public static final double PIVOT_MIN_POS_r = 0, PIVOT_MAX_POS_r = 0.2;
@@ -52,6 +50,9 @@ public class Shooter extends StateMachineSubsystemBase {
   ;
   private static LinearInterpolator shotSpeedFromDistance =
       new LinearInterpolator(getLerpTableFromFile("shotspeeds.lerp"));
+
+  private static LinearInterpolator turretConstraintsFromPivotPos = 
+      new LinearInterpolator(getLerpTableFromFile("turretConstraintFromPivotPos.lerp"));
 
   private static double TIME_TO_SHOOT = 0.25;
 
@@ -152,18 +153,6 @@ public class Shooter extends StateMachineSubsystemBase {
     this.io = io;
     // Switch constants based on mode (the physics simulator is treated as a
     // separate robot with different tuning)
-
-    switch (Constants.currentMode) {
-      case REAL:
-      case REPLAY:
-        io.flywheelConfigurePID(1.0, 0.0, 0.0);
-        break;
-      case SIM:
-        io.flywheelConfigurePID(0.5, 0.0, 0.0);
-        break;
-      default:
-        break;
-    }
 
     // loading lerp tables
 
@@ -454,15 +443,14 @@ public class Shooter extends StateMachineSubsystemBase {
   private Setpoints constrainSetpoints(Setpoints s, boolean isFeeding) { // TODO: constrain
     if (isFeeding) {
       s.feederVel_rps = 0.25;
-      s.flywheel_rps =
-          Util.limit(s.flywheel_rps, FLYWHEEL_MIN_FEED_VEL_rps, FLYWHEEL_MAX_FEED_VEL_rps);
-      s.turretPos_r = Util.limit(s.turretPos_r, TURRET_MIN_FEED_POS_r, TURRET_MAX_FEED_POS_r);
+      s.flywheel_rps = Util.limit(s.flywheel_rps, FLYWHEEL_MIN_FEED_VEL_rps, FLYWHEEL_MAX_FEED_VEL_rps);
       s.pivotPos_r = Util.limit(s.pivotPos_r, PIVOT_MIN_FEED_POS_r, PIVOT_MAX_FEED_POS_r);
+      s.turretPos_r = Util.limit(s.turretPos_r, TURRET_MIN_FEED_POS_r, TURRET_MAX_FEED_POS_r);
     } else {
       s.feederVel_rps = 0;
       s.flywheel_rps = Util.limit(s.flywheel_rps, FLYWHEEL_MIN_VEL_rps, FLYWHEEL_MAX_VEL_rps);
-      s.turretPos_r = Util.limit(s.turretPos_r, TURRET_MIN_POS_r, TURRET_MAX_POS_r);
       s.pivotPos_r = Util.limit(s.pivotPos_r, PIVOT_MIN_POS_r, PIVOT_MAX_POS_r);
+      s.turretPos_r = Util.limit(s.turretPos_r, turretConstraintsFromPivotPos.getInterpolatedValue(s.pivotPos_r));
     }
     return s;
   }
