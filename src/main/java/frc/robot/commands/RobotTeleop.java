@@ -36,7 +36,7 @@ public class RobotTeleop extends Command {
   @Override
   public void initialize() {
     drive.setCurrentState(drive.STRAFE_N_TURN);
-    shooter.setCurrentState(shooter.LOCKONT);
+    shooter.setCurrentState(shooter.TRACKING);
     intake.setCurrentState(intake.IDLE);
     elevator.setCurrentState(elevator.HOLDING);
   }

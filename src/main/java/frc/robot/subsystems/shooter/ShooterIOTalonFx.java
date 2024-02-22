@@ -115,12 +115,26 @@ public class ShooterIOTalonFx implements ShooterIO {
     pivotConfig.CurrentLimits.StatorCurrentLimitEnable = true;
     pivotConfig.MotorOutput.NeutralMode = NeutralModeValue.Coast;
     pivotConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
+
+    // posHold
     pivotConfig.Slot0.kP = 0;
     pivotConfig.Slot0.kI = 0;
     pivotConfig.Slot0.kD = 0;
     pivotConfig.Slot0.kS = 0;
     pivotConfig.Slot0.kV = 0;
     pivotConfig.Slot0.kA = 0;
+
+    // mmPosMove
+    pivotConfig.Slot1.kP = 0;
+    pivotConfig.Slot1.kI = 0;
+    pivotConfig.Slot1.kD = 0;
+    pivotConfig.Slot1.kS = 0;
+    pivotConfig.Slot1.kV = 0;
+    pivotConfig.Slot1.kA = 0;
+
+    pivotConfig.MotionMagic.MotionMagicAcceleration = 0;
+    pivotConfig.MotionMagic.MotionMagicCruiseVelocity = 0;
+    pivotConfig.MotionMagic.MotionMagicJerk = 0;
 
     // TODO: tune all of that & use absolute encoder
 

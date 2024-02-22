@@ -4,17 +4,21 @@
 
 package frc.robot.commands;
 
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.OI;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.shooter.Shooter;
+import frc.robot.subsystems.shooter.Shooter.Setpoints;
 
 public class ShooterBringup extends Command {
 
   private final Drive drive;
   private final Intake intake;
   private final Shooter shooter;
+
+  private Timer t;
 
   boolean hasGamePiece = false;
 
@@ -25,6 +29,8 @@ public class ShooterBringup extends Command {
     intake = Intake.getInstance();
     shooter = Shooter.getInstance();
 
+    t = new Timer();
+
     addRequirements(drive);
   }
 
@@ -33,36 +39,30 @@ public class ShooterBringup extends Command {
   public void initialize() {
     drive.setCurrentState(drive.DISABLED);
     intake.setCurrentState(intake.IDLE);
-    shooter.setCurrentState(shooter.MANUAL);
+    shooter.setCurrentState(shooter.IDLE);
+
+    t.reset();
+    t.start();
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
 
-    if (!intake.isState(intake.DISABLED)) {
+    if (!shooter.isState(shooter.DISABLED)) {
+      double s = 0.125 * Math.sin(t.get() * 0.05);
+      double c = 0.125 * Math.cos(t.get() * 0.05);
 
-      if (intake.beamBroken()) {
-        hasGamePiece = true;
-      } else if (OI.DR.getRightTriggerAxis() > 0) {
-        hasGamePiece = false;
-      }
-
-      if (OI.DR.getAButton()) {
-        if (hasGamePiece && !intake.beamBroken()) {
-          intake.setCurrentState(intake.IDLE);
-        } else if (!hasGamePiece) {
-          intake.setCurrentState(intake.INTAKING);
-        }
-      } else if (OI.DR.getBButton()) {
-        intake.setCurrentState(intake.AMP_SIDE_2);
-        hasGamePiece = false;
-      } else if (OI.DR.getXButton()) {
-        intake.setCurrentState(intake.SHOOTER_SIDE);
-        hasGamePiece = false;
+      if(OI.DR.getAButton()){
+        shooter.queueSetpoints(new Setpoints(0, 0, 0.125));
+        shooter.setCurrentState(shooter.TRACKING);
+      } else if(OI.DR.getBButton()){
+        shooter.queueSetpoints(new Setpoints(0, 0, 0.125));
+        shooter.setCurrentState(shooter.TRACKING);
       } else {
-        intake.setCurrentState(intake.IDLE);
+        shooter.setCurrentState(shooter.IDLE);
       }
+      
     }
 
     if (!drive.isState(drive.DISABLED)) {
