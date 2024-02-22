@@ -50,7 +50,6 @@ public class Drive extends StateMachineSubsystemBase {
   public static final double MAX_LINEAR_SPEED = 4.73;
   public static final double TRACK_WIDTH_X = Units.inchesToMeters(18.75);
   public static final double TRACK_WIDTH_Y = Units.inchesToMeters(18.75);
-  public static final double ROTATION_RATIO = MAX_LINEAR_SPEED / 1.4104; // TODO: check this
   private static final double SKEW_CONSTANT = 0.06;
   public static final double DRIVE_BASE_RADIUS =
       Math.hypot(TRACK_WIDTH_X / 2.0, TRACK_WIDTH_Y / 2.0);
@@ -337,7 +336,9 @@ public class Drive extends StateMachineSubsystemBase {
             (linearVelocity.getX() * MAX_LINEAR_SPEED) * throttle,
             (linearVelocity.getY() * MAX_LINEAR_SPEED) * throttle,
             omega * MAX_ANGULAR_SPEED,
-            getPose().getRotation())); // TODO: tune skew constant
+            getPose().getRotation().plus(
+              new Rotation2d(
+                  getAngularVelocity() * SKEW_CONSTANT)))); // TODO: tune skew constant
   }
 
   public void zeroGyro() {}

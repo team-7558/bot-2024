@@ -203,7 +203,7 @@ public class ModuleIO2024 implements ModuleIO {
         turnCurrent);
 
     inputs.drivePos_r = drivePosition.getValueAsDouble();
-    inputs.driveVel_mps = driveVelocity.getValueAsDouble() / Drive.ROTATION_RATIO;
+    inputs.driveVel_mps = driveVelocity.getValueAsDouble() * Module.WHEEL_RADIUS;
     inputs.driveVolts_V = driveAppliedVolts.getValueAsDouble();
     inputs.driveCurrent_A = new double[] {driveCurrent.getValueAsDouble()};
 
@@ -270,7 +270,7 @@ public class ModuleIO2024 implements ModuleIO {
     // false));
     driveTalon.setControl(
         driveVelocitySetpoint_v
-            .withVelocity(velocity * Drive.ROTATION_RATIO)
+            .withVelocity(velocity / Module.WHEEL_RADIUS)
             .withEnableFOC(true)
             .withSlot(0));
   }
