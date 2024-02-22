@@ -116,7 +116,7 @@ public class Elevator extends StateMachineSubsystemBase {
   }
 
   public boolean atHeight(double height_m) {
-    return Util.inRange(height_m - inputs.pos_m, 0.02);
+    return Util.inRange(height_m - inputs.posMeters, 0.02);
   }
 
   public boolean atTargetHeight() {
@@ -135,7 +135,7 @@ public class Elevator extends StateMachineSubsystemBase {
 
   @Override
   public void outputPeriodic() {
-    SS2d.M.setElevatorHeight(inputs.pos_m);
+    SS2d.M.setElevatorHeight(inputs.posMeters);
     SS2d.S.setElevatorHeight(targetHeight_m);
     Logger.recordOutput("Elevator/TargetHeight_m", targetHeight_m);
   }

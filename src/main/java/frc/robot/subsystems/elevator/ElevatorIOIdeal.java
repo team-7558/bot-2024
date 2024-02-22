@@ -11,9 +11,9 @@ public class ElevatorIOIdeal implements ElevatorIO {
 
   @Override
   public void updateInputs(ElevatorIOInputs inputs) {
-    inputs.volts_V = volts_V;
-    inputs.vel_mps = vel_mps;
-    inputs.pos_m = pos_m;
+    inputs.volts = volts_V;
+    inputs.velMPS = vel_mps;
+    inputs.posMeters = pos_m;
   }
 
   @Override
