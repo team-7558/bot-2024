@@ -13,13 +13,18 @@ public class ElevatorIOSim implements ElevatorIO {
   private PIDController posPid = new PIDController(0.0, 0.0, 0.0);
   private double appliedVolts = 0.0;
 
+  private double lastVel = 0;
+
   @Override
   public void updateInputs(ElevatorIOInputs inputs) {
     sim.update(Constants.globalDelta_sec);
-    inputs.pos_m = sim.getPositionMeters();
-    inputs.vel_mps = sim.getVelocityMetersPerSecond();
-    inputs.volts_V = appliedVolts;
-    inputs.currents_A = new double[] {sim.getCurrentDrawAmps()};
+    inputs.posMeters = sim.getPositionMeters();
+    inputs.velMetersPerSecond = sim.getVelocityMetersPerSecond();
+    inputs.accMetersPerSecond2 =
+        (sim.getVelocityMetersPerSecond() - lastVel) / Constants.globalDelta_sec;
+    inputs.volts = appliedVolts;
+    inputs.currents = new double[] {sim.getCurrentDrawAmps()};
+    lastVel = inputs.velMetersPerSecond;
   }
 
   @Override

@@ -48,9 +48,8 @@ import org.littletonrobotics.junction.Logger;
 public class Drive extends StateMachineSubsystemBase {
   public static final int FL = 0, FR = 1, BL = 2, BR = 3;
   public static final double MAX_LINEAR_SPEED = Units.feetToMeters(14.5);
-  private static final double TRACK_WIDTH_X = Units.inchesToMeters(25.0);
-  private static final double TRACK_WIDTH_Y = Units.inchesToMeters(25.0);
-  public static double ROTATION_RATIO = MAX_LINEAR_SPEED / 1.4104;
+  private static final double TRACK_WIDTH_X = Units.inchesToMeters(18.75);
+  private static final double TRACK_WIDTH_Y = Units.inchesToMeters(18.75);
   private static final double SKEW_CONSTANT = 0.06;
   private static final double DRIVE_BASE_RADIUS =
       Math.hypot(TRACK_WIDTH_X / 2.0, TRACK_WIDTH_Y / 2.0);

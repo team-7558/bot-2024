@@ -9,14 +9,17 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.OI;
 import frc.robot.SS2d;
 import frc.robot.subsystems.drive.Drive;
+import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.shooter.Shooter;
+import frc.robot.util.Util;
 
 public class RobotTeleop extends Command {
 
   private final Drive drive;
   private final Intake intake;
   private final Shooter shooter;
+  private final Elevator elevator;
   boolean hasGamePiece = false;
 
   /** Creates a new DriveTeleop. */
@@ -25,6 +28,7 @@ public class RobotTeleop extends Command {
     drive = Drive.getInstance();
     intake = Intake.getInstance();
     shooter = Shooter.getInstance();
+    elevator = Elevator.getInstance();
     addRequirements(drive);
   }
 
@@ -34,6 +38,7 @@ public class RobotTeleop extends Command {
     drive.setCurrentState(drive.STRAFE_N_TURN);
     intake.setCurrentState(intake.IDLE);
     shooter.setCurrentState(shooter.IDLE);
+    elevator.setCurrentState(elevator.HOMING);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -45,12 +50,30 @@ public class RobotTeleop extends Command {
       // x stance while shooting
       if (OI.DR.getPOV() == 180) {
         drive.setPose(new Pose2d());
-        drive.zeroGyro();
+        // drive.zeroGyro();
       } else if (OI.DR.getXButton()) {
 
       } else {
         // strafe and turn if not other state
         drive.setCurrentState(drive.STRAFE_N_TURN);
+      }
+    }
+
+    if (!elevator.isState(elevator.DISABLED) || !elevator.isState(elevator.HOMING)) {
+      if (OI.DR.getLeftBumper()) {
+        elevator.setCurrentState(elevator.HOMING);
+      } else if (OI.DR.getPOV() > 90) {
+        elevator.setTargetHeight(Util.lerp(Elevator.MIN_HEIGHT_M, Elevator.MAX_HEIGHT_M, 0.2));
+        elevator.setCurrentState(elevator.CLIMBING);
+      } else if (OI.DR.getPOV() == 0) {
+        elevator.setTargetHeight(Util.lerp(Elevator.MIN_HEIGHT_M, Elevator.MAX_HEIGHT_M, 0.8));
+        elevator.setCurrentState(elevator.CLIMBING);
+      } else if (!elevator.isState(elevator.IDLE)
+          && !elevator.isState(elevator.HOMING)
+          && !elevator.isState(elevator.RESETTING)) {
+        elevator.setTargetHeight(elevator.getHeight());
+        elevator.setCurrentState(elevator.HOLDING);
+      } else {
       }
     }
 
@@ -70,6 +93,8 @@ public class RobotTeleop extends Command {
         }
       } else if (OI.DR.getBButton()) {
         intake.setCurrentState(intake.SHOOTER_SIDE);
+      } else if (OI.DR.getXButton()) {
+        intake.setCurrentState(intake.AMP_SIDE_2);
       } else {
         intake.setCurrentState(intake.IDLE);
       }

@@ -113,8 +113,7 @@ public class Module {
           double velocityRadPerSec = Units.radiansToRotations(adjustSpeedSetpoint / WHEEL_RADIUS);
           io.setDriveVoltage(
               driveFeedforward.calculate(velocityRadPerSec)
-                  + driveFeedback.calculate(
-                      inputs.driveVel_mps, velocityRadPerSec * Drive.ROTATION_RATIO));
+                  + driveFeedback.calculate(inputs.driveVel_mps, velocityRadPerSec));
         }
       }
     } else {
