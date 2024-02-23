@@ -7,7 +7,7 @@ public class Test extends AltAuto {
   public Test() {
     super("Test");
 
-    trajstack.appendChain().append("3m Fwd", false);
+    trajstack.appendChain().append("3m Lightning", false);
 
     trajstack.setActiveIdx(0);
     trajstack.generate();

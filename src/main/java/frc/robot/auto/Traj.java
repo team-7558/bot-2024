@@ -6,6 +6,8 @@ import com.pathplanner.lib.path.PathPlannerTrajectory.State;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import frc.robot.G;
+
 import java.util.Optional;
 
 public class Traj implements IFollowable {
@@ -48,7 +50,14 @@ public class Traj implements IFollowable {
               : PathPlannerPath.fromPathFile(filename);
       ChassisSpeeds cs = new ChassisSpeeds();
 
-      this.traj = pppath.getTrajectory(cs, Rotation2d.fromRadians(0));
+
+      double startrad = 0;
+      if(G.isRedAlliance()){
+        pppath = pppath.flipPath();
+        startrad = Math.PI;
+      }
+
+      this.traj = pppath.getTrajectory(cs, Rotation2d.fromRadians(startrad));
       initState = traj.getInitialState();
     } else {
       this.initState = new State();
@@ -78,6 +87,10 @@ public class Traj implements IFollowable {
               prevState.velocityMps * Math.cos(Math.PI * 0.25),
               prevState.velocityMps * Math.sin(Math.PI * 0.25),
               rotvel);
+
+      if(G.isRedAlliance()){
+        pppath = pppath.flipPath();
+      }
 
       this.traj = pppath.getTrajectory(cs, prevState.targetHolonomicRotation);
       initState = traj.getInitialState();

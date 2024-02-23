@@ -34,6 +34,7 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import frc.robot.Constants;
+import frc.robot.G;
 import frc.robot.OI;
 import frc.robot.subsystems.StateMachineSubsystemBase;
 import frc.robot.subsystems.drive.Module.Mode;
@@ -307,10 +308,10 @@ public class Drive extends StateMachineSubsystemBase {
   }
 
   public void drive(double x, double y, double w, double throttle) {
-    /*if (!G.isRedAlliance()) {
+    if (G.isRedAlliance()) {
       x = -x;
       y = -y;
-    }*/
+    }
     // Apply deadband
     double linearMagnitude = MathUtil.applyDeadband(Math.hypot(x, y), Constants.driveDeadband);
     Rotation2d linearDirection = new Rotation2d(x, y);
@@ -328,22 +329,18 @@ public class Drive extends StateMachineSubsystemBase {
 
     // TODO: SKEW CORRECTION
 
-    Logger.recordOutput("Drive/LV", linearVelocity);
-
     // Convert to field relative speeds & send command
 
     double x_ = (linearVelocity.getX() * MAX_LINEAR_SPEED_MPS) * throttle;
     double y_ = (linearVelocity.getY() * MAX_LINEAR_SPEED_MPS) * throttle;
     double w_ = omega * MAX_ANGULAR_SPEED_RADPS;
 
-    Logger.recordOutput("Drive/xp", x_);
-    Logger.recordOutput("Drive/yp", y_);
-    Logger.recordOutput("Drive/wp", w_);
-
     ChassisSpeeds rr =
-        ChassisSpeeds.fromFieldRelativeSpeeds(x_, y_, w_, getPose().getRotation() /*.plus(
-                    new Rotation2d(
-                        getAngularVelocity() * SKEW_CONSTANT))*/);
+        ChassisSpeeds.fromFieldRelativeSpeeds(
+            x_,
+            y_,
+            w_,
+            getPose().getRotation().plus(new Rotation2d(getAngularVelocity() * SKEW_CONSTANT)));
 
     runVelocity(rr); // TODO: tune skew constant
   }
@@ -358,9 +355,6 @@ public class Drive extends StateMachineSubsystemBase {
   public void runVelocity(ChassisSpeeds speeds) {
     // Calculate module setpoints
     ChassisSpeeds discreteSpeeds = ChassisSpeeds.discretize(speeds, Constants.globalDelta_sec);
-    Logger.recordOutput("Drive/CS", speeds);
-    Logger.recordOutput("Drive/DCS", discreteSpeeds);
-
     SwerveModuleState[] setpointStates = kinematics.toSwerveModuleStates(discreteSpeeds);
     SwerveDriveKinematics.desaturateWheelSpeeds(setpointStates, MAX_LINEAR_SPEED_MPS);
 

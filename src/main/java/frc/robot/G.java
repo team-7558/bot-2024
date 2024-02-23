@@ -12,7 +12,7 @@ public class G {
   public static boolean isRedAlliance() {
     if (!allianceFound && DriverStation.getAlliance().isPresent()) {
       isRed = DriverStation.getAlliance().get() == Alliance.Red;
-      allianceFound = true;
+      allianceFound = false;
     }
     return isRed;
   }

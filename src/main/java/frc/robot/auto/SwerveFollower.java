@@ -8,6 +8,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import frc.robot.Constants;
+import frc.robot.G;
 import frc.robot.subsystems.drive.Drive;
 import org.littletonrobotics.junction.Logger;
 
@@ -69,6 +70,11 @@ public class SwerveFollower {
   public void step(double t) {
     PathPlannerTrajectory.State targetState = toFollow.sample(t);
 
+    /*if (G.isRedAlliance()){
+      targetSpeeds.vxMetersPerSecond *= -1.0;
+      targetSpeeds.vyMetersPerSecond *= -1.0;
+    }*/
+
     Pose2d currentPose = drive.getPose();
     ChassisSpeeds currentSpeeds = drive.getChassisSpeedsFromModuleStates();
 
@@ -87,6 +93,11 @@ public class SwerveFollower {
     }*/
 
     ChassisSpeeds targetSpeeds = con.calculateRobotRelativeSpeeds(currentPose, targetState);
+
+    /*if (G.isRedAlliance()){
+      targetSpeeds.vxMetersPerSecond *= -1.0;
+      targetSpeeds.vyMetersPerSecond *= -1.0;
+    }*/
 
     double currentVel =
         Math.hypot(currentSpeeds.vxMetersPerSecond, currentSpeeds.vyMetersPerSecond);
