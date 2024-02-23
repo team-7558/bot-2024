@@ -8,7 +8,6 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import frc.robot.Constants;
-import frc.robot.G;
 import frc.robot.subsystems.drive.Drive;
 import org.littletonrobotics.junction.Logger;
 

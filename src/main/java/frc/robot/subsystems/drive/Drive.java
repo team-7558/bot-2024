@@ -144,7 +144,7 @@ public class Drive extends StateMachineSubsystemBase {
   private SwerveDriveKinematics kinematics = new SwerveDriveKinematics(getModuleTranslations());
   private SwerveDrivePoseEstimator poseEstimator;
   private double autolockSetpoint = 0;
-  private Pose2d pose = new Pose2d();
+  private Pose2d pose;
   private Rotation2d lastGyroRotation = new Rotation2d();
   private ChassisSpeeds chassisSpeeds = new ChassisSpeeds(0, 0, 0);
 
@@ -231,6 +231,9 @@ public class Drive extends StateMachineSubsystemBase {
           }
         };
     setCurrentState(DISABLED);
+
+    resetPose();
+
     poseEstimator =
         new SwerveDrivePoseEstimator(
             kinematics,
@@ -346,6 +349,16 @@ public class Drive extends StateMachineSubsystemBase {
   }
 
   public void zeroGyro() {}
+
+  public void resetPose() {
+    Pose2d p;
+    if (G.isRedAlliance()) {
+      p = new Pose2d(15, 5.5, Rotation2d.fromRotations(0.5));
+    } else {
+      p = new Pose2d(1, 5.5, Rotation2d.fromRotations(0));
+    }
+    hardSetPose(p);
+  }
 
   /**
    * Runs the drive at the desired velocity.

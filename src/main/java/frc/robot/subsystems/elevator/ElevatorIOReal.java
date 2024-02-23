@@ -52,7 +52,6 @@ public class ElevatorIOReal implements ElevatorIO {
     leftFalcon = new TalonFX(1);
     rightFalcon = new TalonFX(4);
 
-
     pos_m = leftFalcon.getPosition();
     vel_mps = leftFalcon.getVelocity();
     acc_mps2 = leftFalcon.getAcceleration();
@@ -112,8 +111,7 @@ public class ElevatorIOReal implements ElevatorIO {
     BaseStatusSignal.refreshAll(pos_m, vel_mps, acc_mps2, volts_V, leftCurrent_A, rightCurrent_A);
     inputs.posMeters = pos_m.getValueAsDouble() + posOffset_m;
     inputs.volts = volts_V.getValueAsDouble();
-    inputs.velMetersPerSecond = vel_mps.getValueAsDouble();
-    inputs.accMetersPerSecond2 = acc_mps2.getValueAsDouble();
+    inputs.velMPS = vel_mps.getValueAsDouble();
     inputs.currents =
         new double[] {leftCurrent_A.getValueAsDouble(), rightCurrent_A.getValueAsDouble()};
   }
@@ -125,12 +123,12 @@ public class ElevatorIOReal implements ElevatorIO {
   }
 
   @Override
-  public void setPos(double position) {
+  public void holdPos(double position) {
     leftFalcon.setControl(posControl.withPosition(position - posOffset_m));
   }
 
   @Override
-  public void climb(double position) {
+  public void travelToPos(double position) {
     leftFalcon.setControl(mmPosControl.withPosition(position - posOffset_m));
   }
 

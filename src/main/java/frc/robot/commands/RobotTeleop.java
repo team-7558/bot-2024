@@ -57,7 +57,6 @@ public class RobotTeleop extends Command {
       // }
     }
 
-
     if (!ss.intakeIsDisabled()) {
 
       if (OI.DR.getAButton()) {
