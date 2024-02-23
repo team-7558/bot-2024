@@ -28,7 +28,7 @@ public class SwerveFollower {
             Drive.HPFG.translationConstants,
             Drive.HPFG.rotationConstants,
             Constants.globalDelta_sec,
-            Drive.MAX_LINEAR_SPEED,
+            Drive.MAX_LINEAR_SPEED_MPS,
             Drive.DRIVE_BASE_RADIUS);
   }
 

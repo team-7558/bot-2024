@@ -113,8 +113,7 @@ public class Module {
           double velocityRotPerSec = Units.radiansToRotations(adjustSpeedSetpoint / WHEEL_RADIUS);
           io.setDriveVoltage(
               driveFeedforward.calculate(velocityRotPerSec)
-                  + driveFeedback.calculate(
-                      inputs.driveVel_mps, velocityRotPerSec));
+                  + driveFeedback.calculate(inputs.driveVel_mps, velocityRotPerSec));
         }
       }
     } else {
@@ -211,7 +210,7 @@ public class Module {
 
   /** Returns the current drive velocity of the module in meters per second. */
   public double getVelocityMetersPerSec() {
-    return Units.rotationsToRadians(inputs.driveVel_mps) * WHEEL_RADIUS;
+    return inputs.driveVel_mps;
   }
 
   /** Returns the module position (turn angle and drive position). */

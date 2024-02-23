@@ -47,13 +47,13 @@ import org.littletonrobotics.junction.Logger;
 
 public class Drive extends StateMachineSubsystemBase {
   public static final int FL = 0, FR = 1, BL = 2, BR = 3;
-  public static final double MAX_LINEAR_SPEED = 4.73;
+  public static final double MAX_LINEAR_SPEED_MPS = 4.73;
   public static final double TRACK_WIDTH_X = Units.inchesToMeters(18.75);
   public static final double TRACK_WIDTH_Y = Units.inchesToMeters(18.75);
   private static final double SKEW_CONSTANT = 0.06;
   public static final double DRIVE_BASE_RADIUS =
       Math.hypot(TRACK_WIDTH_X / 2.0, TRACK_WIDTH_Y / 2.0);
-  public static final double MAX_ANGULAR_SPEED = MAX_LINEAR_SPEED / DRIVE_BASE_RADIUS;
+  public static final double MAX_ANGULAR_SPEED_RADPS = MAX_LINEAR_SPEED_MPS / DRIVE_BASE_RADIUS;
 
   // TODO: tune all this
   // -- VISION CONSTANTS --
@@ -136,7 +136,7 @@ public class Drive extends StateMachineSubsystemBase {
       new HolonomicPathFollowerConfig(
           new PIDConstants(5),
           new PIDConstants(5),
-          MAX_LINEAR_SPEED,
+          MAX_LINEAR_SPEED_MPS,
           DRIVE_BASE_RADIUS,
           new ReplanningConfig(),
           Constants.globalDelta_sec);
@@ -308,10 +308,10 @@ public class Drive extends StateMachineSubsystemBase {
   }
 
   public void drive(double x, double y, double w, double throttle) {
-    if (!G.isRedAlliance()) {
+    /*if (!G.isRedAlliance()) {
       x = -x;
       y = -y;
-    }
+    }*/
     // Apply deadband
     double linearMagnitude = MathUtil.applyDeadband(Math.hypot(x, y), Constants.driveDeadband);
     Rotation2d linearDirection = new Rotation2d(x, y);
@@ -329,16 +329,29 @@ public class Drive extends StateMachineSubsystemBase {
 
     // TODO: SKEW CORRECTION
 
+    Logger.recordOutput("Drive/LV", linearVelocity);
+
     // Convert to field relative speeds & send command
 
-    runVelocity(
-        ChassisSpeeds.fromFieldRelativeSpeeds(
-            (linearVelocity.getX() * MAX_LINEAR_SPEED) * throttle,
-            (linearVelocity.getY() * MAX_LINEAR_SPEED) * throttle,
-            omega * MAX_ANGULAR_SPEED,
-            getPose().getRotation().plus(
-              new Rotation2d(
-                  getAngularVelocity() * SKEW_CONSTANT)))); // TODO: tune skew constant
+    double x_ = (linearVelocity.getX() * MAX_LINEAR_SPEED_MPS) * throttle;
+    double y_ = (linearVelocity.getY() * MAX_LINEAR_SPEED_MPS) * throttle;
+    double w_ = omega * MAX_ANGULAR_SPEED_RADPS;
+
+    Logger.recordOutput("Drive/xp", x_);
+    Logger.recordOutput("Drive/yp", y_);
+    Logger.recordOutput("Drive/wp", w_);
+
+    ChassisSpeeds rr = ChassisSpeeds.fromFieldRelativeSpeeds(
+            x_,
+            y_,
+            w_,
+            getPose()
+                .getRotation()
+                /*.plus(
+                    new Rotation2d(
+                        getAngularVelocity() * SKEW_CONSTANT))*/);
+
+    runVelocity(rr); // TODO: tune skew constant
   }
 
   public void zeroGyro() {}
@@ -351,8 +364,11 @@ public class Drive extends StateMachineSubsystemBase {
   public void runVelocity(ChassisSpeeds speeds) {
     // Calculate module setpoints
     ChassisSpeeds discreteSpeeds = ChassisSpeeds.discretize(speeds, Constants.globalDelta_sec);
+    Logger.recordOutput("Drive/CS", speeds);
+    Logger.recordOutput("Drive/DCS", discreteSpeeds);
+
     SwerveModuleState[] setpointStates = kinematics.toSwerveModuleStates(discreteSpeeds);
-    SwerveDriveKinematics.desaturateWheelSpeeds(setpointStates, MAX_LINEAR_SPEED);
+    SwerveDriveKinematics.desaturateWheelSpeeds(setpointStates, MAX_LINEAR_SPEED_MPS);
 
     // Send setpoints to modules
     SwerveModuleState[] optimizedSetpointStates = new SwerveModuleState[4];
@@ -452,12 +468,12 @@ public class Drive extends StateMachineSubsystemBase {
 
   /** Returns the maximum linear speed in meters per sec. */
   public double getMaxLinearSpeedMetersPerSec() {
-    return MAX_LINEAR_SPEED;
+    return MAX_LINEAR_SPEED_MPS;
   }
 
   /** Returns the maximum angular speed in radians per sec. */
   public double getMaxAngularSpeedRadPerSec() {
-    return MAX_ANGULAR_SPEED;
+    return MAX_ANGULAR_SPEED_RADPS;
   }
 
   public SwerveModulePosition[] getModulePositions() {

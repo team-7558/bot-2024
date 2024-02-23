@@ -224,7 +224,7 @@ public class ModuleIO2023 implements ModuleIO {
 
   @Override
   public void setDriveVelocity(double velocity) {
-    double vel_mps = MathUtil.clamp(velocity, -Drive.MAX_LINEAR_SPEED, Drive.MAX_LINEAR_SPEED);
+    double vel_mps = MathUtil.clamp(velocity, -Drive.MAX_LINEAR_SPEED_MPS, Drive.MAX_LINEAR_SPEED_MPS);
 
     double vel_radps = vel_mps / Module.WHEEL_RADIUS;
     double vel_rotps = Units.radiansToRotations(vel_radps);
