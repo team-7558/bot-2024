@@ -58,7 +58,7 @@ public class ShooterBringup extends Command {
         shooter.setCurrentState(shooter.TRACKING);
       } else if (OI.DR.getBButton()) {
         intake.setCurrentState(intake.SHOOTER_SIDE);
-        shooter.queueSetpoints(new Setpoints(30, 30, 0, 0.11));
+        shooter.queueSetpoints(new Setpoints(45, 40, -0.15, 0.063));
         shooter.setCurrentState(shooter.TRACKING);
       } else {
         intake.setCurrentState(intake.IDLE);
