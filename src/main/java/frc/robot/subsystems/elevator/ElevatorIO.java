@@ -24,5 +24,9 @@ public interface ElevatorIO {
 
   public default void configurePID(double kP, double kI, double kD) {}
 
+  public default void resetPos(double pos_m) {}
+
   public default void stop() {}
+
+  public default void setBrake(boolean brake) {}
 }

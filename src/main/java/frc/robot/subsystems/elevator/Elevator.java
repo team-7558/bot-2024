@@ -5,6 +5,7 @@
 package frc.robot.subsystems.elevator;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.util.Units;
 import frc.robot.Constants;
 import frc.robot.SS2d;
 import frc.robot.subsystems.StateMachineSubsystemBase;
@@ -12,8 +13,8 @@ import frc.robot.util.Util;
 import org.littletonrobotics.junction.Logger;
 
 public class Elevator extends StateMachineSubsystemBase {
-  public static final double MIN_HEIGHT_M = 0.6096;
-  public static final double MAX_HEIGHT_M = 0.8763;
+  public static final double MIN_HEIGHT_M = Units.inchesToMeters(25.5); // 0.6096;
+  public static final double MAX_HEIGHT_M = Units.inchesToMeters(36.25); // 0.8763;
   public static final double STROKE_M = MAX_HEIGHT_M - MIN_HEIGHT_M;
 
   public static final double INTAKE_HEIGHT_M = MIN_HEIGHT_M;
@@ -22,6 +23,8 @@ public class Elevator extends StateMachineSubsystemBase {
   public static final double MAX_FEED_HEIGHT_M = MIN_HEIGHT_M;
   public static final double AMP_HEIGHT_M = MIN_HEIGHT_M;
   public static final double CLIMB_HEIGHT_M = MAX_HEIGHT_M;
+  public static final double MAX_VEL_MPS = 1.0;
+  public static final double CURRENT_THRESHOLD_A = 10;
 
   private static Elevator instance;
 
@@ -49,12 +52,13 @@ public class Elevator extends StateMachineSubsystemBase {
     return instance;
   }
 
-  public final State DISABLED, IDLE, HOLDING, TRAVELLING, HOMING;
+  public final State DISABLED, IDLE, HOLDING, TRAVELLING, HOMING, RESETTING, MANUAL;
 
   private final ElevatorIO io;
   private final ElevatorIOInputsAutoLogged inputs = new ElevatorIOInputsAutoLogged(); // hacky fix
 
   private double targetHeight_m = MIN_HEIGHT_M;
+  private double manualOutput = 0;
 
   private Elevator(ElevatorIO io) {
     super("Elevator");
@@ -70,7 +74,7 @@ public class Elevator extends StateMachineSubsystemBase {
         };
 
     IDLE =
-        new State("IDLE") {
+        new State("IDLE") { // Should only be IDLE at bottom
           @Override
           public void init() {
             stop();
@@ -108,7 +112,48 @@ public class Elevator extends StateMachineSubsystemBase {
 
           @Override
           public void periodic() {
-            io.setVel(-0.1);
+            if (isHomeStalling()) {
+              System.out.println("AWWWWW");
+              setCurrentState(RESETTING);
+            } else {
+              // io.setVel(-0.05);
+              io.setVoltage(-1.5);
+            }
+          }
+        };
+
+    RESETTING =
+        new State("RESETTING") {
+          @Override
+          public void init() {
+            targetHeight_m = MIN_HEIGHT_M;
+            stop();
+          }
+
+          @Override
+          public void periodic() {
+            if (after(0.5)) {
+              resetPosAsMin();
+              setCurrentState(IDLE);
+            }
+          }
+        };
+
+    MANUAL =
+        new State("MANUAL") {
+          @Override
+          public void init() {
+            stop();
+          }
+
+          @Override
+          public void periodic() {
+            io.setVoltage(manualOutput);
+          }
+
+          @Override
+          public void exit() {
+            manualOutput = 0;
           }
         };
 
@@ -127,6 +172,18 @@ public class Elevator extends StateMachineSubsystemBase {
     this.targetHeight_m = MathUtil.clamp(height_m, MIN_HEIGHT_M, MAX_HEIGHT_M);
   }
 
+  public double getTargetHeight() {
+    return this.targetHeight_m;
+  }
+
+  public double getHeight() {
+    return inputs.posMeters;
+  }
+
+  public void setManualOutput(double manualOutput) {
+    this.manualOutput = manualOutput;
+  }
+
   @Override
   public void inputPeriodic() {
     io.updateInputs(inputs);
@@ -142,5 +199,13 @@ public class Elevator extends StateMachineSubsystemBase {
 
   public void stop() {
     io.stop();
+  }
+
+  public boolean isHomeStalling() {
+    return (inputs.currents[0] + inputs.currents[1]) >= CURRENT_THRESHOLD_A;
+  }
+
+  public void resetPosAsMin() {
+    io.resetPos(MIN_HEIGHT_M);
   }
 }
