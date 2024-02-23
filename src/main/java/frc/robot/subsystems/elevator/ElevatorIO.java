@@ -7,8 +7,7 @@ public interface ElevatorIO {
   @AutoLog
   public static class ElevatorIOInputs {
     public double posMeters = Elevator.MIN_HEIGHT_M;
-    public double velMetersPerSecond = 0.0;
-    public double accMetersPerSecond2 = 0.0;
+    public double velMPS = 0.0;
     public double volts = 0.0;
     public double[] currents = new double[] {};
   }
@@ -19,9 +18,9 @@ public interface ElevatorIO {
 
   public default void setVel(double vel_mps) {}
 
-  public default void setPos(double pos_m) {}
+  public default void holdPos(double pos_m) {}
 
-  public default void climb(double pos_m) {}
+  public default void travelToPos(double pos_m) {}
 
   public default void configurePID(double kP, double kI, double kD) {}
 

@@ -52,6 +52,7 @@ public class ElevatorIOReal implements ElevatorIO {
     leftFalcon = new TalonFX(1);
     rightFalcon = new TalonFX(4);
 
+
     pos_m = leftFalcon.getPosition();
     vel_mps = leftFalcon.getVelocity();
     acc_mps2 = leftFalcon.getAcceleration();
@@ -59,8 +60,8 @@ public class ElevatorIOReal implements ElevatorIO {
     rightCurrent_A = rightFalcon.getStatorCurrent();
     volts_V = leftFalcon.getMotorVoltage();
 
-    leaderConfig.CurrentLimits.StatorCurrentLimit = 70.0;
-    leaderConfig.CurrentLimits.StatorCurrentLimitEnable = true;
+    leaderConfig.CurrentLimits.SupplyCurrentLimit = 70.0;
+    leaderConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
     leaderConfig.Feedback.SensorToMechanismRatio = METERS_TO_ROTATIONS;
     leaderConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
     leaderConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;

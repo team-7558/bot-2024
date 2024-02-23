@@ -15,6 +15,7 @@ package frc.robot.subsystems.drive;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.util.Units;
 import frc.robot.Constants;
 
 /**
@@ -25,14 +26,12 @@ import frc.robot.Constants;
 public class ModuleIOIdeal implements ModuleIO {
   private static final double LOOP_PERIOD_SECS = Constants.globalDelta_sec;
 
-  private final Rotation2d turnAbsoluteInitPosition = new Rotation2d(Math.random() * 2.0 * Math.PI);
-
-  private double drivePos_rad = 0.0;
-  private double driveVel_radps = 0.0;
+  private double drivePos_r = 0.0;
+  private double driveVel_mps = 0.0;
   private double driveVolts_V = 0.0;
 
-  private double turnPos_rad = 0.0;
-  private double turnVel_radps = 0.0;
+  private double turnPos_r = 0.0;
+  private double turnVel_rps = 0.0;
   private double turnVolts_V = 0.0;
 
   private int index;
@@ -43,14 +42,14 @@ public class ModuleIOIdeal implements ModuleIO {
 
   @Override
   public void updateInputs(ModuleIOInputs inputs) {
-    inputs.drivePos_r = drivePos_rad;
-    inputs.driveVel_mps = driveVel_radps;
+    inputs.drivePos_r = drivePos_r;
+    inputs.driveVel_mps = driveVel_mps;
     inputs.driveVolts_V = driveVolts_V;
     inputs.driveCurrent_A = new double[] {0};
 
-    inputs.turnAbsPos_rot2d = new Rotation2d(turnPos_rad).plus(turnAbsoluteInitPosition);
-    inputs.turnPos_rot2d = new Rotation2d(turnPos_rad);
-    inputs.turnVel_rps = turnVel_radps;
+    inputs.turnAbsPos_rot2d = Rotation2d.fromRotations(turnPos_r);
+    inputs.turnPos_rot2d = Rotation2d.fromRotations(turnPos_r);
+    inputs.turnVel_rps = turnVel_rps;
     inputs.turnVel_rps = turnVolts_V;
     inputs.turnCurrent_A = new double[] {Math.abs(0)};
 
@@ -61,28 +60,29 @@ public class ModuleIOIdeal implements ModuleIO {
   @Override
   public void setDriveVoltage(double volts) {
     driveVolts_V = MathUtil.clamp(volts, -12.0, 12.0);
-    setDriveVelocity((driveVolts_V / 12.0) * Drive.MAX_LINEAR_SPEED);
+    setDriveVelocity((driveVolts_V / 12.0) * Drive.MAX_LINEAR_SPEED_MPS);
   }
 
   @Override
   public void setTurnVoltage(double volts) {
     turnVolts_V = MathUtil.clamp(volts, -12.0, 12.0);
-    turnVel_radps = (turnVolts_V / 12.0) * Drive.MAX_ANGULAR_SPEED;
-    turnPos_rad += turnVel_radps * LOOP_PERIOD_SECS;
+    turnVel_rps = (turnVolts_V / 12.0) * 4;
+    turnPos_r += turnVel_rps * LOOP_PERIOD_SECS;
   }
 
   @Override
   public void setDriveVelocity(double velocity) {
-    driveVel_radps =
-        MathUtil.clamp(velocity, -Drive.MAX_LINEAR_SPEED, Drive.MAX_LINEAR_SPEED)
-            / Module.WHEEL_RADIUS;
-    drivePos_rad += driveVel_radps * LOOP_PERIOD_SECS;
+    driveVel_mps =
+        MathUtil.clamp(velocity, -Drive.MAX_LINEAR_SPEED_MPS, Drive.MAX_LINEAR_SPEED_MPS);
+    double radps = driveVel_mps / Module.WHEEL_RADIUS;
+    double rps = Units.radiansToRotations(radps);
+    drivePos_r += rps * LOOP_PERIOD_SECS;
   }
 
   @Override
-  public void setTurnAngle(double rad) {
-    double lastTurnPos_rad = turnPos_rad;
-    turnPos_rad = rad;
-    turnVel_radps = (turnPos_rad - lastTurnPos_rad) / LOOP_PERIOD_SECS;
+  public void setTurnAngle(double r) {
+    double lastTurnPos_r = turnPos_r;
+    turnPos_r = r;
+    turnVel_rps = (turnPos_r - lastTurnPos_r) / LOOP_PERIOD_SECS;
   }
 }

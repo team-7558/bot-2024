@@ -13,9 +13,9 @@
 
 package frc.robot.subsystems.drive;
 
-import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.pathfinding.Pathfinding;
 import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
+import com.pathplanner.lib.util.PIDConstants;
 import com.pathplanner.lib.util.PathPlannerLogging;
 import com.pathplanner.lib.util.ReplanningConfig;
 import edu.wpi.first.math.MathUtil;
@@ -32,9 +32,9 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Timer;
 import frc.robot.Constants;
+import frc.robot.G;
 import frc.robot.OI;
 import frc.robot.subsystems.StateMachineSubsystemBase;
 import frc.robot.subsystems.drive.Module.Mode;
@@ -47,13 +47,13 @@ import org.littletonrobotics.junction.Logger;
 
 public class Drive extends StateMachineSubsystemBase {
   public static final int FL = 0, FR = 1, BL = 2, BR = 3;
-  public static final double MAX_LINEAR_SPEED = Units.feetToMeters(14.5);
-  private static final double TRACK_WIDTH_X = Units.inchesToMeters(18.75);
-  private static final double TRACK_WIDTH_Y = Units.inchesToMeters(18.75);
+  public static final double MAX_LINEAR_SPEED_MPS = 4.73;
+  public static final double TRACK_WIDTH_X = Units.inchesToMeters(18.75);
+  public static final double TRACK_WIDTH_Y = Units.inchesToMeters(18.75);
   private static final double SKEW_CONSTANT = 0.06;
-  private static final double DRIVE_BASE_RADIUS =
+  public static final double DRIVE_BASE_RADIUS =
       Math.hypot(TRACK_WIDTH_X / 2.0, TRACK_WIDTH_Y / 2.0);
-  public static final double MAX_ANGULAR_SPEED = MAX_LINEAR_SPEED / DRIVE_BASE_RADIUS;
+  public static final double MAX_ANGULAR_SPEED_RADPS = MAX_LINEAR_SPEED_MPS / DRIVE_BASE_RADIUS;
 
   // TODO: tune all this
   // -- VISION CONSTANTS --
@@ -102,10 +102,10 @@ public class Drive extends StateMachineSubsystemBase {
           instance =
               new Drive(
                   new GyroIO() {},
-                  new ModuleIOSim(0),
-                  new ModuleIOSim(1),
-                  new ModuleIOSim(2),
-                  new ModuleIOSim(3));
+                  new ModuleIOIdeal(0),
+                  new ModuleIOIdeal(1),
+                  new ModuleIOIdeal(2),
+                  new ModuleIOIdeal(3));
           break;
 
         default:
@@ -124,13 +124,22 @@ public class Drive extends StateMachineSubsystemBase {
     return instance;
   }
 
-  public final State DISABLED, SHOOTING, STRAFE_N_TURN, STRAFE_AUTOLOCK;
+  public final State DISABLED, SHOOTING, PATHING, STRAFE_N_TURN, STRAFE_AUTOLOCK;
 
   // IO
   private final GyroIO gyroIO;
   private final GyroIOInputsAutoLogged gyroInputs = new GyroIOInputsAutoLogged();
 
   private final Module[] modules = new Module[4]; // FL, FR, BL, BR
+
+  public static final HolonomicPathFollowerConfig HPFG =
+      new HolonomicPathFollowerConfig(
+          new PIDConstants(5),
+          new PIDConstants(5),
+          MAX_LINEAR_SPEED_MPS,
+          DRIVE_BASE_RADIUS,
+          new ReplanningConfig(),
+          Constants.globalDelta_sec);
 
   private SwerveDriveKinematics kinematics = new SwerveDriveKinematics(getModuleTranslations());
   private SwerveDrivePoseEstimator poseEstimator;
@@ -155,18 +164,6 @@ public class Drive extends StateMachineSubsystemBase {
 
     PhoenixOdometryThread.getInstance().start();
 
-    // Configure AutoBuilder for PathPlanner
-    AutoBuilder.configureHolonomic(
-        this::getPose,
-        this::setPose,
-        () -> getChassisSpeeds(),
-        this::runVelocity,
-        new HolonomicPathFollowerConfig(
-            MAX_LINEAR_SPEED, DRIVE_BASE_RADIUS, new ReplanningConfig()),
-        () ->
-            DriverStation.getAlliance().isPresent()
-                && DriverStation.getAlliance().get() == Alliance.Red,
-        this);
     Pathfinding.setPathfinder(new LocalADStarAK());
     PathPlannerLogging.setLogActivePathCallback(
         (activePath) -> {
@@ -199,6 +196,12 @@ public class Drive extends StateMachineSubsystemBase {
           public void periodic() {
             stopWithX();
           }
+        };
+
+    PATHING =
+        new State("PATHING") {
+          @Override
+          public void periodic() {}
         };
 
     STRAFE_N_TURN =
@@ -301,42 +304,11 @@ public class Drive extends StateMachineSubsystemBase {
     // Be wary about using Timer.getFPGATimestamp in AK
     poseEstimator.updateWithTime(Timer.getFPGATimestamp(), getRotation(), getModulePositions());
     // TODO: figure out if needs to be moved into 250Hz processing loop
-    chassisSpeeds = kinematics.toChassisSpeeds(getModuleStates());
-
-    // TODO: see if this works on a bot, also clean up, Vision should provide poses with timestamp
-    // to Drive
-    // Vision vision = Vision.getInstance();
-    // if (vision.hasTagInView()) {
-    //   for (int i = 0; i < vision.getCameras(); i++) {
-    //     int tagID = (int) vision.getTagID(i);
-    //     if (tagID > 0) {
-    //       double timestamp = vision.getTimestamp(i);
-
-    //       // where the ACTUAL tag is
-    //       Pose2d tagPose2d = Vision.AT_MAP.getTagPose(tagID).get().toPose2d();
-
-    //       // where this camera thinks it is
-    //       Pose2d estimatedPose = vision.getPose(i);
-
-    //       // distance between tag and estimated pose
-    //       double translationDistance =
-    //           tagPose2d.getTranslation().getDistance(getPose().getTranslation());
-
-    //       // implementing cutoff
-    //       if (translationDistance > CUTOFF_DISTANCE) continue;
-
-    //       // adding to the pose estimator with the timestamp
-    //       poseEstimator.addVisionMeasurement(estimatedPose, timestamp);
-
-    //     } else {
-
-    //     }
-    //   }
-    // }
+    chassisSpeeds = getChassisSpeedsFromModuleStates();
   }
 
   public void drive(double x, double y, double w, double throttle) {
-    if (DriverStation.getAlliance().get() == Alliance.Blue) {
+    if (G.isRedAlliance()) {
       x = -x;
       y = -y;
     }
@@ -355,14 +327,22 @@ public class Drive extends StateMachineSubsystemBase {
             .transformBy(new Transform2d(linearMagnitude, 0.0, new Rotation2d()))
             .getTranslation();
 
+    // TODO: SKEW CORRECTION
+
     // Convert to field relative speeds & send command
 
-    runVelocity(
+    double x_ = (linearVelocity.getX() * MAX_LINEAR_SPEED_MPS) * throttle;
+    double y_ = (linearVelocity.getY() * MAX_LINEAR_SPEED_MPS) * throttle;
+    double w_ = omega * MAX_ANGULAR_SPEED_RADPS;
+
+    ChassisSpeeds rr =
         ChassisSpeeds.fromFieldRelativeSpeeds(
-            (linearVelocity.getX() * MAX_LINEAR_SPEED) * throttle,
-            (linearVelocity.getY() * MAX_LINEAR_SPEED) * throttle,
-            omega * MAX_ANGULAR_SPEED,
-            getPose().getRotation())); // TODO: tune skew constant
+            x_,
+            y_,
+            w_,
+            getPose().getRotation().plus(new Rotation2d(getAngularVelocity() * SKEW_CONSTANT)));
+
+    runVelocity(rr); // TODO: tune skew constant
   }
 
   public void zeroGyro() {}
@@ -374,9 +354,9 @@ public class Drive extends StateMachineSubsystemBase {
    */
   public void runVelocity(ChassisSpeeds speeds) {
     // Calculate module setpoints
-    ChassisSpeeds discreteSpeeds = ChassisSpeeds.discretize(speeds, 0.02);
+    ChassisSpeeds discreteSpeeds = ChassisSpeeds.discretize(speeds, Constants.globalDelta_sec);
     SwerveModuleState[] setpointStates = kinematics.toSwerveModuleStates(discreteSpeeds);
-    SwerveDriveKinematics.desaturateWheelSpeeds(setpointStates, MAX_LINEAR_SPEED);
+    SwerveDriveKinematics.desaturateWheelSpeeds(setpointStates, MAX_LINEAR_SPEED_MPS);
 
     // Send setpoints to modules
     SwerveModuleState[] optimizedSetpointStates = new SwerveModuleState[4];
@@ -470,18 +450,18 @@ public class Drive extends StateMachineSubsystemBase {
   }
 
   /** Resets the current odometry pose. */
-  public void setPose(Pose2d pose) {
+  public void hardSetPose(Pose2d pose) {
     this.pose = pose;
   }
 
   /** Returns the maximum linear speed in meters per sec. */
   public double getMaxLinearSpeedMetersPerSec() {
-    return MAX_LINEAR_SPEED;
+    return MAX_LINEAR_SPEED_MPS;
   }
 
   /** Returns the maximum angular speed in radians per sec. */
   public double getMaxAngularSpeedRadPerSec() {
-    return MAX_ANGULAR_SPEED;
+    return MAX_ANGULAR_SPEED_RADPS;
   }
 
   public SwerveModulePosition[] getModulePositions() {
@@ -491,6 +471,11 @@ public class Drive extends StateMachineSubsystemBase {
       modules[BL].getPosition(),
       modules[BR].getPosition()
     };
+  }
+
+  /** Returns robot relative chassis speeds * */
+  public ChassisSpeeds getChassisSpeedsFromModuleStates() {
+    return kinematics.toChassisSpeeds(getModuleStates());
   }
 
   /** Returns robot relative chassis speeds * */

@@ -24,7 +24,7 @@ import org.littletonrobotics.junction.Logger;
 
 public class Module {
   public static final double FUDGE_FACTOR = 0.967;
-  public static final double WHEEL_RADIUS = Units.inchesToMeters(2.0 * FUDGE_FACTOR);
+  public static final double WHEEL_RADIUS = FUDGE_FACTOR * Units.inchesToMeters(2.0);
   public static final double ODOMETRY_FREQUENCY = 250.0;
 
   public enum Mode {
@@ -110,10 +110,10 @@ public class Module {
           double adjustSpeedSetpoint = speedSetpoint * Math.cos(turnFeedback.getPositionError());
 
           // Run drive controller
-          double velocityRadPerSec = Units.radiansToRotations(adjustSpeedSetpoint / WHEEL_RADIUS);
+          double velocityRotPerSec = Units.radiansToRotations(adjustSpeedSetpoint / WHEEL_RADIUS);
           io.setDriveVoltage(
-              driveFeedforward.calculate(velocityRadPerSec)
-                  + driveFeedback.calculate(inputs.driveVel_mps, velocityRadPerSec));
+              driveFeedforward.calculate(velocityRotPerSec)
+                  + driveFeedback.calculate(inputs.driveVel_mps, velocityRotPerSec));
         }
       }
     } else {
@@ -210,7 +210,7 @@ public class Module {
 
   /** Returns the current drive velocity of the module in meters per second. */
   public double getVelocityMetersPerSec() {
-    return Units.rotationsToRadians(inputs.driveVel_mps) * WHEEL_RADIUS;
+    return inputs.driveVel_mps;
   }
 
   /** Returns the module position (turn angle and drive position). */

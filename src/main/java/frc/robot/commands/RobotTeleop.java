@@ -7,28 +7,22 @@ package frc.robot.commands;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.OI;
+import frc.robot.SS;
+import frc.robot.SS.State;
 import frc.robot.SS2d;
 import frc.robot.subsystems.drive.Drive;
-import frc.robot.subsystems.elevator.Elevator;
-import frc.robot.subsystems.intake.Intake;
-import frc.robot.subsystems.shooter.Shooter;
-import frc.robot.util.Util;
 
 public class RobotTeleop extends Command {
 
   private final Drive drive;
-  private final Intake intake;
-  private final Shooter shooter;
-  private final Elevator elevator;
-  boolean hasGamePiece = false;
+  private final SS ss;
 
   /** Creates a new DriveTeleop. */
   public RobotTeleop() {
     // Use addRequirements() here to declare subsystem dependencies.
     drive = Drive.getInstance();
-    intake = Intake.getInstance();
-    shooter = Shooter.getInstance();
-    elevator = Elevator.getInstance();
+    ss = SS.getInstance();
+
     addRequirements(drive);
   }
 
@@ -36,9 +30,7 @@ public class RobotTeleop extends Command {
   @Override
   public void initialize() {
     drive.setCurrentState(drive.STRAFE_N_TURN);
-    intake.setCurrentState(intake.IDLE);
-    shooter.setCurrentState(shooter.IDLE);
-    elevator.setCurrentState(elevator.HOMING);
+    ss.queueState(State.IDLE);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -49,63 +41,38 @@ public class RobotTeleop extends Command {
       // slow mode
       // x stance while shooting
       if (OI.DR.getPOV() == 180) {
-        drive.setPose(new Pose2d());
-        // drive.zeroGyro();
+        drive.hardSetPose(new Pose2d());
+        drive.zeroGyro();
       } else if (OI.DR.getXButton()) {
 
       } else {
         // strafe and turn if not other state
         drive.setCurrentState(drive.STRAFE_N_TURN);
       }
+
+      // if (OI.XK.get(0, 0)) {
+      //   drive.setModuleModes(Mode.VOLTAGE);
+      // } else if (OI.XK.get(0, 1)) {
+      //   drive.setModuleModes(Mode.SETPOINT);
+      // }
     }
 
-    if (!elevator.isState(elevator.DISABLED) || !elevator.isState(elevator.HOMING)) {
-      if (OI.DR.getLeftBumper()) {
-        elevator.setCurrentState(elevator.HOMING);
-      } else if (OI.DR.getPOV() > 90) {
-        elevator.setTargetHeight(Util.lerp(Elevator.MIN_HEIGHT_M, Elevator.MAX_HEIGHT_M, 0.2));
-        elevator.setCurrentState(elevator.CLIMBING);
-      } else if (OI.DR.getPOV() == 0) {
-        elevator.setTargetHeight(Util.lerp(Elevator.MIN_HEIGHT_M, Elevator.MAX_HEIGHT_M, 0.8));
-        elevator.setCurrentState(elevator.CLIMBING);
-      } else if (!elevator.isState(elevator.IDLE)
-          && !elevator.isState(elevator.HOMING)
-          && !elevator.isState(elevator.RESETTING)) {
-        elevator.setTargetHeight(elevator.getHeight());
-        elevator.setCurrentState(elevator.HOLDING);
-      } else {
-      }
-    }
 
-    if (!intake.isState(intake.DISABLED)) {
-
-      if (intake.beamBroken()) {
-        hasGamePiece = true;
-      } else if (OI.DR.getRightBumper()) {
-        hasGamePiece = false;
-      }
+    if (!ss.intakeIsDisabled()) {
 
       if (OI.DR.getAButton()) {
-        if (hasGamePiece && !intake.beamBroken()) {
-          intake.setCurrentState(intake.IDLE);
-        } else if (!hasGamePiece) {
-          intake.setCurrentState(intake.INTAKING);
-        }
-      } else if (OI.DR.getBButton()) {
-        intake.setCurrentState(intake.SHOOTER_SIDE);
-      } else if (OI.DR.getXButton()) {
-        intake.setCurrentState(intake.AMP_SIDE_2);
-      } else {
-        intake.setCurrentState(intake.IDLE);
+        ss.intake();
+      } else if (OI.DR.getAButtonReleased()) {
+        ss.idle();
       }
     }
 
-    if (!shooter.isState(shooter.DISABLED)) {
-      if (OI.DR.getLeftTriggerAxis() > 0) {
-        shooter.setCurrentState(shooter.MANUAL);
-      } else {
-        shooter.setCurrentState(shooter.IDLE);
-      }
+    if (!ss.shooterIsDisabled()) {
+      // if (OI.DR.getLeftTriggerAxis() > 0) {
+      //   shooter.setCurrentState(shooter.MANUAL);
+      // } else {
+      //   shooter.setCurrentState(shooter.IDLE);
+      // }
     }
 
     SS2d.S.setTurretBaseAngle(drive.getRotation());
@@ -129,6 +96,7 @@ public class RobotTeleop extends Command {
   @Override
   public void end(boolean interrupted) {
     drive.setCurrentState(drive.DISABLED);
+    ss.queueState(State.DISABLED);
   }
 
   // Returns true when the command should end.

@@ -88,7 +88,8 @@ public class ModuleIOSim implements ModuleIO {
 
   @Override
   public void setDriveVelocity(double velocity) {
-    driveVelocity = MathUtil.clamp(velocity, -Drive.MAX_LINEAR_SPEED, Drive.MAX_LINEAR_SPEED);
+    driveVelocity =
+        MathUtil.clamp(velocity, -Drive.MAX_LINEAR_SPEED_MPS, Drive.MAX_LINEAR_SPEED_MPS);
     double measuredDriveVelocity = driveSim.getAngularVelocityRadPerSec() * Module.WHEEL_RADIUS;
     double ff = driveVelocityFF.calculate(driveVelocity);
     driveAppliedVolts =

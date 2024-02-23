@@ -19,12 +19,9 @@ public class ElevatorIOSim implements ElevatorIO {
   public void updateInputs(ElevatorIOInputs inputs) {
     sim.update(Constants.globalDelta_sec);
     inputs.posMeters = sim.getPositionMeters();
-    inputs.velMetersPerSecond = sim.getVelocityMetersPerSecond();
-    inputs.accMetersPerSecond2 =
-        (sim.getVelocityMetersPerSecond() - lastVel) / Constants.globalDelta_sec;
+    inputs.velMPS = sim.getVelocityMetersPerSecond();
     inputs.volts = appliedVolts;
     inputs.currents = new double[] {sim.getCurrentDrawAmps()};
-    lastVel = inputs.velMetersPerSecond;
   }
 
   @Override
@@ -40,7 +37,13 @@ public class ElevatorIOSim implements ElevatorIO {
   }
 
   @Override
-  public void setPos(double pos_m) {
+  public void holdPos(double pos_m) {
+    posPid.setSetpoint(pos_m);
+    setVoltage(posPid.calculate(sim.getPositionMeters()));
+  }
+
+  @Override
+  public void travelToPos(double pos_m) {
     posPid.setSetpoint(pos_m);
     setVoltage(posPid.calculate(sim.getPositionMeters()));
   }

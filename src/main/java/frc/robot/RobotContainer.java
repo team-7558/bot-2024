@@ -13,19 +13,13 @@
 
 package frc.robot;
 
-import com.pathplanner.lib.auto.AutoBuilder;
-import com.pathplanner.lib.path.PathPlannerPath;
-import com.pathplanner.lib.path.PathPoint;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.auto.RunAltAutoCommand;
+import frc.robot.auto.Test;
 import frc.robot.commands.RobotTeleop;
 import frc.robot.subsystems.drive.Drive;
-import java.util.List;
-import org.littletonrobotics.junction.Logger;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -36,8 +30,6 @@ import org.littletonrobotics.junction.Logger;
 public class RobotContainer {
   // Subsystems
   private final Drive drive;
-
-  // Controller
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -63,7 +55,41 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    PathPlannerPath path = PathPlannerPath.fromChoreoTrajectory("4note");
+    //   return new FollowPathHolonomic(
+    //         PathPlannerPath.fromChoreoTrajectory("LeftStart"),
+    //         drive::getPose, // Robot pose supplier
+    //         drive::getChassisSpeedsFromModuleStates, // ChassisSpeeds supplier. MUST BE ROBOT
+    // RELATIVE
+    //         drive::runVelocity, // Method that will drive the robot given ROBOT RELATIVE
+    // ChassisSpeeds
+    //         new HolonomicPathFollowerConfig( // HolonomicPathFollowerConfig, this should likely
+    // live in your Constants class
+    //                 new PIDConstants(5.0, 0.0, 0.0), // Translation PID constants
+    //                 new PIDConstants(5.0, 0.0, 0.0), // Rotation PID constants
+    //                 4.5, // Max module speed, in m/s
+    //                 0.4, // Drive base radius in meters. Distance from robot center to furthest
+    // module.
+    //                 new ReplanningConfig() // Default path replanning config. See the API for the
+    // options here
+    //         ),
+    //         () -> {
+    //             // Boolean supplier that controls when the path will be mirrored for the red
+    // alliance
+    //             // This will flip the path being followed to the red side of the field.
+    //             // THE ORIGIN WILL REMAIN ON THE BLUE SIDE
+
+    //             var alliance = DriverStation.getAlliance();
+    //             if (alliance.isPresent()) {
+    //                 return alliance.get() == DriverStation.Alliance.Red;
+    //             }
+    //             return false;
+    //         },
+    //         drive // Reference to this subsystem to set requirements
+    // );
+
+    return new RunAltAutoCommand(new Test());
+
+    /*PathPlannerPath path = PathPlannerPath.fromChoreoTrajectory("4note");
     List<PathPoint> points = path.getAllPathPoints();
     PathPoint[] array = (PathPoint[]) points.toArray(new PathPoint[0]);
     Translation2d[] translationArray = new Translation2d[array.length];
@@ -84,6 +110,6 @@ public class RobotContainer {
     pose = pose.rotateBy(Rotation2d.fromDegrees(180));
 
     drive.setPose(path.getPreviewStartingHolonomicPose());
-    return AutoBuilder.followPath(path.flipPath());
+    return AutoBuilder.followPath(path.flipPath());*/
   }
 }
