@@ -2,7 +2,6 @@ package frc.robot.subsystems.shooter;
 
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
-import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.MotionMagicVelocityVoltage;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
@@ -12,22 +11,26 @@ import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+import edu.wpi.first.math.controller.ArmFeedforward;
+import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
+import frc.robot.Constants;
 import frc.robot.util.Util;
 
 public class ShooterIOTalonFx implements ShooterIO {
-  
-  private static final double FLYWHEEL_GEAR_RATIO = 1;
-  private static final double TURRET_GEAR_RATIO = 196.0 / 18.0; // TODO SET
+
+  private static final double FLYWHEEL_GEAR_RATIO = 1.66;
+  private static final double TURRET_GEAR_RATIO = 160.0 / 14.0; // TODO SET
   private static final double FEEDER_GEAR_RATIO = 1; // TODO: SET
   private static final double PIVOT_GEAR_RATIO = 81; // TODO: SET
-  
+
   private static final double FLYWHEEL_VEL_SWITCH_THRESHOLD = 50.0;
   private static final double FEEDER_VEL_SWITCH_THRESHOLD = 50.0;
-  private static final double TURRET_POS_SWITCH_THRESHOLD = 0.40;
+  private static final double TURRET_POS_SWITCH_THRESHOLD = 0.01;
   private static final double PIVOT_POS_SWITCH_THRESHOLD = 0.20;
-
 
   private final TalonFX flywheelL = new TalonFX(9);
   private final TalonFX flywheelR = new TalonFX(10);
@@ -37,6 +40,12 @@ public class ShooterIOTalonFx implements ShooterIO {
 
   private final DutyCycleEncoder tAbsEnc = new DutyCycleEncoder(1); // TODO: update
   private final DutyCycleEncoder pAbsEnc = new DutyCycleEncoder(4); // TODO: update
+
+  private ProfiledPIDController centennialCon =
+      new ProfiledPIDController(
+          80, 0, 0, new TrapezoidProfile.Constraints(1.25, 0.35), Constants.globalDelta_sec);
+  private ArmFeedforward centennialFF = new ArmFeedforward(0, 0.38, 0, 0);
+  private double ffOffset = 0.06;
 
   private final DigitalInput beambreak = new DigitalInput(0);
 
@@ -63,40 +72,45 @@ public class ShooterIOTalonFx implements ShooterIO {
   private final StatusSignal<Double> FAppliedVolts = feeder.getMotorVoltage();
   private final StatusSignal<Double> FCurrent = feeder.getStatorCurrent();
 
-  //Outputs
+  // Outputs
   VoltageOut flyVolts = new VoltageOut(0, true, false, false, false);
   VelocityVoltage flyVel = new VelocityVoltage(0, 0, true, 0, 0, false, false, false);
-  MotionMagicVelocityVoltage flyMmVel = new MotionMagicVelocityVoltage(0, 0, true, 0, 1, false, false, false);
+  MotionMagicVelocityVoltage flyMmVel =
+      new MotionMagicVelocityVoltage(0, 0, true, 0, 1, false, false, false);
 
   VoltageOut feedVolts = new VoltageOut(0, true, false, false, false);
   VelocityVoltage feedVel = new VelocityVoltage(0, 0, true, 0, 0, false, false, false);
-  MotionMagicVelocityVoltage feedMmVel = new MotionMagicVelocityVoltage(0, 0, true, 0, 1, false, false, false);
+  MotionMagicVelocityVoltage feedMmVel =
+      new MotionMagicVelocityVoltage(0, 0, true, 0, 1, false, false, false);
 
   VoltageOut tVolts = new VoltageOut(0, true, false, false, false);
   PositionVoltage tPos = new PositionVoltage(0, 0, true, 0, 0, false, false, false);
   MotionMagicVoltage tMmPos = new MotionMagicVoltage(0, true, 0, 1, false, false, false);
-  MotionMagicVelocityVoltage tMmVel = new MotionMagicVelocityVoltage(0, 0, true, 0, 2, false, false, false);
- 
+  MotionMagicVelocityVoltage tMmVel =
+      new MotionMagicVelocityVoltage(0, 0, true, 0, 2, false, false, false);
+
   VoltageOut pVolts = new VoltageOut(0, true, false, false, false);
   PositionVoltage pPos = new PositionVoltage(0, 0, true, 0, 0, false, false, false);
   MotionMagicVoltage pMmPos = new MotionMagicVoltage(0, true, 0, 1, false, false, false);
-  MotionMagicVelocityVoltage pMmVel = new MotionMagicVelocityVoltage(0, 0, true, 0, 2, false, false, false);
- 
+  MotionMagicVelocityVoltage pMmVel =
+      new MotionMagicVelocityVoltage(0, 0, true, 0, 2, false, false, false);
+
   public ShooterIOTalonFx() {
     var config = new TalonFXConfiguration();
     config.Feedback.SensorToMechanismRatio = FLYWHEEL_GEAR_RATIO;
     config.CurrentLimits.SupplyCurrentLimit = 30.0;
+    config.ClosedLoopRamps.VoltageClosedLoopRampPeriod = 0.1;
     config.CurrentLimits.SupplyCurrentLimitEnable = true;
     config.MotorOutput.NeutralMode = NeutralModeValue.Coast;
     config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
 
-    //Strong hold
+    // Strong hold
     config.Slot0.kP = 0;
     config.Slot0.kI = 0;
     config.Slot0.kD = 0;
-    config.Slot0.kV = 0;
+    config.Slot0.kV = 0.2;
 
-    //mm Fast ramp
+    // mm Fast ramp
     config.Slot1.kP = 0;
     config.Slot1.kI = 0;
     config.Slot1.kD = 0;
@@ -106,7 +120,7 @@ public class ShooterIOTalonFx implements ShooterIO {
     config.MotionMagic.MotionMagicCruiseVelocity = 0;
     config.MotionMagic.MotionMagicAcceleration = 0;
     config.MotionMagic.MotionMagicJerk = 0;
-    
+
     flywheelL.getConfigurator().apply(config);
     flywheelR.getConfigurator().apply(config);
 
@@ -114,16 +128,17 @@ public class ShooterIOTalonFx implements ShooterIO {
     feederConfig.Feedback.SensorToMechanismRatio = FEEDER_GEAR_RATIO;
     feederConfig.CurrentLimits.SupplyCurrentLimit = 30;
     feederConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
+    feederConfig.ClosedLoopRamps.VoltageClosedLoopRampPeriod = 0.1;
     feederConfig.MotorOutput.NeutralMode = NeutralModeValue.Coast;
     feederConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
 
-    //mmVel
+    // mmVel
     feederConfig.Slot0.kP = 0;
     feederConfig.Slot0.kI = 0;
     feederConfig.Slot0.kD = 0;
     feederConfig.Slot0.kA = 0;
     feederConfig.Slot0.kS = 0;
-    feederConfig.Slot0.kV = 0;
+    feederConfig.Slot0.kV = 0.1;
 
     feederConfig.MotionMagic.MotionMagicCruiseVelocity = 0;
     feederConfig.MotionMagic.MotionMagicAcceleration = 0;
@@ -133,22 +148,23 @@ public class ShooterIOTalonFx implements ShooterIO {
     turretConfig.Feedback.SensorToMechanismRatio = TURRET_GEAR_RATIO;
     turretConfig.CurrentLimits.SupplyCurrentLimit = 30.0; // TODO: tune
     turretConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
-    turretConfig.MotorOutput.NeutralMode = NeutralModeValue.Coast;
+    turretConfig.ClosedLoopRamps.VoltageClosedLoopRampPeriod = 0.1;
+    turretConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
     turretConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
 
     // posHold
-    turretConfig.Slot0.kP = 0;
+    turretConfig.Slot0.kP = 40;
     turretConfig.Slot0.kI = 0;
     turretConfig.Slot0.kD = 0;
 
     // mmPosMove
-    turretConfig.Slot1.kP = 0;
+    turretConfig.Slot1.kP = 30;
     turretConfig.Slot1.kI = 0;
     turretConfig.Slot1.kD = 0;
     turretConfig.Slot1.kS = 0;
-    turretConfig.Slot1.kV = 0;
-    turretConfig.Slot1.kA = 0;
-    
+    turretConfig.Slot1.kV = 2.5;
+    turretConfig.Slot1.kA = 0.1;
+
     // mmVel
     turretConfig.Slot2.kP = 0;
     turretConfig.Slot2.kI = 0;
@@ -157,15 +173,15 @@ public class ShooterIOTalonFx implements ShooterIO {
     turretConfig.Slot2.kV = 0;
     turretConfig.Slot2.kA = 0;
 
-    turretConfig.MotionMagic.MotionMagicAcceleration = 0;
-    turretConfig.MotionMagic.MotionMagicCruiseVelocity = 0;
+    turretConfig.MotionMagic.MotionMagicCruiseVelocity = 2;
+    turretConfig.MotionMagic.MotionMagicAcceleration = 2;
     turretConfig.MotionMagic.MotionMagicJerk = 0;
 
     var pivotConfig = new TalonFXConfiguration();
     pivotConfig.Feedback.SensorToMechanismRatio = PIVOT_GEAR_RATIO;
     pivotConfig.CurrentLimits.SupplyCurrentLimit = 30.0;
     pivotConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
-    pivotConfig.MotorOutput.NeutralMode = NeutralModeValue.Coast;
+    pivotConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
     pivotConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
 
     // posHold
@@ -205,7 +221,7 @@ public class ShooterIOTalonFx implements ShooterIO {
     turret.getConfigurator().apply(turretConfig);
     pivot.getConfigurator().apply(pivotConfig);
 
-    tAbsEnc.setPositionOffset(0.383);
+    tAbsEnc.setPositionOffset(0.554);
     tAbsEnc.setDistancePerRotation(1);
     pAbsEnc.setPositionOffset(0.832);
     pAbsEnc.setDistancePerRotation(1);
@@ -241,22 +257,27 @@ public class ShooterIOTalonFx implements ShooterIO {
 
   @Override
   public void zero() {
-    System.out.println("tAbs Offset: " + -(tAbsEnc.getAbsolutePosition() - tAbsEnc.getPositionOffset()));
-    System.out.println("pAbs Offset: " + -(pAbsEnc.getAbsolutePosition() - pAbsEnc.getPositionOffset()));
+    System.out.println(
+        "tAbs Offset: " + -(tAbsEnc.getAbsolutePosition() - tAbsEnc.getPositionOffset()));
+    System.out.println(
+        "pAbs Offset: " + -(pAbsEnc.getAbsolutePosition() - pAbsEnc.getPositionOffset()));
     turret.setPosition(-(tAbsEnc.getAbsolutePosition() - tAbsEnc.getPositionOffset()));
     pivot.setPosition(-(pAbsEnc.getAbsolutePosition() - pAbsEnc.getPositionOffset()));
   }
-  
+
   @Override
   public void stop() {
     flywheelL.stopMotor();
     flywheelR.stopMotor();
     turret.stopMotor();
     feeder.stopMotor();
+    pivot.stopMotor();
+
+    centennialCon.reset(-(pAbsEnc.getAbsolutePosition() - pAbsEnc.getPositionOffset()), 0);
   }
-  
+
   @Override
-  public void setFlywheelVolts(double volts) { 
+  public void setFlywheelVolts(double volts) {
     double v = Util.limit(volts, 12.0);
     flywheelL.setControl(flyVolts.withOutput(v));
     flywheelR.setControl(flyVolts.withOutput(v));
@@ -264,7 +285,7 @@ public class ShooterIOTalonFx implements ShooterIO {
 
   @Override
   public void setFlywheelVel(double vel_rps) {
-    if(Util.inRange(vel_rps - LVelocity.getValueAsDouble(), FLYWHEEL_VEL_SWITCH_THRESHOLD)){
+    if (Util.inRange(vel_rps - LVelocity.getValueAsDouble(), FLYWHEEL_VEL_SWITCH_THRESHOLD)) {
       flywheelL.setControl(flyVel.withVelocity(vel_rps));
       flywheelR.setControl(flyVel.withVelocity(vel_rps));
     } else {
@@ -281,7 +302,7 @@ public class ShooterIOTalonFx implements ShooterIO {
 
   @Override
   public void setFeederVel(double vel_rps) {
-    if(Util.inRange(vel_rps - FVelocity.getValueAsDouble(), FEEDER_VEL_SWITCH_THRESHOLD)){
+    if (Util.inRange(vel_rps - FVelocity.getValueAsDouble(), FEEDER_VEL_SWITCH_THRESHOLD)) {
       feeder.setControl(feedVel.withVelocity(vel_rps));
       feeder.setControl(feedVel.withVelocity(vel_rps));
     } else {
@@ -298,7 +319,7 @@ public class ShooterIOTalonFx implements ShooterIO {
 
   /** Run closed loop at the specified velocity. */
   public void setTurretPos(double pos_r) {
-    if(Util.inRange(pos_r - TPosition.getValueAsDouble(), TURRET_POS_SWITCH_THRESHOLD)){
+    if (Util.inRange(pos_r - TPosition.getValueAsDouble(), TURRET_POS_SWITCH_THRESHOLD)) {
       turret.setControl(tPos.withPosition(pos_r));
       turret.setControl(tPos.withPosition(pos_r));
     } else {
@@ -320,13 +341,19 @@ public class ShooterIOTalonFx implements ShooterIO {
 
   /** Run closed loop at the specified velocity. */
   public void setPivotPos(double pos_r) {
-    if(Util.inRange(pos_r - PPosition.getValueAsDouble(), PIVOT_POS_SWITCH_THRESHOLD)){
+    /*if (Util.inRange(pos_r - PPosition.getValueAsDouble(), PIVOT_POS_SWITCH_THRESHOLD)) {
       pivot.setControl(pPos.withPosition(pos_r));
       pivot.setControl(pPos.withPosition(pos_r));
     } else {
       pivot.setControl(pMmPos.withPosition(pos_r));
       pivot.setControl(pMmPos.withPosition(pos_r));
-    }
+    }*/
+    double m = -(pAbsEnc.getAbsolutePosition() - pAbsEnc.getPositionOffset());
+    System.out.println("m");
+    double output =
+        centennialCon.calculate(m, pos_r)
+            + centennialFF.calculate(Units.rotationsToRadians(m + ffOffset), 0);
+    setPivotVolts(output);
   }
 
   /** Run closed loop at the specified velocity. */

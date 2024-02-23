@@ -65,5 +65,4 @@ public interface ShooterIO {
   public default void stop() {}
 
   public default void zero() {}
-
 }

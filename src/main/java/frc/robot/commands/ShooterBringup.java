@@ -50,19 +50,20 @@ public class ShooterBringup extends Command {
   public void execute() {
 
     if (!shooter.isState(shooter.DISABLED)) {
-      double s = 0.125 * Math.sin(t.get() * 0.05);
-      double c = 0.125 * Math.cos(t.get() * 0.05);
+      double s = 0.025 * Math.sin(t.get() * 0.5);
+      double c = 0.025 * Math.cos(t.get() * 1);
 
-      if(OI.DR.getAButton()){
-        shooter.queueSetpoints(new Setpoints(0, 0, 0.125));
+      if (OI.DR.getAButton()) {
+        shooter.queueSetpoints(new Setpoints(30, 0, 0.11));
         shooter.setCurrentState(shooter.TRACKING);
-      } else if(OI.DR.getBButton()){
-        shooter.queueSetpoints(new Setpoints(0, 0, 0.125));
+      } else if (OI.DR.getBButton()) {
+        intake.setCurrentState(intake.SHOOTER_SIDE);
+        shooter.queueSetpoints(new Setpoints(30, 30, 0, 0.11));
         shooter.setCurrentState(shooter.TRACKING);
       } else {
+        intake.setCurrentState(intake.IDLE);
         shooter.setCurrentState(shooter.IDLE);
       }
-      
     }
 
     if (!drive.isState(drive.DISABLED)) {
