@@ -29,6 +29,7 @@ public class VisionProcessingThread extends Thread {
           if (latestResult.hasTargets()) {
             Optional<EstimatedRobotPose> poseOptional = camera.poseEstimator.update(latestResult);
             if (poseOptional.isPresent()) {
+              if(latestResult.getBestTarget().getPoseAmbiguity() > 0.2) return; // as per photonvision's reccomendations
               EstimatedRobotPose estimatedPose = poseOptional.get();
               Logger.recordOutput("Vision/3DPose", estimatedPose.estimatedPose);
               camera.poses[camera.poseIndex] = estimatedPose.estimatedPose;
