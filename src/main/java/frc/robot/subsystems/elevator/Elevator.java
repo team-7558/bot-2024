@@ -101,7 +101,7 @@ public class Elevator extends StateMachineSubsystemBase {
               setCurrentState(RESETTING);
             } else {
               // io.setVel(-0.05);
-              io.setVoltage(-0.5);
+              io.setVoltage(-1.5);
             }
           }
         };

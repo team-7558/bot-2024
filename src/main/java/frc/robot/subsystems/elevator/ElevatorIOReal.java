@@ -59,14 +59,14 @@ public class ElevatorIOReal implements ElevatorIO {
     rightCurrent_A = rightFalcon.getStatorCurrent();
     volts_V = leftFalcon.getMotorVoltage();
 
-    leaderConfig.CurrentLimits.StatorCurrentLimit = 40.0;
+    leaderConfig.CurrentLimits.StatorCurrentLimit = 70.0;
     leaderConfig.CurrentLimits.StatorCurrentLimitEnable = true;
     leaderConfig.Feedback.SensorToMechanismRatio = METERS_TO_ROTATIONS;
-    leaderConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
+    leaderConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
     leaderConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
 
-    leaderConfig.MotionMagic.MotionMagicCruiseVelocity = 1.3;
-    leaderConfig.MotionMagic.MotionMagicAcceleration = 2.0;
+    leaderConfig.MotionMagic.MotionMagicCruiseVelocity = 1.7;
+    leaderConfig.MotionMagic.MotionMagicAcceleration = 2.3;
     leaderConfig.MotionMagic.MotionMagicJerk = 5;
     leaderConfig.MotionMagic.MotionMagicExpo_kV = 0.5;
     leaderConfig.MotionMagic.MotionMagicExpo_kA = 0.5;
@@ -100,7 +100,7 @@ public class ElevatorIOReal implements ElevatorIO {
 
     leftFalcon.getConfigurator().apply(leaderConfig);
 
-    rightFalcon.setControl(new Follower(leftFalcon.getDeviceID(), true).withUpdateFreqHz(200));
+    rightFalcon.setControl(new Follower(leftFalcon.getDeviceID(), false).withUpdateFreqHz(50));
 
     resetPos(Elevator.MIN_HEIGHT_M);
   }

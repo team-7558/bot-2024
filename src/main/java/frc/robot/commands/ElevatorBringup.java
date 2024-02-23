@@ -36,8 +36,8 @@ public class ElevatorBringup extends Command {
       boolean up = OI.DR.getPOV() == 0, down = OI.DR.getPOV() == 180;
       double manual = 3.0 * (up ? 1 : down ? -1 : 0);
       if (up || down) {
-        elevator.setCurrentState(elevator.MANUAL);
         elevator.setManualOutput(manual);
+        elevator.setCurrentState(elevator.MANUAL);
       } else if (OI.DR.getXButton()) {
         elevator.setTargetHeight(Util.lerp(Elevator.MIN_HEIGHT_M, Elevator.MAX_HEIGHT_M, 0.2));
         elevator.setCurrentState(elevator.CLIMBING);
