@@ -34,7 +34,6 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import frc.robot.Constants;
-import frc.robot.G;
 import frc.robot.OI;
 import frc.robot.subsystems.StateMachineSubsystemBase;
 import frc.robot.subsystems.drive.Module.Mode;
@@ -341,13 +340,8 @@ public class Drive extends StateMachineSubsystemBase {
     Logger.recordOutput("Drive/yp", y_);
     Logger.recordOutput("Drive/wp", w_);
 
-    ChassisSpeeds rr = ChassisSpeeds.fromFieldRelativeSpeeds(
-            x_,
-            y_,
-            w_,
-            getPose()
-                .getRotation()
-                /*.plus(
+    ChassisSpeeds rr =
+        ChassisSpeeds.fromFieldRelativeSpeeds(x_, y_, w_, getPose().getRotation() /*.plus(
                     new Rotation2d(
                         getAngularVelocity() * SKEW_CONSTANT))*/);
 

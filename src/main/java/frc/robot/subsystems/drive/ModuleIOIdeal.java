@@ -26,8 +26,6 @@ import frc.robot.Constants;
 public class ModuleIOIdeal implements ModuleIO {
   private static final double LOOP_PERIOD_SECS = Constants.globalDelta_sec;
 
-  private final Rotation2d turnAbsoluteInitPosition = new Rotation2d(Math.random() * 2.0 * Math.PI);
-
   private double drivePos_r = 0.0;
   private double driveVel_mps = 0.0;
   private double driveVolts_V = 0.0;
@@ -49,8 +47,8 @@ public class ModuleIOIdeal implements ModuleIO {
     inputs.driveVolts_V = driveVolts_V;
     inputs.driveCurrent_A = new double[] {0};
 
-    inputs.turnAbsPos_rot2d = new Rotation2d(turnPos_r).plus(turnAbsoluteInitPosition);
-    inputs.turnPos_rot2d = new Rotation2d(turnPos_r);
+    inputs.turnAbsPos_rot2d = Rotation2d.fromRotations(turnPos_r);
+    inputs.turnPos_rot2d = Rotation2d.fromRotations(turnPos_r);
     inputs.turnVel_rps = turnVel_rps;
     inputs.turnVel_rps = turnVolts_V;
     inputs.turnCurrent_A = new double[] {Math.abs(0)};
@@ -74,7 +72,8 @@ public class ModuleIOIdeal implements ModuleIO {
 
   @Override
   public void setDriveVelocity(double velocity) {
-    driveVel_mps = MathUtil.clamp(velocity, -Drive.MAX_LINEAR_SPEED_MPS, Drive.MAX_LINEAR_SPEED_MPS);
+    driveVel_mps =
+        MathUtil.clamp(velocity, -Drive.MAX_LINEAR_SPEED_MPS, Drive.MAX_LINEAR_SPEED_MPS);
     double radps = driveVel_mps / Module.WHEEL_RADIUS;
     double rps = Units.radiansToRotations(radps);
     drivePos_r += rps * LOOP_PERIOD_SECS;
@@ -83,7 +82,7 @@ public class ModuleIOIdeal implements ModuleIO {
   @Override
   public void setTurnAngle(double r) {
     double lastTurnPos_r = turnPos_r;
-    turnPos_r = r - turnAbsoluteInitPosition.getRotations();
+    turnPos_r = r;
     turnVel_rps = (turnPos_r - lastTurnPos_r) / LOOP_PERIOD_SECS;
   }
 }
