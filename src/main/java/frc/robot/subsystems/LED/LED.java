@@ -391,28 +391,40 @@ public class LED {
   }
 
   public void game1(int jumperPosX, int jumperPosY, int j) {
+    int amount = 4;
     drawRow(6, 128, 0, 0);
 
+    drawJumper(jumperPosX, jumperPosY, 0, 128, 0);
     if (OI.DR.getAButton()) {
-      for (int i = 6; i > 3; i--) {
-        setRGB(i, 0, 0, 0);
+      for (int i = 1; i < 7; i++) {
+        if (i < 4) {
+          drawJumper(jumperPosX, jumperPosY, 0, 0, 0);
+          drawJumper(jumperPosX, jumperPosY--, 0, 128, 0);
+        } else {
+          drawJumper(jumperPosX, jumperPosY, 0, 0, 0);
+          drawJumper(jumperPosX, jumperPosY++, 0, 128, 0);
+        }
       }
-      drawJumper(jumperPosX, jumperPosY -= 3, 0, 128, 0);
-    } else {
-      drawJumper(jumperPosX, jumperPosY, 0, 128, 0);
     }
 
     if (jumperPosY + 2 == 5 && jumperPosX <= j) {
-      // LED.getInstance().setAllRGB(255, 0, 0);
       int rowR = 0;
       int rowG = 0;
       int rowB = 0;
-      drawPoint(j, 5, rowR, rowG, rowB);
+      // drawPoint(j, 5, rowR, rowG, rowB);
+      spike(amount, j, rowR, rowG, rowB);
     } else {
       int rowR = 0;
       int rowG = 0;
       int rowB = 255;
-      drawPoint(j, 5, rowR, rowG, rowB);
+      // drawPoint(j, 5, rowR, rowG, rowB);
+      spike(amount, j, rowR, rowG, rowB);
+    }
+  }
+
+  public void spike(int amount, int movement, int r, int g, int b) {
+    for (int i = 0; i < amount*2; i+=2) {
+      drawPoint(movement - amount * i, 5, r, g, b);
     }
   }
 
