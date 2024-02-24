@@ -288,6 +288,10 @@ public class Shooter extends StateMachineSubsystemBase {
     io.stop();
   }
 
+  public void zero() {
+    io.zero();
+  }
+
   public void setTargetMode(TargetMode mode) {
     targetMode = mode;
   }

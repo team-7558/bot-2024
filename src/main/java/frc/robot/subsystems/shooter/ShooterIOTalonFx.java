@@ -22,6 +22,8 @@ import frc.robot.util.Util;
 
 public class ShooterIOTalonFx implements ShooterIO {
 
+  private static final double TMRMIN = 0, TMRMAX = 0;
+
   private static final double FLYWHEEL_GEAR_RATIO = 1.66;
   private static final double TURRET_GEAR_RATIO = 5.0 * 160.0 / 14.0; // TODO SET
   private static final double FEEDER_GEAR_RATIO = 1; // TODO: SET
@@ -149,16 +151,16 @@ public class ShooterIOTalonFx implements ShooterIO {
     turretConfig.CurrentLimits.SupplyCurrentLimit = 30.0; // TODO: tune
     turretConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
     turretConfig.ClosedLoopRamps.VoltageClosedLoopRampPeriod = 0.1;
-    turretConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
+    turretConfig.MotorOutput.NeutralMode = NeutralModeValue.Coast;
     turretConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
 
     // posHold
-    turretConfig.Slot0.kP = 40;
+    turretConfig.Slot0.kP = 90;
     turretConfig.Slot0.kI = 0;
     turretConfig.Slot0.kD = 0;
 
     // mmPosMove
-    turretConfig.Slot1.kP = 30;
+    turretConfig.Slot1.kP = 90;
     turretConfig.Slot1.kI = 0;
     turretConfig.Slot1.kD = 0;
     turretConfig.Slot1.kS = 0;
@@ -221,7 +223,7 @@ public class ShooterIOTalonFx implements ShooterIO {
     turret.getConfigurator().apply(turretConfig);
     pivot.getConfigurator().apply(pivotConfig);
 
-    tAbsEnc.setPositionOffset(0.554);
+    tAbsEnc.setPositionOffset(0.693);
     tAbsEnc.setDistancePerRotation(1);
     pAbsEnc.setPositionOffset(0.832);
     pAbsEnc.setDistancePerRotation(1);
@@ -349,7 +351,6 @@ public class ShooterIOTalonFx implements ShooterIO {
       pivot.setControl(pMmPos.withPosition(pos_r));
     }*/
     double m = -(pAbsEnc.getAbsolutePosition() - pAbsEnc.getPositionOffset());
-    System.out.println("m");
     double output =
         centennialCon.calculate(m, pos_r)
             + centennialFF.calculate(Units.rotationsToRadians(m + ffOffset), 0);
