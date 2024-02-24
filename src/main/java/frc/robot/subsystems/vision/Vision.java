@@ -42,6 +42,14 @@ public class Vision extends SubsystemBase {
 
   public static final AprilTagFieldLayout AT_MAP;
 
+  public static void resetArrays() {
+    // for (VisionIOPhoton io : getInstance().cameras) {
+    //   for (int i = 0; i < io.poses.length; i++) {
+    //     io.poses[i] = new Pose3d();
+    //   }
+    // }
+  }
+
   static {
     AprilTagFieldLayout temp;
     try {
@@ -58,22 +66,32 @@ public class Vision extends SubsystemBase {
   public static Vision getInstance() {
     if (instance == null) {
 
-      ApriltagIO cam0, cam1, cam2, cam3;
+      VisionIOPhoton cam0, cam1, cam2, cam3;
 
       switch (Constants.currentMode) { // TODO: SET BACK TO NORMAL
         case REAL:
-          cam0 = new VisionIOPhoton("BL", new Transform3d()); // TODO: update transform & name later
+          cam0 =
+              new VisionIOPhoton(
+                  "BL",
+                  new Transform3d(
+                      0.04,
+                      -0.3,
+                      0.5,
+                      new Rotation3d(
+                          Units.degreesToRadians(-10),
+                          Units.degreesToRadians(10),
+                          Units.degreesToRadians(-110)))); // TODO: update transform & name later
           cam1 =
               new VisionIOPhoton(
                   "BR",
                   new Transform3d(
                       0,
                       0,
-                      -0.5,
+                      0,
                       new Rotation3d(
                           Units.degreesToRadians(10),
                           Units.degreesToRadians(10),
-                          Units.degreesToRadians(110))));
+                          Units.degreesToRadians(100))));
           // VisionIO cam1 =7
           //     new VisionIOPhoton("camera2", new Transform3d()); // TODO: update transform & name
           // VisionIO cam2 =
@@ -103,10 +121,10 @@ public class Vision extends SubsystemBase {
   private LimelightIO limelight;
   public LimelightIOInputsAutoLogged limelightInputs;
 
-  private ApriltagIO cameras[];
+  private VisionIOPhoton cameras[];
   private ApriltagIOInputsAutoLogged[] visionInputs;
 
-  private Vision(LimelightIO limelight, ApriltagIO... cameras) {
+  private Vision(LimelightIO limelight, VisionIOPhoton... cameras) {
     this.cameras = cameras;
     this.visionInputs =
         new ApriltagIOInputsAutoLogged[] {
