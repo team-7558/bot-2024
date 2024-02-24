@@ -23,7 +23,7 @@ import frc.robot.util.Util;
 public class ShooterIOTalonFx implements ShooterIO {
 
   private static final double FLYWHEEL_GEAR_RATIO = 1.66;
-  private static final double TURRET_GEAR_RATIO = 160.0 / 14.0; // TODO SET
+  private static final double TURRET_GEAR_RATIO = 5.0 * 160.0 / 14.0; // TODO SET
   private static final double FEEDER_GEAR_RATIO = 1; // TODO: SET
   private static final double PIVOT_GEAR_RATIO = 81; // TODO: SET
 
