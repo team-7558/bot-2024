@@ -59,7 +59,7 @@ public class RobotTeleop extends Command {
 
     if (!ss.intakeIsDisabled()) {
 
-      if (OI.DR.getAButton()) {
+      if (OI.DR.getAButtonPressed()) {
         ss.intake();
       } else if (OI.DR.getAButtonReleased()) {
         ss.idle();

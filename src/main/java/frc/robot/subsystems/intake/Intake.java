@@ -75,6 +75,7 @@ public class Intake extends StateMachineSubsystemBase {
           @Override
           public void init() {
             directionSpeed = 0;
+            intakeSpeed = 0;
           }
 
           @Override

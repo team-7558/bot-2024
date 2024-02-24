@@ -59,7 +59,7 @@ public class SS {
     shooter = Shooter.getInstance();
     elevator = Elevator.getInstance();
 
-    hasGamePiece = true;
+    hasGamePiece = false;
   }
 
   public void queueState(State s) {
@@ -71,6 +71,7 @@ public class SS {
     Logger.recordOutput("SS/currState", lastState);
     Logger.recordOutput("SS/nextState", lastState);
     Logger.recordOutput("SS/stateTime", timer.get());
+    Logger.recordOutput("SS/hasGamepiece", hasGamePiece);
   }
 
   public void periodic() {
