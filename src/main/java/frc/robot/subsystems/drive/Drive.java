@@ -36,7 +36,6 @@ import frc.robot.Constants;
 import frc.robot.OI;
 import frc.robot.subsystems.StateMachineSubsystemBase;
 import frc.robot.subsystems.drive.Module.Mode;
-import frc.robot.subsystems.vision.Vision;
 import frc.robot.util.LocalADStarAK;
 import frc.robot.util.Util;
 import java.util.concurrent.locks.Lock;
@@ -417,9 +416,10 @@ public class Drive extends StateMachineSubsystemBase {
 
   public void addToPoseEstimator(Pose2d pose, double timestamp) {
     // poseEstimator.addVisionMeasurement(pose, timestamp);
-    pose = pose;
+    System.out.println("estimator");
+    Logger.recordOutput("Odometry/Test", pose);
+    this.pose = pose;
     posesAdded++;
-    Vision.resetArrays();
   }
 
   /** Returns the average drive velocity in radians/sec. */
@@ -457,7 +457,7 @@ public class Drive extends StateMachineSubsystemBase {
   /** Returns the current odometry pose. */
   @AutoLogOutput(key = "Odometry/Robot")
   public Pose2d getPose() {
-    return poseEstimator.getEstimatedPosition();
+    return this.pose;
   }
 
   /** Returns the current odometry rotation. */

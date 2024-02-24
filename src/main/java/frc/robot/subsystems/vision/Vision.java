@@ -102,6 +102,12 @@ public class Vision extends SubsystemBase {
           instance = new Vision(new LimelightIO() {}, cam0, cam1);
           break;
         case SIM:
+          cam0 =
+              new VisionIOPhoton(
+                  "camera0",
+                  new Transform3d(
+                      0, 0, 0, new Rotation3d())); // TODO: update transform & name later
+          instance = new Vision(new LimelightIO() {}, cam0);
           // no sim
           break;
         case REPLAY:
@@ -243,22 +249,9 @@ public class Vision extends SubsystemBase {
   }
 
   public void handleFrameData() {
-    outer:
     for (int i = 0; i < cameras.length; i++) {
       cameras[i].updateInputs(visionInputs[i]);
       Logger.processInputs("Vision/Camera" + i + "/Inputs", visionInputs[i]);
-      for (int j = 0;
-          j < visionInputs[i].poses.length && j < visionInputs[i].poseTimestamps.length;
-          j++) {
-        double timestamp = visionInputs[i].poseTimestamps[j];
-        if (timestamp == 0) {
-          managePipelines(i, Drive.getInstance().getPose());
-          continue
-              outer; // empty array means no more inputs in the processing frame so skip to next cam
-        }
-        TimestampedPose pose = new TimestampedPose(visionInputs[i].poses[j].toPose2d(), timestamp);
-        Drive.getInstance().addToPoseEstimator(pose.pose, pose.timestamp);
-      }
       managePipelines(i, Drive.getInstance().getPose());
     }
   }

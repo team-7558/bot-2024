@@ -10,10 +10,9 @@ public interface ApriltagIO {
   public static class ApriltagIOInputs {
     public int tagID = -1;
     public int pipelineID = 0;
-    public Pose3d[] poses = new Pose3d[0];
-    public double[] poseTimestamps = new double[0];
-    public double[] tids = new double[0];
-    public double timestamp = -1;
+    public Pose3d poses = new Pose3d();
+    public double timestamp = 0;
+    public double tid = 0;
     public double latency = -1;
   }
 
