@@ -21,8 +21,8 @@ public class Elevator extends StateMachineSubsystemBase {
   public static final double RESET_HEIGHT_M = MIN_HEIGHT_M + 0.04;
   public static final double MIN_FEED_HEIGHT_M = MIN_HEIGHT_M;
   public static final double MAX_FEED_HEIGHT_M = MIN_HEIGHT_M;
-  public static final double AMP_HEIGHT_M = MIN_HEIGHT_M;
-  public static final double CLIMB_HEIGHT_M = MAX_HEIGHT_M;
+  public static final double AMP_HEIGHT_M = Util.lerp(MIN_HEIGHT_M, MAX_HEIGHT_M, 0.95);
+  public static final double CLIMB_HEIGHT_M = MAX_HEIGHT_M - 0.04;
   public static final double MAX_VEL_MPS = 1.0;
   public static final double CURRENT_THRESHOLD_A = 10;
 
@@ -99,7 +99,7 @@ public class Elevator extends StateMachineSubsystemBase {
             if (!atTargetHeight()) {
               io.travelToPos(targetHeight_m);
             } else {
-              setCurrentState(TRAVELLING);
+              setCurrentState(HOLDING);
             }
           }
         };
@@ -113,11 +113,10 @@ public class Elevator extends StateMachineSubsystemBase {
           @Override
           public void periodic() {
             if (isHomeStalling()) {
-              System.out.println("AWWWWW");
               setCurrentState(RESETTING);
             } else {
               // io.setVel(-0.05);
-              io.setVoltage(-1.5);
+              io.setVoltage(-1.0);
             }
           }
         };

@@ -14,6 +14,7 @@ public class ElevatorIOIdeal implements ElevatorIO {
     inputs.volts = volts_V;
     inputs.velMPS = vel_mps;
     inputs.posMeters = pos_m;
+    inputs.currents = new double[] {40, 40};
   }
 
   @Override

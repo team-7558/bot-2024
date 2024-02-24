@@ -13,7 +13,6 @@
 
 package frc.robot.subsystems.drive;
 
-import com.pathplanner.lib.pathfinding.Pathfinding;
 import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
 import com.pathplanner.lib.util.PIDConstants;
 import com.pathplanner.lib.util.PathPlannerLogging;
@@ -38,7 +37,6 @@ import frc.robot.G;
 import frc.robot.OI;
 import frc.robot.subsystems.StateMachineSubsystemBase;
 import frc.robot.subsystems.drive.Module.Mode;
-import frc.robot.util.LocalADStarAK;
 import frc.robot.util.Util;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -134,8 +132,8 @@ public class Drive extends StateMachineSubsystemBase {
 
   public static final HolonomicPathFollowerConfig HPFG =
       new HolonomicPathFollowerConfig(
-          new PIDConstants(5),
-          new PIDConstants(5),
+          new PIDConstants(2),
+          new PIDConstants(2),
           MAX_LINEAR_SPEED_MPS,
           DRIVE_BASE_RADIUS,
           new ReplanningConfig(),
@@ -164,7 +162,7 @@ public class Drive extends StateMachineSubsystemBase {
 
     PhoenixOdometryThread.getInstance().start();
 
-    Pathfinding.setPathfinder(new LocalADStarAK());
+    // TEMP Pathfinding.setPathfinder(new LocalADStarAK());
     PathPlannerLogging.setLogActivePathCallback(
         (activePath) -> {
           Logger.recordOutput(
@@ -210,7 +208,7 @@ public class Drive extends StateMachineSubsystemBase {
           public void periodic() {
             double throttle = 1.0;
             throttle = Util.lerp(1, 0.4, OI.DR.getRightTriggerAxis() * OI.DR.getRightTriggerAxis());
-            drive(-OI.DR.getLeftY(), -OI.DR.getLeftX(), -OI.DR.getRightX() * 0.75, throttle);
+            drive(-OI.DR.getLeftY(), -OI.DR.getLeftX(), -OI.DR.getRightX() * 0.4, throttle);
           }
         };
 
@@ -347,8 +345,6 @@ public class Drive extends StateMachineSubsystemBase {
 
     runVelocity(rr); // TODO: tune skew constant
   }
-
-  public void zeroGyro() {}
 
   public void resetPose() {
     Pose2d p;

@@ -22,7 +22,9 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Filesystem;
+import edu.wpi.first.wpilibj.Timer;
 import frc.robot.Constants;
+import frc.robot.OI;
 import frc.robot.SS2d;
 import frc.robot.subsystems.StateMachineSubsystemBase;
 import frc.robot.subsystems.drive.Drive;
@@ -36,8 +38,6 @@ public class Shooter extends StateMachineSubsystemBase {
 
   private static double HEIGHT_M = 0;
 
-  public static double ACCELERATION = 5.0; // TODO: tune
-
   public static final double FLYWHEEL_MIN_VEL_rps = 0, FLYWHEEL_MAX_VEL_rps = 100;
   public static final double TURRET_MIN_POS_r = -0.25, TURRET_MAX_POS_r = 0.25;
   public static final double PIVOT_MIN_POS_r = 0, PIVOT_MAX_POS_r = 0.2;
@@ -50,6 +50,9 @@ public class Shooter extends StateMachineSubsystemBase {
   ;
   private static LinearInterpolator shotSpeedFromDistance =
       new LinearInterpolator(getLerpTableFromFile("shotspeeds.lerp"));
+
+  private static LinearInterpolator turretConstraintsFromPivotPos =
+      new LinearInterpolator(getLerpTableFromFile("turretConstraintFromPivotPos.lerp"));
 
   private static double TIME_TO_SHOOT = 0.25;
 
@@ -125,7 +128,7 @@ public class Shooter extends StateMachineSubsystemBase {
     return instance;
   }
 
-  public final State DISABLED, IDLE, LOCKONT, SHOOTING, BEING_FED, MANUAL;
+  public final State DISABLED, IDLE, TRACKING, SHOOTING, BEING_FED, MANUAL;
   private final ShooterIOInputsAutoLogged inputs = new ShooterIOInputsAutoLogged();
 
   private final ShooterIO io;
@@ -151,18 +154,6 @@ public class Shooter extends StateMachineSubsystemBase {
     // Switch constants based on mode (the physics simulator is treated as a
     // separate robot with different tuning)
 
-    switch (Constants.currentMode) {
-      case REAL:
-      case REPLAY:
-        io.flywheelConfigurePID(1.0, 0.0, 0.0);
-        break;
-      case SIM:
-        io.flywheelConfigurePID(0.5, 0.0, 0.0);
-        break;
-      default:
-        break;
-    }
-
     // loading lerp tables
 
     lastSetpoints = new Setpoints(0, 0, 0.0, 0.0); // Default values defined here
@@ -173,6 +164,11 @@ public class Shooter extends StateMachineSubsystemBase {
 
           @Override
           public void init() {
+            stop();
+          }
+
+          @Override
+          public void periodic() {
             stop();
           }
         };
@@ -186,7 +182,9 @@ public class Shooter extends StateMachineSubsystemBase {
           }
 
           @Override
-          public void periodic() {}
+          public void periodic() {
+            stop();
+          }
 
           @Override
           public void exit() {}
@@ -204,14 +202,15 @@ public class Shooter extends StateMachineSubsystemBase {
         };
 
     // turent locks on to target and follow it
-    LOCKONT =
-        new State("LOCKONT") {
+    TRACKING =
+        new State("TRACKING") {
           @Override
           public void init() {}
 
           @Override
           public void periodic() {
-            queueSetpoints(constrainSetpoints(shooterPipeline(), false));
+            // queueSetpoints(constrainSetpoints(shooterPipeline(), false));
+            track();
           }
 
           @Override
@@ -226,6 +225,7 @@ public class Shooter extends StateMachineSubsystemBase {
           @Override
           public void periodic() {
             queueSetpoints(new Setpoints(0.2));
+            track();
             // feederVel_rps = 1;
             // output.setFlywheelVel(1);
           }
@@ -243,8 +243,8 @@ public class Shooter extends StateMachineSubsystemBase {
 
           @Override
           public void periodic() {
-            io.setFeederVolts(5);
-            io.setFlywheelVolts(8);
+            io.setFeederVolts(OI.DR.getLeftTriggerAxis() * 0.4 * 12);
+            io.setFlywheelVolts(OI.DR.getRightTriggerAxis() * 0.6 * 12);
           }
 
           @Override
@@ -254,6 +254,9 @@ public class Shooter extends StateMachineSubsystemBase {
         };
 
     setCurrentState(DISABLED);
+
+    Timer.delay(3); // TODO: periodically set this in disabled
+    io.zero();
   }
 
   @Override
@@ -264,13 +267,8 @@ public class Shooter extends StateMachineSubsystemBase {
 
   @Override
   public void outputPeriodic() {
-    // io.setFeederVel(currSetpoints.feederVel_rps);
-    // io.setFlywheelVel(currSetpoints.flywheel_rps);
-    // io.setTurretPos(currSetpoints.turretPos_r);
-    // io.setPivotPos(currSetpoints.pivotPos_r);
-
-    SS2d.M.setShooterTilt(inputs.pivotPosR * 360);
-    SS2d.M.setTurretAngle(inputs.turretPosR * 360);
+    SS2d.M.setShooterTilt(inputs.pivotAbsPosR * 360);
+    SS2d.M.setTurretAngle(inputs.turretAbsPosR * 360);
 
     SS2d.S.setShooterTilt(currSetpoints.pivotPos_r * 360);
     SS2d.S.setTurretAngle(currSetpoints.turretPos_r * 360);
@@ -290,8 +288,19 @@ public class Shooter extends StateMachineSubsystemBase {
     io.stop();
   }
 
+  public void zero() {
+    io.zero();
+  }
+
   public void setTargetMode(TargetMode mode) {
     targetMode = mode;
+  }
+
+  private void track() {
+    io.setFeederVel(currSetpoints.feederVel_rps);
+    io.setFlywheelVel(currSetpoints.flywheel_rps);
+    io.setTurretPos(currSetpoints.turretPos_r);
+    io.setPivotPos(currSetpoints.pivotPos_r);
   }
 
   public void queueSetpoints(Setpoints s) {
@@ -447,13 +456,15 @@ public class Shooter extends StateMachineSubsystemBase {
       s.feederVel_rps = 0.25;
       s.flywheel_rps =
           Util.limit(s.flywheel_rps, FLYWHEEL_MIN_FEED_VEL_rps, FLYWHEEL_MAX_FEED_VEL_rps);
-      s.turretPos_r = Util.limit(s.turretPos_r, TURRET_MIN_FEED_POS_r, TURRET_MAX_FEED_POS_r);
       s.pivotPos_r = Util.limit(s.pivotPos_r, PIVOT_MIN_FEED_POS_r, PIVOT_MAX_FEED_POS_r);
+      s.turretPos_r = Util.limit(s.turretPos_r, TURRET_MIN_FEED_POS_r, TURRET_MAX_FEED_POS_r);
     } else {
       s.feederVel_rps = 0;
       s.flywheel_rps = Util.limit(s.flywheel_rps, FLYWHEEL_MIN_VEL_rps, FLYWHEEL_MAX_VEL_rps);
-      s.turretPos_r = Util.limit(s.turretPos_r, TURRET_MIN_POS_r, TURRET_MAX_POS_r);
       s.pivotPos_r = Util.limit(s.pivotPos_r, PIVOT_MIN_POS_r, PIVOT_MAX_POS_r);
+      s.turretPos_r =
+          Util.limit(
+              s.turretPos_r, turretConstraintsFromPivotPos.getInterpolatedValue(s.pivotPos_r));
     }
     return s;
   }

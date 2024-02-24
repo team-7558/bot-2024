@@ -4,7 +4,6 @@
 
 package frc.robot.commands;
 
-import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.OI;
 import frc.robot.SS;
@@ -30,7 +29,7 @@ public class RobotTeleop extends Command {
   @Override
   public void initialize() {
     drive.setCurrentState(drive.STRAFE_N_TURN);
-    ss.queueState(State.IDLE);
+    ss.queueState(State.BOOT);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -41,8 +40,7 @@ public class RobotTeleop extends Command {
       // slow mode
       // x stance while shooting
       if (OI.DR.getPOV() == 180) {
-        drive.hardSetPose(new Pose2d());
-        drive.zeroGyro();
+        drive.resetPose();
       } else if (OI.DR.getXButton()) {
 
       } else {
@@ -57,13 +55,31 @@ public class RobotTeleop extends Command {
       // }
     }
 
-    if (!ss.intakeIsDisabled()) {
-
-      if (OI.DR.getAButtonPressed()) {
-        ss.intake();
-      } else if (OI.DR.getAButtonReleased()) {
+    if (!ss.elevatorIsDisabled()) {
+      if (OI.DR.getPOV() == 90) {
+        ss.queueState(State.BOOT);
+      } else if (OI.DR.getXButtonPressed()) {
+        ss.climbUp();
+      } else if (OI.DR.getXButtonReleased()) {
+        ss.climbDown();
+      } else if (OI.DR.getRightBumperPressed()) {
+        ss.amp();
+      } else if (OI.DR.getRightBumperReleased()) {
         ss.idle();
       }
+    }
+
+    if (!ss.intakeIsDisabled()) {
+
+      if (OI.DR.getLeftBumperPressed()) {
+        ss.intake();
+      } else if (OI.DR.getLeftBumperReleased()) {
+        ss.idle();
+      }
+    }
+
+    if (OI.DR.getStartButtonPressed()) {
+      ss.shoot();
     }
 
     if (!ss.shooterIsDisabled()) {

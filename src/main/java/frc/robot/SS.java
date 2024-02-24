@@ -13,6 +13,7 @@ public class SS {
   public enum State {
     DISABLED,
     IDLE,
+    BOOT,
     MANUAL,
     TEST_2,
     TEST_3,
@@ -22,7 +23,8 @@ public class SS {
     AMP_SCORING_UP,
     AMP_SCORING_DOWN,
     SHOOTING,
-    CLIMBING,
+    CLIMBING_UP,
+    CLIMBING_DOWN,
     ENDGAME
   }
 
@@ -90,11 +92,26 @@ public class SS {
         break;
       case IDLE:
         if (first) {
-          intake.setCurrentState(intake.IDLE);
+          if (hasGamePiece) {
+            intake.setCurrentState(intake.GHOSTING);
+          } else {
+            intake.setCurrentState(intake.IDLE);
+          }
           shooter.setCurrentState(shooter.IDLE);
           elevator.setCurrentState(elevator.IDLE);
         }
 
+        break;
+      case BOOT:
+        if (first) {
+          intake.setCurrentState(intake.IDLE);
+          shooter.setCurrentState(shooter.IDLE);
+          elevator.setCurrentState(elevator.HOMING);
+        }
+
+        if (elevator.isState(elevator.IDLE)) {
+          queueState(State.IDLE);
+        }
         break;
       case MANUAL:
         if (first) {
@@ -105,11 +122,12 @@ public class SS {
 
         break;
       case TEST_2:
-        if (after(3)) {
-          queueState(State.TEST_3);
-        }
+        if (first) {}
+        elevator.setTargetHeight(0.5 * (Elevator.MAX_HEIGHT_M + Elevator.MIN_HEIGHT_M));
+        elevator.setCurrentState(elevator.TRAVELLING);
         break;
       case TEST_3:
+        break;
       case INTAKING_DEEP:
       case INTAKING_CORAL:
       case INTAKING:
@@ -123,8 +141,8 @@ public class SS {
         }
 
         if (hasGamePiece && !intake.beamBroken()) {
-          queueState(State.IDLE);
-          intake.setCurrentState(intake.IDLE);
+          // queueState(State.IDLE);
+          intake.setCurrentState(intake.GHOSTING);
         } else if (!hasGamePiece) {
           intake.setCurrentState(intake.INTAKING);
         }
@@ -150,18 +168,24 @@ public class SS {
         break;
       case AMP_SCORING_DOWN:
         if (elevator.isState(elevator.HOLDING)) {
-          elevator.setCurrentState(elevator.HOMING);
+          queueState(State.BOOT);
           hasGamePiece = false;
         }
-
-        if (elevator.isState(elevator.IDLE)) {
-          queueState(State.IDLE);
+        break;
+      case CLIMBING_UP:
+        if (first) {
+          elevator.setTargetHeight(Elevator.CLIMB_HEIGHT_M);
+          elevator.setCurrentState(elevator.TRAVELLING);
         }
-
+        break;
+      case CLIMBING_DOWN:
+        if (first) {
+          elevator.setTargetHeight(Elevator.MIN_HEIGHT_M);
+          elevator.setCurrentState(elevator.TRAVELLING);
+        }
         break;
       case SHOOTING:
         hasGamePiece = false;
-      case CLIMBING:
       default:
         System.out.println(currState + " unimplemented state");
     }
@@ -178,12 +202,16 @@ public class SS {
   // TODO: replace example based on what you wanna do, ex. shoot(double x, double y)
   public void action(State s) {
     System.out.println("Switching to state " + s);
-    queueState(s);
+    queueState(State.TEST_2);
   }
 
   public void idle() {
     if (currState != State.IDLE) {
-      queueState(State.IDLE);
+      if (elevator.getHeight() > Elevator.MIN_HEIGHT_M) {
+        queueState(State.BOOT);
+      } else {
+        queueState(State.IDLE);
+      }
     }
   }
 
@@ -201,13 +229,19 @@ public class SS {
 
   public void shoot() {
     if (currState == State.IDLE) {
-      queueState(State.INTAKING);
+      queueState(State.SHOOTING);
     }
   }
 
-  public void climb() {
+  public void climbUp() {
     if (currState == State.IDLE) {
-      queueState(State.INTAKING);
+      queueState(State.CLIMBING_UP);
+    }
+  }
+
+  public void climbDown() {
+    if (currState == State.CLIMBING_UP) {
+      queueState(State.CLIMBING_DOWN);
     }
   }
 

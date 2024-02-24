@@ -29,7 +29,7 @@ public class IntakeIOTalonFX implements IntakeIO {
 
   private final TalonFX topMotor = new TalonFX(3); // Not gunna be 0 1 (cameron told me to add that)
   private final TalonFX bottomMotor = new TalonFX(2);
-  private final DigitalInput beambreak = new DigitalInput(1);
+  private final DigitalInput beambreak = new DigitalInput(7);
 
   private final StatusSignal<Double> bottomVelocity = bottomMotor.getVelocity();
   private final StatusSignal<Double> bottomAppliedVolts = bottomMotor.getMotorVoltage();
@@ -51,6 +51,7 @@ public class IntakeIOTalonFX implements IntakeIO {
     config.CurrentLimits.SupplyCurrentLimit = 30.0;
     config.CurrentLimits.SupplyCurrentLimitEnable = true;
     config.MotorOutput.NeutralMode = NeutralModeValue.Coast;
+    config.OpenLoopRamps.DutyCycleOpenLoopRampPeriod = 0.1;
     bottomMotor.getConfigurator().apply(config);
     topMotor.getConfigurator().apply(config);
 

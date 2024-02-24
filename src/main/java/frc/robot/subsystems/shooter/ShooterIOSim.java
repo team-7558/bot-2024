@@ -60,9 +60,4 @@ public class ShooterIOSim implements ShooterIO {
   public void stop() {
     setFlywheelVolts(0.0);
   }
-
-  @Override
-  public void flywheelConfigurePID(double kP, double kI, double kD) {
-    pid.setPID(kP, kI, kD);
-  }
 }
