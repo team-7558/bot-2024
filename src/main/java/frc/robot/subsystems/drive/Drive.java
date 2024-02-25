@@ -141,7 +141,7 @@ public class Drive extends StateMachineSubsystemBase {
 
   private SwerveDriveKinematics kinematics = new SwerveDriveKinematics(getModuleTranslations());
   private SwerveDrivePoseEstimator poseEstimator;
-  private double autolockSetpoint = 0;
+  private double autolockSetpoint_r = 0;
   private Pose2d pose;
   private Rotation2d lastGyroRotation = new Rotation2d();
   private ChassisSpeeds chassisSpeeds = new ChassisSpeeds(0, 0, 0);
@@ -208,7 +208,12 @@ public class Drive extends StateMachineSubsystemBase {
           public void periodic() {
             double throttle = 1.0;
             throttle = Util.lerp(1, 0.4, OI.DR.getRightTriggerAxis() * OI.DR.getRightTriggerAxis());
-            drive(-OI.DR.getLeftY(), -OI.DR.getLeftX(), -OI.DR.getRightX() * 0.4, throttle);
+
+            double x_ = -Util.sqInput(OI.DR.getLeftY());
+            double y_ = -Util.sqInput(OI.DR.getLeftX());
+            double w_ = -Util.sqInput(OI.DR.getRightX());
+
+            drive(x_, y_, w_ * 0.6, throttle);
           }
         };
 
@@ -218,14 +223,18 @@ public class Drive extends StateMachineSubsystemBase {
           public void periodic() {
             double throttle = 1.0;
             throttle = Util.lerp(1, 0.4, OI.DR.getRightTriggerAxis() * OI.DR.getRightTriggerAxis());
+
+            double x_ = -Util.sqInput(OI.DR.getLeftY());
+            double y_ = -Util.sqInput(OI.DR.getLeftX());
+
             double err =
                 Math.IEEEremainder(
-                    getPose().getRotation().getRadians() - Units.degreesToRadians(autolockSetpoint),
-                    Math.PI * 2.0);
+                    getPose().getRotation().getRotations() - autolockSetpoint_r, 1.0);
             Logger.recordOutput("Drive/Autolock Heading Error", err);
-            double con = Util.inRange(err, 0.35) ? 2 * err : 0.8 * err;
+            double con = Util.inRange(err, 0.1) ? 6 * err : 2 * err;
+            con = Util.limit(con, 0.2);
             Logger.recordOutput("Drive/Autolock Heading Output", con);
-            drive(-OI.DR.getLeftY(), -OI.DR.getLeftX(), -con, throttle);
+            drive(x_, y_, -con, throttle);
           }
         };
     setCurrentState(DISABLED);
@@ -514,19 +523,19 @@ public class Drive extends StateMachineSubsystemBase {
   /**
    * Sets the autolock setpoint
    *
-   * @param degrees
+   * @param rots
    */
-  public void setAutolockSetpoint(double degrees) {
-    this.autolockSetpoint = degrees;
+  public void setAutolockSetpoint(double rots) {
+    this.autolockSetpoint_r = rots;
   }
 
   /**
    * Gets the autolock setpoint
    *
-   * @return degrees
+   * @return rotations
    */
   public double getAutolockSetpoint() {
-    return autolockSetpoint;
+    return autolockSetpoint_r;
   }
 
   public void setModuleModes(Module.Mode mode) {

@@ -4,6 +4,7 @@ import edu.wpi.first.wpilibj.Timer;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.shooter.Shooter;
+import frc.robot.subsystems.shooter.Shooter.Setpoints;
 import frc.robot.util.Util;
 import org.littletonrobotics.junction.Logger;
 
@@ -15,16 +16,27 @@ public class SS {
     IDLE,
     BOOT,
     MANUAL,
+
     TEST_2,
     TEST_3,
+
     INTAKING,
     INTAKING_DEEP,
     INTAKING_CORAL,
+
+    AMP_SCORING_CHAMBER,
     AMP_SCORING_UP,
     AMP_SCORING_DOWN,
+
+    PRECHAMBER,
+    CHAMBER,
+
+    TRACKING,
     SHOOTING,
+
     CLIMBING_UP,
     CLIMBING_DOWN,
+
     ENDGAME
   }
 
@@ -167,9 +179,9 @@ public class SS {
 
         break;
       case AMP_SCORING_DOWN:
+        hasGamePiece = false;
         if (elevator.isState(elevator.HOLDING)) {
           queueState(State.BOOT);
-          hasGamePiece = false;
         }
         break;
       case CLIMBING_UP:
@@ -184,8 +196,38 @@ public class SS {
           elevator.setCurrentState(elevator.TRAVELLING);
         }
         break;
+      case PRECHAMBER:
+        if (first) {
+          elevator.setTargetHeight(Elevator.MIN_FEED_HEIGHT_M);
+          elevator.setCurrentState(elevator.TRAVELLING);
+          shooter.queueSetpoints(new Setpoints(0, 0, 0, 0.0));
+          shooter.setCurrentState(shooter.TRACKING);
+        }
+
+        if (shooter.isAtSetpoints() && elevator.isState(elevator.HOLDING)) {
+          queueState(State.CHAMBER);
+        }
+        break;
+      case CHAMBER:
+        if (first) {
+          shooter.setCurrentState(shooter.BEING_FED);
+        }
+
+        if (shooter.isState(shooter.IDLE)) {
+          queueState(State.IDLE);
+        }
+        break;
       case SHOOTING:
         hasGamePiece = false;
+        if (first) {
+          shooter.queueSetpoints(new Setpoints(40, 0, 0, 0.1));
+          shooter.setCurrentState(shooter.TRACKING);
+        }
+
+        if (after(2.5)) {
+          shooter.queueSetpoints(new Setpoints(40));
+        }
+        break;
       default:
         System.out.println(currState + " unimplemented state");
     }
@@ -224,6 +266,12 @@ public class SS {
   public void amp() {
     if (currState == State.IDLE) {
       queueState(State.AMP_SCORING_UP);
+    }
+  }
+
+  public void chamber() {
+    if (currState == State.IDLE) {
+      queueState(State.PRECHAMBER);
     }
   }
 

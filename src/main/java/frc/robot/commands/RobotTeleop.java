@@ -5,6 +5,7 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.G;
 import frc.robot.OI;
 import frc.robot.SS;
 import frc.robot.SS.State;
@@ -30,6 +31,7 @@ public class RobotTeleop extends Command {
   public void initialize() {
     drive.setCurrentState(drive.STRAFE_N_TURN);
     ss.queueState(State.BOOT);
+    ss.disableShooter();
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -41,8 +43,12 @@ public class RobotTeleop extends Command {
       // x stance while shooting
       if (OI.DR.getPOV() == 180) {
         drive.resetPose();
-      } else if (OI.DR.getXButton()) {
-
+      } else if (OI.DR.getBButton()) {
+        drive.setAutolockSetpoint(0.25);
+        drive.setCurrentState(drive.STRAFE_AUTOLOCK);
+      } else if (OI.DR.getAButton()) {
+        drive.setAutolockSetpoint(G.isRedAlliance() ? 0.5 : 0);
+        drive.setCurrentState(drive.STRAFE_AUTOLOCK);
       } else {
         // strafe and turn if not other state
         drive.setCurrentState(drive.STRAFE_N_TURN);
@@ -78,11 +84,18 @@ public class RobotTeleop extends Command {
       }
     }
 
-    if (OI.DR.getStartButtonPressed()) {
-      ss.shoot();
-    }
-
     if (!ss.shooterIsDisabled()) {
+      if (OI.DR.getStartButtonPressed()) {
+        ss.shoot();
+      } else if (OI.DR.getStartButtonReleased()) {
+        ss.idle();
+      }
+
+      if (OI.DR.getBackButtonPressed()) {
+        ss.chamber();
+      } else if (OI.DR.getBackButtonReleased()) {
+        ss.idle();
+      }
       // if (OI.DR.getLeftTriggerAxis() > 0) {
       //   shooter.setCurrentState(shooter.MANUAL);
       // } else {

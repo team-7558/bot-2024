@@ -193,11 +193,18 @@ public class Shooter extends StateMachineSubsystemBase {
     BEING_FED =
         new State("BEING_FED") {
           @Override
-          public void init() {}
+          public void init() {
+            queueSetpoints(new Setpoints(15));
+          }
 
           @Override
           public void periodic() {
-            queueSetpoints(constrainSetpoints(shooterPipeline(), !inputs.beamBreakActivated));
+            // queueSetpoints(constrainSetpoints(shooterPipeline(), !inputs.beamBreakActivated));
+            track();
+
+            if (inputs.beamBreakActivated) {
+              setCurrentState(IDLE);
+            }
           }
         };
 
@@ -314,6 +321,15 @@ public class Shooter extends StateMachineSubsystemBase {
     currSetpoints.pivotPos_r =
         s.pivotPos_r == Setpoints.DEFAULT ? lastSetpoints.pivotPos_r : s.pivotPos_r;
     lastSetpoints.copy(temp);
+  }
+
+  public boolean isAtSetpoints() {
+    boolean res = true;
+
+    res |= Util.inRange(currSetpoints.turretPos_r - inputs.turretPosR, 0.01);
+    res |= Util.inRange(currSetpoints.pivotPos_r - inputs.pivotPosR, 0.01);
+
+    return res;
   }
 
   /** Returns the current velocity in RPM. */

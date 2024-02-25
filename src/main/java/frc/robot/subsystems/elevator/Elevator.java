@@ -24,7 +24,7 @@ public class Elevator extends StateMachineSubsystemBase {
   public static final double AMP_HEIGHT_M = Util.lerp(MIN_HEIGHT_M, MAX_HEIGHT_M, 0.95);
   public static final double CLIMB_HEIGHT_M = MAX_HEIGHT_M - 0.04;
   public static final double MAX_VEL_MPS = 1.0;
-  public static final double CURRENT_THRESHOLD_A = 10;
+  public static final double CURRENT_THRESHOLD_A = 50;
 
   private static Elevator instance;
 
@@ -40,7 +40,7 @@ public class Elevator extends StateMachineSubsystemBase {
 
         case SIM:
           // Sim robot, instantiate physics sim IO implementations
-          instance = new Elevator(new ElevatorIOIdeal());
+          instance = new Elevator(new ElevatorIOSim());
           break;
 
         default:

@@ -106,7 +106,7 @@ public class ModuleIO2024 implements ModuleIO {
         cancoder = new CANcoder(8, "Optimus"); // todo change
         turnTalon = new TalonFX(7, "Optimus");
         // absoluteEncoderOffset = Rotation2d.fromRotations(0.20751953125); // MUST BE CALIBRATED
-        absoluteEncoderOffset = Rotation2d.fromRadians(1.618); // MUST BE CALIBRATED
+        absoluteEncoderOffset = Rotation2d.fromRadians(1.418); // MUST BE CALIBRATED
         // absoluteEncoderOffset = Rotation2d.fromRotations(0.294); // MUST BE CALIBRATED
         break;
       case Drive.BL:

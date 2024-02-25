@@ -49,7 +49,7 @@ public class ShooterIOTalonFx implements ShooterIO {
   private ArmFeedforward centennialFF = new ArmFeedforward(0, 0.38, 0, 0);
   private double ffOffset = 0.06;
 
-  private final DigitalInput beambreak = new DigitalInput(0);
+  private final DigitalInput beambreak = new DigitalInput(2);
 
   // getting stats from robot
   private final StatusSignal<Double> LVelocity = flywheelL.getVelocity();

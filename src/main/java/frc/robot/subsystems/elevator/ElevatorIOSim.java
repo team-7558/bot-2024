@@ -2,15 +2,25 @@ package frc.robot.subsystems.elevator;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.simulation.ElevatorSim;
 import frc.robot.Constants;
 
 public class ElevatorIOSim implements ElevatorIO {
 
   private ElevatorSim sim =
-      new ElevatorSim(DCMotor.getFalcon500Foc(2), 1, 0, 0, 0, 0, false, 0, null);
+      new ElevatorSim(
+          DCMotor.getFalcon500Foc(2),
+          45,
+          Units.lbsToKilograms(20),
+          Units.inchesToMeters(0.75),
+          Elevator.MIN_HEIGHT_M,
+          Elevator.MAX_HEIGHT_M,
+          false,
+          Elevator.MIN_HEIGHT_M,
+          null);
   private PIDController velPid = new PIDController(0.0, 0.0, 0.0);
-  private PIDController posPid = new PIDController(0.0, 0.0, 0.0);
+  private PIDController posPid = new PIDController(300.0, 0.0, 0.0);
   private double appliedVolts = 0.0;
 
   private double lastVel = 0;
@@ -21,7 +31,7 @@ public class ElevatorIOSim implements ElevatorIO {
     inputs.posMeters = sim.getPositionMeters();
     inputs.velMPS = sim.getVelocityMetersPerSecond();
     inputs.volts = appliedVolts;
-    inputs.currents = new double[] {sim.getCurrentDrawAmps()};
+    inputs.currents = new double[] {sim.getCurrentDrawAmps(), sim.getCurrentDrawAmps()};
   }
 
   @Override

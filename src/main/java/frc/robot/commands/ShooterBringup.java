@@ -54,11 +54,11 @@ public class ShooterBringup extends Command {
       double c = 0.025 * Math.cos(t.get() * 0.5);
 
       if (OI.DR.getAButton()) {
-        shooter.queueSetpoints(new Setpoints(45, -0.03, 0.09));
+        shooter.queueSetpoints(new Setpoints(0, 0.00, 0.00));
         shooter.setCurrentState(shooter.TRACKING);
       } else if (OI.DR.getBButton()) {
         intake.setCurrentState(intake.SHOOTER_SIDE);
-        shooter.queueSetpoints(new Setpoints(45, 40, -0.03, 0.09));
+        shooter.queueSetpoints(new Setpoints(0, 0, 0.0, 0.00));
         shooter.setCurrentState(shooter.TRACKING);
       } else {
         intake.setCurrentState(intake.IDLE);

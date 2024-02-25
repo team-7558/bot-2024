@@ -216,4 +216,8 @@ public class Util {
   public static double FPGATimeDelta_ms(long delta) {
     return 0.001 * (delta);
   }
+
+  public static double sqInput(double x) {
+    return Math.signum(x) * x * x;
+  }
 }
