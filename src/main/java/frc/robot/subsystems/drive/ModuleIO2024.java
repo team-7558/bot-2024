@@ -69,6 +69,7 @@ public class ModuleIO2024 implements ModuleIO {
 
   private final boolean isTurnMotorInverted = true;
   private final boolean isLeftSideDriveInverted = true;
+  private boolean braked = true;
   private final Rotation2d absoluteEncoderOffset;
 
   private static final Slot0Configs steerGains =
@@ -132,33 +133,33 @@ public class ModuleIO2024 implements ModuleIO {
 
     var driveConfig = new TalonFXConfiguration();
     driveConfig.Slot0 = driveGains;
-    driveConfig.CurrentLimits.StatorCurrentLimit = 40.0;
+    driveConfig.CurrentLimits.SupplyCurrentLimit = 40.0;
+    driveConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
+    driveConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
     driveConfig.MotorOutput.Inverted =
         isLeftSideDriveInverted && (index == Drive.BL || index == Drive.FL)
             ? InvertedValue.Clockwise_Positive
             : InvertedValue.CounterClockwise_Positive;
-    driveConfig.CurrentLimits.StatorCurrentLimitEnable = true;
     driveConfig.Feedback.SensorToMechanismRatio = DRIVE_GEAR_RATIO;
     driveConfig.Slot0 = driveGains;
     driveConfig.Slot1 = driveGainsTorque;
     driveTalon.getConfigurator().apply(driveConfig);
-    setDriveBrakeMode(false);
 
     var turnConfig = new TalonFXConfiguration();
     turnConfig.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RemoteCANcoder;
     turnConfig.Feedback.FeedbackRemoteSensorID = cancoder.getDeviceID();
     turnConfig.Slot0 = steerGains;
     turnConfig.Slot1 = steerGainsTorque;
-    turnConfig.CurrentLimits.StatorCurrentLimit = 30.0;
+    turnConfig.CurrentLimits.SupplyCurrentLimit = 30.0;
+    turnConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
+    turnConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
     turnConfig.MotorOutput.Inverted =
         isTurnMotorInverted
             ? InvertedValue.Clockwise_Positive
             : InvertedValue.CounterClockwise_Positive;
     turnConfig.Feedback.RotorToSensorRatio = TURN_GEAR_RATIO;
-    turnConfig.CurrentLimits.StatorCurrentLimitEnable = true;
     turnConfig.ClosedLoopGeneral.ContinuousWrap = true;
     turnTalon.getConfigurator().apply(turnConfig);
-    setTurnBrakeMode(false);
 
     timestampQueue = PhoenixOdometryThread.getInstance().makeTimestampQueue();
 
@@ -243,25 +244,22 @@ public class ModuleIO2024 implements ModuleIO {
   }
 
   @Override
-  public void setDriveBrakeMode(boolean enable) {
-    var config = new MotorOutputConfigs();
-    config.Inverted =
+  public void toggleBrake() {
+    var dconfig = new MotorOutputConfigs();
+    var tconfig = new MotorOutputConfigs();
+    dconfig.Inverted =
         isLeftSideDriveInverted && (index == Drive.BL || index == Drive.FL)
             ? InvertedValue.Clockwise_Positive
             : InvertedValue.CounterClockwise_Positive;
-    config.NeutralMode = enable ? NeutralModeValue.Brake : NeutralModeValue.Coast;
-    driveTalon.getConfigurator().apply(config);
-  }
-
-  @Override
-  public void setTurnBrakeMode(boolean enable) {
-    var config = new MotorOutputConfigs();
-    config.Inverted =
+    tconfig.Inverted =
         isTurnMotorInverted
             ? InvertedValue.Clockwise_Positive
             : InvertedValue.CounterClockwise_Positive;
-    config.NeutralMode = enable ? NeutralModeValue.Brake : NeutralModeValue.Coast;
-    turnTalon.getConfigurator().apply(config);
+    dconfig.NeutralMode = braked ? NeutralModeValue.Coast : NeutralModeValue.Brake;
+    tconfig.NeutralMode = braked ? NeutralModeValue.Coast : NeutralModeValue.Brake;
+    braked = !braked;
+    driveTalon.getConfigurator().apply(dconfig);
+    turnTalon.getConfigurator().apply(tconfig);
   }
 
   @Override

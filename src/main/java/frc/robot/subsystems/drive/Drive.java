@@ -388,14 +388,10 @@ public class Drive extends StateMachineSubsystemBase {
     Logger.recordOutput("SwerveStates/SetpointsOptimized", optimizedSetpointStates);
   }
 
-  public void setBrakeMode(boolean brake) {
+  public void toggleBrake() {
     for (var module : modules) {
-      module.setBrakeMode(brake);
+      module.toggleBrake();
     }
-  }
-
-  public boolean getBrakeMode() {
-    return modules[FL].getBrakeMode();
   }
 
   /** Stops the drive. */

@@ -14,6 +14,7 @@ import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.wpilibj.DigitalInput;
 import org.littletonrobotics.junction.Logger;
 
 public class ElevatorIOReal implements ElevatorIO {
@@ -21,8 +22,10 @@ public class ElevatorIOReal implements ElevatorIO {
   private final TalonFX leftFalcon;
   private final TalonFX rightFalcon;
 
-  private static final double MIN_HEIGHT_R = -0.59;
-  private static final double MAX_HEIGHT_R = 84.22;
+  private final DigitalInput hallEffect;
+
+  private static final double MIN_HEIGHT_R = 0.7309519531249999;
+  private static final double MAX_HEIGHT_R = 59.944819140625;
   private static final double STROKE_R = MAX_HEIGHT_R - MIN_HEIGHT_R;
   private static final double METERS_TO_ROTATIONS = STROKE_R / Elevator.STROKE_M;
   private static final double ROTATIONS_TO_METERS = 1.0 / METERS_TO_ROTATIONS;
@@ -33,6 +36,7 @@ public class ElevatorIOReal implements ElevatorIO {
   private final StatusSignal<Double> leftCurrent_A, rightCurrent_A;
 
   private final boolean isLeftMotorInverted = false;
+  private boolean isBraked = true;
   private final VoltageOut voltageControl;
   private final MotionMagicVelocityVoltage mmVelControl;
   private final PositionVoltage posControl;
@@ -51,6 +55,7 @@ public class ElevatorIOReal implements ElevatorIO {
 
     leftFalcon = new TalonFX(1);
     rightFalcon = new TalonFX(4);
+    hallEffect = new DigitalInput(5);
 
     pos_m = leftFalcon.getPosition();
     vel_mps = leftFalcon.getVelocity();
@@ -61,30 +66,31 @@ public class ElevatorIOReal implements ElevatorIO {
 
     leaderConfig.CurrentLimits.SupplyCurrentLimit = 70.0;
     leaderConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
+    leaderConfig.ClosedLoopRamps.VoltageClosedLoopRampPeriod = 0.05;
     leaderConfig.Feedback.SensorToMechanismRatio = METERS_TO_ROTATIONS;
     leaderConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
     leaderConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
 
-    leaderConfig.MotionMagic.MotionMagicCruiseVelocity = 1.9;
-    leaderConfig.MotionMagic.MotionMagicAcceleration = 2.3;
-    leaderConfig.MotionMagic.MotionMagicJerk = 10;
+    leaderConfig.MotionMagic.MotionMagicCruiseVelocity = 2.0;
+    leaderConfig.MotionMagic.MotionMagicAcceleration = 2.0;
+    leaderConfig.MotionMagic.MotionMagicJerk = 0;
     leaderConfig.MotionMagic.MotionMagicExpo_kV = 0.5;
     leaderConfig.MotionMagic.MotionMagicExpo_kA = 0.5;
 
     // Position control gains
     leaderConfig.Slot0.GravityType = GravityTypeValue.Elevator_Static;
-    leaderConfig.Slot0.kG = 0.78;
-    leaderConfig.Slot0.kP = 971;
+    leaderConfig.Slot0.kG = 0.05;
+    leaderConfig.Slot0.kP = 1114;
     leaderConfig.Slot0.kI = 0;
-    leaderConfig.Slot0.kD = 0;
+    leaderConfig.Slot0.kD = 16;
 
     // MotionMagic Position gains
     leaderConfig.Slot1.GravityType = GravityTypeValue.Elevator_Static;
     leaderConfig.Slot1.kG = 0.05;
-    leaderConfig.Slot1.kV = 57.5;
+    leaderConfig.Slot1.kV = 26;
     leaderConfig.Slot1.kS = 0.0;
-    leaderConfig.Slot1.kA = 5;
-    leaderConfig.Slot1.kP = 971;
+    leaderConfig.Slot1.kA = 1;
+    leaderConfig.Slot1.kP = 1323;
     leaderConfig.Slot1.kI = 0;
     leaderConfig.Slot1.kD = 0.0;
 
@@ -114,6 +120,7 @@ public class ElevatorIOReal implements ElevatorIO {
     inputs.velMPS = vel_mps.getValueAsDouble();
     inputs.currents =
         new double[] {leftCurrent_A.getValueAsDouble(), rightCurrent_A.getValueAsDouble()};
+    inputs.hallEffect = !hallEffect.get();
   }
 
   @Override
@@ -149,12 +156,12 @@ public class ElevatorIOReal implements ElevatorIO {
   }
 
   @Override
-  public void setBrake(boolean brake) {
+  public void toggleBrake() {
     var config = new MotorOutputConfigs();
 
-    config.Inverted = InvertedValue.CounterClockwise_Positive;
-    config.NeutralMode = brake ? NeutralModeValue.Brake : NeutralModeValue.Coast;
-
+    config.Inverted = InvertedValue.Clockwise_Positive;
+    config.NeutralMode = isBraked ? NeutralModeValue.Coast : NeutralModeValue.Brake;
+    isBraked = !isBraked;
     leftFalcon.getConfigurator().apply(config);
   }
 }

@@ -40,6 +40,9 @@ public class Robot extends LoggedRobot {
   private Command autonomousCommand;
   private RobotContainer robotContainer;
   private Drive drive;
+  private Elevator elevator;
+  private Shooter shooter;
+  private Intake intake;
 
   boolean lastState = false;
 
@@ -50,10 +53,10 @@ public class Robot extends LoggedRobot {
   protected Robot() {
     super(Constants.globalDelta_sec);
 
-    Elevator.getInstance();
-    Intake.getInstance();
+    elevator = Elevator.getInstance();
+    intake = Intake.getInstance();
     drive = Drive.getInstance();
-    Shooter.getInstance();
+    shooter = Shooter.getInstance();
     Vision.getInstance();
   }
 
@@ -61,8 +64,10 @@ public class Robot extends LoggedRobot {
   public void disabledPeriodic() {
     boolean buttonPressed = RobotController.getUserButton();
     if (buttonPressed && !lastState) {
-      System.out.println("AAAAAH");
-      Drive.getInstance().setBrakeMode(!Drive.getInstance().getBrakeMode());
+      System.out.println("Toggling Brakes");
+      drive.toggleBrake();
+      shooter.toggleBrake();
+      elevator.toggleBrake();
     }
 
     lastState = buttonPressed;

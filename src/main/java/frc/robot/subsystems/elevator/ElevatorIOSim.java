@@ -32,6 +32,7 @@ public class ElevatorIOSim implements ElevatorIO {
     inputs.velMPS = sim.getVelocityMetersPerSecond();
     inputs.volts = appliedVolts;
     inputs.currents = new double[] {sim.getCurrentDrawAmps(), sim.getCurrentDrawAmps()};
+    inputs.hallEffect = true;
   }
 
   @Override

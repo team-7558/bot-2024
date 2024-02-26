@@ -10,6 +10,8 @@ public interface ElevatorIO {
     public double velMPS = 0.0;
     public double volts = 0.0;
     public double[] currents = new double[] {};
+
+    public boolean hallEffect = false;
   }
 
   public default void updateInputs(ElevatorIOInputs Inputs) {}
@@ -28,5 +30,5 @@ public interface ElevatorIO {
 
   public default void stop() {}
 
-  public default void setBrake(boolean brake) {}
+  public default void toggleBrake() {}
 }

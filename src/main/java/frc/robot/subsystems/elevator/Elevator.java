@@ -85,22 +85,22 @@ public class Elevator extends StateMachineSubsystemBase {
         new State("HOLDING") {
           @Override
           public void periodic() {
-            if (atTargetHeight()) {
-              io.holdPos(targetHeight_m);
-            } else {
-              setCurrentState(TRAVELLING);
-            }
+            // if (atTargetHeight()) {
+            io.holdPos(targetHeight_m);
+            // } else {
+            // setCurrentState(TRAVELLING);
+            // }
           }
         };
     TRAVELLING =
         new State("TRAVELLING") {
           @Override
           public void periodic() {
-            if (!atTargetHeight()) {
-              io.travelToPos(targetHeight_m);
-            } else {
-              setCurrentState(HOLDING);
-            }
+            // if (!atTargetHeight()) {
+            io.travelToPos(targetHeight_m);
+            // } else {
+            // setCurrentState(HOLDING);
+            // }
           }
         };
     HOMING =
@@ -152,6 +152,7 @@ public class Elevator extends StateMachineSubsystemBase {
 
           @Override
           public void exit() {
+            stop();
             manualOutput = 0;
           }
         };
@@ -183,6 +184,10 @@ public class Elevator extends StateMachineSubsystemBase {
     this.manualOutput = manualOutput;
   }
 
+  public void toggleBrake() {
+    io.toggleBrake();
+  }
+
   @Override
   public void inputPeriodic() {
     io.updateInputs(inputs);
@@ -201,7 +206,7 @@ public class Elevator extends StateMachineSubsystemBase {
   }
 
   public boolean isHomeStalling() {
-    return (inputs.currents[0] + inputs.currents[1]) >= CURRENT_THRESHOLD_A;
+    return inputs.hallEffect;
   }
 
   public void resetPosAsMin() {

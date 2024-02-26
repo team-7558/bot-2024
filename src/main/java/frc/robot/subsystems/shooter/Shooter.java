@@ -22,7 +22,6 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Filesystem;
-import edu.wpi.first.wpilibj.Timer;
 import frc.robot.Constants;
 import frc.robot.OI;
 import frc.robot.SS2d;
@@ -37,6 +36,9 @@ import org.littletonrobotics.junction.Logger;
 public class Shooter extends StateMachineSubsystemBase {
 
   private static double HEIGHT_M = 0;
+
+  public static final double TURRET_ZERO_POS = 0.25;
+  public static final double PIVOT_ZERO_POS = 0.0;
 
   public static final double FLYWHEEL_MIN_VEL_rps = 0, FLYWHEEL_MAX_VEL_rps = 100;
   public static final double TURRET_MIN_POS_r = -0.25, TURRET_MAX_POS_r = 0.25;
@@ -128,7 +130,7 @@ public class Shooter extends StateMachineSubsystemBase {
     return instance;
   }
 
-  public final State DISABLED, IDLE, TRACKING, SHOOTING, BEING_FED, MANUAL;
+  public final State DISABLED, IDLE, TRACKING, SHOOTING, BEING_FED, ZEROING, MANUAL;
   private final ShooterIOInputsAutoLogged inputs = new ShooterIOInputsAutoLogged();
 
   private final ShooterIO io;
@@ -241,6 +243,36 @@ public class Shooter extends StateMachineSubsystemBase {
           public void exit() {}
         };
 
+    ZEROING =
+        new State("ZEROING") {
+
+          @Override
+          public void init() {
+            io.setPivotVolts(-1.);
+          }
+
+          @Override
+          public void periodic() {
+
+            if (inputs.pivotHallEffect) {
+              io.setPivotVolts(0);
+              if (inputs.turretHallEffect) {
+                io.setTurretVolts(0);
+                io.zero();
+                if (Util.inRange(inputs.turretPosR - TURRET_ZERO_POS, 0.005)
+                    && Util.inRange(inputs.pivotPosR - PIVOT_ZERO_POS, 0.005)) {
+                  setCurrentState(IDLE);
+                }
+              } else {
+                io.setTurretVolts(1.5);
+              }
+            }
+          }
+
+          @Override
+          public void exit() {}
+        };
+
     MANUAL =
         new State("MANUAL") {
           @Override
@@ -261,9 +293,6 @@ public class Shooter extends StateMachineSubsystemBase {
         };
 
     setCurrentState(DISABLED);
-
-    Timer.delay(3); // TODO: periodically set this in disabled
-    io.zero();
   }
 
   @Override
@@ -274,8 +303,8 @@ public class Shooter extends StateMachineSubsystemBase {
 
   @Override
   public void outputPeriodic() {
-    SS2d.M.setShooterTilt(inputs.pivotAbsPosR * 360);
-    SS2d.M.setTurretAngle(inputs.turretAbsPosR * 360);
+    SS2d.M.setShooterTilt(inputs.pivotPosR * 360);
+    SS2d.M.setTurretAngle(inputs.turretPosR * 360);
 
     SS2d.S.setShooterTilt(currSetpoints.pivotPos_r * 360);
     SS2d.S.setTurretAngle(currSetpoints.turretPos_r * 360);
@@ -293,6 +322,10 @@ public class Shooter extends StateMachineSubsystemBase {
   public void stop() {
     queueSetpoints(new Setpoints(0, 0));
     io.stop();
+  }
+
+  public void toggleBrake() {
+    io.toggleBrake();
   }
 
   public void zero() {
@@ -323,11 +356,19 @@ public class Shooter extends StateMachineSubsystemBase {
     lastSetpoints.copy(temp);
   }
 
+  public boolean isTurretAtSetpoint(double tol) {
+    return Util.inRange(currSetpoints.turretPos_r - inputs.turretPosR, tol);
+  }
+
+  public boolean isPivotAtSetpoint(double tol) {
+    return Util.inRange(currSetpoints.pivotPos_r - inputs.pivotPosR, tol);
+  }
+
   public boolean isAtSetpoints() {
     boolean res = true;
 
-    res |= Util.inRange(currSetpoints.turretPos_r - inputs.turretPosR, 0.01);
-    res |= Util.inRange(currSetpoints.pivotPos_r - inputs.pivotPosR, 0.01);
+    res |= isTurretAtSetpoint(0.01);
+    res |= isPivotAtSetpoint(0.01);
 
     return res;
   }

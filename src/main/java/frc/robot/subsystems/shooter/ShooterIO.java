@@ -27,6 +27,8 @@ public interface ShooterIO {
     public double turretCurrent = 0.0;
 
     public boolean beamBreakActivated = false;
+    public boolean turretHallEffect = false;
+    public boolean pivotHallEffect = false;
   }
   /** Updates the set of loggable inputs. */
   public default void updateInputs(ShooterIOInputs inputs) {}
@@ -65,4 +67,6 @@ public interface ShooterIO {
   public default void stop() {}
 
   public default void zero() {}
+
+  public default void toggleBrake() {}
 }

@@ -39,7 +39,7 @@ public class ShooterBringup extends Command {
   public void initialize() {
     drive.setCurrentState(drive.DISABLED);
     intake.setCurrentState(intake.IDLE);
-    shooter.setCurrentState(shooter.IDLE);
+    shooter.setCurrentState(shooter.ZEROING);
 
     t.reset();
     t.start();
@@ -50,19 +50,30 @@ public class ShooterBringup extends Command {
   public void execute() {
 
     if (!shooter.isState(shooter.DISABLED)) {
-      double s = 0.1 * Math.sin(t.get() * 0.5);
-      double c = 0.025 * Math.cos(t.get() * 0.5);
+      if (OI.DR.getLeftBumper()) {
+        shooter.setCurrentState(shooter.ZEROING);
+      }
+      double s = 0.05 * Math.sin(t.get() * 0.5);
+      double c = 0.025 * Math.cos(t.get() * 1.5);
 
       if (OI.DR.getAButton()) {
-        shooter.queueSetpoints(new Setpoints(0, 0.00, 0.00));
+        shooter.queueSetpoints(new Setpoints(40, 0.0, 0.0));
+        if (shooter.isTurretAtSetpoint(0.03)) {
+          shooter.queueSetpoints(new Setpoints(40, 0, 0.075));
+        }
         shooter.setCurrentState(shooter.TRACKING);
       } else if (OI.DR.getBButton()) {
         intake.setCurrentState(intake.SHOOTER_SIDE);
-        shooter.queueSetpoints(new Setpoints(0, 0, 0.0, 0.00));
+        shooter.queueSetpoints(new Setpoints(40, 40, 0.0, 0.00));
+        if (shooter.isTurretAtSetpoint(0.03)) {
+          shooter.queueSetpoints(new Setpoints(40, 40, 0, 0.075));
+        }
         shooter.setCurrentState(shooter.TRACKING);
-      } else {
+      } else if (!shooter.isState(shooter.ZEROING)) {
         intake.setCurrentState(intake.IDLE);
         shooter.setCurrentState(shooter.IDLE);
+      } else {
+        intake.setCurrentState(intake.IDLE);
       }
 
       if (OI.DR.getYButton()) {

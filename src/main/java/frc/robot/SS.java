@@ -117,11 +117,11 @@ public class SS {
       case BOOT:
         if (first) {
           intake.setCurrentState(intake.IDLE);
-          shooter.setCurrentState(shooter.IDLE);
+          shooter.setCurrentState(shooter.ZEROING);
           elevator.setCurrentState(elevator.HOMING);
         }
 
-        if (elevator.isState(elevator.IDLE)) {
+        if (elevator.isState(elevator.IDLE) && shooter.isState(shooter.IDLE)) {
           queueState(State.IDLE);
         }
         break;

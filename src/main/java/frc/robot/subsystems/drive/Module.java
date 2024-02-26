@@ -74,7 +74,6 @@ public class Module {
     }
 
     turnFeedback.enableContinuousInput(-Math.PI, Math.PI);
-    setBrakeMode(true);
   }
 
   /**
@@ -188,10 +187,8 @@ public class Module {
   }
 
   /** Sets whether brake mode is enabled. */
-  public void setBrakeMode(boolean enabled) {
-    isBrake = enabled;
-    io.setDriveBrakeMode(isBrake);
-    io.setTurnBrakeMode(isBrake);
+  public void toggleBrake() {
+    io.toggleBrake();
   }
 
   public boolean getBrakeMode() {
