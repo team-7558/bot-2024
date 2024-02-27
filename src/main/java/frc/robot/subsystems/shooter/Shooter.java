@@ -143,6 +143,8 @@ public class Shooter extends StateMachineSubsystemBase {
   public enum TargetMode {
     SPEAKER,
     TRAP,
+    CLEAR,
+    AMP,
     CUSTOM
   }
 
@@ -236,7 +238,7 @@ public class Shooter extends StateMachineSubsystemBase {
           @Override
           public void init() {
             queueSetpoints(new Setpoints(20));
-            ShotLogger.log(currSetpoints, Drive.getInstance().getPose());
+            ShotLogger.log(currSetpoints, targetMode);
           }
 
           @Override
