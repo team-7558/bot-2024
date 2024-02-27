@@ -84,16 +84,26 @@ public class RobotTeleop extends Command {
       }
     }
 
+    if (OI.DR.getPOV() == 270) {
+      ss.clearGamePiece();
+    }
+
     if (!ss.shooterIsDisabled()) {
       if (OI.DR.getStartButtonPressed()) {
-        ss.shoot();
+        ss.shootPreset1();
       } else if (OI.DR.getStartButtonReleased()) {
         ss.idle();
       }
 
       if (OI.DR.getBackButtonPressed()) {
-        ss.chamber();
+        ss.shootPreset2();
       } else if (OI.DR.getBackButtonReleased()) {
+        ss.idle();
+      }
+
+      if (OI.DR.getYButtonPressed()) {
+        ss.chamber();
+      } else if (OI.DR.getYButtonReleased()) {
         ss.idle();
       }
       // if (OI.DR.getLeftTriggerAxis() > 0) {

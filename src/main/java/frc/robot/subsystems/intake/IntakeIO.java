@@ -52,4 +52,6 @@ public interface IntakeIO {
   public default void setDirectionVelocity(double velocity) {}
 
   public default void stop() {}
+
+  public default void toggleBrake() {}
 }

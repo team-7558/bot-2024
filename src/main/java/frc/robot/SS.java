@@ -15,6 +15,7 @@ public class SS {
     DISABLED,
     IDLE,
     BOOT,
+    RESETTING_ELEVATOR,
     MANUAL,
 
     TEST_2,
@@ -104,13 +105,13 @@ public class SS {
         break;
       case IDLE:
         if (first) {
-          if (hasGamePiece) {
-            intake.setCurrentState(intake.GHOSTING);
-          } else {
-            intake.setCurrentState(intake.IDLE);
-          }
           shooter.setCurrentState(shooter.IDLE);
           elevator.setCurrentState(elevator.IDLE);
+        }
+        if (hasGamePiece) {
+          intake.setCurrentState(intake.GHOSTING);
+        } else {
+          intake.setCurrentState(intake.IDLE);
         }
 
         break;
@@ -122,6 +123,16 @@ public class SS {
         }
 
         if (elevator.isState(elevator.IDLE) && shooter.isState(shooter.IDLE)) {
+          queueState(State.IDLE);
+        }
+        break;
+      case RESETTING_ELEVATOR:
+        if (first) {
+          elevator.setCurrentState(elevator.HOMING);
+          intake.setCurrentState(intake.IDLE);
+        }
+
+        if (elevator.isState(elevator.IDLE)) {
           queueState(State.IDLE);
         }
         break;
@@ -181,7 +192,7 @@ public class SS {
       case AMP_SCORING_DOWN:
         hasGamePiece = false;
         if (elevator.isState(elevator.HOLDING)) {
-          queueState(State.BOOT);
+          queueState(State.RESETTING_ELEVATOR);
         }
         break;
       case CLIMBING_UP:
@@ -211,6 +222,7 @@ public class SS {
       case CHAMBER:
         if (first) {
           shooter.setCurrentState(shooter.BEING_FED);
+          intake.setCurrentState(intake.SHOOTER_SIDE);
         }
 
         if (shooter.isState(shooter.IDLE)) {
@@ -218,14 +230,13 @@ public class SS {
         }
         break;
       case SHOOTING:
-        hasGamePiece = false;
         if (first) {
-          shooter.queueSetpoints(new Setpoints(40, 0, 0, 0.1));
           shooter.setCurrentState(shooter.TRACKING);
         }
 
-        if (after(2.5)) {
-          shooter.queueSetpoints(new Setpoints(40));
+        if (shooter.isAtSetpoints() && after(0.2)) {
+          hasGamePiece = false;
+          shooter.setCurrentState(shooter.SHOOTING);
         }
         break;
       default:
@@ -249,8 +260,8 @@ public class SS {
 
   public void idle() {
     if (currState != State.IDLE) {
-      if (elevator.getHeight() > Elevator.MIN_HEIGHT_M) {
-        queueState(State.BOOT);
+      if (!elevator.atHeight(Elevator.MIN_HEIGHT_M, 0.01)) {
+        queueState(State.RESETTING_ELEVATOR);
       } else {
         queueState(State.IDLE);
       }
@@ -281,6 +292,20 @@ public class SS {
     }
   }
 
+  public void shootPreset1() {
+    if (currState == State.IDLE) {
+      shooter.queueSetpoints(new Setpoints(30, 0, 0, 0.18));
+      queueState(State.SHOOTING);
+    }
+  }
+
+  public void shootPreset2() {
+    if (currState == State.IDLE) {
+      shooter.queueSetpoints(new Setpoints(40, 0, 0, 0.102));
+      queueState(State.SHOOTING);
+    }
+  }
+
   public void climbUp() {
     if (currState == State.IDLE) {
       queueState(State.CLIMBING_UP);
@@ -295,6 +320,10 @@ public class SS {
 
   public boolean hasGamePiece() {
     return hasGamePiece;
+  }
+
+  public void clearGamePiece() {
+    hasGamePiece = false;
   }
 
   // Subsystem management

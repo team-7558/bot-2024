@@ -19,10 +19,10 @@ public class Elevator extends StateMachineSubsystemBase {
 
   public static final double INTAKE_HEIGHT_M = MIN_HEIGHT_M;
   public static final double RESET_HEIGHT_M = MIN_HEIGHT_M + 0.04;
-  public static final double MIN_FEED_HEIGHT_M = MIN_HEIGHT_M;
-  public static final double MAX_FEED_HEIGHT_M = MIN_HEIGHT_M;
-  public static final double AMP_HEIGHT_M = Util.lerp(MIN_HEIGHT_M, MAX_HEIGHT_M, 0.95);
-  public static final double CLIMB_HEIGHT_M = MAX_HEIGHT_M - 0.04;
+  public static final double MIN_FEED_HEIGHT_M = MIN_HEIGHT_M + Units.inchesToMeters(0.5);
+  public static final double MAX_FEED_HEIGHT_M = MIN_HEIGHT_M + Units.inchesToMeters(0.5);
+  public static final double AMP_HEIGHT_M = Util.lerp(MIN_HEIGHT_M, MAX_HEIGHT_M, 0.98);
+  public static final double CLIMB_HEIGHT_M = MAX_HEIGHT_M - 0.01;
   public static final double MAX_VEL_MPS = 1.0;
   public static final double CURRENT_THRESHOLD_A = 50;
 
@@ -85,22 +85,22 @@ public class Elevator extends StateMachineSubsystemBase {
         new State("HOLDING") {
           @Override
           public void periodic() {
-            // if (atTargetHeight()) {
-            io.holdPos(targetHeight_m);
-            // } else {
-            // setCurrentState(TRAVELLING);
-            // }
+            if (atTargetHeight()) {
+              io.holdPos(targetHeight_m);
+            } else {
+              setCurrentState(TRAVELLING);
+            }
           }
         };
     TRAVELLING =
         new State("TRAVELLING") {
           @Override
           public void periodic() {
-            // if (!atTargetHeight()) {
-            io.travelToPos(targetHeight_m);
-            // } else {
-            // setCurrentState(HOLDING);
-            // }
+            if (!atTargetHeight()) {
+              io.travelToPos(targetHeight_m);
+            } else {
+              setCurrentState(HOLDING);
+            }
           }
         };
     HOMING =
@@ -160,12 +160,16 @@ public class Elevator extends StateMachineSubsystemBase {
     setCurrentState(DISABLED);
   }
 
-  public boolean atHeight(double height_m) {
-    return Util.inRange(height_m - inputs.posMeters, 0.02);
+  public boolean atHeight(double height_m, double tol) {
+    return Util.inRange(height_m - inputs.posMeters, tol);
   }
 
   public boolean atTargetHeight() {
-    return atHeight(targetHeight_m);
+    return atTargetHeight(0.02);
+  }
+
+  public boolean atTargetHeight(double tol) {
+    return atHeight(targetHeight_m, tol);
   }
 
   public void setTargetHeight(double height_m) {

@@ -68,6 +68,7 @@ public class Robot extends LoggedRobot {
       drive.toggleBrake();
       shooter.toggleBrake();
       elevator.toggleBrake();
+      intake.toggleBrake();
     }
 
     lastState = buttonPressed;
@@ -106,7 +107,7 @@ public class Robot extends LoggedRobot {
     switch (Constants.currentMode) {
       case REAL:
         // Running on a real robot, log to a USB stick ("/U/logs")
-        Logger.addDataReceiver(new WPILOGWriter("/media/sda1/"));
+        Logger.addDataReceiver(new WPILOGWriter("/U/logs"));
         Logger.addDataReceiver(new NT4Publisher());
         break;
 

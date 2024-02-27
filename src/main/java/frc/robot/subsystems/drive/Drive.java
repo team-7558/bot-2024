@@ -213,7 +213,7 @@ public class Drive extends StateMachineSubsystemBase {
             double y_ = -Util.sqInput(OI.DR.getLeftX());
             double w_ = -Util.sqInput(OI.DR.getRightX());
 
-            drive(x_, y_, w_ * 0.6, throttle);
+            drive(x_, y_, w_ * 0.3, throttle);
           }
         };
 
@@ -231,7 +231,7 @@ public class Drive extends StateMachineSubsystemBase {
                 Math.IEEEremainder(
                     getPose().getRotation().getRotations() - autolockSetpoint_r, 1.0);
             Logger.recordOutput("Drive/Autolock Heading Error", err);
-            double con = Util.inRange(err, 0.1) ? 6 * err : 2 * err;
+            double con = Util.inRange(err, 0.1) ? 3 * err : 2 * err;
             con = Util.limit(con, 0.2);
             Logger.recordOutput("Drive/Autolock Heading Output", con);
             drive(x_, y_, -con, throttle);
@@ -360,7 +360,7 @@ public class Drive extends StateMachineSubsystemBase {
     if (G.isRedAlliance()) {
       p = new Pose2d(15, 5.5, Rotation2d.fromRotations(0.5));
     } else {
-      p = new Pose2d(1, 5.5, Rotation2d.fromRotations(0));
+      p = new Pose2d(1.5, 5.5, Rotation2d.fromRotations(0));
     }
     hardSetPose(p);
   }

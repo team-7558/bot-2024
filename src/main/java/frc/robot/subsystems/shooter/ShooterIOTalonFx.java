@@ -6,6 +6,7 @@ import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.MotionMagicVelocityVoltage;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
+import com.ctre.phoenix6.controls.NeutralOut;
 import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
@@ -13,11 +14,7 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
-import edu.wpi.first.math.controller.ArmFeedforward;
-import edu.wpi.first.math.controller.ProfiledPIDController;
-import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.DigitalInput;
-import frc.robot.Constants;
 import frc.robot.util.Util;
 
 public class ShooterIOTalonFx implements ShooterIO {
@@ -40,15 +37,9 @@ public class ShooterIOTalonFx implements ShooterIO {
   private final TalonFX pivot = new TalonFX(7); // TODO: update
   private final TalonFX feeder = new TalonFX(8);
 
-  private final DigitalInput beambreak = new DigitalInput(0);
+  private final DigitalInput beambreak = new DigitalInput(2);
   private final DigitalInput tLimit = new DigitalInput(8);
   private final DigitalInput pLimit = new DigitalInput(9);
-
-  private ProfiledPIDController centennialCon =
-      new ProfiledPIDController(
-          80, 0, 0, new TrapezoidProfile.Constraints(1.25, 0.35), Constants.globalDelta_sec);
-  private ArmFeedforward centennialFF = new ArmFeedforward(0, 0.38, 0, 0);
-  private double ffOffset = 0.06;
 
   private boolean isBraked = true;
 
@@ -76,6 +67,8 @@ public class ShooterIOTalonFx implements ShooterIO {
   private final StatusSignal<Double> FCurrent = feeder.getStatorCurrent();
 
   // Outputs
+  NeutralOut nout = new NeutralOut();
+
   VoltageOut flyVolts = new VoltageOut(0, true, false, false, false);
   VelocityVoltage flyVel = new VelocityVoltage(0, 0, true, 0, 0, false, false, false);
   MotionMagicVelocityVoltage flyMmVel =
@@ -111,7 +104,7 @@ public class ShooterIOTalonFx implements ShooterIO {
     config.Slot0.kP = 0.2;
     config.Slot0.kI = 0;
     config.Slot0.kD = 0;
-    config.Slot0.kV = 0.2;
+    config.Slot0.kV = 0.22;
 
     // mm Fast ramp
     config.Slot1.kP = 0;
@@ -132,7 +125,7 @@ public class ShooterIOTalonFx implements ShooterIO {
     feederConfig.CurrentLimits.SupplyCurrentLimit = 30;
     feederConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
     feederConfig.ClosedLoopRamps.VoltageClosedLoopRampPeriod = 0.1;
-    feederConfig.MotorOutput.NeutralMode = NeutralModeValue.Coast;
+    feederConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
     feederConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
 
     // mmVel
@@ -288,12 +281,17 @@ public class ShooterIOTalonFx implements ShooterIO {
 
   @Override
   public void setFlywheelVel(double vel_rps) {
-    if (Util.inRange(vel_rps - LVelocity.getValueAsDouble(), FLYWHEEL_VEL_SWITCH_THRESHOLD)) {
-      flywheelL.setControl(flyVel.withVelocity(vel_rps));
-      flywheelR.setControl(flyVel.withVelocity(vel_rps));
+    if (vel_rps != 0.0) {
+      if (Util.inRange(vel_rps - LVelocity.getValueAsDouble(), FLYWHEEL_VEL_SWITCH_THRESHOLD)) {
+        flywheelL.setControl(flyVel.withVelocity(vel_rps));
+        flywheelR.setControl(flyVel.withVelocity(vel_rps));
+      } else {
+        flywheelL.setControl(flyMmVel.withVelocity(vel_rps));
+        flywheelR.setControl(flyMmVel.withVelocity(vel_rps));
+      }
     } else {
-      flywheelL.setControl(flyMmVel.withVelocity(vel_rps));
-      flywheelR.setControl(flyMmVel.withVelocity(vel_rps));
+      flywheelL.setControl(nout);
+      flywheelR.setControl(nout);
     }
   }
 
@@ -305,12 +303,16 @@ public class ShooterIOTalonFx implements ShooterIO {
 
   @Override
   public void setFeederVel(double vel_rps) {
-    if (Util.inRange(vel_rps - FVelocity.getValueAsDouble(), FEEDER_VEL_SWITCH_THRESHOLD)) {
-      feeder.setControl(feedVel.withVelocity(vel_rps));
-      feeder.setControl(feedVel.withVelocity(vel_rps));
+    if (vel_rps != 0.0) {
+      if (Util.inRange(vel_rps - FVelocity.getValueAsDouble(), FEEDER_VEL_SWITCH_THRESHOLD)) {
+        feeder.setControl(feedVel.withVelocity(vel_rps));
+        feeder.setControl(feedVel.withVelocity(vel_rps));
+      } else {
+        feeder.setControl(feedMmVel.withVelocity(vel_rps));
+        feeder.setControl(feedMmVel.withVelocity(vel_rps));
+      }
     } else {
-      feeder.setControl(feedMmVel.withVelocity(vel_rps));
-      feeder.setControl(feedMmVel.withVelocity(vel_rps));
+      feeder.setControl(nout);
     }
   }
 
@@ -405,11 +407,16 @@ public class ShooterIOTalonFx implements ShooterIO {
   public void toggleBrake() {
     var pconfig = new MotorOutputConfigs();
     var tconfig = new MotorOutputConfigs();
+    var fconfig = new MotorOutputConfigs();
     pconfig.Inverted = InvertedValue.CounterClockwise_Positive;
     tconfig.Inverted = InvertedValue.Clockwise_Positive;
+    fconfig.Inverted = InvertedValue.CounterClockwise_Positive;
     pconfig.NeutralMode = isBraked ? NeutralModeValue.Coast : NeutralModeValue.Brake;
     tconfig.NeutralMode = isBraked ? NeutralModeValue.Coast : NeutralModeValue.Brake;
+    fconfig.NeutralMode = isBraked ? NeutralModeValue.Coast : NeutralModeValue.Brake;
+
     isBraked = !isBraked;
+    feeder.getConfigurator().apply(fconfig);
     pivot.getConfigurator().apply(pconfig);
     turret.getConfigurator().apply(tconfig);
   }

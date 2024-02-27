@@ -15,11 +15,13 @@ package frc.robot.subsystems.intake;
 
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
+import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DigitalInput;
@@ -46,14 +48,21 @@ public class IntakeIOTalonFX implements IntakeIO {
   private final VoltageOut topVOut = new VoltageOut(0);
   private final VelocityVoltage topVelOut = new VelocityVoltage(0);
 
+  private boolean isBraked = true;
+
   public IntakeIOTalonFX() {
-    var config = new TalonFXConfiguration();
-    config.CurrentLimits.SupplyCurrentLimit = 30.0;
-    config.CurrentLimits.SupplyCurrentLimitEnable = true;
-    config.MotorOutput.NeutralMode = NeutralModeValue.Coast;
-    config.OpenLoopRamps.DutyCycleOpenLoopRampPeriod = 0.1;
-    bottomMotor.getConfigurator().apply(config);
-    topMotor.getConfigurator().apply(config);
+    var bottomconfig = new TalonFXConfiguration();
+    bottomconfig.CurrentLimits.SupplyCurrentLimit = 30.0;
+    bottomconfig.CurrentLimits.SupplyCurrentLimitEnable = true;
+    bottomconfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
+    bottomconfig.OpenLoopRamps.DutyCycleOpenLoopRampPeriod = 0.1;
+    bottomMotor.getConfigurator().apply(bottomconfig);
+    var topconfig = new TalonFXConfiguration();
+    topconfig.CurrentLimits.SupplyCurrentLimit = 30.0;
+    topconfig.CurrentLimits.SupplyCurrentLimitEnable = true;
+    topconfig.MotorOutput.NeutralMode = NeutralModeValue.Coast;
+    topconfig.OpenLoopRamps.DutyCycleOpenLoopRampPeriod = 0.1;
+    topMotor.getConfigurator().apply(topconfig);
 
     BaseStatusSignal.setUpdateFrequencyForAll(
         50.0,
@@ -122,5 +131,13 @@ public class IntakeIOTalonFX implements IntakeIO {
   public void stop() {
     topMotor.stopMotor();
     bottomMotor.stopMotor();
+  }
+
+  @Override
+  public void toggleBrake() {
+    var cfg = new MotorOutputConfigs();
+    cfg.Inverted = InvertedValue.CounterClockwise_Positive;
+    cfg.NeutralMode = isBraked ? NeutralModeValue.Coast : NeutralModeValue.Brake;
+    bottomMotor.getConfigurator().apply(cfg);
   }
 }

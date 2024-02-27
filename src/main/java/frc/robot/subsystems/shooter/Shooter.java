@@ -105,6 +105,11 @@ public class Shooter extends StateMachineSubsystemBase {
       this.pivotPos_r = o.pivotPos_r;
       return this;
     }
+
+    @Override
+    public String toString() {
+      return flywheel_rps + " | " + feederVel_rps + " | " + turretPos_r + " | " + pivotPos_r;
+    }
   }
 
   private static Shooter instance;
@@ -196,7 +201,7 @@ public class Shooter extends StateMachineSubsystemBase {
         new State("BEING_FED") {
           @Override
           public void init() {
-            queueSetpoints(new Setpoints(15));
+            queueSetpoints(new Setpoints(0, 5, 0, 0));
           }
 
           @Override
@@ -229,14 +234,13 @@ public class Shooter extends StateMachineSubsystemBase {
     SHOOTING =
         new State("SHOOTING") {
           @Override
-          public void init() {}
+          public void init() {
+            queueSetpoints(new Setpoints(20));
+          }
 
           @Override
           public void periodic() {
-            queueSetpoints(new Setpoints(0.2));
             track();
-            // feederVel_rps = 1;
-            // output.setFlywheelVel(1);
           }
 
           @Override
@@ -309,18 +313,21 @@ public class Shooter extends StateMachineSubsystemBase {
     SS2d.S.setShooterTilt(currSetpoints.pivotPos_r * 360);
     SS2d.S.setTurretAngle(currSetpoints.turretPos_r * 360);
 
-    // Log flywheel speed in RPM
-    Logger.recordOutput("Shooter/FlywheelSpeedRPM", getVelocityRPM());
-
     Logger.recordOutput("Shooter/TargetFeed", currSetpoints.feederVel_rps);
     Logger.recordOutput("Shooter/TargetFly", currSetpoints.flywheel_rps);
     Logger.recordOutput("Shooter/TargetTurr", currSetpoints.turretPos_r);
     Logger.recordOutput("Shooter/TargetPivot", currSetpoints.pivotPos_r);
+
+    Logger.recordOutput("Shooter/PrevTargetFeed", lastSetpoints.feederVel_rps);
+    Logger.recordOutput("Shooter/PrevTargetFly", lastSetpoints.flywheel_rps);
+    Logger.recordOutput("Shooter/PrevTargetTurr", lastSetpoints.turretPos_r);
+    Logger.recordOutput("Shooter/PrevTargetPivot", lastSetpoints.pivotPos_r);
   }
 
   /** Stops Everything */
   public void stop() {
-    queueSetpoints(new Setpoints(0, 0));
+    // TODO: fgure out who  is ghost calling this
+    // queueSetpoints(new Setpoints(0, 0));
     io.stop();
   }
 
@@ -344,6 +351,7 @@ public class Shooter extends StateMachineSubsystemBase {
   }
 
   public void queueSetpoints(Setpoints s) {
+    // System.out.println(s);
     Setpoints temp = new Setpoints().copy(currSetpoints);
     currSetpoints.flywheel_rps =
         s.flywheel_rps == Setpoints.DEFAULT ? lastSetpoints.flywheel_rps : s.flywheel_rps;
@@ -356,6 +364,10 @@ public class Shooter extends StateMachineSubsystemBase {
     lastSetpoints.copy(temp);
   }
 
+  public boolean isFlywheelAtSetpoint(double tol) {
+    return Util.inRange(currSetpoints.flywheel_rps - inputs.flywheelVelRPS, tol);
+  }
+
   public boolean isTurretAtSetpoint(double tol) {
     return Util.inRange(currSetpoints.turretPos_r - inputs.turretPosR, tol);
   }
@@ -366,9 +378,10 @@ public class Shooter extends StateMachineSubsystemBase {
 
   public boolean isAtSetpoints() {
     boolean res = true;
-
-    res |= isTurretAtSetpoint(0.01);
-    res |= isPivotAtSetpoint(0.01);
+    res &= isFlywheelAtSetpoint(1);
+    res &= isTurretAtSetpoint(0.01);
+    res &= isPivotAtSetpoint(0.01);
+    Logger.recordOutput("Shooter/AtSetpoints", res);
 
     return res;
   }
