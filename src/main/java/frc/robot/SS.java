@@ -182,10 +182,6 @@ public class SS {
           intake.setCurrentState(intake.AMP_SIDE_1);
         }
 
-        if (elevator.isState(elevator.HOLDING)) {
-          queueState(State.AMP_SCORING_DOWN);
-        }
-
         break;
       case AMP_SCORING_DOWN:
         if (first) {
@@ -196,7 +192,7 @@ public class SS {
           hasGamePiece = false;
         }
 
-        if (elevator.isState(elevator.HOLDING)) {
+        if (elevator.isState(elevator.HOLDING) && after(.02)) {
           queueState(State.RESETTING_ELEVATOR);
         }
         break;

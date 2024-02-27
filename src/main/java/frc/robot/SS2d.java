@@ -159,7 +159,7 @@ public class SS2d {
   }
 
   public void setTurretBaseAngle(Rotation2d angle_r2d) {
-    turretBase.setAngle(angle_r2d.minus(Rotation2d.fromRotations(0.5)));
+    turretBase.setAngle(G.isRedAlliance()? angle_r2d : angle_r2d.minus(Rotation2d.fromRotations(0.5)));
   }
 
   public static void periodic() {
