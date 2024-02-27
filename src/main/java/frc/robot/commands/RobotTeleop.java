@@ -68,10 +68,10 @@ public class RobotTeleop extends Command {
         ss.climbUp();
       } else if (OI.DR.getXButtonReleased()) {
         ss.climbDown();
-      } else if (OI.DR.getRightBumperPressed()) {
-        ss.amp();
-      } else if (OI.DR.getRightBumperReleased()) {
-        ss.idle();
+      } else if (OI.DR.getRightBumper()) {
+        ss.ampUp();
+      } else {
+        ss.ampDown();
       }
     }
 

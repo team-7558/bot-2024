@@ -236,6 +236,7 @@ public class Shooter extends StateMachineSubsystemBase {
           @Override
           public void init() {
             queueSetpoints(new Setpoints(20));
+            ShotLogger.log(currSetpoints, Drive.getInstance().getPose());
           }
 
           @Override
@@ -384,6 +385,11 @@ public class Shooter extends StateMachineSubsystemBase {
     Logger.recordOutput("Shooter/AtSetpoints", res);
 
     return res;
+  }
+
+  public Setpoints getMeasuredSetpoints() {
+    return new Setpoints(
+        inputs.flywheelVelRPS, inputs.feederVelRPS, inputs.turretPosR, inputs.pivotPosR);
   }
 
   /** Returns the current velocity in RPM. */

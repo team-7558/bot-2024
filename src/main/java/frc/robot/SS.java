@@ -91,8 +91,12 @@ public class SS {
 
   public void periodic() {
     boolean first = currState != lastState;
-    boolean last = nextState != currState;
     lastState = currState;
+
+    if (nextState != currState) {
+      currState = nextState;
+      timer.restart();
+    }
 
     // Control Switch
     switch (currState) {
@@ -113,7 +117,6 @@ public class SS {
         } else {
           intake.setCurrentState(intake.IDLE);
         }
-
         break;
       case BOOT:
         if (first) {
@@ -178,19 +181,21 @@ public class SS {
 
           intake.setCurrentState(intake.AMP_SIDE_1);
         }
-        if (last) {
-          elevator.setTargetHeight(Elevator.RESET_HEIGHT_M);
-          elevator.setCurrentState(elevator.TRAVELLING);
 
-          intake.setCurrentState(intake.AMP_SIDE_2);
-        }
         if (elevator.isState(elevator.HOLDING)) {
           queueState(State.AMP_SCORING_DOWN);
         }
 
         break;
       case AMP_SCORING_DOWN:
-        hasGamePiece = false;
+        if (first) {
+          elevator.setTargetHeight(Elevator.RESET_HEIGHT_M);
+          elevator.setCurrentState(elevator.TRAVELLING);
+
+          intake.setCurrentState(intake.AMP_SIDE_2);
+          hasGamePiece = false;
+        }
+
         if (elevator.isState(elevator.HOLDING)) {
           queueState(State.RESETTING_ELEVATOR);
         }
@@ -229,6 +234,11 @@ public class SS {
           queueState(State.IDLE);
         }
         break;
+      case TRACKING:
+        if (first) {
+          shooter.setCurrentState(shooter.TRACKING);
+        }
+        break;
       case SHOOTING:
         if (first) {
           shooter.setCurrentState(shooter.TRACKING);
@@ -244,12 +254,6 @@ public class SS {
     }
 
     stateInfoLog();
-
-    // Figure out if its better to do this before or after the switch statement
-    if (last) {
-      currState = nextState;
-      timer.restart();
-    }
   }
 
   // TODO: replace example based on what you wanna do, ex. shoot(double x, double y)
@@ -274,9 +278,15 @@ public class SS {
     }
   }
 
-  public void amp() {
+  public void ampUp() {
     if (currState == State.IDLE) {
       queueState(State.AMP_SCORING_UP);
+    }
+  }
+
+  public void ampDown() {
+    if (currState == State.AMP_SCORING_UP && elevator.isState(elevator.HOLDING)) {
+      queueState(State.AMP_SCORING_DOWN);
     }
   }
 
@@ -307,7 +317,7 @@ public class SS {
   }
 
   public void climbUp() {
-    if (currState == State.IDLE) {
+    if (currState == State.IDLE || currState == State.CLIMBING_DOWN) {
       queueState(State.CLIMBING_UP);
     }
   }
