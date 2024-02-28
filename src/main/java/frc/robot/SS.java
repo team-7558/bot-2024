@@ -35,6 +35,7 @@ public class SS {
 
     TRACKING,
     SHOOTING,
+    SHOOTING_FROM_GROUND,
 
     CLIMBING_UP,
     CLIMBING_DOWN,
@@ -245,6 +246,12 @@ public class SS {
           hasGamePiece = false;
           intake.setCurrentState(intake.SHOOTER_SIDE);
           shooter.setCurrentState(shooter.SHOOTING);
+        }
+        break;
+      case SHOOTING_FROM_GROUND:
+        if (first) {
+          shooter.setCurrentState(shooter.SHOOTING);
+          intake.setCurrentState(intake.SHOOTER_SIDE);
         }
         break;
       default:
