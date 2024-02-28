@@ -21,6 +21,7 @@ public class SS {
     TEST_2,
     TEST_3,
 
+    SPITTING,
     INTAKING,
     INTAKING_DEEP,
     INTAKING_CORAL,
@@ -151,6 +152,12 @@ public class SS {
         break;
       case TEST_3:
         break;
+      case SPITTING:
+        if (first) {
+          intake.setCurrentState(intake.SPITTING);
+          hasGamePiece = false;
+        }
+        break;
       case INTAKING_DEEP:
       case INTAKING_CORAL:
       case INTAKING:
@@ -265,6 +272,12 @@ public class SS {
       } else {
         queueState(State.IDLE);
       }
+    }
+  }
+
+  public void spit() {
+    if (currState == State.IDLE) {
+      queueState(State.SPITTING);
     }
   }
 

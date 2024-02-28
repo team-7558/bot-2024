@@ -133,8 +133,9 @@ public class ModuleIO2024 implements ModuleIO {
 
     var driveConfig = new TalonFXConfiguration();
     driveConfig.Slot0 = driveGains;
-    driveConfig.CurrentLimits.SupplyCurrentLimit = 40.0;
+    driveConfig.CurrentLimits.SupplyCurrentLimit = 30.0;
     driveConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
+    driveConfig.ClosedLoopRamps.VoltageClosedLoopRampPeriod = 0.1;
     driveConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
     driveConfig.MotorOutput.Inverted =
         isLeftSideDriveInverted && (index == Drive.BL || index == Drive.FL)
@@ -150,8 +151,9 @@ public class ModuleIO2024 implements ModuleIO {
     turnConfig.Feedback.FeedbackRemoteSensorID = cancoder.getDeviceID();
     turnConfig.Slot0 = steerGains;
     turnConfig.Slot1 = steerGainsTorque;
-    turnConfig.CurrentLimits.SupplyCurrentLimit = 30.0;
+    turnConfig.CurrentLimits.SupplyCurrentLimit = 20.0;
     turnConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
+    // turnConfig.ClosedLoopRamps.VoltageClosedLoopRampPeriod = 0.3;
     turnConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
     turnConfig.MotorOutput.Inverted =
         isTurnMotorInverted

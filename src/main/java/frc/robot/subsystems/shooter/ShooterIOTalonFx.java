@@ -94,7 +94,7 @@ public class ShooterIOTalonFx implements ShooterIO {
   public ShooterIOTalonFx() {
     var config = new TalonFXConfiguration();
     config.Feedback.SensorToMechanismRatio = FLYWHEEL_GEAR_RATIO;
-    config.CurrentLimits.SupplyCurrentLimit = 30.0;
+    config.CurrentLimits.SupplyCurrentLimit = 20.0;
     config.ClosedLoopRamps.VoltageClosedLoopRampPeriod = 0.1;
     config.CurrentLimits.SupplyCurrentLimitEnable = true;
     config.MotorOutput.NeutralMode = NeutralModeValue.Coast;
@@ -122,7 +122,7 @@ public class ShooterIOTalonFx implements ShooterIO {
 
     var feederConfig = new TalonFXConfiguration();
     feederConfig.Feedback.SensorToMechanismRatio = FEEDER_GEAR_RATIO;
-    feederConfig.CurrentLimits.SupplyCurrentLimit = 30;
+    feederConfig.CurrentLimits.SupplyCurrentLimit = 20;
     feederConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
     feederConfig.ClosedLoopRamps.VoltageClosedLoopRampPeriod = 0.1;
     feederConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
@@ -142,7 +142,7 @@ public class ShooterIOTalonFx implements ShooterIO {
 
     var turretConfig = new TalonFXConfiguration();
     turretConfig.Feedback.SensorToMechanismRatio = TURRET_GEAR_RATIO;
-    turretConfig.CurrentLimits.SupplyCurrentLimit = 30.0; // TODO: tune
+    turretConfig.CurrentLimits.SupplyCurrentLimit = 20.0; // TODO: tune
     turretConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
     turretConfig.ClosedLoopRamps.VoltageClosedLoopRampPeriod = 0.1;
     turretConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
@@ -175,7 +175,7 @@ public class ShooterIOTalonFx implements ShooterIO {
 
     var pivotConfig = new TalonFXConfiguration();
     pivotConfig.Feedback.SensorToMechanismRatio = PIVOT_GEAR_RATIO;
-    pivotConfig.CurrentLimits.SupplyCurrentLimit = 30.0;
+    pivotConfig.CurrentLimits.SupplyCurrentLimit = 20.0;
     pivotConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
     pivotConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
     pivotConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;

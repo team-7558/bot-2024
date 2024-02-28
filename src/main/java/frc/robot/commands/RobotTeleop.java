@@ -64,9 +64,9 @@ public class RobotTeleop extends Command {
     if (!ss.elevatorIsDisabled()) {
       if (OI.DR.getPOV() == 90) {
         ss.queueState(State.BOOT);
-      } else if (OI.DR.getXButtonPressed()) {
+      } else if (OI.OP.getXButtonPressed()) {
         ss.climbUp();
-      } else if (OI.DR.getXButtonReleased()) {
+      } else if (OI.OP.getXButtonReleased()) {
         ss.climbDown();
       } else if (OI.DR.getRightBumperPressed()) {
         ss.amp();
@@ -82,6 +82,12 @@ public class RobotTeleop extends Command {
       } else if (OI.DR.getLeftBumperReleased()) {
         ss.idle();
       }
+
+      if (OI.OP.getAButtonPressed()) {
+        ss.spit();
+      } else if (OI.OP.getAButtonReleased()) {
+        ss.idle();
+      }
     }
 
     if (OI.DR.getPOV() == 270) {
@@ -89,21 +95,21 @@ public class RobotTeleop extends Command {
     }
 
     if (!ss.shooterIsDisabled()) {
-      if (OI.DR.getStartButtonPressed()) {
+      if (OI.OP.getStartButtonPressed()) {
         ss.shootPreset1();
-      } else if (OI.DR.getStartButtonReleased()) {
+      } else if (OI.OP.getStartButtonReleased()) {
         ss.idle();
       }
 
-      if (OI.DR.getBackButtonPressed()) {
+      if (OI.OP.getBackButtonPressed()) {
         ss.shootPreset2();
-      } else if (OI.DR.getBackButtonReleased()) {
+      } else if (OI.OP.getBackButtonReleased()) {
         ss.idle();
       }
 
-      if (OI.DR.getYButtonPressed()) {
+      if (OI.OP.getYButtonPressed()) {
         ss.chamber();
-      } else if (OI.DR.getYButtonReleased()) {
+      } else if (OI.OP.getYButtonReleased()) {
         ss.idle();
       }
       // if (OI.DR.getLeftTriggerAxis() > 0) {

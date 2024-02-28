@@ -45,7 +45,7 @@ import org.littletonrobotics.junction.Logger;
 
 public class Drive extends StateMachineSubsystemBase {
   public static final int FL = 0, FR = 1, BL = 2, BR = 3;
-  public static final double MAX_LINEAR_SPEED_MPS = 4.73;
+  public static final double MAX_LINEAR_SPEED_MPS = 0.7;
   public static final double TRACK_WIDTH_X = Units.inchesToMeters(18.75);
   public static final double TRACK_WIDTH_Y = Units.inchesToMeters(18.75);
   private static final double SKEW_CONSTANT = 0.06;
@@ -209,11 +209,11 @@ public class Drive extends StateMachineSubsystemBase {
             double throttle = 1.0;
             throttle = Util.lerp(1, 0.4, OI.DR.getRightTriggerAxis() * OI.DR.getRightTriggerAxis());
 
-            double x_ = -Util.sqInput(OI.DR.getLeftY());
-            double y_ = -Util.sqInput(OI.DR.getLeftX());
+            double x_ = -OI.DR.getLeftY();
+            double y_ = -OI.DR.getLeftX();
             double w_ = -Util.sqInput(OI.DR.getRightX());
 
-            drive(x_, y_, w_ * 0.3, throttle);
+            drive(x_, y_, w_ * 0.5, throttle);
           }
         };
 
@@ -224,14 +224,14 @@ public class Drive extends StateMachineSubsystemBase {
             double throttle = 1.0;
             throttle = Util.lerp(1, 0.4, OI.DR.getRightTriggerAxis() * OI.DR.getRightTriggerAxis());
 
-            double x_ = -Util.sqInput(OI.DR.getLeftY());
-            double y_ = -Util.sqInput(OI.DR.getLeftX());
+            double x_ = -OI.DR.getLeftY();
+            double y_ = -OI.DR.getLeftX();
 
             double err =
                 Math.IEEEremainder(
                     getPose().getRotation().getRotations() - autolockSetpoint_r, 1.0);
             Logger.recordOutput("Drive/Autolock Heading Error", err);
-            double con = Util.inRange(err, 0.1) ? 3 * err : 2 * err;
+            double con = Util.inRange(err, 0.1) ? 3.5 * err : 2 * err;
             con = Util.limit(con, 0.2);
             Logger.recordOutput("Drive/Autolock Heading Output", con);
             drive(x_, y_, -con, throttle);
@@ -323,9 +323,9 @@ public class Drive extends StateMachineSubsystemBase {
       y = -y;
     }
     // Apply deadband
-    double linearMagnitude = MathUtil.applyDeadband(Math.hypot(x, y), Constants.driveDeadband);
+    double linearMagnitude = MathUtil.applyDeadband(Math.hypot(x, y), 0);
     Rotation2d linearDirection = new Rotation2d(x, y);
-    double omega = MathUtil.applyDeadband(w, Constants.driveDeadband);
+    double omega = MathUtil.applyDeadband(w, 0);
 
     // Square values
     linearMagnitude = linearMagnitude * linearMagnitude;

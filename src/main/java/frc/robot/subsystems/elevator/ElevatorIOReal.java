@@ -64,7 +64,7 @@ public class ElevatorIOReal implements ElevatorIO {
     rightCurrent_A = rightFalcon.getStatorCurrent();
     volts_V = leftFalcon.getMotorVoltage();
 
-    leaderConfig.CurrentLimits.SupplyCurrentLimit = 70.0;
+    leaderConfig.CurrentLimits.SupplyCurrentLimit = 40.0;
     leaderConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
     leaderConfig.ClosedLoopRamps.VoltageClosedLoopRampPeriod = 0.05;
     leaderConfig.Feedback.SensorToMechanismRatio = METERS_TO_ROTATIONS;
