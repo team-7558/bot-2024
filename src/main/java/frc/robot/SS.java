@@ -313,6 +313,13 @@ public class SS {
     }
   }
 
+  public void shootAmp() {
+    if (currState == State.IDLE) {
+      shooter.queueSetpoints(new Setpoints(10, 0, 0, 0.2));
+      queueState(State.SHOOTING);
+    }
+  }
+
   public void shootPreset1() {
     if (currState == State.IDLE) {
       shooter.queueSetpoints(new Setpoints(30, 0, 0, 0.18));
@@ -321,6 +328,48 @@ public class SS {
   }
 
   public void shootPreset2() {
+    if (currState == State.IDLE) {
+      shooter.queueSetpoints(new Setpoints(40, 0, 0, 0.102));
+      queueState(State.SHOOTING);
+    }
+  }  
+
+  public void shootPreset3() {
+    if (currState == State.IDLE) {
+      shooter.queueSetpoints(new Setpoints(40, 0, 0, 0.102));
+      queueState(State.SHOOTING);
+    }
+  }  
+
+  public void shootPreset4() {
+    if (currState == State.IDLE) {
+      shooter.queueSetpoints(new Setpoints(40, 0, 0, 0.102));
+      queueState(State.SHOOTING);
+    }
+  }  
+
+  public void shootPreset5() {
+    if (currState == State.IDLE) {
+      shooter.queueSetpoints(new Setpoints(40, 0, 0, 0.102));
+      queueState(State.SHOOTING);
+    }
+  }  
+
+  public void shootPreset6() {
+    if (currState == State.IDLE) {
+      shooter.queueSetpoints(new Setpoints(40, 0, 0, 0.102));
+      queueState(State.SHOOTING);
+    }
+  }  
+
+  public void shootPreset7() {
+    if (currState == State.IDLE) {
+      shooter.queueSetpoints(new Setpoints(40, 0, 0, 0.102));
+      queueState(State.SHOOTING);
+    }
+  }  
+
+  public void shootPreset8() {
     if (currState == State.IDLE) {
       shooter.queueSetpoints(new Setpoints(40, 0, 0, 0.102));
       queueState(State.SHOOTING);
