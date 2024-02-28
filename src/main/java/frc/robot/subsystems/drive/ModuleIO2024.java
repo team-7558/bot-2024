@@ -210,7 +210,7 @@ public class ModuleIO2024 implements ModuleIO {
         turnCurrent);
 
     inputs.drivePos_r = drivePosition.getValueAsDouble();
-    inputs.driveVel_mps = driveVelocity.getValueAsDouble() * Module.WHEEL_RADIUS;
+    inputs.driveVel_mps = driveVelocity.getValueAsDouble() * Module.RPS_TO_MPS;
     inputs.driveVolts_V = driveAppliedVolts.getValueAsDouble();
     inputs.driveCurrent_A = new double[] {driveCurrent.getValueAsDouble()};
 
@@ -272,16 +272,12 @@ public class ModuleIO2024 implements ModuleIO {
 
     // driveTalon.setControl(new PositionVoltage(velocity, 0, true, velocity, 0, false, false,
     // false));
-    driveTalon.setControl(
-        driveVelocitySetpoint_v
-            .withVelocity(velocity / Module.WHEEL_RADIUS)
-            .withEnableFOC(true)
-            .withSlot(0));
+    driveTalon.setControl(driveVelocitySetpoint_v.withVelocity(velocity / Module.RPS_TO_MPS));
   }
 
   @Override
   public void setTurnAngle(double pos_r) {
-    turnTalon.setControl(turnPositionSetpoint_v.withPosition(pos_r).withSlot(0));
+    turnTalon.setControl(turnPositionSetpoint_v.withPosition(pos_r));
 
     Logger.recordOutput("Drive/" + index + "/angleSetpoint", pos_r);
 

@@ -243,6 +243,7 @@ public class SS {
 
         if (shooter.isAtSetpoints() && after(0.2)) {
           hasGamePiece = false;
+          intake.setCurrentState(intake.SHOOTER_SIDE);
           shooter.setCurrentState(shooter.SHOOTING);
         }
         break;

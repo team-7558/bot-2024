@@ -45,7 +45,7 @@ import org.littletonrobotics.junction.Logger;
 
 public class Drive extends StateMachineSubsystemBase {
   public static final int FL = 0, FR = 1, BL = 2, BR = 3;
-  public static final double MAX_LINEAR_SPEED_MPS = 0.7;
+  public static final double MAX_LINEAR_SPEED_MPS = 4.23;
   public static final double TRACK_WIDTH_X = Units.inchesToMeters(18.75);
   public static final double TRACK_WIDTH_Y = Units.inchesToMeters(18.75);
   private static final double SKEW_CONSTANT = 0.06;
@@ -232,7 +232,7 @@ public class Drive extends StateMachineSubsystemBase {
                     getPose().getRotation().getRotations() - autolockSetpoint_r, 1.0);
             Logger.recordOutput("Drive/Autolock Heading Error", err);
             double con = Util.inRange(err, 0.1) ? 3.5 * err : 2 * err;
-            con = Util.limit(con, 0.2);
+            con = Util.limit(con, 0.6);
             Logger.recordOutput("Drive/Autolock Heading Output", con);
             drive(x_, y_, -con, throttle);
           }
@@ -315,6 +315,7 @@ public class Drive extends StateMachineSubsystemBase {
     poseEstimator.updateWithTime(Timer.getFPGATimestamp(), getRotation(), getModulePositions());
     // TODO: figure out if needs to be moved into 250Hz processing loop
     chassisSpeeds = getChassisSpeedsFromModuleStates();
+    Logger.recordOutput("Drive/Speeds", chassisSpeeds);
   }
 
   public void drive(double x, double y, double w, double throttle) {

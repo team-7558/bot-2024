@@ -209,7 +209,7 @@ public class Shooter extends StateMachineSubsystemBase {
             // queueSetpoints(constrainSetpoints(shooterPipeline(), !inputs.beamBreakActivated));
             track();
 
-            if (false && inputs.beamBreakActivated) {
+            if (inputs.beamBreakActivated) {
               setCurrentState(IDLE);
             }
           }

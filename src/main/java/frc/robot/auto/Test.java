@@ -7,19 +7,27 @@ public class Test extends AltAuto {
   public Test() {
     super("Test");
 
-    trajstack.appendChain().append("3m Lightning", false);
+    trajstack.appendChain().append("3m Fwd", false);
 
     trajstack.setActiveIdx(0);
     trajstack.generate();
   }
 
   @Override
-  public void onInit() {}
+  public void onInit() {
+    ss.queueState(State.IDLE);
+  }
 
   @Override
   public void onExecute() {
-    if (after(3)) {
-      ss.queueState(State.TEST_2);
+    if (between(1, 4)) {
+      ss.intake();
+    } else if (between(5, 7)) {
+      ss.chamber();
+    } else if (between(7.5, 11)) {
+      ss.shootPreset2();
+    } else {
+      ss.idle();
     }
   }
 }
