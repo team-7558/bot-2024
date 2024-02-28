@@ -1,5 +1,6 @@
 package frc.robot.auto;
 
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.Timer;
 import frc.robot.SS;
 import frc.robot.subsystems.drive.Drive;
@@ -33,6 +34,8 @@ public abstract class AltAuto {
     if (!trajstack.isGenerated()) {
       trajstack.generate();
     }
+
+    drive.hardSetPose(new Pose2d(trajstack.getInitState().positionMeters, trajstack.getInitState().targetHolonomicRotation));
 
     drive.setCurrentState(drive.PATHING);
 
