@@ -37,8 +37,11 @@ public abstract class AltAuto {
       trajstack.generate();
     }
 
-    if(forcePoseReset){
-        drive.hardSetPose(new Pose2d(trajstack.getInitState().positionMeters, trajstack.getInitState().targetHolonomicRotation));
+    if (forcePoseReset) {
+      drive.hardSetPose(
+          new Pose2d(
+              trajstack.getInitState().positionMeters,
+              trajstack.getInitState().targetHolonomicRotation));
     }
 
     drive.setCurrentState(drive.PATHING);

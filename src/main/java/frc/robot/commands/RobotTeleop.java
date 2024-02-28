@@ -97,7 +97,7 @@ public class RobotTeleop extends Command {
     if (!ss.shooterIsDisabled()) {
       if (OI.XK.get(7, 0)) {
         ss.chamber();
-      } if (OI.XK.get(7, 1)) {
+      } else if (OI.XK.get(7, 1)) {
         ss.shootAmp();
       } else if (OI.XK.get(8, 0)) {
         ss.shootPreset1();
@@ -116,7 +116,7 @@ public class RobotTeleop extends Command {
       } else if (OI.XK.get(8, 7)) {
         ss.shootPreset8();
       } else {
-        ss.idle();
+        ss.idleFromShooting();
       }
       // if (OI.DR.getLeftTriggerAxis() > 0) {
       //   shooter.setCurrentState(shooter.MANUAL);
