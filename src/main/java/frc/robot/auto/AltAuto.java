@@ -16,12 +16,14 @@ public abstract class AltAuto {
   protected final SS ss;
 
   private Timer t;
+  private boolean forcePoseReset;
 
-  public AltAuto(String s) {
+  public AltAuto(String s, boolean forcePoseReset) {
     name = s;
     drive = Drive.getInstance();
     ss = SS.getInstance();
     trajstack = new Trajstack();
+    this.forcePoseReset = forcePoseReset;
     t = new Timer();
   }
 
@@ -35,10 +37,12 @@ public abstract class AltAuto {
       trajstack.generate();
     }
 
-    drive.hardSetPose(
-        new Pose2d(
-            trajstack.getInitState().positionMeters,
-            trajstack.getInitState().targetHolonomicRotation));
+    if (forcePoseReset) {
+      drive.hardSetPose(
+          new Pose2d(
+              trajstack.getInitState().positionMeters,
+              trajstack.getInitState().targetHolonomicRotation));
+    }
 
     drive.setCurrentState(drive.PATHING);
 

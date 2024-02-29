@@ -13,6 +13,8 @@
 
 package frc.robot.subsystems.shooter;
 
+import edu.wpi.first.math.filter.Debouncer;
+import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
@@ -140,6 +142,8 @@ public class Shooter extends StateMachineSubsystemBase {
 
   private final ShooterIO io;
 
+  private final Debouncer feedDebouncer = new Debouncer(0.01, DebounceType.kRising);
+
   public enum TargetMode {
     SPEAKER,
     TRAP,
@@ -201,7 +205,7 @@ public class Shooter extends StateMachineSubsystemBase {
         new State("BEING_FED") {
           @Override
           public void init() {
-            queueSetpoints(new Setpoints(0, 5, 0, 0));
+            queueSetpoints(new Setpoints(0, 10, 0, 0));
           }
 
           @Override
@@ -209,7 +213,7 @@ public class Shooter extends StateMachineSubsystemBase {
             // queueSetpoints(constrainSetpoints(shooterPipeline(), !inputs.beamBreakActivated));
             track();
 
-            if (inputs.beamBreakActivated) {
+            if (feedDebouncer.calculate(inputs.beamBreakActivated)) {
               setCurrentState(IDLE);
             }
           }
@@ -268,7 +272,7 @@ public class Shooter extends StateMachineSubsystemBase {
                   setCurrentState(IDLE);
                 }
               } else {
-                io.setTurretVolts(1.5);
+                io.setTurretVolts(1);
               }
             }
           }
