@@ -18,7 +18,6 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.auto.Calibration;
 import frc.robot.auto.RunAltAutoCommand;
-import frc.robot.auto.Test;
 import frc.robot.commands.RobotTeleop;
 import frc.robot.subsystems.drive.Drive;
 
