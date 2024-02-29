@@ -205,7 +205,7 @@ public class Shooter extends StateMachineSubsystemBase {
         new State("BEING_FED") {
           @Override
           public void init() {
-            queueSetpoints(new Setpoints(0, 10, 0, 0));
+            queueSetpoints(new Setpoints(0, 8, 0, 0));
           }
 
           @Override
@@ -239,7 +239,7 @@ public class Shooter extends StateMachineSubsystemBase {
         new State("SHOOTING") {
           @Override
           public void init() {
-            queueSetpoints(new Setpoints(20));
+            queueSetpoints(new Setpoints(8));
           }
 
           @Override

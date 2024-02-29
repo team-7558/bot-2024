@@ -132,11 +132,11 @@ public class Intake extends StateMachineSubsystemBase {
           }
         };
     AMP_NEW =
-        new State("AMP_SIDE_2") {
+        new State("AMP_NEW") {
           @Override
           public void init() {
-            directionSpeed = 1.0;
-            intakeSpeed = 1.0;
+            directionSpeed = 0.43;
+            intakeSpeed = 0.43;
           }
         };
     SHOOTER_SIDE =
