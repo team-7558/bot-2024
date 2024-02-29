@@ -142,7 +142,7 @@ public class Shooter extends StateMachineSubsystemBase {
 
   private final ShooterIO io;
 
-  private final Debouncer feedDebouncer = new Debouncer(0.01, DebounceType.kRising);
+  private final Debouncer feedDebouncer = new Debouncer(0.02, DebounceType.kRising);
 
   public enum TargetMode {
     SPEAKER,
@@ -382,7 +382,7 @@ public class Shooter extends StateMachineSubsystemBase {
 
   public boolean isAtSetpoints() {
     boolean res = true;
-    res &= isFlywheelAtSetpoint(1);
+    res &= isFlywheelAtSetpoint(4);
     res &= isTurretAtSetpoint(0.01);
     res &= isPivotAtSetpoint(0.01);
     Logger.recordOutput("Shooter/AtSetpoints", res);

@@ -3,7 +3,7 @@ package frc.robot.auto;
 public class Calibration extends AltAuto {
 
   public Calibration() {
-    super("Calibration");
+    super("Calibration", true);
 
     trajstack.appendChain().append("Calibration Real", false);
 

@@ -37,6 +37,7 @@ public class SS {
     TRACKING,
     SHOOTING,
     SHOOTING_FROM_GROUND,
+    FEEDING_FROM_GROUND,
 
     CLIMBING_UP,
     CLIMBING_DOWN,
@@ -264,6 +265,12 @@ public class SS {
           intake.setCurrentState(intake.SHOOTER_SIDE);
         }
         break;
+      case FEEDING_FROM_GROUND:
+        if (first) {
+          shooter.setCurrentState(shooter.BEING_FED);
+          intake.setCurrentState(intake.SHOOTER_SIDE);
+        }
+        break;
       default:
         System.out.println(currState + " unimplemented state");
     }
@@ -350,6 +357,12 @@ public class SS {
     }
   }
 
+  public void feedFromGroundAutoPreset() {
+    if (currState == State.IDLE) {
+      queueState(State.FEEDING_FROM_GROUND);
+    }
+  }
+
   public void shootPreset2() {
     if (currState == State.IDLE) {
       shooter.queueSetpoints(new Setpoints(40, 0, 0.09, 0.12));
@@ -359,7 +372,7 @@ public class SS {
 
   public void shootPreset3() {
     if (currState == State.IDLE) {
-      shooter.queueSetpoints(new Setpoints(40, -0.138, 0.11));
+      shooter.queueSetpoints(new Setpoints(40, 0, -0.138, 0.11));
       queueState(State.SHOOTING);
     }
   }
