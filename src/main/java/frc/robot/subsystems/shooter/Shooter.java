@@ -142,7 +142,7 @@ public class Shooter extends StateMachineSubsystemBase {
 
   private final ShooterIO io;
 
-  private final Debouncer feedDebouncer = new Debouncer(0.13, DebounceType.kBoth);
+  private final Debouncer feedDebouncer = new Debouncer(0.01, DebounceType.kRising);
 
   public enum TargetMode {
     SPEAKER,

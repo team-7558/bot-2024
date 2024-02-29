@@ -215,6 +215,8 @@ public class SS {
         if (first) {
           elevator.setTargetHeight(Elevator.CLIMB_HEIGHT_M);
           elevator.setCurrentState(elevator.TRAVELLING);
+          shooter.queueSetpoints(new Setpoints(0, 0, 0.18));
+          shooter.setCurrentState(shooter.TRACKING);
         }
         break;
       case CLIMBING_DOWN:
@@ -392,7 +394,7 @@ public class SS {
 
   public void shootPreset8() {
     if (currState == State.IDLE) {
-      shooter.queueSetpoints(new Setpoints(40, 0, 0, 0.142));
+      shooter.queueSetpoints(new Setpoints(30, 0, 0.08, 0.12));
       queueState(State.SHOOTING);
     }
   }

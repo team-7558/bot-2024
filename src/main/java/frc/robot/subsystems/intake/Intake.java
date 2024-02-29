@@ -110,7 +110,7 @@ public class Intake extends StateMachineSubsystemBase {
         new State("INTAKING") {
           @Override
           public void periodic() {
-            intakeSpeed = beamBroken() ? 0.3 : 0.80;
+            intakeSpeed = beamBroken() ? 0.3 : 0.50;
             directionSpeed = 0;
           }
         };
