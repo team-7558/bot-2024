@@ -20,12 +20,11 @@ public class VisionProcessingThread extends Thread {
       try {
         if (camera.camera.isConnected()) {
           PhotonPipelineResult latestResult = camera.camera.getLatestResult();
-
+          camera.poseEstimator.setReferencePose(Drive.getInstance().getPoseEstimatorPose());
           Optional<EstimatedRobotPose> poseOptional = camera.poseEstimator.update(latestResult);
           if (poseOptional.isPresent()) {
 
             EstimatedRobotPose estimatedPose = poseOptional.get();
-            Logger.recordOutput("Vision/3DPose", estimatedPose.estimatedPose);
             Drive.getInstance()
                 .addToPoseEstimator(
                     estimatedPose.estimatedPose.toPose2d(), latestResult.getTimestampSeconds());

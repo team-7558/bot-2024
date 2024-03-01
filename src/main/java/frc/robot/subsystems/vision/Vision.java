@@ -42,14 +42,6 @@ public class Vision extends SubsystemBase {
 
   public static final AprilTagFieldLayout AT_MAP;
 
-  public static void resetArrays() {
-    // for (VisionIOPhoton io : getInstance().cameras) {
-    //   for (int i = 0; i < io.poses.length; i++) {
-    //     io.poses[i] = new Pose3d();
-    //   }
-    // }
-  }
-
   static {
     AprilTagFieldLayout temp;
     try {

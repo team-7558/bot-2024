@@ -35,7 +35,7 @@ public class VisionIOPhoton implements ApriltagIO {
       e.printStackTrace();
     }
     this.poseEstimator =
-        new PhotonPoseEstimator(fieldLayout, PoseStrategy.LOWEST_AMBIGUITY, camToRobot);
+        new PhotonPoseEstimator(fieldLayout, PoseStrategy.CLOSEST_TO_REFERENCE_POSE, camToRobot);
     this.transform = camToRobot;
   }
 
