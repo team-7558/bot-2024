@@ -5,6 +5,7 @@ import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -41,6 +42,14 @@ public class Vision extends SubsystemBase {
 
   public static final AprilTagFieldLayout AT_MAP;
 
+  public static void resetArrays() {
+    // for (VisionIOPhoton io : getInstance().cameras) {
+    //   for (int i = 0; i < io.poses.length; i++) {
+    //     io.poses[i] = new Pose3d();
+    //   }
+    // }
+  }
+
   static {
     AprilTagFieldLayout temp;
     try {
@@ -57,43 +66,56 @@ public class Vision extends SubsystemBase {
   public static Vision getInstance() {
     if (instance == null) {
 
-      VisionIO cam0, cam1, cam2, cam3;
+      VisionIOPhoton cam0, cam1, cam2, cam3;
 
-      switch (Constants.currentMode) {
+      switch (Constants.currentMode) { // TODO: SET BACK TO NORMAL
         case REAL:
-          cam0 = new VisionIOPhoton("camera0", new Transform3d()); // TODO: update transform &
-          // name
-          // VisionIO cam1 =
-          //     new VisionIOPhoton("camera2", new Transform3d()); // TODO: update transform &
-          // name
+          cam0 =
+              new VisionIOPhoton(
+                  "BL",
+                  new Transform3d(
+                      0.65,
+                      -0.28,
+                      0,
+                      new Rotation3d(
+                          Units.degreesToRadians(-10),
+                          Units.degreesToRadians(-10),
+                          Units.degreesToRadians(130)))); // TODO: update transform & name later
+          cam1 =
+              new VisionIOPhoton(
+                  "BR",
+                  new Transform3d(
+                      0.65,
+                      0.28,
+                      0,
+                      new Rotation3d(
+                          Units.degreesToRadians(10),
+                          Units.degreesToRadians(10),
+                          Units.degreesToRadians(-130))));
+          // VisionIO cam1 =7
+          //     new VisionIOPhoton("camera2", new Transform3d()); // TODO: update transform & name
           // VisionIO cam2 =
-          //     new VisionIOPhoton("camera3", new Transform3d()); // TODO: update transform &
-          // name
+          //     new VisionIOPhoton("camera3", new Transform3d()); // TODO: update transform & name
           // VisionIO cam3 =
-          //     new VisionIOPhoton("camera4", new Transform3d()); // TODO: update transform &
-          // name
-          // VisionIO limelight = new VisionIOLimelight("limelight"); // TODO: update name
-          instance = new Vision(/*cam0*/ new VisionIOSim("camera0", new Transform3d()));
+          //     new VisionIOPhoton("camera4", new Transform3d()); // TODO: update transform & name
+          // LimelightIO limelight = new LimelightIOReal("limelight");
+          instance = new Vision(new LimelightIO() {}, cam1);
           break;
         case SIM:
-          cam0 = new VisionIOSim("camera0", new Transform3d());
-          // VisionIOSim camone =
-          //     new VisionIOSim("camera1", new Transform3d(-0.3, 0.1, 0.3, new Rotation3d(0, 90,
-          // 90)));
-          // VisionIOSim camtwo =
-          //     new VisionIOSim("camera1", new Transform3d(0.3, 0.1, -0.3, new Rotation3d(0, 90,
-          // 0)));
-          // VisionIOSim camthree =
-          //     new VisionIOSim("camera1", new Transform3d(-0.3, 0.1, -0.3, new Rotation3d(0, 90,
-          // 0)));
-          instance = new Vision(cam0);
+          cam0 =
+              new VisionIOPhoton(
+                  "camera0",
+                  new Transform3d(
+                      0, 0, 0, new Rotation3d())); // TODO: update transform & name later
+          instance = new Vision(new LimelightIO() {}, cam0);
+          // no sim
           break;
         case REPLAY:
           // idk yet
 
         default:
           // nothing yet
-          instance = new Vision(new VisionIOSim("camera0", new Transform3d()));
+          //
       }
     }
 
@@ -102,32 +124,28 @@ public class Vision extends SubsystemBase {
 
   private List<Pose2d> posesToLog;
 
-  private VisionIO cameras[];
-  private VisionIOInputsAutoLogged[] visionInputs;
+  private LimelightIO limelight;
+  public LimelightIOInputsAutoLogged limelightInputs;
 
-  private Vision(VisionIO... cameras) {
+  private VisionIOPhoton cameras[];
+  private ApriltagIOInputsAutoLogged[] visionInputs;
+
+  private Vision(LimelightIO limelight, VisionIOPhoton... cameras) {
     this.cameras = cameras;
     this.visionInputs =
-        new VisionIOInputsAutoLogged[] {
-          new VisionIOInputsAutoLogged(),
-          new VisionIOInputsAutoLogged(),
-          new VisionIOInputsAutoLogged(),
-          new VisionIOInputsAutoLogged()
+        new ApriltagIOInputsAutoLogged[] {
+          new ApriltagIOInputsAutoLogged(),
+          new ApriltagIOInputsAutoLogged(),
+          new ApriltagIOInputsAutoLogged(),
+          new ApriltagIOInputsAutoLogged()
         };
-
+    this.limelight = limelight;
+    this.limelightInputs = new LimelightIOInputsAutoLogged();
     posesToLog = new ArrayList<>();
   }
 
   public int getCameras() {
     return cameras.length;
-  }
-
-  public Pose2d[] getPoses() {
-    Pose2d[] poses = new Pose2d[cameras.length];
-    for (int i = 0; i < cameras.length; i++) {
-      poses[i] = visionInputs[i].pose;
-    }
-    return poses;
   }
 
   public void setPipeline(int camera, int pipeline) {
@@ -138,20 +156,8 @@ public class Vision extends SubsystemBase {
     return visionInputs[camera].pipelineID;
   }
 
-  public double getXOffset(int camera) {
-    return visionInputs[camera].xOffset;
-  }
-
-  public double getYOffset(int camera) {
-    return visionInputs[camera].yOffset;
-  }
-
   public int getTagID(int camera) {
     return visionInputs[camera].tagID;
-  }
-
-  public Pose2d getPose(int camera) {
-    return visionInputs[camera].pose;
   }
 
   public double getTimestamp(int camera) {
@@ -164,7 +170,7 @@ public class Vision extends SubsystemBase {
 
   public boolean hasTagInView() {
     for (int i = 0; i < visionInputs.length; i++) {
-      VisionIOInputsAutoLogged input = visionInputs[i];
+      ApriltagIOInputsAutoLogged input = visionInputs[i];
       if (input.tagID != 1) {
         return true;
       }
@@ -173,7 +179,7 @@ public class Vision extends SubsystemBase {
   }
 
   public void managePipelines(int camID, Pose2d botpose) {
-    VisionIO cam = cameras[camID];
+    ApriltagIO cam = cameras[camID];
     boolean shouldSwitchToQuick = false;
     boolean shouldSwitchToClear = false;
 
@@ -238,21 +244,36 @@ public class Vision extends SubsystemBase {
     }
 
     if (shouldSwitchToClear) { // TODO: implement for noise reduction
-      // cam.setPipeline(CLEAR_PIPELINE_ID);
+      cam.setPipeline(CLEAR_PIPELINE_ID);
+    }
+  }
+
+  public void handleFrameData() {
+    for (int i = 0; i < cameras.length; i++) {
+      cameras[i].updateInputs(visionInputs[i]);
+      // Logger.processInputs("Vision/Camera" + i + "/Inputs", visionInputs[i]);
+      managePipelines(i, Drive.getInstance().getPose());
     }
   }
 
   @Override
   public void periodic() {
     PerfTracker.start("Vision");
-    for (int i = 0; i < cameras.length; i++) {
-      cameras[i].updateInputs(visionInputs[i]);
-      Logger.processInputs("Vision/Camera" + i + "/Inputs", visionInputs[i]);
-
-      managePipelines(i, Drive.getInstance().getPose());
-    }
-
+    // Logger.processInputs("Vision/Limelight", limelightInputs);
+    handleFrameData();
+    PerfTracker.end("Vision");
     Logger.recordOutput("Vision/TagSet", posesToLog.toArray(new Pose2d[0]));
     posesToLog.clear();
+  }
+
+  public static class TimestampedPose {
+
+    public Pose2d pose;
+    public double timestamp;
+
+    public TimestampedPose(Pose2d pose, double timestamp) {
+      this.pose = pose;
+      this.timestamp = timestamp;
+    }
   }
 }

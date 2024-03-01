@@ -248,7 +248,7 @@ public class Drive extends StateMachineSubsystemBase {
             getModulePositions(),
             new Pose2d(),
             VecBuilder.fill(0.1, 0.1, 0.05),
-            VecBuilder.fill(0.5, 0.5, 0.5)); // TODO: TUNE STANDARD DEVIATIONS
+            VecBuilder.fill(0.02, 0.02, 3)); // TODO: TUNE STANDARD DEVIATIONS
   }
 
   @Override
@@ -420,6 +420,10 @@ public class Drive extends StateMachineSubsystemBase {
     }
   }
 
+  public void addToPoseEstimator(Pose2d pose, double timestamp) {
+    poseEstimator.addVisionMeasurement(pose, timestamp);
+  }
+
   /** Returns the average drive velocity in radians/sec. */
   public double getCharacterizationVelocity() {
     double driveVelocityAverage = 0.0;
@@ -456,6 +460,11 @@ public class Drive extends StateMachineSubsystemBase {
   @AutoLogOutput(key = "Odometry/Robot")
   public Pose2d getPose() {
     return pose;
+  }
+
+  @AutoLogOutput(key = "Odometry/PoseEstimator")
+  public Pose2d getPoseEstimatorPose() {
+    return poseEstimator.getEstimatedPosition();
   }
 
   /** Returns the current odometry rotation. */

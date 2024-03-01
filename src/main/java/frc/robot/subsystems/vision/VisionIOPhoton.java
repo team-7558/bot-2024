@@ -4,23 +4,29 @@ import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Transform3d;
 import java.io.IOException;
-import java.util.Optional;
-import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonPoseEstimator;
 import org.photonvision.PhotonPoseEstimator.PoseStrategy;
 import org.photonvision.targeting.PhotonPipelineResult;
 import org.photonvision.targeting.PhotonTrackedTarget;
 
-public class VisionIOPhoton implements VisionIO {
+public class VisionIOPhoton implements ApriltagIO {
 
-  private final PhotonCamera camera;
-  private final PhotonPoseEstimator poseEstimator;
-  private AprilTagFieldLayout fieldLayout = null;
-  private final Transform3d transform;
+  public final PhotonCamera camera;
+  public final PhotonPoseEstimator poseEstimator;
+  public AprilTagFieldLayout fieldLayout = null;
+  public final Transform3d transform;
+  public PhotonPipelineResult recentResult;
+  private final VisionProcessingThread thread;
 
   public VisionIOPhoton(String camname, Transform3d camToRobot) {
     this.camera = new PhotonCamera(camname);
+    thread = new VisionProcessingThread(this);
+    thread.start();
+
+    // this is a listener for any changes on the photonvision networktable. might need to change
+    // this later. this is async
+    // maybe change this to just a while true loop in a thread
     try {
       fieldLayout =
           AprilTagFieldLayout.loadFromResource(AprilTagFields.k2024Crescendo.m_resourceFile);
@@ -34,21 +40,17 @@ public class VisionIOPhoton implements VisionIO {
   }
 
   @Override
-  public void updateInputs(VisionIOInputs inputs) {
-    PhotonPipelineResult latestResult = camera.getLatestResult();
-    if (latestResult.hasTargets()) {
-      PhotonTrackedTarget target = latestResult.getBestTarget();
-      inputs.tagID = target.getFiducialId();
-      inputs.xOffset = target.getYaw();
-      inputs.yOffset = target.getPitch();
-      Optional<EstimatedRobotPose> poseOptional = poseEstimator.update(latestResult);
-      if (!poseOptional.isEmpty()) {
-        System.out.println("its not null");
-        inputs.pose = poseOptional.get().estimatedPose.toPose2d();
+  public void updateInputs(ApriltagIOInputs inputs) {
+
+    if (recentResult != null) {
+      PhotonPipelineResult latestResult = recentResult;
+      if (latestResult.hasTargets()) {
+        PhotonTrackedTarget target = latestResult.getBestTarget();
+        inputs.tagID = target.getFiducialId();
+        inputs.pipelineID = camera.getPipelineIndex();
+        inputs.timestamp = latestResult.getTimestampSeconds();
+        inputs.latency = latestResult.getLatencyMillis();
       }
-      inputs.pipelineID = camera.getPipelineIndex();
-      inputs.timestamp = latestResult.getTimestampSeconds();
-      inputs.latency = latestResult.getLatencyMillis();
     }
   }
 

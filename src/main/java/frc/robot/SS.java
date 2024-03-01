@@ -122,20 +122,20 @@ public class SS {
         break;
       case BOOT:
         if (first) {
-          if(homedClimb && homedShooter){
+          if (homedClimb && homedShooter) {
             queueState(State.IDLE);
-          }else{
+          } else {
             intake.setCurrentState(intake.IDLE);
             shooter.setCurrentState(shooter.ZEROING);
             elevator.setCurrentState(elevator.HOMING);
           }
         }
 
-        if(elevator.isState(elevator.IDLE)){
+        if (elevator.isState(elevator.IDLE)) {
           homedClimb = true;
         }
 
-        if(shooter.isState(shooter.IDLE)){
+        if (shooter.isState(shooter.IDLE)) {
           homedShooter = true;
         }
 
