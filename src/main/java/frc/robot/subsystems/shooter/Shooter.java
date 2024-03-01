@@ -211,11 +211,10 @@ public class Shooter extends StateMachineSubsystemBase {
           @Override
           public void periodic() {
             // queueSetpoints(constrainSetpoints(shooterPipeline(), !inputs.beamBreakActivated));
-            track();
-
             if (feedDebouncer.calculate(inputs.beamBreakActivated)) {
               setCurrentState(IDLE);
             }
+            track();
           }
         };
 
@@ -391,9 +390,8 @@ public class Shooter extends StateMachineSubsystemBase {
   }
 
   /** Returns the current velocity in RPM. */
-  public double getVelocityRPM() {
-
-    return 60 * (inputs.flywheelVelRPS);
+  public boolean beamBroken(){
+    return inputs.beamBreakActivated;
   }
 
   /** Runs forwards at the commanded voltage. */
