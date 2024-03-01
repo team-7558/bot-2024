@@ -43,6 +43,7 @@ public class Robot extends LoggedRobot {
   private Elevator elevator;
   private Shooter shooter;
   private Intake intake;
+  private Vision vision;
 
   boolean lastState = false;
 
@@ -57,7 +58,7 @@ public class Robot extends LoggedRobot {
     intake = Intake.getInstance();
     drive = Drive.getInstance();
     shooter = Shooter.getInstance();
-    Vision.getInstance();
+    vision = Vision.getInstance();
   }
 
   @Override
@@ -147,6 +148,7 @@ public class Robot extends LoggedRobot {
     // the Command-based framework to work.
     SS.getInstance().periodic();
     SS2d.periodic();
+    vision.periodic();
     CommandScheduler.getInstance().run();
     PerfTracker.periodic();
   }

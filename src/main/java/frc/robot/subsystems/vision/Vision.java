@@ -19,7 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 import org.littletonrobotics.junction.Logger;
 
-public class Vision extends SubsystemBase {
+public class Vision{
 
   // default pipeline, tracking apriltags at high FPS and low res.
   public static final int QUICK_PIPELINE_ID = 1;
@@ -242,16 +242,15 @@ public class Vision extends SubsystemBase {
     }
   }
 
-  @Override
   public void periodic() {
-    PerfTracker.start("Vision");
+    int id = PerfTracker.start("Vision");
     for (int i = 0; i < cameras.length; i++) {
       cameras[i].updateInputs(visionInputs[i]);
       Logger.processInputs("Vision/Camera" + i + "/Inputs", visionInputs[i]);
 
       managePipelines(i, Drive.getInstance().getPose());
     }
-
+    PerfTracker.end(id);
     Logger.recordOutput("Vision/TagSet", posesToLog.toArray(new Pose2d[0]));
     posesToLog.clear();
   }
