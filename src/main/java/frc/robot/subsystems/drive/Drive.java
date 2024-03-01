@@ -18,6 +18,7 @@ import com.pathplanner.lib.util.PIDConstants;
 import com.pathplanner.lib.util.PathPlannerLogging;
 import com.pathplanner.lib.util.ReplanningConfig;
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -28,6 +29,8 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.math.numbers.N1;
+import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
@@ -58,6 +61,8 @@ public class Drive extends StateMachineSubsystemBase {
   // TODO: tune all this
   // -- VISION CONSTANTS --
 
+  public static final Matrix<N3,N1> odometryStdDevs = VecBuilder.fill(0.003, 0.003, 0.0002);
+
   // maximum distance on high fps, low res before we switch the camera to high res lower fps
   public static final double MAX_DISTANCE = 3.0;
 
@@ -68,7 +73,7 @@ public class Drive extends StateMachineSubsystemBase {
   public static final double CUTOFF_DISTANCE = 7.0;
 
   // ratio for the distance scaling on the standard deviation
-  private static final double APRILTAG_COEFFICIENT = 0.1; // NEEDS TO BE TUNED
+  private static final double APRILTAG_COEFFICIENT = 0.01; // NEEDS TO BE TUNED
 
   public static final Lock odometryLock = new ReentrantLock();
 
@@ -243,7 +248,7 @@ public class Drive extends StateMachineSubsystemBase {
 
     resetPose();
 
-    estimator = new frc.robot.util.PoseEstimator(VecBuilder.fill(0.003, 0.003, 0.0002));
+    estimator = new PoseEstimator(odometryStdDevs);
   }
 
   @Override
@@ -415,8 +420,7 @@ public class Drive extends StateMachineSubsystemBase {
     }
   }
 
-  public void addToPoseEstimator(Pose2d pose, double timestamp) {
-    double dist = pose.getTranslation().getDistance(getPoseEstimatorPose().getTranslation());
+  public void addToPoseEstimator(Pose2d pose, double timestamp, double dist) {    
     estimator.addVisionData(List.of(new PoseEstimator.TimestampedVisionUpdate(timestamp, pose, VecBuilder.fill(APRILTAG_COEFFICIENT * dist,APRILTAG_COEFFICIENT * dist,10)))); // 10 cuz gyro is good and apriltag rotations suck
   }
 
