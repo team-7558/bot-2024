@@ -390,7 +390,7 @@ public class Shooter extends StateMachineSubsystemBase {
   }
 
   /** Returns the current velocity in RPM. */
-  public boolean beamBroken(){
+  public boolean beamBroken() {
     return inputs.beamBreakActivated;
   }
 

@@ -226,10 +226,14 @@ public class SS {
         break;
       case PRECHAMBER:
         if (first) {
-          elevator.setTargetHeight(Elevator.MIN_FEED_HEIGHT_M);
-          elevator.setCurrentState(elevator.TRAVELLING);
-          shooter.queueSetpoints(new Setpoints(0, 0, 0, 0.0));
-          shooter.setCurrentState(shooter.TRACKING);
+          if (!shooter.beamBroken()) {
+            elevator.setTargetHeight(Elevator.MIN_FEED_HEIGHT_M);
+            elevator.setCurrentState(elevator.TRAVELLING);
+            shooter.queueSetpoints(new Setpoints(0, 0, 0, 0.0));
+            shooter.setCurrentState(shooter.TRACKING);
+          } else {
+            queueState(State.CHAMBER);
+          }
         }
 
         if (shooter.isTurretAtSetpoint(0.03)
@@ -241,7 +245,7 @@ public class SS {
       case CHAMBER:
         if (first) {
           shooter.setCurrentState(shooter.BEING_FED);
-          if(!shooter.beamBroken()){
+          if (!shooter.beamBroken()) {
             intake.setCurrentState(intake.SHOOTER_SIDE);
           }
         }
@@ -324,7 +328,7 @@ public class SS {
   }
 
   public void chamber() {
-    if (currState != State.BOOT) {
+    if (currState != State.BOOT && currState != State.CHAMBER && currState != State.PRECHAMBER) {
       queueState(State.PRECHAMBER);
     }
   }
