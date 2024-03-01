@@ -26,6 +26,8 @@ public class ShooterIOIdeal implements ShooterIO {
     inputs.turretVelRPS = 0.0;
     inputs.turretCurrent = 0.0;
     inputs.beamBreakActivated = false;
+    inputs.turretHallEffect = true;
+    inputs.pivotHallEffect = true;
   }
 
   /** Run closed loop at the specified velocity. */
@@ -57,5 +59,11 @@ public class ShooterIOIdeal implements ShooterIO {
   public void stop() {
     feederVel_rps = 0;
     flywheelVel_rps = 0;
+  }
+
+  @Override
+  public void zero() {
+    turretPos_r = Shooter.TURRET_ZERO_POS;
+    pivotPos_r = Shooter.PIVOT_ZERO_POS;
   }
 }

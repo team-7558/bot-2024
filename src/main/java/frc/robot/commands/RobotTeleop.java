@@ -53,6 +53,74 @@ public class RobotTeleop extends Command {
         // strafe and turn if not other state
         drive.setCurrentState(drive.STRAFE_N_TURN);
       }
+    }
+
+    if (OI.DR.getPOV() == 270 || OI.XK.get(0, 6)) {
+      ss.clearGamePiece();
+    }
+
+    if (!ss.isDisabled()) {
+
+      if (OI.DR.getPOV() == 0 || OI.XK.get(0, 7)) {
+        ss.resetHomingFlags();
+        ss.queueState(State.BOOT);
+      } else if (OI.DR.getRightBumper()) {
+        ss.amp();
+      } else if (OI.XK.get(5, 0)) {
+        ss.climbUp();
+      } else if (OI.XK.get(7, 0)) {
+        ss.chamber();
+      } else if (OI.XK.get(6, 0)) {
+        ss.spit();
+      } else if (OI.XK.get(7, 1)) {
+        ss.shootAmp();
+      } else if (OI.XK.get(8, 0)) {
+        ss.shootPreset1();
+      } else if (OI.XK.get(8, 1)) {
+        ss.shootPreset2();
+      } else if (OI.XK.get(8, 2)) {
+        ss.shootPreset3();
+      } else if (OI.XK.get(8, 3)) {
+        ss.shootPreset4();
+      } else if (OI.XK.get(8, 4)) {
+        ss.shootPreset5();
+      } else if (OI.XK.get(8, 5)) {
+        ss.shootPreset6();
+      } else if (OI.XK.get(8, 6)) {
+        ss.shootPreset7();
+      } else if (OI.XK.get(8, 7)) {
+        ss.shootPreset8();
+      } else if (OI.DR.getLeftBumper()) {
+        ss.intake();
+      } else {
+        ss.idle();
+      }
+    }
+
+    SS2d.S.setTurretBaseAngle(drive.getRotation());
+    SS2d.M.setTurretBaseAngle(drive.getRotation());
+
+    SS2d.S.setDistance(2.5);
+    SS2d.M.setDistance(5);
+  }
+
+  public void executeOld() {
+
+    if (!drive.isState(drive.DISABLED)) {
+      // slow mode
+      // x stance while shooting
+      if (OI.DR.getPOV() == 180) {
+        drive.resetPose();
+      } else if (OI.DR.getBButton()) {
+        drive.setAutolockSetpoint(0.25);
+        drive.setCurrentState(drive.STRAFE_AUTOLOCK);
+      } else if (OI.DR.getAButton()) {
+        drive.setAutolockSetpoint(G.isRedAlliance() ? 0.5 : 0);
+        drive.setCurrentState(drive.STRAFE_AUTOLOCK);
+      } else {
+        // strafe and turn if not other state
+        drive.setCurrentState(drive.STRAFE_N_TURN);
+      }
 
       // if (OI.XK.get(0, 0)) {
       //   drive.setModuleModes(Mode.VOLTAGE);

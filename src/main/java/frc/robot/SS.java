@@ -1,5 +1,6 @@
 package frc.robot;
 
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Timer;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.intake.Intake;
@@ -26,10 +27,7 @@ public class SS {
     INTAKING_DEEP,
     INTAKING_CORAL,
 
-    AMP_SCORING_CHAMBER,
-    AMP_SCORING_UP,
-    AMP_SCORING_DOWN,
-    AMP_NEW,
+    AMP_SCORING,
 
     PRECHAMBER,
     CHAMBER,
@@ -83,6 +81,7 @@ public class SS {
   }
 
   public void queueState(State s) {
+    System.out.println("Queueing state: " + s);
     nextState = s;
   }
 
@@ -96,8 +95,11 @@ public class SS {
 
   public void periodic() {
     boolean first = currState != lastState;
-    boolean last = nextState != currState;
     lastState = currState;
+    if (currState != nextState) {
+      timer.restart();
+      currState = nextState;
+    }
 
     // Control Switch
     switch (currState) {
@@ -122,20 +124,20 @@ public class SS {
         break;
       case BOOT:
         if (first) {
-          if(homedClimb && homedShooter){
+          if (homedClimb && homedShooter) {
             queueState(State.IDLE);
-          }else{
+          } else {
             intake.setCurrentState(intake.IDLE);
             shooter.setCurrentState(shooter.ZEROING);
             elevator.setCurrentState(elevator.HOMING);
           }
         }
 
-        if(elevator.isState(elevator.IDLE)){
+        if (elevator.isState(elevator.IDLE)) {
           homedClimb = true;
         }
 
-        if(shooter.isState(shooter.IDLE)){
+        if (shooter.isState(shooter.IDLE)) {
           homedShooter = true;
         }
 
@@ -183,7 +185,7 @@ public class SS {
       case INTAKING_CORAL:
       case INTAKING:
         if (first) {
-          elevator.setTargetHeight(Elevator.INTAKE_HEIGHT_M);
+          elevator.setTargetHeight(Elevator.MIN_HEIGHT_M);
           elevator.setCurrentState(elevator.TRAVELLING);
         }
 
@@ -199,34 +201,12 @@ public class SS {
         }
 
         break;
-      case AMP_SCORING_UP:
-        if (first) {
-          elevator.setTargetHeight(Elevator.AMP_HEIGHT_M);
-          elevator.setCurrentState(elevator.TRAVELLING);
-
-          intake.setCurrentState(intake.AMP_SIDE_1);
-        }
-        if (last) {
-          elevator.setTargetHeight(Elevator.RESET_HEIGHT_M);
-          elevator.setCurrentState(elevator.TRAVELLING);
-
-          intake.setCurrentState(intake.AMP_SIDE_2);
-        }
-        if (elevator.isState(elevator.HOLDING)) {
-          queueState(State.AMP_SCORING_DOWN);
-        }
-
-        break;
-      case AMP_SCORING_DOWN:
-        hasGamePiece = false;
-        if (elevator.isState(elevator.HOLDING)) {
-          queueState(State.RESETTING_ELEVATOR);
-        }
-        break;
-      case AMP_NEW:
+      case AMP_SCORING:
         if (first) {
           hasGamePiece = false;
-          intake.setCurrentState(intake.AMP_NEW);
+          elevator.setTargetHeight(Elevator.MIN_HEIGHT_M);
+          elevator.setCurrentState(elevator.TRAVELLING);
+          intake.setCurrentState(intake.AMP_SCORING);
         }
 
         break;
@@ -290,12 +270,6 @@ public class SS {
     }
 
     stateInfoLog();
-
-    // Figure out if its better to do this before or after the switch statement
-    if (last) {
-      currState = nextState;
-      timer.restart();
-    }
   }
 
   // TODO: replace example based on what you wanna do, ex. shoot(double x, double y)
@@ -306,7 +280,9 @@ public class SS {
 
   public void idle() {
     if (currState != State.IDLE && currState != State.BOOT) {
-      if (!elevator.atHeight(Elevator.MIN_HEIGHT_M, 0.01)) {
+      if (currState == State.CLIMBING_UP || currState == State.CLIMBING_DOWN) {
+        queueState(State.CLIMBING_DOWN);
+      } else if (!elevator.atHeight(Elevator.MIN_HEIGHT_M, 0.01)) {
         queueState(State.RESETTING_ELEVATOR);
       } else {
         queueState(State.IDLE);
@@ -334,14 +310,14 @@ public class SS {
   }
 
   public void intake() {
-    if (currState == State.IDLE) {
+    if (currState != State.BOOT) {
       queueState(State.INTAKING);
     }
   }
 
   public void amp() {
     if (currState == State.IDLE) {
-      queueState(State.AMP_NEW);
+      queueState(State.AMP_SCORING);
     }
   }
 
@@ -394,7 +370,7 @@ public class SS {
 
   public void shootPreset5() {
     if (currState == State.IDLE) {
-      shooter.queueSetpoints(new Setpoints(45, 0, -0.023, 0.06));
+      shooter.queueSetpoints(new Setpoints(45, 0, -0.023, Units.degreesToRotations(40)));
       queueState(State.SHOOTING);
     }
   }
@@ -442,6 +418,11 @@ public class SS {
 
   // Subsystem management
 
+  public void resetHomingFlags() {
+    homedClimb = false;
+    homedShooter = false;
+  }
+
   public void disableIntake() {
     intake.setCurrentState(intake.DISABLED);
   }
@@ -464,6 +445,10 @@ public class SS {
 
   public boolean shooterIsDisabled() {
     return shooter.isState(shooter.DISABLED);
+  }
+
+  public boolean isDisabled() {
+    return currState == State.DISABLED;
   }
 
   // Timer Functions
