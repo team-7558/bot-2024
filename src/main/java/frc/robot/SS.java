@@ -64,7 +64,7 @@ public class SS {
   private State currState;
   private State nextState;
 
-  private boolean hasGamePiece;
+  private boolean hasGamePiece, homedShooter, homedClimb;
 
   private SS() {
     lastState = State.DISABLED;
@@ -78,6 +78,8 @@ public class SS {
     elevator = Elevator.getInstance();
 
     hasGamePiece = false;
+    homedShooter = false;
+    homedClimb = false;
   }
 
   public void queueState(State s) {
@@ -120,22 +122,39 @@ public class SS {
         break;
       case BOOT:
         if (first) {
-          intake.setCurrentState(intake.IDLE);
-          shooter.setCurrentState(shooter.ZEROING);
-          elevator.setCurrentState(elevator.HOMING);
+          if(homedClimb && homedShooter){
+            queueState(State.IDLE);
+          }else{
+            intake.setCurrentState(intake.IDLE);
+            shooter.setCurrentState(shooter.ZEROING);
+            elevator.setCurrentState(elevator.HOMING);
+          }
         }
 
-        if (elevator.isState(elevator.IDLE) && shooter.isState(shooter.IDLE)) {
+        if(elevator.isState(elevator.IDLE)){
+          homedClimb = true;
+        }
+
+        if(shooter.isState(shooter.IDLE)){
+          homedShooter = true;
+        }
+
+        if (homedClimb && homedShooter) {
           queueState(State.IDLE);
         }
         break;
       case RESETTING_ELEVATOR:
         if (first) {
+          homedClimb = false;
           elevator.setCurrentState(elevator.HOMING);
           intake.setCurrentState(intake.IDLE);
         }
 
         if (elevator.isState(elevator.IDLE)) {
+          homedClimb = true;
+        }
+
+        if (homedClimb) {
           queueState(State.IDLE);
         }
         break;
