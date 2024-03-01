@@ -416,7 +416,6 @@ public class Drive extends StateMachineSubsystemBase {
 
   public void addToPoseEstimator(Pose2d pose, double timestamp) {
     // poseEstimator.addVisionMeasurement(pose, timestamp);
-    System.out.println("estimator");
     Logger.recordOutput("Odometry/Test", pose);
     this.pose = pose;
     posesAdded++;

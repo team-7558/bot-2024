@@ -74,9 +74,9 @@ public class Vision extends SubsystemBase {
               new VisionIOPhoton(
                   "BL",
                   new Transform3d(
-                      0.04,
-                      -0.3,
-                      0.5,
+                      -0.6,
+                      -0.28,
+                      0,
                       new Rotation3d(
                           Units.degreesToRadians(-10),
                           Units.degreesToRadians(10),
@@ -85,13 +85,13 @@ public class Vision extends SubsystemBase {
               new VisionIOPhoton(
                   "BR",
                   new Transform3d(
-                      0,
-                      0,
+                      0.6,
+                      0.28,
                       0,
                       new Rotation3d(
                           Units.degreesToRadians(10),
                           Units.degreesToRadians(10),
-                          Units.degreesToRadians(100))));
+                          Units.degreesToRadians(-130))));
           // VisionIO cam1 =7
           //     new VisionIOPhoton("camera2", new Transform3d()); // TODO: update transform & name
           // VisionIO cam2 =
@@ -99,7 +99,7 @@ public class Vision extends SubsystemBase {
           // VisionIO cam3 =
           //     new VisionIOPhoton("camera4", new Transform3d()); // TODO: update transform & name
           // LimelightIO limelight = new LimelightIOReal("limelight");
-          instance = new Vision(new LimelightIO() {}, cam0, cam1);
+          instance = new Vision(new LimelightIO() {}, cam1);
           break;
         case SIM:
           cam0 =
@@ -251,7 +251,7 @@ public class Vision extends SubsystemBase {
   public void handleFrameData() {
     for (int i = 0; i < cameras.length; i++) {
       cameras[i].updateInputs(visionInputs[i]);
-      Logger.processInputs("Vision/Camera" + i + "/Inputs", visionInputs[i]);
+      // Logger.processInputs("Vision/Camera" + i + "/Inputs", visionInputs[i]);
       managePipelines(i, Drive.getInstance().getPose());
     }
   }
