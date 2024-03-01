@@ -1,0 +1,43 @@
+{
+  "version": 1.0,
+  "startingPose": {
+    "position": {
+      "x": 0.38878560286238717,
+      "y": 6.8296975196279845
+    },
+    "rotation": 0
+  },
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Amp Side High Scoring #1"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Amp Side High Scoring #2"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Amp Side High Scoring #3"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Amp Side High Scoring #4"
+          }
+        }
+      ]
+    }
+  },
+  "folder": null,
+  "choreoAuto": false
+}

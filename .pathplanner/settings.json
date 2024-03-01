@@ -3,9 +3,10 @@
   "robotLength": 0.737,
   "holonomicMode": true,
   "pathFolders": [
-    "Source Side Autos",
+    "Amp Side Autos",
     "Distance Tests",
-    "Amp Side Autos"
+    "High Scoring Auto Test",
+    "Middle Side Autos"
   ],
   "autoFolders": [],
   "defaultMaxVel": 2.0,

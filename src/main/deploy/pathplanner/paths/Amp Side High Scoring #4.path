@@ -1,0 +1,58 @@
+{
+  "version": 1.0,
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 4.34318046672699,
+        "y": 4.903722819092893
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 3.8104640601960074,
+        "y": 4.8422555414162405
+      },
+      "isLocked": false,
+      "linkedName": "Waypoint #4 End"
+    },
+    {
+      "anchor": {
+        "x": 2.7450312471340426,
+        "y": 5.85988047184081
+      },
+      "prevControl": {
+        "x": 2.54697001906483,
+        "y": 5.586692571055691
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": null
+    }
+  ],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 0.55,
+      "rotationDegrees": 139.09995144315695,
+      "rotateFast": true
+    }
+  ],
+  "constraintZones": [],
+  "eventMarkers": [],
+  "globalConstraints": {
+    "maxVelocity": 2.0,
+    "maxAcceleration": 2.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": 88.26429541107166,
+    "rotateFast": false
+  },
+  "reversed": false,
+  "folder": "High Scoring Auto Test",
+  "previewStartingState": {
+    "rotation": 0,
+    "velocity": 0
+  },
+  "useDefaultConstraints": true
+}
