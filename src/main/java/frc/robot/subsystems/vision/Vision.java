@@ -9,7 +9,6 @@ import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.PerfTracker;
 import frc.robot.subsystems.drive.Drive;
@@ -19,7 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 import org.littletonrobotics.junction.Logger;
 
-public class Vision{
+public class Vision {
 
   // default pipeline, tracking apriltags at high FPS and low res.
   public static final int QUICK_PIPELINE_ID = 1;

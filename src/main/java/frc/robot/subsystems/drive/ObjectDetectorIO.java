@@ -8,17 +8,16 @@ import org.littletonrobotics.junction.AutoLog;
 
 /** Add your docs here. */
 public interface ObjectDetectorIO {
-    @AutoLog
-    public static class ObjectDetectorIOInputs {
-        public boolean connected = false;
-        public boolean tv = false;
-        public double tx = 0.0;
-        public double ty = 0.0;
-        public double ta = 0.0;
-    }
+  @AutoLog
+  public static class ObjectDetectorIOInputs {
+    public boolean connected = false;
+    public boolean tv = false;
+    public double tx = 0.0;
+    public double ty = 0.0;
+    public double ta = 0.0;
+  }
 
-    public default void updateInputs(ObjectDetectorIOInputs inputs){}
+  public default void updateInputs(ObjectDetectorIOInputs inputs) {}
 
-    public default void setPipeline(int id){}
-
+  public default void setPipeline(int id) {}
 }

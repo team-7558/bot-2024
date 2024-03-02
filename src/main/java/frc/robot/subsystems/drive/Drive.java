@@ -125,7 +125,13 @@ public class Drive extends StateMachineSubsystemBase {
     return instance;
   }
 
-  public final State DISABLED, SHOOTING, PATHING, STRAFE_N_TURN, STRAFE_AUTOLOCK, STRAFE_AUTOLOCK_NEW, INTAKING;
+  public final State DISABLED,
+      SHOOTING,
+      PATHING,
+      STRAFE_N_TURN,
+      STRAFE_AUTOLOCK,
+      STRAFE_AUTOLOCK_NEW,
+      INTAKING;
 
   // IO
   private final GyroIO gyroIO;
@@ -256,13 +262,10 @@ public class Drive extends StateMachineSubsystemBase {
             double x_ = -OI.DR.getLeftY();
             double y_ = -OI.DR.getLeftX();
 
-
-
             double err =
                 Math.IEEEremainder(
                     getPose().getRotation().getRotations() - intermediaryAutolockSetpoint_r, 1.0);
 
-            
             Logger.recordOutput("Drive/Autolock Heading Error", err);
             double con = Util.inRange(err, 0.1) ? 3.5 * err : 2 * err;
             con = Util.limit(con, 0.6);
@@ -283,8 +286,8 @@ public class Drive extends StateMachineSubsystemBase {
             double w_ = -Util.sqInput(OI.DR.getRightX());
 
             ChassisSpeeds rrSpeeds = drive(x_, y_, w_ * 0.5, throttle);
-            if(llInputs.connected){
-              if(llInputs.tv){
+            if (llInputs.connected) {
+              if (llInputs.tv) {
                 rrSpeeds.vyMetersPerSecond += 0.05 * llInputs.tx;
                 rrSpeeds.vxMetersPerSecond += 0.00 * llInputs.ty;
                 rrSpeeds.omegaRadiansPerSecond += 0.005 * llInputs.tx;
@@ -411,7 +414,6 @@ public class Drive extends StateMachineSubsystemBase {
             y_,
             w_,
             getPose().getRotation().plus(new Rotation2d(getAngularVelocity() * SKEW_CONSTANT)));
-
 
     return rr;
   }
