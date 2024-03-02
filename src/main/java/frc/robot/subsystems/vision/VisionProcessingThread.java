@@ -1,14 +1,13 @@
 package frc.robot.subsystems.vision;
 
 import frc.robot.subsystems.drive.Drive;
+import frc.robot.subsystems.vision.Vision.VisionUpdate;
 import java.util.Optional;
-import org.littletonrobotics.junction.Logger;
 import org.photonvision.EstimatedRobotPose;
 import org.photonvision.targeting.PhotonPipelineResult;
 import org.photonvision.targeting.PhotonTrackedTarget;
 
 public class VisionProcessingThread extends Thread {
-
 
   public static final int MAX_FPS = 60;
   public static final long SLEEP_TIME = 1000 / 60;
@@ -32,14 +31,23 @@ public class VisionProcessingThread extends Thread {
             EstimatedRobotPose estimatedPose = poseOptional.get();
 
             double distanceSums = 0;
-            for(PhotonTrackedTarget tag : latestResult.targets) {
-              distanceSums += Vision.AT_MAP.getTagPose(tag.getFiducialId()).get().toPose2d().getTranslation().getDistance(Drive.getInstance().getPoseEstimatorPose().getTranslation());
-            }
+            PhotonTrackedTarget tag = latestResult.getBestTarget();
+            distanceSums +=
+                Vision.AT_MAP
+                    .getTagPose(tag.getFiducialId())
+                    .get()
+                    .toPose2d()
+                    .getTranslation()
+                    .getDistance(Drive.getInstance().getPoseEstimatorPose().getTranslation());
             double distance = distanceSums / latestResult.targets.size();
 
             Drive.getInstance()
                 .addToPoseEstimator(
-                    estimatedPose.estimatedPose.toPose2d(), latestResult.getTimestampSeconds(),distance);
+                    (new VisionUpdate(
+                        estimatedPose.estimatedPose.toPose2d(),
+                        latestResult.getTimestampSeconds(),
+                        distance)));
+
             camera.recentResult = latestResult;
           }
         }

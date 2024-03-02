@@ -42,6 +42,10 @@ public class Vision extends SubsystemBase {
 
   public static final AprilTagFieldLayout AT_MAP;
 
+  public static record VisionUpdate(Pose2d pose, double timestamp, double distance) {}
+
+  public static List<VisionUpdate> visionUpdates = new ArrayList<>();
+
   static {
     AprilTagFieldLayout temp;
     try {

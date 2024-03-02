@@ -18,8 +18,8 @@ import com.pathplanner.lib.util.PIDConstants;
 import com.pathplanner.lib.util.PathPlannerLogging;
 import com.pathplanner.lib.util.ReplanningConfig;
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
@@ -29,8 +29,6 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.math.numbers.N1;
-import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
@@ -39,10 +37,8 @@ import frc.robot.G;
 import frc.robot.OI;
 import frc.robot.subsystems.StateMachineSubsystemBase;
 import frc.robot.subsystems.drive.Module.Mode;
-import frc.robot.util.PoseEstimator;
+import frc.robot.subsystems.vision.Vision.VisionUpdate;
 import frc.robot.util.Util;
-
-import java.util.List;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import org.littletonrobotics.junction.AutoLogOutput;
@@ -61,8 +57,6 @@ public class Drive extends StateMachineSubsystemBase {
   // TODO: tune all this
   // -- VISION CONSTANTS --
 
-  public static final Matrix<N3,N1> odometryStdDevs = VecBuilder.fill(0.003, 0.003, 0.0002);
-
   // maximum distance on high fps, low res before we switch the camera to high res lower fps
   public static final double MAX_DISTANCE = 3.0;
 
@@ -73,7 +67,7 @@ public class Drive extends StateMachineSubsystemBase {
   public static final double CUTOFF_DISTANCE = 7.0;
 
   // ratio for the distance scaling on the standard deviation
-  private static final double APRILTAG_COEFFICIENT = 0.01; // NEEDS TO BE TUNED
+  private static final double APRILTAG_COEFFICIENT = 0.001; // NEEDS TO BE TUNED
 
   public static final Lock odometryLock = new ReentrantLock();
 
@@ -147,9 +141,10 @@ public class Drive extends StateMachineSubsystemBase {
           Constants.globalDelta_sec);
 
   private SwerveDriveKinematics kinematics = new SwerveDriveKinematics(getModuleTranslations());
-  private PoseEstimator estimator;
+  // private BetterPoseEstimator poseEstimator;
+  private SwerveDrivePoseEstimator poseEstimator;
   private double autolockSetpoint_r = 0;
-  private Pose2d pose;
+  private Pose2d pose = new Pose2d();
   private Rotation2d lastGyroRotation = new Rotation2d();
   private ChassisSpeeds chassisSpeeds = new ChassisSpeeds(0, 0, 0);
 
@@ -246,9 +241,17 @@ public class Drive extends StateMachineSubsystemBase {
         };
     setCurrentState(DISABLED);
 
-    resetPose();
+    poseEstimator =
+        new SwerveDrivePoseEstimator(
+            kinematics,
+            pose.getRotation(),
+            getModulePositions(),
+            this.pose,
+            VecBuilder.fill(0.1, 0.1, 0.05),
+            VecBuilder.fill(0.5, 0.5, 0.5));
+    ; // TODO: TUNE STANDARD DEVIATIONS
 
-    estimator = new PoseEstimator(odometryStdDevs);
+    resetPose();
   }
 
   @Override
@@ -306,13 +309,14 @@ public class Drive extends StateMachineSubsystemBase {
         Rotation2d gyroRotation = gyroInputs.odometryYawPositions[deltaIndex];
         twist = new Twist2d(twist.dx, twist.dy, gyroRotation.minus(lastGyroRotation).getRadians());
         lastGyroRotation = gyroRotation;
+        poseEstimator.updateWithTime(Timer.getFPGATimestamp(), gyroRotation, wheelDeltas);
       }
       // Apply the twist (change since last sample) to the current pose
       pose = pose.exp(twist);
-      estimator.addDriveData(Timer.getFPGATimestamp(), twist);
     }
 
     // Be wary about using Timer.getFPGATimestamp in AK
+
     // TODO: figure out if needs to be moved into 250Hz processing loop
     chassisSpeeds = getChassisSpeedsFromModuleStates();
     Logger.recordOutput("Drive/Speeds", chassisSpeeds);
@@ -420,10 +424,6 @@ public class Drive extends StateMachineSubsystemBase {
     }
   }
 
-  public void addToPoseEstimator(Pose2d pose, double timestamp, double dist) {    
-    estimator.addVisionData(List.of(new PoseEstimator.TimestampedVisionUpdate(timestamp, pose, VecBuilder.fill(APRILTAG_COEFFICIENT * dist,APRILTAG_COEFFICIENT * dist,10)))); // 10 cuz gyro is good and apriltag rotations suck
-  }
-
   /** Returns the average drive velocity in radians/sec. */
   public double getCharacterizationVelocity() {
     double driveVelocityAverage = 0.0;
@@ -462,9 +462,19 @@ public class Drive extends StateMachineSubsystemBase {
     return pose;
   }
 
-  @AutoLogOutput(key = "Odometry/PoseEstimator")
+  @AutoLogOutput(key = "Odometry/Estimation")
   public Pose2d getPoseEstimatorPose() {
-    return estimator.getLatestPose();
+    return poseEstimator.getEstimatedPosition();
+  }
+
+  public void addToPoseEstimator(VisionUpdate update) {
+    poseEstimator.addVisionMeasurement(
+        update.pose(),
+        update.timestamp(),
+        VecBuilder.fill(
+            APRILTAG_COEFFICIENT * update.distance(),
+            APRILTAG_COEFFICIENT * update.distance(),
+            10));
   }
 
   /** Returns the current odometry rotation. */
@@ -476,6 +486,7 @@ public class Drive extends StateMachineSubsystemBase {
   /** Resets the current odometry pose. */
   public void hardSetPose(Pose2d pose) {
     this.pose = pose;
+    this.poseEstimator.resetPosition(lastGyroRotation, getModulePositions(), pose);
   }
 
   /** Returns the maximum linear speed in meters per sec. */
