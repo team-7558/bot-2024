@@ -22,7 +22,6 @@ public class VisionIOPhoton implements ApriltagIO {
   public VisionIOPhoton(String camname, Transform3d camToRobot) {
     this.camera = new PhotonCamera(camname);
     thread = new VisionProcessingThread(this);
-    thread.start();
 
     // this is a listener for any changes on the photonvision networktable. might need to change
     // this later. this is async

@@ -65,6 +65,8 @@ public class Drive extends StateMachineSubsystemBase {
   // TODO: tune all this
   // -- VISION CONSTANTS --
 
+  // public static final double POSE_DIFFERENCE = 1.0;
+
   public static final Matrix<N3, N1> odometryStdDevs = VecBuilder.fill(0.005, 0.005, 0.001);
 
   // maximum distance on high fps, low res before we switch the camera to high res lower fps
@@ -77,7 +79,7 @@ public class Drive extends StateMachineSubsystemBase {
   public static final double CUTOFF_DISTANCE = 7.0;
 
   // ratio for the distance scaling on the standard deviation
-  private static final double APRILTAG_COEFFICIENT = 0.001; // NEEDS TO BE TUNED
+  private static final double APRILTAG_COEFFICIENT = 0.03; // NEEDS TO BE TUNED
 
   public static final Lock odometryLock = new ReentrantLock();
   public static final Queue<Double> timestampQueue = new ArrayBlockingQueue<>(100);
@@ -179,13 +181,13 @@ public class Drive extends StateMachineSubsystemBase {
 
     super("Drive");
     this.gyroIO = gyroIO;
-    modules[FL] = new Module(flModuleIO, FL, Mode.VOLTAGE);
-    modules[FR] = new Module(frModuleIO, FR, Mode.VOLTAGE);
-    modules[BL] = new Module(blModuleIO, BL, Mode.VOLTAGE);
-    modules[BR] = new Module(brModuleIO, BR, Mode.VOLTAGE);
+    modules[FL] = new Module(flModuleIO, FL, Mode.SETPOINT);
+    modules[FR] = new Module(frModuleIO, FR, Mode.SETPOINT);
+    modules[BL] = new Module(blModuleIO, BL, Mode.SETPOINT);
+    modules[BR] = new Module(brModuleIO, BR, Mode.SETPOINT);
 
     if (Constants.currentMode != Constants.Mode.SIM) {
-      PhoenixOdometryThread.getInstance().start();
+      PhoenixOdometryThread.getInstance();
     }
 
     // TEMP Pathfinding.setPathfinder(new LocalADStarAK());
@@ -511,6 +513,8 @@ public class Drive extends StateMachineSubsystemBase {
   }
 
   public void addToPoseEstimator(VisionUpdate update) {
+    // if (update.pose().getTranslation().getDistance(getPoseEstimatorPose().getTranslation())
+    //     > POSE_DIFFERENCE) return;
     OdometryState.getInstance()
         .addVisionObservation(
             new VisionObservation(

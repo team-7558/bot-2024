@@ -72,7 +72,7 @@ public class Vision extends SubsystemBase {
                   new Transform3d(
                       0.65,
                       -0.28,
-                      0,
+                      -0.3,
                       new Rotation3d(
                           Units.degreesToRadians(-10),
                           Units.degreesToRadians(-10),
@@ -83,10 +83,10 @@ public class Vision extends SubsystemBase {
                   new Transform3d(
                       0.65,
                       0.28,
-                      0,
+                      -0.3,
                       new Rotation3d(
                           Units.degreesToRadians(10),
-                          Units.degreesToRadians(10),
+                          Units.degreesToRadians(-10),
                           Units.degreesToRadians(-130))));
           // VisionIO cam1 =7
           //     new VisionIOPhoton("camera2", new Transform3d()); // TODO: update transform & name

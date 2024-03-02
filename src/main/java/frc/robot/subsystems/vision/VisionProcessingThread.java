@@ -3,6 +3,7 @@ package frc.robot.subsystems.vision;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.vision.Vision.VisionUpdate;
 import java.util.Optional;
+import org.littletonrobotics.junction.Logger;
 import org.photonvision.EstimatedRobotPose;
 import org.photonvision.targeting.PhotonPipelineResult;
 import org.photonvision.targeting.PhotonTrackedTarget;
@@ -16,6 +17,8 @@ public class VisionProcessingThread extends Thread {
 
   public VisionProcessingThread(VisionIOPhoton camera) {
     this.camera = camera;
+    setDaemon(true);
+    start();
   }
 
   @Override
@@ -27,6 +30,10 @@ public class VisionProcessingThread extends Thread {
           camera.poseEstimator.setReferencePose(Drive.getInstance().getPoseEstimatorPose());
           Optional<EstimatedRobotPose> poseOptional = camera.poseEstimator.update(latestResult);
           if (poseOptional.isPresent()) {
+            Logger.recordOutput(
+                "Vision/Ambiguity", latestResult.getBestTarget().getPoseAmbiguity());
+
+            // System.out.println("adding pose");
 
             EstimatedRobotPose estimatedPose = poseOptional.get();
 
@@ -39,7 +46,10 @@ public class VisionProcessingThread extends Thread {
                     .toPose2d()
                     .getTranslation()
                     .getDistance(Drive.getInstance().getPoseEstimatorPose().getTranslation());
-            double distance = distanceSums / latestResult.targets.size();
+            double distance =
+                (distanceSums / latestResult.targets.size())
+                    * (latestResult.getBestTarget().getPoseAmbiguity() + 1);
+            // Logger.recordOutput("Vision/TargetDist", distance);
 
             Drive.getInstance()
                 .addToPoseEstimator(

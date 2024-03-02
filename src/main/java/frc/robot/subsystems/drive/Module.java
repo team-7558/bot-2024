@@ -237,7 +237,8 @@ public class Module {
     SwerveModulePosition[] positions = new SwerveModulePosition[minOdometryPositions];
     for (int i = 0; i < minOdometryPositions; i++) {
       positions[i] =
-          new SwerveModulePosition(inputs.odometryDrivePos_r[i], inputs.odometryTurnPos_rot2d[i]);
+          new SwerveModulePosition(
+              inputs.odometryDrivePos_r[i] * RPS_TO_MPS, inputs.odometryTurnPos_rot2d[i]);
     }
     return positions;
   }

@@ -227,8 +227,8 @@ public class Shooter extends StateMachineSubsystemBase {
 
           @Override
           public void periodic() {
-            // queueSetpoints(constrainSetpoints(shooterPipeline(), false));
-            track();
+            queueSetpoints(constrainSetpoints(shooterPipeline(), false));
+            // track();
           }
 
           @Override
@@ -515,7 +515,7 @@ public class Shooter extends StateMachineSubsystemBase {
         delta.getX() * delta.getX() + delta.getY() * delta.getY() + delta.getZ() * delta.getZ();
     double dist = Math.sqrt(dist2);
 
-    double flywheel_rps = shotSpeedFromDistance.getInterpolatedValue(dist);
+    double flywheel_rps = 45; // shotSpeedFromDistance.getInterpolatedValue(dist);
 
     double theta =
         Math.IEEEremainder(Math.atan2(delta.getY(), delta.getX()) + Math.PI, 2 * Math.PI);
@@ -536,9 +536,9 @@ public class Shooter extends StateMachineSubsystemBase {
       s.feederVel_rps = 0;
       s.flywheel_rps = Util.limit(s.flywheel_rps, FLYWHEEL_MIN_VEL_rps, FLYWHEEL_MAX_VEL_rps);
       s.pivotPos_r = Util.limit(s.pivotPos_r, PIVOT_MIN_POS_r, PIVOT_MAX_POS_r);
-      s.turretPos_r =
-          Util.limit(
-              s.turretPos_r, turretConstraintsFromPivotPos.getInterpolatedValue(s.pivotPos_r));
+      s.turretPos_r = Util.limit(s.turretPos_r, -15, 15);
+      // Util.limit(
+      //     s.turretPos_r, turretConstraintsFromPivotPos.getInterpolatedValue(s.pivotPos_r));
     }
     return s;
   }
