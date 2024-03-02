@@ -122,7 +122,7 @@ public class Drive extends StateMachineSubsystemBase {
     return instance;
   }
 
-  public final State DISABLED, SHOOTING, PATHING, STRAFE_N_TURN, STRAFE_AUTOLOCK;
+  public final State DISABLED, SHOOTING, PATHING, STRAFE_N_TURN, STRAFE_AUTOLOCK, STRAFE_AUTOLOCK_NEW;
 
   // IO
   private final GyroIO gyroIO;
@@ -141,7 +141,7 @@ public class Drive extends StateMachineSubsystemBase {
 
   private SwerveDriveKinematics kinematics = new SwerveDriveKinematics(getModuleTranslations());
   private SwerveDrivePoseEstimator poseEstimator;
-  private double autolockSetpoint_r = 0;
+  private double autolockSetpoint_r = 0, intermediaryAutolockSetpoint_r = 0;
   private Pose2d pose;
   private Rotation2d lastGyroRotation = new Rotation2d();
   private ChassisSpeeds chassisSpeeds = new ChassisSpeeds(0, 0, 0);
@@ -226,10 +226,33 @@ public class Drive extends StateMachineSubsystemBase {
 
             double x_ = -OI.DR.getLeftY();
             double y_ = -OI.DR.getLeftX();
+            intermediaryAutolockSetpoint_r = autolockSetpoint_r;
+            double err =
+                Math.IEEEremainder(
+                    getPose().getRotation().getRotations() - intermediaryAutolockSetpoint_r, 1.0);
+            Logger.recordOutput("Drive/Autolock Heading Error", err);
+            double con = Util.inRange(err, 0.1) ? 3.5 * err : 2 * err;
+            con = Util.limit(con, 0.6);
+            Logger.recordOutput("Drive/Autolock Heading Output", con);
+            drive(x_, y_, -con, throttle);
+          }
+        };
+
+    STRAFE_AUTOLOCK_NEW =
+        new State("STRAFE AUTOLOCK NEW") {
+          @Override
+          public void periodic() {
+            double throttle = 1.0;
+            throttle = Util.lerp(1, 0.4, OI.DR.getRightTriggerAxis() * OI.DR.getRightTriggerAxis());
+
+            double x_ = -OI.DR.getLeftY();
+            double y_ = -OI.DR.getLeftX();
 
             double err =
                 Math.IEEEremainder(
-                    getPose().getRotation().getRotations() - autolockSetpoint_r, 1.0);
+                    getPose().getRotation().getRotations() - intermediaryAutolockSetpoint_r, 1.0);
+
+            
             Logger.recordOutput("Drive/Autolock Heading Error", err);
             double con = Util.inRange(err, 0.1) ? 3.5 * err : 2 * err;
             con = Util.limit(con, 0.6);
