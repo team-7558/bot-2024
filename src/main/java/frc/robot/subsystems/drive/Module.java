@@ -230,4 +230,15 @@ public class Module {
   public double getCharacterizationVelocity() {
     return Units.rotationsToRadians(inputs.driveVel_mps);
   }
+
+  public SwerveModulePosition[] getModulePositions() {
+    int minOdometryPositions =
+        Math.min(inputs.odometryDrivePos_r.length, inputs.odometryTurnPos_rot2d.length);
+    SwerveModulePosition[] positions = new SwerveModulePosition[minOdometryPositions];
+    for (int i = 0; i < minOdometryPositions; i++) {
+      positions[i] =
+          new SwerveModulePosition(inputs.odometryDrivePos_r[i], inputs.odometryTurnPos_rot2d[i]);
+    }
+    return positions;
+  }
 }

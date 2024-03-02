@@ -30,7 +30,6 @@ public interface ModuleIO {
     public double turnVolts_V = 0.0;
     public double[] turnCurrent_A = new double[] {};
 
-    public double[] odometryTimestamps = new double[] {};
     public double[] odometryDrivePos_r = new double[] {};
     public Rotation2d[] odometryTurnPos_rot2d = new Rotation2d[] {};
   }
