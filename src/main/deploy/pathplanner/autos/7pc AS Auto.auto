@@ -2,8 +2,8 @@
   "version": 1.0,
   "startingPose": {
     "position": {
-      "x": 0.38878560286238717,
-      "y": 6.8296975196279845
+      "x": 0.5,
+      "y": 6.92
     },
     "rotation": 0
   },
@@ -14,25 +14,43 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Amp Side High Scoring #1"
+            "pathName": "7pc AS #1"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "Amp Side High Scoring #2"
+            "pathName": "7pc AS #2"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "Amp Side High Scoring #3"
+            "pathName": "7pc AS #3"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "Amp Side High Scoring #4"
+            "pathName": "7pc AS #4"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "7pc AS #5"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "7pc AS #6"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "7pc AS #7"
           }
         }
       ]

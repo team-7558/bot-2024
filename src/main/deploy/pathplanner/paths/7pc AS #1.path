@@ -3,25 +3,25 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 4.34318046672699,
-        "y": 4.903722819092893
+        "x": 0.5,
+        "y": 6.92
       },
       "prevControl": null,
       "nextControl": {
-        "x": 3.8104640601960074,
-        "y": 4.8422555414162405
+        "x": 2.172726206177712,
+        "y": 4.864644303492382
       },
       "isLocked": false,
-      "linkedName": "Waypoint #4 End"
+      "linkedName": null
     },
     {
       "anchor": {
-        "x": 2.7450312471340426,
-        "y": 5.85988047184081
+        "x": 7.79,
+        "y": 7.52
       },
       "prevControl": {
-        "x": 2.54697001906483,
-        "y": 5.586692571055691
+        "x": 7.227397227566823,
+        "y": 7.8250870702774895
       },
       "nextControl": null,
       "isLocked": false,
@@ -30,29 +30,29 @@
   ],
   "rotationTargets": [
     {
-      "waypointRelativePos": 0.55,
-      "rotationDegrees": 139.09995144315695,
-      "rotateFast": true
+      "waypointRelativePos": 0.3,
+      "rotationDegrees": 17.352288000001778,
+      "rotateFast": false
     }
   ],
   "constraintZones": [],
   "eventMarkers": [],
   "globalConstraints": {
-    "maxVelocity": 2.0,
-    "maxAcceleration": 2.0,
+    "maxVelocity": 4.0,
+    "maxAcceleration": 4.0,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 88.26429541107166,
+    "rotation": 0,
     "rotateFast": false
   },
   "reversed": false,
-  "folder": "High Scoring Auto Test",
+  "folder": "Kai Farmer",
   "previewStartingState": {
     "rotation": 0,
     "velocity": 0
   },
-  "useDefaultConstraints": true
+  "useDefaultConstraints": false
 }

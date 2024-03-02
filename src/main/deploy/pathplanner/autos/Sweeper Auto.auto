@@ -1,0 +1,43 @@
+{
+  "version": 1.0,
+  "startingPose": {
+    "position": {
+      "x": 1.44,
+      "y": 0.91
+    },
+    "rotation": 0
+  },
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Sweeper SS Starting"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Sweeper SS 5 Swept"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Sweeper SS 5 to Default"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Sweeper Default"
+          }
+        }
+      ]
+    }
+  },
+  "folder": null,
+  "choreoAuto": false
+}

@@ -1,0 +1,148 @@
+{
+  "version": 1.0,
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 0.504890460696063,
+        "y": 6.9184835873831485
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 2.178166353004919,
+        "y": 4.862744633975125
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 7.792177714139123,
+        "y": 7.519496969110411
+      },
+      "prevControl": {
+        "x": 7.22531282001,
+        "y": 7.82683335749367
+      },
+      "nextControl": {
+        "x": 7.880088422096007,
+        "y": 7.471834537085594
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 6.194028494546174,
+        "y": 6.460893853568073
+      },
+      "prevControl": {
+        "x": 7.006762499381904,
+        "y": 6.9936102600990555
+      },
+      "nextControl": {
+        "x": 6.132508181727717,
+        "y": 6.420569614913958
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 7.792177714139123,
+        "y": 5.7847537991249025
+      },
+      "prevControl": {
+        "x": 6.751074477705903,
+        "y": 6.240236465064437
+      },
+      "nextControl": {
+        "x": 7.837985580884232,
+        "y": 5.764712857423917
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 6.194028494546174,
+        "y": 6.460893853568073
+      },
+      "prevControl": {
+        "x": 6.469166479041249,
+        "y": 6.41712190148931
+      },
+      "nextControl": {
+        "x": 5.893521803682543,
+        "y": 6.508701736205469
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 7.655583763746563,
+        "y": 4.138796696894558
+      },
+      "prevControl": {
+        "x": 6.394642834351905,
+        "y": 6.048221532835047
+      },
+      "nextControl": {
+        "x": 7.894623176933542,
+        "y": 3.776822728354275
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 4.742185097496275,
+        "y": 3.854683633374176
+      },
+      "prevControl": {
+        "x": 5.065551403420963,
+        "y": 4.08731813943301
+      },
+      "nextControl": {
+        "x": 3.864293424091253,
+        "y": 3.223115371394205
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 2.1711208880103423,
+        "y": 4.350517320003026
+      },
+      "prevControl": {
+        "x": 2.1425535079049434,
+        "y": 2.440598318156914
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": null
+    }
+  ],
+  "rotationTargets": [],
+  "constraintZones": [],
+  "eventMarkers": [],
+  "globalConstraints": {
+    "maxVelocity": 4.0,
+    "maxAcceleration": 4.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": -39.80557109226522,
+    "rotateFast": false
+  },
+  "reversed": false,
+  "folder": "Kai Farmer",
+  "previewStartingState": {
+    "rotation": 0,
+    "velocity": 0
+  },
+  "useDefaultConstraints": false
+}

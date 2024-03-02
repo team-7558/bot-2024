@@ -3,72 +3,66 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 6.173539401987291,
-        "y": 6.256002927979233
+        "x": 1.440559020885097,
+        "y": 0.9083497701105212
       },
       "prevControl": null,
       "nextControl": {
-        "x": 7.70339164638396,
-        "y": 6.440404761009188
+        "x": 2.4405590208850976,
+        "y": 0.9083497701105212
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 7.8536449918157745,
-        "y": 4.125137301855303
+        "x": 7.74,
+        "y": 0.76
       },
       "prevControl": {
-        "x": 7.7785183190998675,
-        "y": 4.951530701730288
+        "x": 6.748846397745205,
+        "y": 0.76
       },
       "nextControl": {
-        "x": 7.907663269761858,
-        "y": 3.5309362444483816
+        "x": 7.79,
+        "y": 0.76
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 4.34318046672699,
-        "y": 4.903722819092893
+        "x": 7.7648589240606105,
+        "y": 4.241242159688978
       },
       "prevControl": {
-        "x": 6.323792747419109,
-        "y": 4.002202746501999
+        "x": 7.785348016619495,
+        "y": 2.479180199624958
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "Waypoint #4 End"
+      "linkedName": null
     }
   ],
-  "rotationTargets": [
-    {
-      "waypointRelativePos": 0.8,
-      "rotationDegrees": -24.532360703841146,
-      "rotateFast": false
-    }
-  ],
+  "rotationTargets": [],
   "constraintZones": [],
   "eventMarkers": [],
   "globalConstraints": {
-    "maxVelocity": 2.0,
-    "maxAcceleration": 2.0,
+    "maxVelocity": 4.0,
+    "maxAcceleration": 4.0,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 0,
+    "rotation": 18.43494882292192,
     "rotateFast": false
   },
   "reversed": false,
-  "folder": "High Scoring Auto Test",
+  "folder": "Sweeper",
   "previewStartingState": {
     "rotation": 0,
     "velocity": 0
   },
-  "useDefaultConstraints": true
+  "useDefaultConstraints": false
 }
