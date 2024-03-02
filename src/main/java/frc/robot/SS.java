@@ -1,6 +1,7 @@
 package frc.robot;
 
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.Timer;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.intake.Intake;
@@ -254,12 +255,13 @@ public class SS {
           queueState(State.IDLE);
         }
         break;
-      case SHOOTING:
+      case TRACKING:
         if (first) {
           shooter.setCurrentState(shooter.TRACKING);
         }
-
-        if (shooter.isAtSetpoints() && after(0.2)) {
+        break;
+      case SHOOTING:
+        if (shooter.isAtSetpoints()) {
           hasGamePiece = false;
           intake.setCurrentState(intake.SHOOTER_SIDE);
           shooter.setCurrentState(shooter.SHOOTING);
@@ -276,6 +278,14 @@ public class SS {
     }
 
     stateInfoLog();
+
+    if (currState == State.INTAKING && hasGamePiece) {
+      OI.DR.setRumble(RumbleType.kLeftRumble, 0.3);
+    } else if (currState == State.TRACKING && shooter.isAtSetpoints()) {
+      OI.DR.setRumble(RumbleType.kBothRumble, 0.6);
+    } else {
+      OI.DR.setRumble(RumbleType.kBothRumble, 0);
+    }
   }
 
   // TODO: replace example based on what you wanna do, ex. shoot(double x, double y)
@@ -286,8 +296,10 @@ public class SS {
 
   public void idle() {
     if (currState != State.IDLE && currState != State.BOOT) {
-      if (currState == State.CLIMBING_UP || currState == State.CLIMBING_DOWN) {
+      if (currState == State.CLIMBING_UP) {
         queueState(State.CLIMBING_DOWN);
+      } else if (currState == State.CLIMBING_DOWN) {
+        // queueState(State.CLIMBING_DOWN);
       } else if (!elevator.atHeight(Elevator.MIN_HEIGHT_M, 0.01)) {
         queueState(State.RESETTING_ELEVATOR);
       } else {
@@ -342,68 +354,68 @@ public class SS {
   public void shootAmp() {
     if (currState != State.BOOT) {
       shooter.queueSetpoints(new Setpoints(13.5, 0, 0, 0.12));
-      queueState(State.SHOOTING);
+      queueState(State.TRACKING);
     }
   }
 
   public void shootPreset1() {
     if (currState != State.BOOT) {
       shooter.queueSetpoints(new Setpoints(30, 0, 0, 0.145));
-      queueState(State.SHOOTING);
+      queueState(State.TRACKING);
     }
   }
 
   public void shootPreset2() {
     if (currState != State.BOOT) {
       shooter.queueSetpoints(new Setpoints(40, 0, 0.09, 0.105));
-      queueState(State.SHOOTING);
+      queueState(State.TRACKING);
     }
   }
 
   public void shootPreset3() {
     if (currState != State.BOOT) {
-      shooter.queueSetpoints(new Setpoints(40, -0.138, 0.08));
-      queueState(State.SHOOTING);
+      shooter.queueSetpoints(new Setpoints(40, 0, -0.134, 0.102));
+      queueState(State.TRACKING);
     }
   }
 
   public void shootPreset4() {
     if (currState != State.BOOT) {
       shooter.queueSetpoints(new Setpoints(40, 0, 0, 0.1));
-      queueState(State.SHOOTING);
+      queueState(State.TRACKING);
     }
   }
 
   public void shootPreset5() {
     if (currState != State.BOOT) {
       shooter.queueSetpoints(new Setpoints(45, 0, -0.023, Units.degreesToRotations(40)));
-      queueState(State.SHOOTING);
+      queueState(State.TRACKING);
     }
   }
 
   public void shootPreset6() {
     if (currState != State.BOOT) {
       shooter.queueSetpoints(new Setpoints(45, 0, -0.029, 0.065));
-      queueState(State.SHOOTING);
+      queueState(State.TRACKING);
     }
   }
 
   public void shootPreset7() {
     if (currState != State.BOOT) {
-      shooter.queueSetpoints(new Setpoints(45, 0, -0.084, 0.075));
-      queueState(State.SHOOTING);
+      shooter.queueSetpoints(new Setpoints(45, 0, -0.080, 0.078));
+      queueState(State.TRACKING);
     }
   }
 
   public void shootPreset8() {
     if (currState != State.BOOT) {
-      shooter.queueSetpoints(new Setpoints(30, 0, 0.08, 0.105));
-      queueState(State.SHOOTING);
+      shooter.queueSetpoints(new Setpoints(28, 0, 0.075, 0.135));
+      queueState(State.TRACKING);
     }
   }
 
   public void climbUp() {
-    if (currState != State.BOOT) {
+    if (currState != State.BOOT && currState != State.CLIMBING_UP) {
       queueState(State.CLIMBING_UP);
     }
   }

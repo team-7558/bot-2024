@@ -227,7 +227,7 @@ public class Drive extends StateMachineSubsystemBase {
             double y_ = -OI.DR.getLeftX();
             double w_ = -Util.sqInput(OI.DR.getRightX());
 
-            runVelocity(drive(x_, y_, w_ * 0.5, throttle));
+            runVelocity(drive(x_, y_, w_ * 0.45, throttle));
           }
         };
 

@@ -204,17 +204,17 @@ public class Shooter extends StateMachineSubsystemBase {
     BEING_FED =
         new State("BEING_FED") {
           @Override
-          public void init() {
-            queueSetpoints(new Setpoints(0, 8, 0, 0));
-          }
+          public void init() {}
 
           @Override
           public void periodic() {
             // queueSetpoints(constrainSetpoints(shooterPipeline(), !inputs.beamBreakActivated));
-            if (feedDebouncer.calculate(inputs.beamBreakActivated)) {
+            if (inputs.beamBreakActivated) {
               setCurrentState(IDLE);
+            } else {
+              queueSetpoints(new Setpoints(0, 8, 0, 0));
+              track();
             }
-            track();
           }
         };
 
