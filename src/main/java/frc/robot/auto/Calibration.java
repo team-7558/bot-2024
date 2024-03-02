@@ -1,23 +1,19 @@
 package frc.robot.auto;
 
-public class Calibration extends AltAuto  {
+public class Calibration extends AltAuto {
 
-    public Calibration() {
-        super("Calibration");
+  public Calibration() {
+    super("Calibration", true);
 
-        trajstack.appendChain().append("Calibration Real", false);
-    
-        trajstack.setActiveIdx(0);
-        trajstack.generate();
-    }
+    trajstack.appendChain().append("Calibration Real", false);
 
-    @Override
-    public void onInit() {
+    trajstack.setActiveIdx(0);
+    trajstack.generate();
+  }
 
-    }
+  @Override
+  public void onInit() {}
 
-    @Override
-    public void onExecute() {
-    }
-    
+  @Override
+  public void onExecute() {}
 }

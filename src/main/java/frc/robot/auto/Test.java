@@ -5,7 +5,7 @@ import frc.robot.SS.State;
 public class Test extends AltAuto {
 
   public Test() {
-    super("Test");
+    super("Test", true);
 
     trajstack.appendChain().append("3m Fwd", false);
 

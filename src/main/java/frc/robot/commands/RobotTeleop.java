@@ -64,9 +64,9 @@ public class RobotTeleop extends Command {
     if (!ss.elevatorIsDisabled()) {
       if (OI.DR.getPOV() == 90) {
         ss.queueState(State.BOOT);
-      } else if (OI.OP.getXButtonPressed()) {
+      } else if (OI.XK.getPressed(5, 0)) {
         ss.climbUp();
-      } else if (OI.OP.getXButtonReleased()) {
+      } else if (OI.XK.getReleased(5, 0)) {
         ss.climbDown();
       } else if (OI.DR.getRightBumperPressed()) {
         ss.amp();
@@ -83,9 +83,9 @@ public class RobotTeleop extends Command {
         ss.idle();
       }
 
-      if (OI.OP.getAButtonPressed()) {
+      if (OI.XK.getPressed(6, 0)) {
         ss.spit();
-      } else if (OI.OP.getAButtonReleased()) {
+      } else if (OI.XK.getReleased(6, 0)) {
         ss.idle();
       }
     }
@@ -95,22 +95,28 @@ public class RobotTeleop extends Command {
     }
 
     if (!ss.shooterIsDisabled()) {
-      if (OI.OP.getStartButtonPressed()) {
-        ss.shootPreset1();
-      } else if (OI.OP.getStartButtonReleased()) {
-        ss.idle();
-      }
-
-      if (OI.OP.getBackButtonPressed()) {
-        ss.shootPreset2();
-      } else if (OI.OP.getBackButtonReleased()) {
-        ss.idle();
-      }
-
-      if (OI.OP.getYButtonPressed()) {
+      if (OI.XK.get(7, 0)) {
         ss.chamber();
-      } else if (OI.OP.getYButtonReleased()) {
-        ss.idle();
+      } else if (OI.XK.get(7, 1)) {
+        ss.shootAmp();
+      } else if (OI.XK.get(8, 0)) {
+        ss.shootPreset1();
+      } else if (OI.XK.get(8, 1)) {
+        ss.shootPreset2();
+      } else if (OI.XK.get(8, 2)) {
+        ss.shootPreset3();
+      } else if (OI.XK.get(8, 3)) {
+        ss.shootPreset4();
+      } else if (OI.XK.get(8, 4)) {
+        ss.shootPreset5();
+      } else if (OI.XK.get(8, 5)) {
+        ss.shootPreset6();
+      } else if (OI.XK.get(8, 6)) {
+        ss.shootPreset7();
+      } else if (OI.XK.get(8, 7)) {
+        ss.shootPreset8();
+      } else {
+        ss.idleFromShooting();
       }
       // if (OI.DR.getLeftTriggerAxis() > 0) {
       //   shooter.setCurrentState(shooter.MANUAL);

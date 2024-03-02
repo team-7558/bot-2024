@@ -49,6 +49,7 @@ public class Intake extends StateMachineSubsystemBase {
       SHOOTER_SIDE,
       AMP_SIDE_1,
       AMP_SIDE_2,
+      AMP_NEW,
       SPITTING;
 
   private final IntakeIO io;
@@ -93,19 +94,23 @@ public class Intake extends StateMachineSubsystemBase {
           @Override
           public void init() {
             directionSpeed = 0;
+            intakeSpeed = 0;
           }
 
           @Override
           public void periodic() {
             if (beamBroken()) stop();
-            else intakeSpeed = -0.1;
+            else {
+              intakeSpeed = -0.1;
+              directionSpeed = -0.1;
+            }
           }
         };
     INTAKING =
         new State("INTAKING") {
           @Override
           public void periodic() {
-            intakeSpeed = beamBroken() ? 0.3 : 0.80;
+            intakeSpeed = beamBroken() ? 0.3 : 0.50;
             directionSpeed = 0;
           }
         };
@@ -124,6 +129,14 @@ public class Intake extends StateMachineSubsystemBase {
           public void init() {
             directionSpeed = 0.7;
             intakeSpeed = 0.0;
+          }
+        };
+    AMP_NEW =
+        new State("AMP_SIDE_2") {
+          @Override
+          public void init() {
+            directionSpeed = 0.43;
+            intakeSpeed = 0.43;
           }
         };
     SHOOTER_SIDE =

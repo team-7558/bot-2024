@@ -1,6 +1,6 @@
 {
-  "robotWidth": 0.609,
-  "robotLength": 0.737,
+  "robotWidth": 0.762,
+  "robotLength": 0.889,
   "holonomicMode": true,
   "pathFolders": [
     "Amp Side Autos",
