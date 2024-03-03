@@ -18,7 +18,7 @@ import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.DutyCycleOut;
-import com.ctre.phoenix6.controls.VelocityVoltage;
+import com.ctre.phoenix6.controls.MotionMagicVelocityVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
@@ -27,7 +27,14 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DigitalInput;
 
 public class IntakeIOTalonFX implements IntakeIO {
-  private static final double GEAR_RATIO = 1;
+  private static final double TOP_GEAR_RATIO = 16.0 / 24.0;
+  private static final double BOTTOM_GEAR_RATIO = 24.0 / 36.0;
+
+  private static final double TOP_RADIUS_M = Units.inchesToMeters(0.605);
+  private static final double BOTTOM_RADIUS_M = Units.inchesToMeters(0.605);
+
+  private static final double TOP_RPS_TO_MPS = TOP_RADIUS_M * Math.PI * 2.0;
+  private static final double BOTTOM_RPS_TO_MPS = BOTTOM_RADIUS_M * Math.PI * 2.0;
 
   private final TalonFX topMotor = new TalonFX(3); // Not gunna be 0 1 (cameron told me to add that)
   private final TalonFX bottomMotor = new TalonFX(2);
@@ -43,10 +50,12 @@ public class IntakeIOTalonFX implements IntakeIO {
 
   private final DutyCycleOut bottomDCOut = new DutyCycleOut(0);
   private final VoltageOut bottomVOut = new VoltageOut(0);
-  private final VelocityVoltage bottomVelOut = new VelocityVoltage(0);
+  private final MotionMagicVelocityVoltage bottomVelOut =
+      new MotionMagicVelocityVoltage(0, 0, true, 0, 0, false, false, false);
   private final DutyCycleOut topDCOut = new DutyCycleOut(0);
   private final VoltageOut topVOut = new VoltageOut(0);
-  private final VelocityVoltage topVelOut = new VelocityVoltage(0);
+  private final MotionMagicVelocityVoltage topVelOut =
+      new MotionMagicVelocityVoltage(0, 0, true, 0, 0, false, false, false);
 
   private boolean isBraked = true;
 
@@ -56,12 +65,35 @@ public class IntakeIOTalonFX implements IntakeIO {
     bottomconfig.CurrentLimits.SupplyCurrentLimitEnable = true;
     bottomconfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
     bottomconfig.OpenLoopRamps.DutyCycleOpenLoopRampPeriod = 0.1;
+    bottomconfig.ClosedLoopRamps.VoltageClosedLoopRampPeriod = 0.1;
+    bottomconfig.Feedback.SensorToMechanismRatio = BOTTOM_GEAR_RATIO;
+
+    bottomconfig.MotionMagic.MotionMagicCruiseVelocity = 0.5;
+    bottomconfig.MotionMagic.MotionMagicAcceleration = 0.5;
+    bottomconfig.MotionMagic.MotionMagicJerk = 0;
+
+    bottomconfig.Slot0.kV = 0;
+    bottomconfig.Slot0.kA = 0;
+    bottomconfig.Slot0.kP = 0;
+    bottomconfig.Slot0.kD = 0;
     bottomMotor.getConfigurator().apply(bottomconfig);
+
     var topconfig = new TalonFXConfiguration();
     topconfig.CurrentLimits.SupplyCurrentLimit = 30.0;
     topconfig.CurrentLimits.SupplyCurrentLimitEnable = true;
-    topconfig.MotorOutput.NeutralMode = NeutralModeValue.Coast;
+    topconfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
     topconfig.OpenLoopRamps.DutyCycleOpenLoopRampPeriod = 0.1;
+    topconfig.ClosedLoopRamps.VoltageClosedLoopRampPeriod = 0.1;
+    topconfig.Feedback.SensorToMechanismRatio = TOP_GEAR_RATIO;
+
+    topconfig.MotionMagic.MotionMagicCruiseVelocity = 0.5;
+    topconfig.MotionMagic.MotionMagicAcceleration = 0.5;
+    topconfig.MotionMagic.MotionMagicJerk = 0;
+
+    topconfig.Slot0.kV = 0;
+    topconfig.Slot0.kA = 0;
+    topconfig.Slot0.kP = 0;
+    topconfig.Slot0.kD = 0;
     topMotor.getConfigurator().apply(topconfig);
 
     BaseStatusSignal.setUpdateFrequencyForAll(
@@ -86,14 +118,12 @@ public class IntakeIOTalonFX implements IntakeIO {
         topAppliedVolts,
         topCurrent);
     inputs.beamBreakActivated = beambreak.get();
-    inputs.intakeVelocityRadPerSec =
-        Units.rotationsToRadians(bottomVelocity.getValueAsDouble()) / GEAR_RATIO;
+    inputs.intakeVelocityMPS = bottomVelocity.getValueAsDouble() * BOTTOM_RPS_TO_MPS;
     inputs.intakeAppliedVolts = bottomAppliedVolts.getValueAsDouble();
     inputs.currentAmps =
         new double[] {bottomCurrent.getValueAsDouble(), topCurrent.getValueAsDouble()};
 
-    inputs.directionVelocityRadPerSec =
-        Units.rotationsToRadians(topVelocity.getValueAsDouble()) / GEAR_RATIO;
+    inputs.directionVelocityMPS = topVelocity.getValueAsDouble() * TOP_RPS_TO_MPS;
     inputs.directionAppliedVolts = topAppliedVolts.getValueAsDouble();
   }
 
@@ -108,8 +138,8 @@ public class IntakeIOTalonFX implements IntakeIO {
   }
 
   @Override
-  public void setIntakeVelocity(double velocityRadPerSec) {
-    bottomMotor.setControl(bottomVelOut.withVelocity(Units.radiansToRotations(velocityRadPerSec)));
+  public void setIntakeVelocity(double velMPS) {
+    bottomMotor.setControl(bottomVelOut.withVelocity(velMPS / BOTTOM_RPS_TO_MPS));
   }
 
   @Override
@@ -123,8 +153,8 @@ public class IntakeIOTalonFX implements IntakeIO {
   }
 
   @Override
-  public void setDirectionVelocity(double velocityRadPerSec) {
-    topMotor.setControl(topVelOut.withVelocity(Units.radiansToRotations(velocityRadPerSec)));
+  public void setDirectionVelocity(double velMPS) {
+    topMotor.setControl(topVelOut.withVelocity(velMPS / TOP_RPS_TO_MPS));
   }
 
   @Override
@@ -139,5 +169,6 @@ public class IntakeIOTalonFX implements IntakeIO {
     cfg.Inverted = InvertedValue.CounterClockwise_Positive;
     cfg.NeutralMode = isBraked ? NeutralModeValue.Coast : NeutralModeValue.Brake;
     bottomMotor.getConfigurator().apply(cfg);
+    topMotor.getConfigurator().apply(cfg);
   }
 }

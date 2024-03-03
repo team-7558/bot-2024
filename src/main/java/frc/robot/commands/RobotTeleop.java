@@ -44,7 +44,10 @@ public class RobotTeleop extends Command {
       // slow mode
       // x stance while shooting
       if (OI.DR.getPOV() == 180) {
-        drive.hardSetPose(new Pose2d(drive.getPose().getTranslation(), Rotation2d.fromRotations(G.isRedAlliance() ? 0.5 : 0)));
+        drive.hardSetPose(
+            new Pose2d(
+                drive.getPose().getTranslation(),
+                Rotation2d.fromRotations(G.isRedAlliance() ? 0.5 : 0)));
       } else if (OI.DR.getBButton()) {
         drive.setAutolockSetpoint(0.25);
         drive.setCurrentState(drive.STRAFE_AUTOLOCK);

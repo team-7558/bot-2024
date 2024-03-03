@@ -25,7 +25,6 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Filesystem;
 import frc.robot.Constants;
-import frc.robot.OI;
 import frc.robot.SS2d;
 import frc.robot.subsystems.StateMachineSubsystemBase;
 import frc.robot.subsystems.drive.Drive;
@@ -71,7 +70,7 @@ public class Shooter extends StateMachineSubsystemBase {
   private static final Pose3d TRAP_RIGHT_RED = new Pose3d(11.905, 4.498, 1.171, new Rotation3d());
   private static final Pose3d TRAP_BACK_RED = new Pose3d(11.220, 4.105, 1.171, new Rotation3d());
 
-  public static class Setpoints {
+  public static class Setpoints{
     private static double DEFAULT =
         -7558.0; // This way we can handle the behaviour of the setpoints specifically
 
@@ -156,12 +155,17 @@ public class Shooter extends StateMachineSubsystemBase {
   public enum TargetMode {
     SPEAKER,
     TRAP,
+    AMP,
+    CLEAR,
     CUSTOM
   }
 
   private TargetMode targetMode = TargetMode.SPEAKER;
 
   private Setpoints lastSetpoints, currSetpoints;
+
+  private double manualTurretVel = 0;
+  private double manualPivotVel = 0;
 
   // hoodangle at 1 rad because angle of hood at max height is around 60 degrees, turret is 180
   // degrees turret so 90 seems like it would be ok
@@ -248,6 +252,7 @@ public class Shooter extends StateMachineSubsystemBase {
           @Override
           public void init() {
             queueSetpoints(new Setpoints(8));
+            ShotLogger.log();
           }
 
           @Override
@@ -298,8 +303,7 @@ public class Shooter extends StateMachineSubsystemBase {
 
           @Override
           public void periodic() {
-            io.setFeederVolts(OI.DR.getLeftTriggerAxis() * 0.4 * 12);
-            io.setFlywheelVolts(OI.DR.getRightTriggerAxis() * 0.6 * 12);
+            io.setPivotVolts(manualPivotVel);
           }
 
           @Override
@@ -351,6 +355,10 @@ public class Shooter extends StateMachineSubsystemBase {
     io.zero();
   }
 
+  public TargetMode getTargetMode(){
+    return targetMode;
+  }
+
   public void setTargetMode(TargetMode mode) {
     targetMode = mode;
   }
@@ -360,6 +368,10 @@ public class Shooter extends StateMachineSubsystemBase {
     io.setFlywheelVel(currSetpoints.flywheel_rps);
     io.setTurretPos(currSetpoints.turretPos_r);
     io.setPivotPos(currSetpoints.pivotPos_r);
+  }
+
+  public Setpoints getMeasuredSetpoints(){
+    return new Setpoints(inputs.flywheelVelRPS, inputs.feederVelRPS, inputs.turretPosR, inputs.pivotPosR);
   }
 
   public void queueSetpoints(Setpoints s) {
@@ -622,5 +634,13 @@ public class Shooter extends StateMachineSubsystemBase {
     Logger.recordOutput("Shooter/PositionAdjustedTarget", trap);
     Logger.recordOutput("Shooter/VelocityAdjustedTarget", velocityAdjustedTrap);
     return newSetpoints;
+  }
+
+  public void setManualTurretVel(double vel_rps) {
+    manualTurretVel = vel_rps;
+  }
+
+  public void setManualPivotVel(double vel_rps) {
+    manualPivotVel = vel_rps;
   }
 }

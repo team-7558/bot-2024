@@ -39,7 +39,7 @@ public class ShooterBringup extends Command {
   public void initialize() {
     drive.setCurrentState(drive.DISABLED);
     intake.setCurrentState(intake.IDLE);
-    shooter.setCurrentState(shooter.ZEROING);
+    shooter.setCurrentState(shooter.IDLE);
 
     t.reset();
     t.start();
@@ -56,7 +56,13 @@ public class ShooterBringup extends Command {
       double s = 0.05 * Math.sin(t.get() * 0.5);
       double c = 0.025 * Math.cos(t.get() * 1.5);
 
-      if (OI.DR.getAButton()) {
+      if (OI.DR.getPOV() == 0) {
+        shooter.setManualPivotVel(0.5);
+        shooter.setCurrentState(shooter.MANUAL);
+      } else if (OI.DR.getPOV() == 180) {
+        shooter.setManualPivotVel(-0.25);
+        shooter.setCurrentState(shooter.MANUAL);
+      } else if (OI.DR.getAButton()) {
         shooter.queueSetpoints(new Setpoints(40, 0.0, Shooter.PIVOT_MIN_POS_r));
         // if (shooter.isTurretAtSetpoint(0.03)) {
         //   shooter.queueSetpoints(new Setpoints(40, 0, 0.075));

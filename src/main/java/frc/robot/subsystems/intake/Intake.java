@@ -4,7 +4,6 @@
 
 package frc.robot.subsystems.intake;
 
-import edu.wpi.first.math.util.Units;
 import frc.robot.Constants;
 import frc.robot.SS2d;
 import frc.robot.subsystems.StateMachineSubsystemBase;
@@ -155,18 +154,10 @@ public class Intake extends StateMachineSubsystemBase {
   public void outputPeriodic() {
     io.setDirectionSpeed(directionSpeed);
     io.setIntakeSpeed(intakeSpeed);
-    SS2d.M.setIntakeMotors(inputs.intakeVelocityRadPerSec, inputs.directionVelocityRadPerSec);
+    SS2d.M.setIntakeMotors(inputs.intakeVelocityMPS, inputs.directionVelocityMPS);
     SS2d.S.setIntakeMotors(intakeSpeed, directionSpeed);
     Logger.recordOutput("Intake/TargetBottomSpeed", intakeSpeed);
     Logger.recordOutput("Intake/TargetTopSpeed", directionSpeed);
-  }
-
-  public double getIntakeVelocityRPM() {
-    return Units.radiansPerSecondToRotationsPerMinute(inputs.intakeVelocityRadPerSec);
-  }
-
-  public double getDirectionVelocityRPM() {
-    return Units.radiansPerSecondToRotationsPerMinute(inputs.directionVelocityRadPerSec);
   }
 
   public void runCharacterizationVolts(double volts) {
@@ -174,7 +165,7 @@ public class Intake extends StateMachineSubsystemBase {
   }
 
   public double getCharacterizationVelocity() {
-    return inputs.intakeVelocityRadPerSec;
+    return inputs.intakeVelocityMPS;
   }
 
   public void toggleBrake() {
