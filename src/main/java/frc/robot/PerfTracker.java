@@ -19,7 +19,7 @@ public class PerfTracker {
     size = 0;
   }
 
-  public static void start(String name) {
+  public static int start(String name) {
     int id = nameList.indexOf(name);
     if (id < 0) {
       id = size;
@@ -29,13 +29,10 @@ public class PerfTracker {
     } else {
       perfmap.set(id, Logger.getRealTimestamp());
     }
+    return id;
   }
 
-  public static void end(String name) {
-    int id = nameList.indexOf(name);
-    if (id < 0) {
-      System.err.println("Cant end a timer that didnt start: " + name);
-    }
+  public static void end(int id) {
     perfmap.set(id, Logger.getRealTimestamp() - perfmap.get(id));
   }
 

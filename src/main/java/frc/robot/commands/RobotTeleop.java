@@ -57,50 +57,27 @@ public class RobotTeleop extends Command {
         // strafe and turn if not other state
         drive.setCurrentState(drive.STRAFE_N_TURN);
       }
-
-      // if (OI.XK.get(0, 0)) {
-      //   drive.setModuleModes(Mode.VOLTAGE);
-      // } else if (OI.XK.get(0, 1)) {
-      //   drive.setModuleModes(Mode.SETPOINT);
-      // }
     }
 
-    if (!ss.elevatorIsDisabled()) {
-      if (OI.DR.getPOV() == 90) {
-        ss.queueState(State.BOOT);
-      } else if (OI.XK.getPressed(5, 0)) {
-        ss.climbUp();
-      } else if (OI.XK.getReleased(5, 0)) {
-        ss.climbDown();
-      } else if (OI.DR.getRightBumperPressed()) {
-        ss.amp();
-      } else if (OI.DR.getRightBumperReleased()) {
-        ss.idle();
-      }
-    }
-
-    if (!ss.intakeIsDisabled()) {
-
-      if (OI.DR.getLeftBumperPressed()) {
-        ss.intake();
-      } else if (OI.DR.getLeftBumperReleased()) {
-        ss.idle();
-      }
-
-      if (OI.XK.getPressed(6, 0)) {
-        ss.spit();
-      } else if (OI.XK.getReleased(6, 0)) {
-        ss.idle();
-      }
-    }
-
-    if (OI.DR.getPOV() == 270) {
+    if (OI.DR.getPOV() == 270 || OI.XK.get(0, 6)) {
       ss.clearGamePiece();
     }
 
-    if (!ss.shooterIsDisabled()) {
-      if (OI.XK.get(7, 0)) {
+    if (!ss.isDisabled()) {
+
+      if (OI.DR.getPOV() == 90 || OI.XK.get(0, 7)) {
+        ss.resetHomingFlags();
+        ss.queueState(State.BOOT);
+      } else if (OI.DR.getRightBumper()) {
+        ss.amp();
+      } else if (OI.XK.get(5, 0)) {
+        ss.climbUp();
+      } else if (OI.XK.get(7, 0)) {
         ss.chamber();
+      } else if (OI.XK.get(6, 0)) {
+        ss.spit();
+      } else if (OI.DR.getLeftTriggerAxis() > 0.05) {
+        ss.shoot();
       } else if (OI.XK.get(7, 1)) {
         ss.shootAmp();
       } else if (OI.XK.get(8, 0)) {
@@ -119,14 +96,11 @@ public class RobotTeleop extends Command {
         ss.shootPreset7();
       } else if (OI.XK.get(8, 7)) {
         ss.shootPreset8();
+      } else if (OI.DR.getLeftBumper()) {
+        ss.intake();
       } else {
-        ss.idleFromShooting();
+        ss.idle();
       }
-      // if (OI.DR.getLeftTriggerAxis() > 0) {
-      //   shooter.setCurrentState(shooter.MANUAL);
-      // } else {
-      //   shooter.setCurrentState(shooter.IDLE);
-      // }
     }
 
     SS2d.S.setTurretBaseAngle(drive.getRotation());
@@ -134,16 +108,6 @@ public class RobotTeleop extends Command {
 
     SS2d.S.setDistance(2.5);
     SS2d.M.setDistance(5);
-
-    // if (!intake.isState(intake.DISABLED)) {
-    //   if (OI.DR.getRightBumper()) {
-    //     intake.setCurrentState(intake.AMP_SIDE_2);
-    //   } else if (OI.DR.getLeftBumper()) {
-    //     intake.setCurrentState(intake.SHOOTER_SIDE);
-    //   } else {
-    //     intake.setCurrentState(intake.IDLE);
-    //   }
-    // }
   }
 
   // Called once the command ends or is interrupted.

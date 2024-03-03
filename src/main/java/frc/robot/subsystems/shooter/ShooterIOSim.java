@@ -40,6 +40,9 @@ public class ShooterIOSim implements ShooterIO {
     inputs.flywheelVelRPS = sim.getAngularVelocityRadPerSec() * 0.5 / Math.PI;
     inputs.flywheelVolts = appliedVolts;
     inputs.flywheelCurrent = new double[] {sim.getCurrentDrawAmps(), sim.getCurrentDrawAmps()};
+
+    inputs.turretHallEffect = true;
+    inputs.pivotHallEffect = true;
   }
 
   @Override

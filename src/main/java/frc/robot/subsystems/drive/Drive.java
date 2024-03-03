@@ -106,7 +106,8 @@ public class Drive extends StateMachineSubsystemBase {
                   new ModuleIO2024(0),
                   new ModuleIO2024(1),
                   new ModuleIO2024(2),
-                  new ModuleIO2024(3));
+                  new ModuleIO2024(3),
+                  new ObjectDetectorIOReal());
           break;
 
         case SIM:
@@ -128,7 +129,8 @@ public class Drive extends StateMachineSubsystemBase {
                   new ModuleIO() {},
                   new ModuleIO() {},
                   new ModuleIO() {},
-                  new ModuleIO() {});
+                  new ModuleIO() {},
+                  new ObjectDetectorIO() {});
           break;
       }
     }
@@ -141,7 +143,18 @@ public class Drive extends StateMachineSubsystemBase {
     public double[] timestamps = new double[] {};
   }
 
-  public final State DISABLED, SHOOTING, PATHING, STRAFE_N_TURN, STRAFE_AUTOLOCK;
+  @AutoLog
+  public static class OdometryTimestampInputs {
+    public double[] timestamps = new double[] {};
+  }
+
+  public final State DISABLED,
+      SHOOTING,
+      PATHING,
+      STRAFE_N_TURN,
+      STRAFE_AUTOLOCK,
+      STRAFE_AUTOLOCK_NEW,
+      INTAKING;
 
   // IO
   private final GyroIO gyroIO;
@@ -152,6 +165,9 @@ public class Drive extends StateMachineSubsystemBase {
 
   private SwerveDriveWheelPositions lastPositions = null;
   private double lastTime = 0.0;
+
+  private final ObjectDetectorIO llIO;
+  private final ObjectDetectorIOInputsAutoLogged llInputs = new ObjectDetectorIOInputsAutoLogged();
 
   private final Module[] modules = new Module[4]; // FL, FR, BL, BR
 
@@ -169,6 +185,7 @@ public class Drive extends StateMachineSubsystemBase {
   // private BetterPoseEstimator poseEstimator;
   private SwerveDrivePoseEstimator poseEstimator;
   private double autolockSetpoint_r = 0;
+  private Pose2d pose;
   private Rotation2d lastGyroRotation = new Rotation2d();
   private ChassisSpeeds chassisSpeeds = new ChassisSpeeds(0, 0, 0);
 
@@ -177,10 +194,12 @@ public class Drive extends StateMachineSubsystemBase {
       ModuleIO flModuleIO,
       ModuleIO frModuleIO,
       ModuleIO blModuleIO,
-      ModuleIO brModuleIO) {
+      ModuleIO brModuleIO,
+      ObjectDetectorIO llIO) {
 
     super("Drive");
     this.gyroIO = gyroIO;
+    this.llIO = llIO;
     modules[FL] = new Module(flModuleIO, FL, Mode.SETPOINT);
     modules[FR] = new Module(frModuleIO, FR, Mode.SETPOINT);
     modules[BL] = new Module(blModuleIO, BL, Mode.SETPOINT);
@@ -241,7 +260,7 @@ public class Drive extends StateMachineSubsystemBase {
             double y_ = -OI.DR.getLeftX();
             double w_ = -Util.sqInput(OI.DR.getRightX());
 
-            drive(x_, y_, w_ * 0.5, throttle);
+            runVelocity(drive(x_, y_, w_ * 0.45, throttle));
           }
         };
 
@@ -254,15 +273,60 @@ public class Drive extends StateMachineSubsystemBase {
 
             double x_ = -OI.DR.getLeftY();
             double y_ = -OI.DR.getLeftX();
-
+            intermediaryAutolockSetpoint_r = autolockSetpoint_r;
             double err =
                 Math.IEEEremainder(
-                    getPose().getRotation().getRotations() - autolockSetpoint_r, 1.0);
+                    getPose().getRotation().getRotations() - intermediaryAutolockSetpoint_r, 1.0);
             Logger.recordOutput("Drive/Autolock Heading Error", err);
             double con = Util.inRange(err, 0.1) ? 3.5 * err : 2 * err;
             con = Util.limit(con, 0.6);
             Logger.recordOutput("Drive/Autolock Heading Output", con);
-            drive(x_, y_, -con, throttle);
+            runVelocity(drive(x_, y_, -con, throttle));
+          }
+        };
+
+    STRAFE_AUTOLOCK_NEW =
+        new State("STRAFE AUTOLOCK NEW") {
+          @Override
+          public void periodic() {
+            double throttle = 1.0;
+            throttle = Util.lerp(1, 0.4, OI.DR.getRightTriggerAxis() * OI.DR.getRightTriggerAxis());
+
+            double x_ = -OI.DR.getLeftY();
+            double y_ = -OI.DR.getLeftX();
+
+            double err =
+                Math.IEEEremainder(
+                    getPose().getRotation().getRotations() - intermediaryAutolockSetpoint_r, 1.0);
+
+            Logger.recordOutput("Drive/Autolock Heading Error", err);
+            double con = Util.inRange(err, 0.1) ? 3.5 * err : 2 * err;
+            con = Util.limit(con, 0.6);
+            Logger.recordOutput("Drive/Autolock Heading Output", con);
+            runVelocity(drive(x_, y_, -con, throttle));
+          }
+        };
+
+    INTAKING =
+        new State("INTAKING") {
+          @Override
+          public void periodic() {
+            double throttle = 1.0;
+            throttle = Util.lerp(1, 0.4, OI.DR.getRightTriggerAxis() * OI.DR.getRightTriggerAxis());
+
+            double x_ = -OI.DR.getLeftY();
+            double y_ = -OI.DR.getLeftX();
+            double w_ = -Util.sqInput(OI.DR.getRightX());
+
+            ChassisSpeeds rrSpeeds = drive(x_, y_, w_ * 0.5, throttle);
+            if (llInputs.connected) {
+              if (llInputs.tv) {
+                rrSpeeds.vyMetersPerSecond += 0.05 * llInputs.tx;
+                rrSpeeds.vxMetersPerSecond += 0.00 * llInputs.ty;
+                rrSpeeds.omegaRadiansPerSecond += 0.005 * llInputs.tx;
+              }
+            }
+            runVelocity(rrSpeeds);
           }
         };
     setCurrentState(DISABLED);
@@ -284,7 +348,10 @@ public class Drive extends StateMachineSubsystemBase {
       module.updateInputs();
     }
     odometryLock.unlock();
+
+    llIO.updateInputs(llInputs);
     Logger.processInputs("Drive/Gyro", gyroInputs);
+    Logger.processInputs("Drive/LL", llInputs);
     for (var module : modules) {
       module.inputPeriodic();
     }
@@ -367,7 +434,7 @@ public class Drive extends StateMachineSubsystemBase {
     Logger.recordOutput("Drive/Speeds", chassisSpeeds);
   }
 
-  public void drive(double x, double y, double w, double throttle) {
+  public ChassisSpeeds drive(double x, double y, double w, double throttle) {
     if (G.isRedAlliance()) {
       x = -x;
       y = -y;
@@ -402,7 +469,7 @@ public class Drive extends StateMachineSubsystemBase {
             w_,
             getPose().getRotation().plus(new Rotation2d(getAngularVelocity() * SKEW_CONSTANT)));
 
-    runVelocity(rr); // TODO: tune skew constant
+    return rr;
   }
 
   public void resetPose() {

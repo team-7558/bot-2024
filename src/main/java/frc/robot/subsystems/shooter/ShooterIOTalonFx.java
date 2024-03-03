@@ -170,7 +170,7 @@ public class ShooterIOTalonFx implements ShooterIO {
     turretConfig.Slot2.kA = 0;
 
     turretConfig.MotionMagic.MotionMagicCruiseVelocity = 1;
-    turretConfig.MotionMagic.MotionMagicAcceleration = 1;
+    turretConfig.MotionMagic.MotionMagicAcceleration = 1.8;
     turretConfig.MotionMagic.MotionMagicJerk = 4;
 
     var pivotConfig = new TalonFXConfiguration();
@@ -210,7 +210,7 @@ public class ShooterIOTalonFx implements ShooterIO {
     pivotConfig.Slot2.kA = 0;
 
     pivotConfig.MotionMagic.MotionMagicCruiseVelocity = 0.45;
-    pivotConfig.MotionMagic.MotionMagicAcceleration = 0.25;
+    pivotConfig.MotionMagic.MotionMagicAcceleration = 0.4;
     pivotConfig.MotionMagic.MotionMagicJerk = 2;
 
     // TODO: tune all of that & use absolute encoder

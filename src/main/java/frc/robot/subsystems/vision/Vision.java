@@ -10,7 +10,6 @@ import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.PerfTracker;
 import frc.robot.subsystems.drive.Drive;
@@ -20,7 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 import org.littletonrobotics.junction.Logger;
 
-public class Vision extends SubsystemBase {
+public class Vision {
 
   // default pipeline, tracking apriltags at high FPS and low res.
   public static final int QUICK_PIPELINE_ID = 1;
@@ -252,12 +251,9 @@ public class Vision extends SubsystemBase {
     }
   }
 
-  @Override
   public void periodic() {
-    PerfTracker.start("Vision");
     // Logger.processInputs("Vision/Limelight", limelightInputs);
     handleFrameData();
-    PerfTracker.end("Vision");
     Logger.recordOutput("Vision/TagSet", posesToLog.toArray(new Pose2d[0]));
     posesToLog.clear();
   }
