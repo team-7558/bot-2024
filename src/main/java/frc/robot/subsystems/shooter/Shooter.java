@@ -40,14 +40,15 @@ public class Shooter extends StateMachineSubsystemBase {
   private static double HEIGHT_M = 0;
 
   public static final double TURRET_ZERO_POS = 0.25;
-  public static final double PIVOT_ZERO_POS = 0.0;
+  public static final double PIVOT_ZERO_POS = Units.degreesToRotations(10);
 
   public static final double FLYWHEEL_MIN_VEL_rps = 0, FLYWHEEL_MAX_VEL_rps = 100;
-  public static final double TURRET_MIN_POS_r = -0.25, TURRET_MAX_POS_r = 0.25;
-  public static final double PIVOT_MIN_POS_r = 0, PIVOT_MAX_POS_r = 0.2;
+  public static final double TURRET_MIN_POS_r = -TURRET_ZERO_POS,
+      TURRET_MAX_POS_r = TURRET_ZERO_POS;
+  public static final double PIVOT_MIN_POS_r = PIVOT_ZERO_POS, PIVOT_MAX_POS_r = 0.2;
   public static final double FLYWHEEL_MIN_FEED_VEL_rps = 0, FLYWHEEL_MAX_FEED_VEL_rps = 100;
   public static final double TURRET_MIN_FEED_POS_r = -0.02, TURRET_MAX_FEED_POS_r = 0.02;
-  public static final double PIVOT_MIN_FEED_POS_r = 0, PIVOT_MAX_FEED_POS_r = 0.1;
+  public static final double PIVOT_MIN_FEED_POS_r = PIVOT_ZERO_POS, PIVOT_MAX_FEED_POS_r = 0.1;
 
   private static LinearInterpolator shotTimesFromDistance =
       new LinearInterpolator(getLerpTableFromFile("shottimes.lerp"));
@@ -104,6 +105,14 @@ public class Shooter extends StateMachineSubsystemBase {
       this.flywheel_rps = o.flywheel_rps;
       this.feederVel_rps = o.feederVel_rps;
       this.turretPos_r = o.turretPos_r;
+      this.pivotPos_r = o.pivotPos_r;
+      return this;
+    }
+
+    public Setpoints copyAndFlipTurret(Setpoints o) {
+      this.flywheel_rps = o.flywheel_rps;
+      this.feederVel_rps = o.feederVel_rps;
+      this.turretPos_r = -o.turretPos_r;
       this.pivotPos_r = o.pivotPos_r;
       return this;
     }
@@ -167,7 +176,7 @@ public class Shooter extends StateMachineSubsystemBase {
 
     // loading lerp tables
 
-    lastSetpoints = new Setpoints(0, 0, 0.0, 0.0); // Default values defined here
+    lastSetpoints = new Setpoints(0, 0, 0.0, PIVOT_MIN_POS_r); // Default values defined here
     currSetpoints = new Setpoints().copy(lastSetpoints);
 
     DISABLED =
@@ -212,7 +221,7 @@ public class Shooter extends StateMachineSubsystemBase {
             if (inputs.beamBreakActivated) {
               setCurrentState(IDLE);
             } else {
-              queueSetpoints(new Setpoints(0, 8, 0, 0));
+              queueSetpoints(new Setpoints(0, 8, 0, PIVOT_MIN_POS_r));
               track();
             }
           }

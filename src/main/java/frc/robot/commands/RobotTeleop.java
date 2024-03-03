@@ -75,23 +75,24 @@ public class RobotTeleop extends Command {
       } else if (OI.DR.getLeftTriggerAxis() > 0.05) {
         ss.shoot();
       } else if (OI.XK.get(7, 1)) {
-        ss.shootAmp();
+        ss.trackAmp();
       } else if (OI.XK.get(8, 0)) {
-        ss.shootPreset1();
+        ss.trackFender();
       } else if (OI.XK.get(8, 1)) {
-        ss.shootPreset2();
+        ss.trackFrontPost();
       } else if (OI.XK.get(8, 2)) {
-        ss.shootPreset3();
+        ss.trackSidePost();
       } else if (OI.XK.get(8, 3)) {
-        ss.shootPreset4();
+        ss.trackAmpBox();
       } else if (OI.XK.get(8, 4)) {
-        ss.shootPreset5();
+        ss.trackFrontCourt();
       } else if (OI.XK.get(8, 5)) {
-        ss.shootPreset6();
+        ss.trackWingPost();
       } else if (OI.XK.get(8, 6)) {
-        ss.shootPreset7();
+        ss.trackWingWall();
+        ;
       } else if (OI.XK.get(8, 7)) {
-        ss.shootPreset8();
+        ss.trackWallClear();
       } else if (OI.DR.getLeftBumper()) {
         ss.intake();
       } else {

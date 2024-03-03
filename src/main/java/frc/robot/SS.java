@@ -1,12 +1,12 @@
 package frc.robot;
 
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.Timer;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.subsystems.shooter.Shooter.Setpoints;
+import frc.robot.subsystems.shooter.ShotPresets;
 import frc.robot.util.Util;
 import org.littletonrobotics.junction.Logger;
 
@@ -215,7 +215,7 @@ public class SS {
         if (first) {
           elevator.setTargetHeight(Elevator.CLIMB_HEIGHT_M);
           elevator.setCurrentState(elevator.TRAVELLING);
-          shooter.queueSetpoints(new Setpoints(0, 0, 0.17));
+          shooter.queueSetpoints(new Setpoints(0, 0, 0, 0.17));
           shooter.setCurrentState(shooter.TRACKING);
         }
         break;
@@ -230,7 +230,7 @@ public class SS {
           if (!shooter.beamBroken()) {
             elevator.setTargetHeight(Elevator.MIN_FEED_HEIGHT_M);
             elevator.setCurrentState(elevator.TRAVELLING);
-            shooter.queueSetpoints(new Setpoints(0, 0, 0, 0.0));
+            shooter.queueSetpoints(new Setpoints(0, 0, 0, Shooter.PIVOT_MIN_POS_r));
             shooter.setCurrentState(shooter.TRACKING);
           } else {
             queueState(State.CHAMBER);
@@ -351,65 +351,89 @@ public class SS {
     }
   }
 
-  public void shootAmp() {
+  public void trackAmp() {
     if (currState != State.BOOT) {
-      shooter.queueSetpoints(new Setpoints(13.5, 0, 0, 0.12));
+      shooter.queueSetpoints(
+          G.isRedAlliance() ? ShotPresets.RED_BUDGET_AMP : ShotPresets.BLUE_BUDGET_AMP);
       queueState(State.TRACKING);
     }
   }
 
-  public void shootPreset1() {
+  public void trackFender() {
     if (currState != State.BOOT) {
-      shooter.queueSetpoints(new Setpoints(30, 0, 0, 0.145));
+      shooter.queueSetpoints(G.isRedAlliance() ? ShotPresets.RED_FENDER : ShotPresets.BLUE_FENDER);
       queueState(State.TRACKING);
     }
   }
 
-  public void shootPreset2() {
+  public void trackFrontPost() {
     if (currState != State.BOOT) {
-      shooter.queueSetpoints(new Setpoints(40, 0, 0.09, 0.105));
+      shooter.queueSetpoints(
+          G.isRedAlliance() ? ShotPresets.RED_FRONT_POST : ShotPresets.BLUE_FRONT_POST);
       queueState(State.TRACKING);
     }
   }
 
-  public void shootPreset3() {
+  public void trackSidePost() {
     if (currState != State.BOOT) {
-      shooter.queueSetpoints(new Setpoints(40, 0, -0.134, 0.102));
+      shooter.queueSetpoints(
+          G.isRedAlliance() ? ShotPresets.RED_SIDE_POST : ShotPresets.BLUE_SIDE_POST);
       queueState(State.TRACKING);
     }
   }
 
-  public void shootPreset4() {
+  public void trackAmpBox() {
     if (currState != State.BOOT) {
-      shooter.queueSetpoints(new Setpoints(40, 0, 0, 0.1));
+      shooter.queueSetpoints(
+          G.isRedAlliance() ? ShotPresets.RED_AMP_BOX : ShotPresets.BLUE_AMP_BOX);
       queueState(State.TRACKING);
     }
   }
 
-  public void shootPreset5() {
+  public void trackFrontCourt() {
     if (currState != State.BOOT) {
-      shooter.queueSetpoints(new Setpoints(45, 0, -0.023, Units.degreesToRotations(40)));
+      shooter.queueSetpoints(
+          G.isRedAlliance() ? ShotPresets.RED_FRONT_COURT : ShotPresets.BLUE_FRONT_COURT);
       queueState(State.TRACKING);
     }
   }
 
-  public void shootPreset6() {
+  public void trackWingPost() {
     if (currState != State.BOOT) {
-      shooter.queueSetpoints(new Setpoints(45, 0, -0.029, 0.065));
+      shooter.queueSetpoints(
+          G.isRedAlliance() ? ShotPresets.RED_WING_POST : ShotPresets.BLUE_WING_POST);
       queueState(State.TRACKING);
     }
   }
 
-  public void shootPreset7() {
+  public void trackWingWall() {
     if (currState != State.BOOT) {
-      shooter.queueSetpoints(new Setpoints(45, 0, -0.080, 0.078));
+      shooter.queueSetpoints(
+          G.isRedAlliance() ? ShotPresets.RED_WING_WALL : ShotPresets.BLUE_WING_WALL);
       queueState(State.TRACKING);
     }
   }
 
-  public void shootPreset8() {
+  public void trackWallClear() {
     if (currState != State.BOOT) {
-      shooter.queueSetpoints(new Setpoints(28, 0, 0.075, 0.135));
+      shooter.queueSetpoints(
+          G.isRedAlliance() ? ShotPresets.RED_CLEAR_WALL : ShotPresets.BLUE_CLEAR_WALL);
+      queueState(State.TRACKING);
+    }
+  }
+
+  public void trackMidClear() {
+    if (currState != State.BOOT) {
+      shooter.queueSetpoints(
+          G.isRedAlliance() ? ShotPresets.RED_CLEAR_MID : ShotPresets.BLUE_CLEAR_MID);
+      queueState(State.TRACKING);
+    }
+  }
+
+  public void trackCloseClear() {
+    if (currState != State.BOOT) {
+      shooter.queueSetpoints(
+          G.isRedAlliance() ? ShotPresets.RED_CLEAR_CLOSE : ShotPresets.BLUE_CLEAR_CLOSE);
       queueState(State.TRACKING);
     }
   }

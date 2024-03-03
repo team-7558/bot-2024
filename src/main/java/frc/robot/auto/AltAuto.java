@@ -38,10 +38,7 @@ public abstract class AltAuto {
     }
 
     if (forcePoseReset) {
-      drive.hardSetPose(
-          new Pose2d(
-              trajstack.getInitState().positionMeters,
-              trajstack.getInitState().targetHolonomicRotation));
+      drive.hardSetPose(new Pose2d(trajstack.getInitState().positionMeters, drive.getRotation()));
     }
 
     drive.setCurrentState(drive.PATHING);
