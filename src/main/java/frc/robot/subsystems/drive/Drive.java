@@ -118,7 +118,8 @@ public class Drive extends StateMachineSubsystemBase {
                   new ModuleIOSim(0),
                   new ModuleIOSim(1),
                   new ModuleIOSim(2),
-                  new ModuleIOSim(3));
+                  new ModuleIOSim(3),
+                  new ObjectDetectorIO() {});
           break;
 
         default:
@@ -136,11 +137,6 @@ public class Drive extends StateMachineSubsystemBase {
     }
 
     return instance;
-  }
-
-  @AutoLog
-  public static class OdometryTimestampInputs {
-    public double[] timestamps = new double[] {};
   }
 
   @AutoLog
@@ -273,10 +269,9 @@ public class Drive extends StateMachineSubsystemBase {
 
             double x_ = -OI.DR.getLeftY();
             double y_ = -OI.DR.getLeftX();
-            intermediaryAutolockSetpoint_r = autolockSetpoint_r;
             double err =
                 Math.IEEEremainder(
-                    getPose().getRotation().getRotations() - intermediaryAutolockSetpoint_r, 1.0);
+                    getPose().getRotation().getRotations() - autolockSetpoint_r, 1.0);
             Logger.recordOutput("Drive/Autolock Heading Error", err);
             double con = Util.inRange(err, 0.1) ? 3.5 * err : 2 * err;
             con = Util.limit(con, 0.6);
@@ -297,7 +292,7 @@ public class Drive extends StateMachineSubsystemBase {
 
             double err =
                 Math.IEEEremainder(
-                    getPose().getRotation().getRotations() - intermediaryAutolockSetpoint_r, 1.0);
+                    getPose().getRotation().getRotations() - autolockSetpoint_r, 1.0);
 
             Logger.recordOutput("Drive/Autolock Heading Error", err);
             double con = Util.inRange(err, 0.1) ? 3.5 * err : 2 * err;

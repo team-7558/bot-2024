@@ -44,7 +44,7 @@ public class Shooter extends StateMachineSubsystemBase {
 
   public static final double FLYWHEEL_MIN_VEL_rps = 0, FLYWHEEL_MAX_VEL_rps = 100;
   public static final double TURRET_MIN_POS_r = -0.25, TURRET_MAX_POS_r = 0.25;
-  public static final double PIVOT_MIN_POS_r = 0, PIVOT_MAX_POS_r = 0.2;
+  public static final double PIVOT_MIN_POS_r = 0, PIVOT_MAX_POS_r = 0.1;
   public static final double FLYWHEEL_MIN_FEED_VEL_rps = 0, FLYWHEEL_MAX_FEED_VEL_rps = 100;
   public static final double TURRET_MIN_FEED_POS_r = -0.02, TURRET_MAX_FEED_POS_r = 0.02;
   public static final double PIVOT_MIN_FEED_POS_r = 0, PIVOT_MAX_FEED_POS_r = 0.1;
@@ -227,7 +227,7 @@ public class Shooter extends StateMachineSubsystemBase {
           @Override
           public void periodic() {
             queueSetpoints(constrainSetpoints(shooterPipeline(), false));
-            // track();
+            track();
           }
 
           @Override
@@ -534,9 +534,8 @@ public class Shooter extends StateMachineSubsystemBase {
       s.feederVel_rps = 0;
       s.flywheel_rps = Util.limit(s.flywheel_rps, FLYWHEEL_MIN_VEL_rps, FLYWHEEL_MAX_VEL_rps);
       s.pivotPos_r = Util.limit(s.pivotPos_r, PIVOT_MIN_POS_r, PIVOT_MAX_POS_r);
-      s.turretPos_r = Util.limit(s.turretPos_r, -15, 15);
-      // Util.limit(
-      //     s.turretPos_r, turretConstraintsFromPivotPos.getInterpolatedValue(s.pivotPos_r));
+      s.turretPos_r = Util.limit(s.turretPos_r, -0.18, 0.18);
+      // turretConstraintsFromPivotPos.getInterpolatedValue(s.pivotPos_r)
     }
     return s;
   }

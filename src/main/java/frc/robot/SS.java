@@ -231,7 +231,7 @@ public class SS {
             elevator.setTargetHeight(Elevator.MIN_FEED_HEIGHT_M);
             elevator.setCurrentState(elevator.TRAVELLING);
             shooter.queueSetpoints(new Setpoints(0, 0, 0, 0.0));
-            shooter.setCurrentState(shooter.TRACKING);
+            shooter.setCurrentState(shooter.BEING_FED);
           } else {
             queueState(State.CHAMBER);
           }
@@ -348,6 +348,12 @@ public class SS {
   public void shoot() {
     if (currState != State.BOOT) {
       queueState(State.SHOOTING);
+    }
+  }
+
+  public void track() {
+    if (currState != State.BOOT) {
+      queueState(State.TRACKING);
     }
   }
 
