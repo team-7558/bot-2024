@@ -38,14 +38,15 @@ public class VisionProcessingThread extends Thread {
             EstimatedRobotPose estimatedPose = poseOptional.get();
 
             double distanceSums = 0;
-            PhotonTrackedTarget tag = latestResult.getBestTarget();
-            distanceSums +=
-                Vision.AT_MAP
-                    .getTagPose(tag.getFiducialId())
-                    .get()
-                    .toPose2d()
-                    .getTranslation()
-                    .getDistance(Drive.getInstance().getPoseEstimatorPose().getTranslation());
+            for (PhotonTrackedTarget tag : latestResult.getTargets()) {
+              distanceSums +=
+                  Vision.AT_MAP
+                      .getTagPose(tag.getFiducialId())
+                      .get()
+                      .toPose2d()
+                      .getTranslation()
+                      .getDistance(Drive.getInstance().getPoseEstimatorPose().getTranslation());
+            }
             double distance =
                 (distanceSums / latestResult.targets.size())
                     * (latestResult.getBestTarget().getPoseAmbiguity() + 1);
