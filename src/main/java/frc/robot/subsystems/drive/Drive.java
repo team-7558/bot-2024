@@ -13,6 +13,7 @@
 
 package frc.robot.subsystems.drive;
 
+import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
 import com.pathplanner.lib.util.PIDConstants;
 import com.pathplanner.lib.util.PathPlannerLogging;
@@ -161,6 +162,7 @@ public class Drive extends StateMachineSubsystemBase {
     modules[BR] = new Module(brModuleIO, BR, Mode.SETPOINT);
 
     PhoenixOdometryThread.getInstance().start();
+
 
     // TEMP Pathfinding.setPathfinder(new LocalADStarAK());
     PathPlannerLogging.setLogActivePathCallback(

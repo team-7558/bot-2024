@@ -13,11 +13,10 @@
 
 package frc.robot;
 
+import com.pathplanner.lib.auto.AutoBuilder;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.auto.RunAltAutoCommand;
-import frc.robot.auto.ampside.Default;
 import frc.robot.commands.RobotTeleop;
 import frc.robot.subsystems.drive.Drive;
 
@@ -87,7 +86,7 @@ public class RobotContainer {
     //         drive // Reference to this subsystem to set requirements
     // );
 
-    return new RunAltAutoCommand(new Default());
+    return AutoBuilder.buildAuto("7pc AS Auto");
 
     /*PathPlannerPath path = PathPlannerPath.fromChoreoTrajectory("4note");
     List<PathPoint> points = path.getAllPathPoints();
