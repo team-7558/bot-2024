@@ -34,7 +34,7 @@ public class Vision {
   public static final double AT_FOV_RAD = Units.degreesToRadians(140); // TODO: TUNE
 
   // Distance for quick
-  public static final double QUICK_DISTANCE_M = 3.0;
+  public static final double QUICK_DISTANCE_M = 1.0;
 
   // Distance for clear
   public static final double CLEAR_DISTANCE_M = QUICK_DISTANCE_M + 0.1;
@@ -94,7 +94,7 @@ public class Vision {
           // VisionIO cam3 =
           //     new VisionIOPhoton("camera4", new Transform3d()); // TODO: update transform & name
           // LimelightIO limelight = new LimelightIOReal("limelight");
-          instance = new Vision(cam0,cam1);
+          instance = new Vision(cam0, cam1);
           break;
         case SIM:
           cam0 =
@@ -118,7 +118,6 @@ public class Vision {
   }
 
   private List<Pose2d> posesToLog;
-
 
   private VisionIOPhoton cameras[];
   private ApriltagIOInputsAutoLogged[] visionInputs;
