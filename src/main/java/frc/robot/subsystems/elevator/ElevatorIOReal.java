@@ -80,17 +80,17 @@ public class ElevatorIOReal implements ElevatorIO {
     // Position control gains
     leaderConfig.Slot0.GravityType = GravityTypeValue.Elevator_Static;
     leaderConfig.Slot0.kG = 0.07;
-    leaderConfig.Slot0.kP = 500;
+    leaderConfig.Slot0.kP = 0;
     leaderConfig.Slot0.kI = 0;
     leaderConfig.Slot0.kD = 0; // 16;
 
     // MotionMagic Position gains
     leaderConfig.Slot1.GravityType = GravityTypeValue.Elevator_Static;
     leaderConfig.Slot1.kG = 0.07;
-    leaderConfig.Slot1.kV = 40;
+    leaderConfig.Slot1.kV = 0;
     leaderConfig.Slot1.kS = 0.0;
     leaderConfig.Slot1.kA = 0; // 1;
-    leaderConfig.Slot1.kP = 1114;
+    leaderConfig.Slot1.kP = 0;
     leaderConfig.Slot1.kI = 0;
     leaderConfig.Slot1.kD = 0.0;
 

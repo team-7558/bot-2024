@@ -39,7 +39,7 @@ public class ShooterBringup extends Command {
   public void initialize() {
     drive.setCurrentState(drive.DISABLED);
     intake.setCurrentState(intake.IDLE);
-    shooter.setCurrentState(shooter.IDLE);
+    shooter.setCurrentState(shooter.ZEROING);
 
     t.reset();
     t.start();
@@ -57,10 +57,10 @@ public class ShooterBringup extends Command {
       double c = 0.025 * Math.cos(t.get() * 1.5);
 
       if (OI.DR.getPOV() == 0) {
-        shooter.setManualPivotVel(0.5);
+        shooter.setManualPivotVel(0.75);
         shooter.setCurrentState(shooter.MANUAL);
       } else if (OI.DR.getPOV() == 180) {
-        shooter.setManualPivotVel(-0.25);
+        shooter.setManualPivotVel(-0.35);
         shooter.setCurrentState(shooter.MANUAL);
       } else if (OI.DR.getAButton()) {
         shooter.queueSetpoints(new Setpoints(40, 0.0, Shooter.PIVOT_MIN_POS_r));
@@ -69,8 +69,8 @@ public class ShooterBringup extends Command {
         // }
         shooter.setCurrentState(shooter.TRACKING);
       } else if (OI.DR.getBButton()) {
-        intake.setCurrentState(intake.SHOOTER_SIDE);
-        shooter.queueSetpoints(new Setpoints(40, 40, 0.0, Shooter.PIVOT_MIN_POS_r));
+        intake.setCurrentState(intake.FEEDING);
+        shooter.queueSetpoints(new Setpoints(40, 8, 0.0, Shooter.PIVOT_MIN_POS_r));
         // if (shooter.isTurretAtSetpoint(0.03)) {
         //   shooter.queueSetpoints(new Setpoints(40, 40, 0, 0.075));
         // }

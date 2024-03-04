@@ -41,7 +41,14 @@ public class Intake extends StateMachineSubsystemBase {
     return instance;
   }
 
-  public final State DISABLED, IDLE, GHOSTING, INTAKING, SHOOTER_SIDE, AMP_SCORING, SPITTING;
+  public final State DISABLED,
+      IDLE,
+      GHOSTING,
+      INTAKING,
+      FEEDING,
+      SHOOTER_SIDE,
+      AMP_SCORING,
+      SPITTING;
 
   private final IntakeIO io;
   private final IntakeIOInputsAutoLogged inputs = new IntakeIOInputsAutoLogged();
@@ -122,12 +129,20 @@ public class Intake extends StateMachineSubsystemBase {
             intakeSpeed = 0.27;
           }
         };
+    FEEDING =
+        new State("FEEDING") {
+          @Override
+          public void init() {
+            directionSpeed = -0.42;
+            intakeSpeed = 0.33;
+          }
+        };
     SPITTING =
         new State("SPITTING") {
           @Override
           public void init() {
             intakeSpeed = -0.25;
-            directionSpeed = 0.0;
+            directionSpeed = -0.25;
           }
         };
 

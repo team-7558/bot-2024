@@ -18,7 +18,7 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.auto.RunAltAutoCommand;
 import frc.robot.auto.Test;
-import frc.robot.commands.ShooterBringup;
+import frc.robot.commands.ElevatorBringup;
 import frc.robot.subsystems.drive.Drive;
 
 /**
@@ -46,7 +46,7 @@ public class RobotContainer {
    * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureButtonBindings() {
-    drive.setDefaultCommand(new ShooterBringup());
+    drive.setDefaultCommand(new ElevatorBringup());
   }
 
   /**

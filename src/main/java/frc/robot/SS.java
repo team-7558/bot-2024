@@ -6,6 +6,7 @@ import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.subsystems.shooter.Shooter.Setpoints;
+import frc.robot.subsystems.shooter.Shooter.TargetMode;
 import frc.robot.subsystems.shooter.ShotPresets;
 import frc.robot.util.Util;
 import org.littletonrobotics.junction.Logger;
@@ -82,7 +83,7 @@ public class SS {
   }
 
   public void queueState(State s) {
-    System.out.println("Queueing state: " + s);
+    System.out.println(currState + " -> " + s);
     nextState = s;
   }
 
@@ -290,7 +291,6 @@ public class SS {
 
   // TODO: replace example based on what you wanna do, ex. shoot(double x, double y)
   public void action(State s) {
-    System.out.println("Switching to state " + s);
     queueState(State.TEST_2);
   }
 
@@ -348,6 +348,14 @@ public class SS {
   public void shoot() {
     if (currState != State.BOOT) {
       queueState(State.SHOOTING);
+    }
+  }
+
+  public void trackFromPose() {
+    if (currState != State.BOOT) {
+      shooter.setTargetMode(TargetMode.SPEAKER);
+      shooter.queueSetpoints(shooter.constrainSetpoints(shooter.shooterPipeline(), hasGamePiece));
+      queueState(State.TRACKING);
     }
   }
 
