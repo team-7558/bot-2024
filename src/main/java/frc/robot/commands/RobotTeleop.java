@@ -4,6 +4,8 @@
 
 package frc.robot.commands;
 
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.G;
 import frc.robot.OI;
@@ -46,11 +48,20 @@ public class RobotTeleop extends Command {
       // slow mode
       // x stance while shooting
       if (OI.DR.getPOV() == 180) {
-        drive.resetPose();
-      } else if (OI.DR.getBButton()) {
+        drive.hardSetPose(
+            new Pose2d(
+                drive.getPose().getTranslation(),
+                Rotation2d.fromRotations(G.isRedAlliance() ? 0.5 : 0)));
+      } else if (OI.DR.getAButton()) {
         drive.setAutolockSetpoint(0.25);
         drive.setCurrentState(drive.STRAFE_AUTOLOCK);
-      } else if (OI.DR.getAButton()) {
+      } else if (OI.DR.getBButton()) {
+        drive.setAutolockSetpoint(G.isRedAlliance() ? 0.35 : -0.35);
+        drive.setCurrentState(drive.STRAFE_AUTOLOCK);
+      } else if (OI.DR.getXButton()) {
+        drive.setAutolockSetpoint(G.isRedAlliance() ? 0.15 : -0.15);
+        drive.setCurrentState(drive.STRAFE_AUTOLOCK);
+      } else if (OI.DR.getYButton()) {
         drive.setAutolockSetpoint(G.isRedAlliance() ? 0.5 : 0);
         drive.setCurrentState(drive.STRAFE_AUTOLOCK);
       } else {
@@ -79,23 +90,23 @@ public class RobotTeleop extends Command {
       } else if (OI.DR.getLeftTriggerAxis() > 0.05) {
         ss.shoot();
       } else if (OI.XK.get(7, 1)) {
-        ss.track();
+        ss.trackAmp();
       } else if (OI.XK.get(8, 0)) {
-        ss.shootPreset1();
+        ss.trackFender();
       } else if (OI.XK.get(8, 1)) {
-        ss.shootPreset2();
+        ss.trackFrontPost();
       } else if (OI.XK.get(8, 2)) {
-        ss.shootPreset3();
+        ss.trackSidePost();
       } else if (OI.XK.get(8, 3)) {
-        ss.shootPreset4();
+        ss.trackAmpBox();
       } else if (OI.XK.get(8, 4)) {
-        ss.shootPreset5();
+        ss.trackFrontCourt();
       } else if (OI.XK.get(8, 5)) {
-        ss.shootPreset6();
+        ss.trackWingPost();
       } else if (OI.XK.get(8, 6)) {
-        ss.shootPreset7();
+        ss.trackWingWall();
       } else if (OI.XK.get(8, 7)) {
-        ss.shootPreset8();
+        ss.trackWallClear();
       } else if (OI.DR.getLeftBumper()) {
         ss.intake();
       } else {

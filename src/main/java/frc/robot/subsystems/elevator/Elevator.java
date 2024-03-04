@@ -86,22 +86,22 @@ public class Elevator extends StateMachineSubsystemBase {
         new State("HOLDING") {
           @Override
           public void periodic() {
-            if (atTargetHeight()) {
-              io.holdPos(targetHeight_m);
-            } else {
-              setCurrentState(TRAVELLING);
-            }
+            // if (atTargetHeight()) {
+            io.holdPos(targetHeight_m);
+            // } else {
+            //   setCurrentState(TRAVELLING);
+            // }
           }
         };
     TRAVELLING =
         new State("TRAVELLING") {
           @Override
           public void periodic() {
-            if (!atTargetHeight()) {
-              io.travelToPos(targetHeight_m);
-            } else {
-              setCurrentState(HOLDING);
-            }
+            // if (!atTargetHeight()) {
+            io.travelToPos(targetHeight_m);
+            // } else {
+            //   setCurrentState(HOLDING);
+            // }
           }
         };
     HOMING =
@@ -117,7 +117,7 @@ public class Elevator extends StateMachineSubsystemBase {
               setCurrentState(RESETTING);
             } else {
               // io.setVel(-0.05);
-              io.setVoltage(-1.0);
+              io.setVoltage(-0.75);
             }
           }
         };

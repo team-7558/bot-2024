@@ -165,6 +165,6 @@ public class SS2d {
 
   public static void periodic() {
     Logger.recordOutput("SS/Setpoint", S.mech);
-    Logger.recordOutput("SS/Measured/", M.mech);
+    Logger.recordOutput("SS/Measured", M.mech);
   }
 }

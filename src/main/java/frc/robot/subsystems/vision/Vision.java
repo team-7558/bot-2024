@@ -11,6 +11,7 @@ import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
 import frc.robot.Constants;
+import frc.robot.PerfTracker;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.util.Util;
 import java.io.IOException;
@@ -93,7 +94,7 @@ public class Vision {
           // VisionIO cam3 =
           //     new VisionIOPhoton("camera4", new Transform3d()); // TODO: update transform & name
           // LimelightIO limelight = new LimelightIOReal("limelight");
-          instance = new Vision(new LimelightIO() {}, cam1);
+          instance = new Vision(cam0,cam1);
           break;
         case SIM:
           cam0 =
@@ -101,7 +102,7 @@ public class Vision {
                   "camera0",
                   new Transform3d(
                       0, 0, 0, new Rotation3d())); // TODO: update transform & name later
-          instance = new Vision(new LimelightIO() {}, cam0);
+          instance = new Vision(cam0);
           // no sim
           break;
         case REPLAY:
@@ -118,13 +119,11 @@ public class Vision {
 
   private List<Pose2d> posesToLog;
 
-  private LimelightIO limelight;
-  public LimelightIOInputsAutoLogged limelightInputs;
 
   private VisionIOPhoton cameras[];
   private ApriltagIOInputsAutoLogged[] visionInputs;
 
-  private Vision(LimelightIO limelight, VisionIOPhoton... cameras) {
+  private Vision(VisionIOPhoton... cameras) {
     this.cameras = cameras;
     this.visionInputs =
         new ApriltagIOInputsAutoLogged[] {
@@ -133,8 +132,6 @@ public class Vision {
           new ApriltagIOInputsAutoLogged(),
           new ApriltagIOInputsAutoLogged()
         };
-    this.limelight = limelight;
-    this.limelightInputs = new LimelightIOInputsAutoLogged();
     posesToLog = new ArrayList<>();
   }
 
@@ -222,7 +219,7 @@ public class Vision {
           if (Util.isWithinAngleInclusive(tagTheta, vTheta, AT_FOV_RAD)) {
             posesToLog.add(tagpose);
             shouldSwitchToQuick = true;
-            // break; //TODO: reintroduce break for efficiency
+            break; // TODO: reintroduce break for efficiency
           }
         }
       }
@@ -251,10 +248,10 @@ public class Vision {
   }
 
   public void periodic() {
-    // Logger.processInputs("Vision/Limelight", limelightInputs);
+    int id = PerfTracker.start("Vision");
     handleFrameData();
     Logger.recordOutput("Vision/TagSet", posesToLog.toArray(new Pose2d[0]));
-    posesToLog.clear();
+    PerfTracker.end(id);
   }
 
   public static class TimestampedPose {

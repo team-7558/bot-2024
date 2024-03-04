@@ -25,12 +25,12 @@ public class IntakeIOSim implements IntakeIO {
     simIntake.update(Constants.globalDelta_sec);
     simDirection.update(Constants.globalDelta_sec);
 
-    inputs.intakeVelocityRadPerSec = simIntake.getAngularVelocityRadPerSec();
+    inputs.intakeVelocityMPS = simIntake.getAngularVelocityRadPerSec();
     inputs.intakeAppliedVolts = appliedVolts;
     inputs.currentAmps =
         new double[] {simIntake.getCurrentDrawAmps(), simDirection.getCurrentDrawAmps()};
 
-    inputs.directionVelocityRadPerSec = simDirection.getAngularVelocityRadPerSec();
+    inputs.directionVelocityMPS = simDirection.getAngularVelocityRadPerSec();
     inputs.directionAppliedVolts = appliedVolts;
   }
 

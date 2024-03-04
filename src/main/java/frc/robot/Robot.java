@@ -17,6 +17,7 @@ import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.robot.subsystems.LED.LED;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.intake.Intake;
@@ -44,12 +45,13 @@ public class Robot extends LoggedRobot {
   private Shooter shooter;
   private Intake intake;
   private Vision vision;
+  private LED led;
 
   boolean lastState = false;
 
-  Timer t = new Timer();
-
   boolean resetPose = false;
+
+  private Timer t = new Timer();
 
   protected Robot() {
     super(Constants.globalDelta_sec);
@@ -59,6 +61,7 @@ public class Robot extends LoggedRobot {
     drive = Drive.getInstance();
     shooter = Shooter.getInstance();
     vision = Vision.getInstance();
+    led = LED.getInstance();
   }
 
   @Override
@@ -132,6 +135,7 @@ public class Robot extends LoggedRobot {
 
     // Start AdvantageKit logger
     Logger.start();
+    t.start();
 
     // Instantiate our RobotContainer. This will perform all our button bindings,
     // and put our autonomous chooser on the dashboard.
@@ -146,10 +150,14 @@ public class Robot extends LoggedRobot {
     // finished or interrupted commands, and running subsystem periodic() methods.
     // This must be called from the robot's periodic block in order for anything in
     // the Command-based framework to work.
+
+    led.setBlinkin(Math.sin(t.get()));
+
     SS.getInstance().periodic();
     SS2d.periodic();
     vision.periodic();
     CommandScheduler.getInstance().run();
+    led.render();
     PerfTracker.periodic();
   }
 

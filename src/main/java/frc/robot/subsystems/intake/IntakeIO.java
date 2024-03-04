@@ -18,11 +18,11 @@ import org.littletonrobotics.junction.AutoLog;
 public interface IntakeIO {
   @AutoLog
   public static class IntakeIOInputs {
-    public double intakeVelocityRadPerSec = 0.0;
+    public double intakeVelocityMPS = 0.0;
     public double intakeAppliedVolts = 0.0;
     public double[] currentAmps = new double[] {};
 
-    public double directionVelocityRadPerSec = 0.0;
+    public double directionVelocityMPS = 0.0;
     public double directionAppliedVolts = 0.0;
 
     public boolean beamBreakActivated = false;
@@ -40,7 +40,7 @@ public interface IntakeIO {
   public default void setIntakeSpeed(double speed) {}
 
   /** Run the drive motor at the specified velocity. */
-  public default void setIntakeVelocity(double velocity) {}
+  public default void setIntakeVelocity(double velMPS) {}
 
   /** Run the drive motor at the specified voltage. */
   public default void setDirectionVoltage(double volts) {}
@@ -49,7 +49,7 @@ public interface IntakeIO {
   public default void setDirectionSpeed(double speed) {}
 
   /** Run the drive motor at the specified velocity. */
-  public default void setDirectionVelocity(double velocity) {}
+  public default void setDirectionVelocity(double velMPS) {}
 
   public default void stop() {}
 

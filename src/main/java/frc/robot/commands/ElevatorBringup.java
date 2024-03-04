@@ -34,7 +34,7 @@ public class ElevatorBringup extends Command {
       }
 
       boolean up = OI.DR.getPOV() == 0, down = OI.DR.getPOV() == 180;
-      double manual = 1.0 * (up ? 1 : down ? -1 : 0);
+      double manual = 1.5 * (up ? 1 : down ? -1 : 0);
       if (up || down) {
         elevator.setManualOutput(manual);
         elevator.setCurrentState(elevator.MANUAL);

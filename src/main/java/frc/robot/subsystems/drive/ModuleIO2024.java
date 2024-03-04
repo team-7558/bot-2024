@@ -19,7 +19,6 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
 import edu.wpi.first.math.geometry.Rotation2d;
 import java.util.Queue;
-import org.littletonrobotics.junction.Logger;
 
 /**
  * Module IO implementation for Talon FX drive motor controller, Talon FX turn motor controller, and
@@ -271,9 +270,5 @@ public class ModuleIO2024 implements ModuleIO {
   @Override
   public void setTurnAngle(double pos_r) {
     turnTalon.setControl(turnPositionSetpoint_v.withPosition(pos_r));
-
-    Logger.recordOutput("Drive/" + index + "/angleSetpoint", pos_r);
-
-    // turnTalon.setControl(turnPositionSetpoint.withPosition(pos_r));
   }
 }

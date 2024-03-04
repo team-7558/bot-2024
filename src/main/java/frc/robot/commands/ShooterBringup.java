@@ -56,18 +56,24 @@ public class ShooterBringup extends Command {
       double s = 0.05 * Math.sin(t.get() * 0.5);
       double c = 0.025 * Math.cos(t.get() * 1.5);
 
-      if (OI.DR.getAButton()) {
-        shooter.queueSetpoints(new Setpoints(40, 0.0, 0.0));
-        if (shooter.isTurretAtSetpoint(0.03)) {
-          shooter.queueSetpoints(new Setpoints(40, 0, 0.075));
-        }
+      if (OI.DR.getPOV() == 0) {
+        shooter.setManualPivotVel(0.75);
+        shooter.setCurrentState(shooter.MANUAL);
+      } else if (OI.DR.getPOV() == 180) {
+        shooter.setManualPivotVel(-0.35);
+        shooter.setCurrentState(shooter.MANUAL);
+      } else if (OI.DR.getAButton()) {
+        shooter.queueSetpoints(new Setpoints(40, 0.0, Shooter.PIVOT_MIN_POS_r + 0.075 + c));
+        // if (shooter.isTurretAtSetpoint(0.03)) {
+        //   shooter.queueSetpoints(new Setpoints(40, 0, 0.075));
+        // }
         shooter.setCurrentState(shooter.TRACKING);
       } else if (OI.DR.getBButton()) {
-        intake.setCurrentState(intake.SHOOTER_SIDE);
-        shooter.queueSetpoints(new Setpoints(40, 40, 0.0, 0.00));
-        if (shooter.isTurretAtSetpoint(0.03)) {
-          shooter.queueSetpoints(new Setpoints(40, 40, 0, 0.075));
-        }
+        intake.setCurrentState(intake.FEEDING);
+        shooter.queueSetpoints(new Setpoints(40, 8, 0.0, Shooter.PIVOT_MIN_POS_r));
+        // if (shooter.isTurretAtSetpoint(0.03)) {
+        //   shooter.queueSetpoints(new Setpoints(40, 40, 0, 0.075));
+        // }
         shooter.setCurrentState(shooter.TRACKING);
       } else if (!shooter.isState(shooter.ZEROING)) {
         intake.setCurrentState(intake.IDLE);

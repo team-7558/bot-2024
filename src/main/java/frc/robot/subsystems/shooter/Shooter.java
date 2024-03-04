@@ -25,7 +25,6 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Filesystem;
 import frc.robot.Constants;
-import frc.robot.OI;
 import frc.robot.SS2d;
 import frc.robot.subsystems.StateMachineSubsystemBase;
 import frc.robot.subsystems.drive.Drive;
@@ -40,14 +39,16 @@ public class Shooter extends StateMachineSubsystemBase {
   private static double HEIGHT_M = 0;
 
   public static final double TURRET_ZERO_POS = 0.25;
-  public static final double PIVOT_ZERO_POS = 0.0;
+  public static final double PIVOT_ZERO_POS = Units.degreesToRotations(-2.0);
 
   public static final double FLYWHEEL_MIN_VEL_rps = 0, FLYWHEEL_MAX_VEL_rps = 100;
-  public static final double TURRET_MIN_POS_r = -0.25, TURRET_MAX_POS_r = 0.25;
-  public static final double PIVOT_MIN_POS_r = 0, PIVOT_MAX_POS_r = 0.1;
+  public static final double TURRET_MIN_POS_r = -TURRET_ZERO_POS,
+      TURRET_MAX_POS_r = TURRET_ZERO_POS;
+  public static final double PIVOT_MIN_POS_r = PIVOT_ZERO_POS, PIVOT_MAX_POS_r = 0.2;
   public static final double FLYWHEEL_MIN_FEED_VEL_rps = 0, FLYWHEEL_MAX_FEED_VEL_rps = 100;
   public static final double TURRET_MIN_FEED_POS_r = -0.02, TURRET_MAX_FEED_POS_r = 0.02;
-  public static final double PIVOT_MIN_FEED_POS_r = 0, PIVOT_MAX_FEED_POS_r = 0.1;
+  public static final double PIVOT_MIN_FEED_POS_r = PIVOT_ZERO_POS,
+      PIVOT_MAX_FEED_POS_r = Units.degreesToRotations(35);
 
   private static LinearInterpolator shotTimesFromDistance =
       new LinearInterpolator(getLerpTableFromFile("shottimes.lerp"));
@@ -108,6 +109,14 @@ public class Shooter extends StateMachineSubsystemBase {
       return this;
     }
 
+    public Setpoints copyAndFlipTurret(Setpoints o) {
+      this.flywheel_rps = o.flywheel_rps;
+      this.feederVel_rps = o.feederVel_rps;
+      this.turretPos_r = -o.turretPos_r;
+      this.pivotPos_r = o.pivotPos_r;
+      return this;
+    }
+
     @Override
     public String toString() {
       return flywheel_rps + " | " + feederVel_rps + " | " + turretPos_r + " | " + pivotPos_r;
@@ -147,12 +156,17 @@ public class Shooter extends StateMachineSubsystemBase {
   public enum TargetMode {
     SPEAKER,
     TRAP,
+    AMP,
+    CLEAR,
     CUSTOM
   }
 
   private TargetMode targetMode = TargetMode.SPEAKER;
 
   private Setpoints lastSetpoints, currSetpoints;
+
+  private double manualTurretVel = 0;
+  private double manualPivotVel = 0;
 
   // hoodangle at 1 rad because angle of hood at max height is around 60 degrees, turret is 180
   // degrees turret so 90 seems like it would be ok
@@ -167,7 +181,7 @@ public class Shooter extends StateMachineSubsystemBase {
 
     // loading lerp tables
 
-    lastSetpoints = new Setpoints(0, 0, 0.0, 0.0); // Default values defined here
+    lastSetpoints = new Setpoints(0, 0, 0.0, PIVOT_MIN_POS_r); // Default values defined here
     currSetpoints = new Setpoints().copy(lastSetpoints);
 
     DISABLED =
@@ -212,7 +226,7 @@ public class Shooter extends StateMachineSubsystemBase {
             if (inputs.beamBreakActivated) {
               setCurrentState(IDLE);
             } else {
-              queueSetpoints(new Setpoints(0, 8, 0, 0));
+              queueSetpoints(new Setpoints(0, 8, 0, PIVOT_MIN_POS_r));
               track();
             }
           }
@@ -239,6 +253,7 @@ public class Shooter extends StateMachineSubsystemBase {
           @Override
           public void init() {
             queueSetpoints(new Setpoints(8));
+            ShotLogger.log();
           }
 
           @Override
@@ -289,8 +304,7 @@ public class Shooter extends StateMachineSubsystemBase {
 
           @Override
           public void periodic() {
-            io.setFeederVolts(OI.DR.getLeftTriggerAxis() * 0.4 * 12);
-            io.setFlywheelVolts(OI.DR.getRightTriggerAxis() * 0.6 * 12);
+            io.setPivotVolts(manualPivotVel);
           }
 
           @Override
@@ -321,10 +335,12 @@ public class Shooter extends StateMachineSubsystemBase {
     Logger.recordOutput("Shooter/TargetTurr", currSetpoints.turretPos_r);
     Logger.recordOutput("Shooter/TargetPivot", currSetpoints.pivotPos_r);
 
-    Logger.recordOutput("Shooter/PrevTargetFeed", lastSetpoints.feederVel_rps);
-    Logger.recordOutput("Shooter/PrevTargetFly", lastSetpoints.flywheel_rps);
-    Logger.recordOutput("Shooter/PrevTargetTurr", lastSetpoints.turretPos_r);
-    Logger.recordOutput("Shooter/PrevTargetPivot", lastSetpoints.pivotPos_r);
+    if (Constants.verboseLogging) {
+      Logger.recordOutput("Shooter/PrevTargetFeed", lastSetpoints.feederVel_rps);
+      Logger.recordOutput("Shooter/PrevTargetFly", lastSetpoints.flywheel_rps);
+      Logger.recordOutput("Shooter/PrevTargetTurr", lastSetpoints.turretPos_r);
+      Logger.recordOutput("Shooter/PrevTargetPivot", lastSetpoints.pivotPos_r);
+    }
   }
 
   /** Stops Everything */
@@ -342,6 +358,10 @@ public class Shooter extends StateMachineSubsystemBase {
     io.zero();
   }
 
+  public TargetMode getTargetMode() {
+    return targetMode;
+  }
+
   public void setTargetMode(TargetMode mode) {
     targetMode = mode;
   }
@@ -351,6 +371,11 @@ public class Shooter extends StateMachineSubsystemBase {
     io.setFlywheelVel(currSetpoints.flywheel_rps);
     io.setTurretPos(currSetpoints.turretPos_r);
     io.setPivotPos(currSetpoints.pivotPos_r);
+  }
+
+  public Setpoints getMeasuredSetpoints() {
+    return new Setpoints(
+        inputs.flywheelVelRPS, inputs.feederVelRPS, inputs.turretPosR, inputs.pivotPosR);
   }
 
   public void queueSetpoints(Setpoints s) {
@@ -523,9 +548,9 @@ public class Shooter extends StateMachineSubsystemBase {
     return new Setpoints(flywheel_rps, turretPos_r, pivotPos_r);
   }
 
-  private Setpoints constrainSetpoints(Setpoints s, boolean isFeeding) { // TODO: constrain
+  public Setpoints constrainSetpoints(Setpoints s, boolean isFeeding) { // TODO: constrain
     if (isFeeding) {
-      s.feederVel_rps = 0.25;
+      s.feederVel_rps = 8;
       s.flywheel_rps =
           Util.limit(s.flywheel_rps, FLYWHEEL_MIN_FEED_VEL_rps, FLYWHEEL_MAX_FEED_VEL_rps);
       s.pivotPos_r = Util.limit(s.pivotPos_r, PIVOT_MIN_FEED_POS_r, PIVOT_MAX_FEED_POS_r);
@@ -571,9 +596,11 @@ public class Shooter extends StateMachineSubsystemBase {
             botpose, fieldRelSpeeds, positionAdjustedSpeaker);
     Setpoints newSetpoints = calculateSetpointsForPose(botpose, velocityAdjustedSpeaker);
 
-    Logger.recordOutput("Shooter/Target", speaker);
-    Logger.recordOutput("Shooter/PositionAdjustedTarget", positionAdjustedSpeaker);
-    Logger.recordOutput("Shooter/VelocityAdjustedTarget", velocityAdjustedSpeaker);
+    if (Constants.verboseLogging) {
+      Logger.recordOutput("Shooter/Target", speaker);
+      Logger.recordOutput("Shooter/PositionAdjustedTarget", positionAdjustedSpeaker);
+      Logger.recordOutput("Shooter/VelocityAdjustedTarget", velocityAdjustedSpeaker);
+    }
     return newSetpoints;
   }
 
@@ -608,9 +635,19 @@ public class Shooter extends StateMachineSubsystemBase {
         transformTargetPoseFromFieldRelativeVelocity(botpose, fieldRelSpeeds, trap);
     Setpoints newSetpoints = calculateSetpointsForPose(botpose, velocityAdjustedTrap);
 
-    Logger.recordOutput("Shooter/Target", trap);
-    Logger.recordOutput("Shooter/PositionAdjustedTarget", trap);
-    Logger.recordOutput("Shooter/VelocityAdjustedTarget", velocityAdjustedTrap);
+    if (Constants.verboseLogging) {
+      Logger.recordOutput("Shooter/Target", trap);
+      Logger.recordOutput("Shooter/PositionAdjustedTarget", trap);
+      Logger.recordOutput("Shooter/VelocityAdjustedTarget", velocityAdjustedTrap);
+    }
     return newSetpoints;
+  }
+
+  public void setManualTurretVel(double vel_rps) {
+    manualTurretVel = vel_rps;
+  }
+
+  public void setManualPivotVel(double vel_rps) {
+    manualPivotVel = vel_rps;
   }
 }
