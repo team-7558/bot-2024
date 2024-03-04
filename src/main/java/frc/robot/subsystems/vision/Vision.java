@@ -11,7 +11,6 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
 import frc.robot.Constants;
 import frc.robot.PerfTracker;
-import frc.robot.subsystems.drive.Drive;
 import frc.robot.util.Util;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -221,7 +220,7 @@ public class Vision {
           if (Util.isWithinAngleInclusive(tagTheta, vTheta, AT_FOV_RAD)) {
             posesToLog.add(tagpose);
             shouldSwitchToQuick = true;
-            // break; //TODO: reintroduce break for efficiency
+            break; // TODO: reintroduce break for efficiency
           }
         }
       }
@@ -247,10 +246,10 @@ public class Vision {
       cameras[i].updateInputs(visionInputs[i]);
       Logger.processInputs("Vision/Camera" + i + "/Inputs", visionInputs[i]);
 
-      managePipelines(i, Drive.getInstance().getPose());
+      // managePipelines(i, Drive.getInstance().getPose());
     }
-    PerfTracker.end(id);
     Logger.recordOutput("Vision/TagSet", posesToLog.toArray(new Pose2d[0]));
+    PerfTracker.end(id);
     posesToLog.clear();
   }
 }

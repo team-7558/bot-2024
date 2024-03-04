@@ -250,13 +250,13 @@ public class Drive extends StateMachineSubsystemBase {
             double err =
                 Math.IEEEremainder(
                     getPose().getRotation().getRotations() - intermediaryAutolockSetpoint_r, 1.0);
-            Logger.recordOutput("Drive/Autolock Heading Error", err);
+            if (Constants.verboseLogging) Logger.recordOutput("Drive/Autolock Heading Error", err);
             double con =
                 Util.inRange(err, 0.2)
                     ? (Util.inRange(err, 0.05) ? closePID.calculate(err) : midPID.calculate(err))
                     : farPID.calculate(err);
             con = Util.limit(con, 0.6);
-            Logger.recordOutput("Drive/Autolock Heading Output", con);
+            if (Constants.verboseLogging) Logger.recordOutput("Drive/Autolock Heading Output", con);
             runVelocity(drive(x_, y_, -con, throttle));
           }
         };
@@ -275,10 +275,10 @@ public class Drive extends StateMachineSubsystemBase {
                 Math.IEEEremainder(
                     getPose().getRotation().getRotations() - intermediaryAutolockSetpoint_r, 1.0);
 
-            Logger.recordOutput("Drive/Autolock Heading Error", err);
+            if (Constants.verboseLogging) Logger.recordOutput("Drive/Autolock Heading Error", err);
             double con = Util.inRange(err, 0.1) ? 3.5 * err : 2 * err;
             con = Util.limit(con, 0.6);
-            Logger.recordOutput("Drive/Autolock Heading Output", con);
+            if (Constants.verboseLogging) Logger.recordOutput("Drive/Autolock Heading Output", con);
             runVelocity(drive(x_, y_, -con, throttle));
           }
         };

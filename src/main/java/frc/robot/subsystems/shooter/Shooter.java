@@ -39,7 +39,7 @@ public class Shooter extends StateMachineSubsystemBase {
   private static double HEIGHT_M = 0;
 
   public static final double TURRET_ZERO_POS = 0.25;
-  public static final double PIVOT_ZERO_POS = 0;
+  public static final double PIVOT_ZERO_POS = Units.degreesToRotations(-2.0);
 
   public static final double FLYWHEEL_MIN_VEL_rps = 0, FLYWHEEL_MAX_VEL_rps = 100;
   public static final double TURRET_MIN_POS_r = -TURRET_ZERO_POS,
@@ -335,10 +335,12 @@ public class Shooter extends StateMachineSubsystemBase {
     Logger.recordOutput("Shooter/TargetTurr", currSetpoints.turretPos_r);
     Logger.recordOutput("Shooter/TargetPivot", currSetpoints.pivotPos_r);
 
-    Logger.recordOutput("Shooter/PrevTargetFeed", lastSetpoints.feederVel_rps);
-    Logger.recordOutput("Shooter/PrevTargetFly", lastSetpoints.flywheel_rps);
-    Logger.recordOutput("Shooter/PrevTargetTurr", lastSetpoints.turretPos_r);
-    Logger.recordOutput("Shooter/PrevTargetPivot", lastSetpoints.pivotPos_r);
+    if (Constants.verboseLogging) {
+      Logger.recordOutput("Shooter/PrevTargetFeed", lastSetpoints.feederVel_rps);
+      Logger.recordOutput("Shooter/PrevTargetFly", lastSetpoints.flywheel_rps);
+      Logger.recordOutput("Shooter/PrevTargetTurr", lastSetpoints.turretPos_r);
+      Logger.recordOutput("Shooter/PrevTargetPivot", lastSetpoints.pivotPos_r);
+    }
   }
 
   /** Stops Everything */
@@ -595,9 +597,11 @@ public class Shooter extends StateMachineSubsystemBase {
             botpose, fieldRelSpeeds, positionAdjustedSpeaker);
     Setpoints newSetpoints = calculateSetpointsForPose(botpose, velocityAdjustedSpeaker);
 
-    Logger.recordOutput("Shooter/Target", speaker);
-    Logger.recordOutput("Shooter/PositionAdjustedTarget", positionAdjustedSpeaker);
-    Logger.recordOutput("Shooter/VelocityAdjustedTarget", velocityAdjustedSpeaker);
+    if (Constants.verboseLogging) {
+      Logger.recordOutput("Shooter/Target", speaker);
+      Logger.recordOutput("Shooter/PositionAdjustedTarget", positionAdjustedSpeaker);
+      Logger.recordOutput("Shooter/VelocityAdjustedTarget", velocityAdjustedSpeaker);
+    }
     return newSetpoints;
   }
 
@@ -632,9 +636,11 @@ public class Shooter extends StateMachineSubsystemBase {
         transformTargetPoseFromFieldRelativeVelocity(botpose, fieldRelSpeeds, trap);
     Setpoints newSetpoints = calculateSetpointsForPose(botpose, velocityAdjustedTrap);
 
-    Logger.recordOutput("Shooter/Target", trap);
-    Logger.recordOutput("Shooter/PositionAdjustedTarget", trap);
-    Logger.recordOutput("Shooter/VelocityAdjustedTarget", velocityAdjustedTrap);
+    if (Constants.verboseLogging) {
+      Logger.recordOutput("Shooter/Target", trap);
+      Logger.recordOutput("Shooter/PositionAdjustedTarget", trap);
+      Logger.recordOutput("Shooter/VelocityAdjustedTarget", velocityAdjustedTrap);
+    }
     return newSetpoints;
   }
 

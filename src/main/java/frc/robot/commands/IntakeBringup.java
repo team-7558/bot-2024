@@ -54,7 +54,7 @@ public class IntakeBringup extends Command {
       } else if (OI.DR.getBButton()) {
         intake.setCurrentState(intake.AMP_SCORING);
       } else if (OI.DR.getXButton()) {
-        intake.setCurrentState(intake.SHOOTER_SIDE);
+        intake.setCurrentState(intake.FEEDING);
       } else {
         intake.setCurrentState(intake.IDLE);
       }

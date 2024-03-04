@@ -63,7 +63,7 @@ public class ShooterBringup extends Command {
         shooter.setManualPivotVel(-0.35);
         shooter.setCurrentState(shooter.MANUAL);
       } else if (OI.DR.getAButton()) {
-        shooter.queueSetpoints(new Setpoints(40, 0.0, Shooter.PIVOT_MIN_POS_r));
+        shooter.queueSetpoints(new Setpoints(40, 0.0, Shooter.PIVOT_MIN_POS_r + 0.075 + c));
         // if (shooter.isTurretAtSetpoint(0.03)) {
         //   shooter.queueSetpoints(new Setpoints(40, 0, 0.075));
         // }

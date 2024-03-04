@@ -48,10 +48,16 @@ public class RobotTeleop extends Command {
             new Pose2d(
                 drive.getPose().getTranslation(),
                 Rotation2d.fromRotations(G.isRedAlliance() ? 0.5 : 0)));
-      } else if (OI.DR.getBButton()) {
+      } else if (OI.DR.getAButton()) {
         drive.setAutolockSetpoint(0.25);
         drive.setCurrentState(drive.STRAFE_AUTOLOCK);
-      } else if (OI.DR.getAButton()) {
+      } else if (OI.DR.getBButton()) {
+        drive.setAutolockSetpoint(G.isRedAlliance() ? 0.35 : -0.35);
+        drive.setCurrentState(drive.STRAFE_AUTOLOCK);
+      } else if (OI.DR.getXButton()) {
+        drive.setAutolockSetpoint(G.isRedAlliance() ? 0.15 : -0.15);
+        drive.setCurrentState(drive.STRAFE_AUTOLOCK);
+      } else if (OI.DR.getYButton()) {
         drive.setAutolockSetpoint(G.isRedAlliance() ? 0.5 : 0);
         drive.setCurrentState(drive.STRAFE_AUTOLOCK);
       } else {
@@ -95,7 +101,6 @@ public class RobotTeleop extends Command {
         ss.trackWingPost();
       } else if (OI.XK.get(8, 6)) {
         ss.trackWingWall();
-        ;
       } else if (OI.XK.get(8, 7)) {
         ss.trackWallClear();
       } else if (OI.DR.getLeftBumper()) {
