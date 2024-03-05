@@ -19,7 +19,6 @@ import com.pathplanner.lib.util.PathPlannerLogging;
 import com.pathplanner.lib.util.ReplanningConfig;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.VecBuilder;
-import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -235,9 +234,7 @@ public class Drive extends StateMachineSubsystemBase {
     STRAFE_AUTOLOCK =
         new State("STRAFE AUTOLOCK") {
 
-          PIDController closePID = new PIDController(0.5, 0, 1, Constants.globalDelta_sec);
-          PIDController midPID = new PIDController(0.5, 0, 0, Constants.globalDelta_sec);
-          PIDController farPID = new PIDController(0.5, 0, 0, Constants.globalDelta_sec);
+          double scaler = 1.0 / Math.sqrt(2);
 
           @Override
           public void periodic() {
@@ -246,15 +243,14 @@ public class Drive extends StateMachineSubsystemBase {
 
             double x_ = -OI.DR.getLeftY();
             double y_ = -OI.DR.getLeftX();
+            double mag = Math.sqrt(x_ * x_ + y_ * y_);
             intermediaryAutolockSetpoint_r = autolockSetpoint_r;
             double err =
-                Math.IEEEremainder(getRotation().getRotations() - intermediaryAutolockSetpoint_r, 1.0);
+                Math.IEEEremainder(
+                    getRotation().getRotations() - intermediaryAutolockSetpoint_r, 1.0);
             if (Constants.verboseLogging) Logger.recordOutput("Drive/Autolock Heading Error", err);
-            double con =
-                Util.inRange(err, 0.2)
-                    ? (Util.inRange(err, 0.05) ? closePID.calculate(err) : midPID.calculate(err))
-                    : farPID.calculate(err);
-            // con = Util.limit(con, 0.6);
+            double con = 5 * err;
+            con = Util.limit(con, Util.lerp(1.0, 0.2, mag * scaler));
             if (Constants.verboseLogging) Logger.recordOutput("Drive/Autolock Heading Output", con);
             runVelocity(drive(x_, y_, -con, throttle));
           }
@@ -278,7 +274,7 @@ public class Drive extends StateMachineSubsystemBase {
             double con = Util.inRange(err, 0.1) ? 3.5 * err : 2 * err;
             con = Util.limit(con, 0.6);
             if (Constants.verboseLogging) Logger.recordOutput("Drive/Autolock Heading Output", con);
-            runVelocity(drive(x_, y_, -con, throttle));
+            runVelocity(drive(x_, y_, con, throttle));
           }
         };
 
