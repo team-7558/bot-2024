@@ -248,7 +248,7 @@ public class Vision {
 
       // managePipelines(i, Drive.getInstance().getPose());
     }
-    Logger.recordOutput("Vision/TagSet", posesToLog.toArray(new Pose2d[0]));
+    //Logger.recordOutput("Vision/TagSet", posesToLog.toArray(new Pose2d[0]));
     PerfTracker.end(id);
     posesToLog.clear();
   }
