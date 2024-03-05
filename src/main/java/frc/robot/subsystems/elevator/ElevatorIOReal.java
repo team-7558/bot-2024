@@ -66,7 +66,7 @@ public class ElevatorIOReal implements ElevatorIO {
 
     leaderConfig.CurrentLimits.SupplyCurrentLimit = 40.0;
     leaderConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
-    leaderConfig.ClosedLoopRamps.VoltageClosedLoopRampPeriod = 0.05;
+    leaderConfig.ClosedLoopRamps.VoltageClosedLoopRampPeriod = 0.5;
     leaderConfig.Feedback.SensorToMechanismRatio = METERS_TO_ROTATIONS;
     leaderConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
     leaderConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
@@ -80,7 +80,7 @@ public class ElevatorIOReal implements ElevatorIO {
     // Position control gains
     leaderConfig.Slot0.GravityType = GravityTypeValue.Elevator_Static;
     leaderConfig.Slot0.kG = 0.07;
-    leaderConfig.Slot0.kP = 1323;
+    leaderConfig.Slot0.kP = 0;
     leaderConfig.Slot0.kI = 0;
     leaderConfig.Slot0.kD = 0; // 16;
 
@@ -90,7 +90,7 @@ public class ElevatorIOReal implements ElevatorIO {
     leaderConfig.Slot1.kV = 15;
     leaderConfig.Slot1.kS = 0.0;
     leaderConfig.Slot1.kA = 0; // 1;
-    leaderConfig.Slot1.kP = 1323;
+    leaderConfig.Slot1.kP = 10;
     leaderConfig.Slot1.kI = 0;
     leaderConfig.Slot1.kD = 0.0;
 
