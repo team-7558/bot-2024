@@ -79,13 +79,6 @@ public class Drive extends StateMachineSubsystemBase {
       switch (Constants.currentMode) {
         case REAL:
           // Real robot, instantiate hardware IO implementations
-          // instance =
-          // new Drive(
-          //     new GyroIOPigeon2(),
-          //     new ModuleIO2023(0),
-          //     new ModuleIO2023(1),
-          //     new ModuleIO2023(2),
-          //     new ModuleIO2023(3));
           instance =
               new Drive(
                   new GyroIOPigeon2(),
