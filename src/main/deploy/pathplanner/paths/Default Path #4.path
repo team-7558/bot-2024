@@ -3,25 +3,25 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 1.35,
-        "y": 7.3
+        "x": 3.02,
+        "y": 6.3
       },
       "prevControl": null,
       "nextControl": {
-        "x": 1.4499999999999986,
-        "y": 7.3
+        "x": 2.765520339692926,
+        "y": 6.563339316362494
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 11.38,
-        "y": 7.36
+        "x": 2.690393666977018,
+        "y": 6.747741149392449
       },
       "prevControl": {
-        "x": 10.298676703842595,
-        "y": 7.380489092558884
+        "x": 2.7586906421732977,
+        "y": 6.515531433725098
       },
       "nextControl": null,
       "isLocked": false,
@@ -30,26 +30,29 @@
   ],
   "rotationTargets": [
     {
-      "waypointRelativePos": 0.05,
-      "rotationDegrees": 0,
+      "waypointRelativePos": 0.5,
+      "rotationDegrees": 68.35828588011059,
       "rotateFast": false
     }
   ],
   "constraintZones": [],
   "eventMarkers": [],
   "globalConstraints": {
-    "maxVelocity": 1.0,
-    "maxAcceleration": 1.0,
+    "maxVelocity": 2.0,
+    "maxAcceleration": 2.0,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 0.0,
+    "rotation": 54.926245506651725,
     "rotateFast": false
   },
   "reversed": false,
-  "folder": "Distance Tests",
-  "previewStartingState": null,
-  "useDefaultConstraints": false
+  "folder": "Middle Side Autos",
+  "previewStartingState": {
+    "rotation": 90.19772745122567,
+    "velocity": 0
+  },
+  "useDefaultConstraints": true
 }

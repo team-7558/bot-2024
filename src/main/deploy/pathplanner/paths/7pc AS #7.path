@@ -3,57 +3,57 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 1.25,
-        "y": 5.7
+        "x": 2.17,
+        "y": 4.35
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.3680339887498967,
-        "y": 5.7
+        "x": 2.335249395956363,
+        "y": 4.282220344806746
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 2.25,
-        "y": 5.7
+        "x": 2.3830572785937587,
+        "y": 4.248071857208607
       },
       "prevControl": {
-        "x": 2.1500000000000026,
-        "y": 5.7
+        "x": 2.2259742356423153,
+        "y": 4.309539134885258
       },
       "nextControl": {
-        "x": 2.3499999999999996,
-        "y": 5.7
+        "x": 2.540140321545202,
+        "y": 4.186604579531956
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 3.25,
-        "y": 6.7
+        "x": 2.3830572785937587,
+        "y": 5.55937378097718
       },
       "prevControl": {
-        "x": 3.15,
-        "y": 6.7
+        "x": 2.3762275810741307,
+        "y": 4.951530701730288
       },
       "nextControl": {
-        "x": 3.35,
-        "y": 6.7
+        "x": 2.390628606194069,
+        "y": 6.233221937404795
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 4.25,
-        "y": 6.7
+        "x": 2.3830572785937587,
+        "y": 6.822867822108356
       },
       "prevControl": {
-        "x": 4.15,
-        "y": 6.7
+        "x": 2.4817206231084676,
+        "y": 6.505286887445655
       },
       "nextControl": null,
       "isLocked": false,
@@ -62,37 +62,34 @@
   ],
   "rotationTargets": [
     {
-      "waypointRelativePos": 0.5,
+      "waypointRelativePos": 1.6500000000000001,
+      "rotationDegrees": 23.947374236644393,
+      "rotateFast": false
+    },
+    {
+      "waypointRelativePos": 2.0,
       "rotationDegrees": 0,
       "rotateFast": false
     }
   ],
   "constraintZones": [],
-  "eventMarkers": [
-    {
-      "name": "New Event Marker",
-      "waypointRelativePos": 1.5,
-      "command": {
-        "type": "parallel",
-        "data": {
-          "commands": []
-        }
-      }
-    }
-  ],
+  "eventMarkers": [],
   "globalConstraints": {
     "maxVelocity": 1.0,
-    "maxAcceleration": 1.0,
+    "maxAcceleration": 2.0,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 0,
+    "rotation": 20.646990824970395,
     "rotateFast": false
   },
   "reversed": false,
-  "folder": "Distance Tests",
-  "previewStartingState": null,
+  "folder": "Kai Farmer",
+  "previewStartingState": {
+    "rotation": -20.0079118878993,
+    "velocity": 0
+  },
   "useDefaultConstraints": false
 }

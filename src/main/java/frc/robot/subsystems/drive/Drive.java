@@ -250,7 +250,7 @@ public class Drive extends StateMachineSubsystemBase {
                     getRotation().getRotations() - intermediaryAutolockSetpoint_r, 1.0);
             if (Constants.verboseLogging) Logger.recordOutput("Drive/Autolock Heading Error", err);
             double con = 5 * err;
-            con = Util.limit(con, Util.lerp(1.0, 0.2, mag * scaler));
+            con = Util.limit(con, Util.lerp(0.8, 0.2, mag * scaler));
             if (Constants.verboseLogging) Logger.recordOutput("Drive/Autolock Heading Output", con);
             runVelocity(drive(x_, y_, -con, throttle));
           }

@@ -3,53 +3,50 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 1.35,
-        "y": 7.3
+        "x": 1.44,
+        "y": 0.91
       },
       "prevControl": null,
       "nextControl": {
-        "x": 1.4499999999999986,
-        "y": 7.3
+        "x": 2.44,
+        "y": 0.9100000000000001
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 11.38,
-        "y": 7.36
+        "x": 7.741760008563195,
+        "y": 0.7551228919383578
       },
       "prevControl": {
-        "x": 10.298676703842595,
-        "y": 7.380489092558884
+        "x": 6.751760008563195,
+        "y": 0.7551228919383578
       },
       "nextControl": null,
       "isLocked": false,
       "linkedName": null
     }
   ],
-  "rotationTargets": [
-    {
-      "waypointRelativePos": 0.05,
-      "rotationDegrees": 0,
-      "rotateFast": false
-    }
-  ],
+  "rotationTargets": [],
   "constraintZones": [],
   "eventMarkers": [],
   "globalConstraints": {
-    "maxVelocity": 1.0,
-    "maxAcceleration": 1.0,
+    "maxVelocity": 4.0,
+    "maxAcceleration": 4.0,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 0.0,
+    "rotation": 4.112615097280742,
     "rotateFast": false
   },
   "reversed": false,
-  "folder": "Distance Tests",
-  "previewStartingState": null,
+  "folder": "Sweeper",
+  "previewStartingState": {
+    "rotation": 0,
+    "velocity": 0
+  },
   "useDefaultConstraints": false
 }

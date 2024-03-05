@@ -3,57 +3,41 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 10.0,
-        "y": 0.0
+        "x": 1.440559020885097,
+        "y": 0.9083497701105212
       },
       "prevControl": null,
       "nextControl": {
-        "x": 10.1,
-        "y": 0.0
+        "x": 2.4405590208850976,
+        "y": 0.9083497701105212
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 0.0,
-        "y": 0.0
+        "x": 7.74,
+        "y": 0.76
       },
       "prevControl": {
-        "x": -0.1,
-        "y": 0.0
+        "x": 6.748846397745205,
+        "y": 0.76
       },
       "nextControl": {
-        "x": 7.25,
-        "y": -0.5
+        "x": 7.79,
+        "y": 0.76
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 0.28085199027540975,
-        "y": 5.52661562465982
+        "x": 7.7648589240606105,
+        "y": 4.241242159688978
       },
       "prevControl": {
-        "x": 3.201036866359452,
-        "y": 2.4913186254943933
-      },
-      "nextControl": {
-        "x": -2.6393328858086322,
-        "y": 8.561912623825247
-      },
-      "isLocked": false,
-      "linkedName": null
-    },
-    {
-      "anchor": {
-        "x": 16.259661090750754,
-        "y": 5.52661562465982
-      },
-      "prevControl": {
-        "x": 7.022726241881054,
-        "y": 6.919658732174606
+        "x": 7.785348016619495,
+        "y": 2.479180199624958
       },
       "nextControl": null,
       "isLocked": false,
@@ -64,18 +48,21 @@
   "constraintZones": [],
   "eventMarkers": [],
   "globalConstraints": {
-    "maxVelocity": 0.5,
-    "maxAcceleration": 0.5,
+    "maxVelocity": 4.0,
+    "maxAcceleration": 4.0,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 0,
+    "rotation": 18.43494882292192,
     "rotateFast": false
   },
   "reversed": false,
-  "folder": "Distance Tests",
-  "previewStartingState": null,
+  "folder": "Sweeper",
+  "previewStartingState": {
+    "rotation": 0,
+    "velocity": 0
+  },
   "useDefaultConstraints": false
 }
