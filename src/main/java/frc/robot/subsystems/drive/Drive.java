@@ -235,9 +235,9 @@ public class Drive extends StateMachineSubsystemBase {
     STRAFE_AUTOLOCK =
         new State("STRAFE AUTOLOCK") {
 
-          PIDController closePID = new PIDController(3.5, 0, 0, Constants.globalDelta_sec);
-          PIDController midPID = new PIDController(2.75, 0, 0, Constants.globalDelta_sec);
-          PIDController farPID = new PIDController(2, 0, 0, Constants.globalDelta_sec);
+          PIDController closePID = new PIDController(0.5, 0, 1, Constants.globalDelta_sec);
+          PIDController midPID = new PIDController(0.5, 0, 0, Constants.globalDelta_sec);
+          PIDController farPID = new PIDController(0.5, 0, 0, Constants.globalDelta_sec);
 
           @Override
           public void periodic() {
@@ -248,14 +248,13 @@ public class Drive extends StateMachineSubsystemBase {
             double y_ = -OI.DR.getLeftX();
             intermediaryAutolockSetpoint_r = autolockSetpoint_r;
             double err =
-                Math.IEEEremainder(
-                    getPose().getRotation().getRotations() - intermediaryAutolockSetpoint_r, 1.0);
+                Math.IEEEremainder(getRotation().getRotations() - intermediaryAutolockSetpoint_r, 1.0);
             if (Constants.verboseLogging) Logger.recordOutput("Drive/Autolock Heading Error", err);
             double con =
                 Util.inRange(err, 0.2)
                     ? (Util.inRange(err, 0.05) ? closePID.calculate(err) : midPID.calculate(err))
                     : farPID.calculate(err);
-            con = Util.limit(con, 0.6);
+            // con = Util.limit(con, 0.6);
             if (Constants.verboseLogging) Logger.recordOutput("Drive/Autolock Heading Output", con);
             runVelocity(drive(x_, y_, -con, throttle));
           }

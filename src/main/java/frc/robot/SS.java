@@ -216,7 +216,7 @@ public class SS {
         if (first) {
           elevator.setTargetHeight(Elevator.CLIMB_HEIGHT_M);
           elevator.setCurrentState(elevator.TRAVELLING);
-          shooter.queueSetpoints(new Setpoints(0, 0, 0, 0.17));
+          shooter.queueSetpoints(new Setpoints(0, 0, 0, 0.15));
           shooter.setCurrentState(shooter.TRACKING);
         }
         break;
@@ -229,8 +229,6 @@ public class SS {
       case PRECHAMBER:
         if (first) {
           if (!shooter.beamBroken()) {
-            elevator.setTargetHeight(Elevator.MIN_FEED_HEIGHT_M);
-            elevator.setCurrentState(elevator.TRAVELLING);
             shooter.queueSetpoints(new Setpoints(0, 0, 0, Shooter.PIVOT_MIN_POS_r));
             shooter.setCurrentState(shooter.TRACKING);
           } else {
@@ -238,9 +236,7 @@ public class SS {
           }
         }
 
-        if (shooter.isTurretAtSetpoint(0.03)
-            && shooter.isPivotAtSetpoint(0.03)
-            && elevator.isState(elevator.HOLDING)) {
+        if (shooter.isTurretAtSetpoint(0.03) && shooter.isPivotAtSetpoint(0.03)) {
           queueState(State.CHAMBER);
         }
         break;
@@ -355,6 +351,13 @@ public class SS {
     if (currState != State.BOOT) {
       shooter.setTargetMode(TargetMode.SPEAKER);
       shooter.queueSetpoints(shooter.constrainSetpoints(shooter.shooterPipeline(), hasGamePiece));
+      queueState(State.TRACKING);
+    }
+  }
+
+  public void trackTrap() {
+    if (currState != State.BOOT) {
+      shooter.queueSetpoints(ShotPresets.TRAP_SHOT);
       queueState(State.TRACKING);
     }
   }

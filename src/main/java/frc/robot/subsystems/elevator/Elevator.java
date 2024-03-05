@@ -86,22 +86,22 @@ public class Elevator extends StateMachineSubsystemBase {
         new State("HOLDING") {
           @Override
           public void periodic() {
-            // if (atTargetHeight()) {
-            io.holdPos(targetHeight_m);
-            // } else {
-            //   setCurrentState(TRAVELLING);
-            // }
+            if (atTargetHeight()) {
+              io.holdPos(targetHeight_m);
+            } else {
+              setCurrentState(TRAVELLING);
+            }
           }
         };
     TRAVELLING =
         new State("TRAVELLING") {
           @Override
           public void periodic() {
-            // if (!atTargetHeight()) {
-            io.travelToPos(targetHeight_m);
-            // } else {
-            //   setCurrentState(HOLDING);
-            // }
+            if (!atTargetHeight()) {
+              io.travelToPos(targetHeight_m);
+            } else {
+              setCurrentState(HOLDING);
+            }
           }
         };
     HOMING =

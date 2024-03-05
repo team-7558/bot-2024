@@ -46,7 +46,8 @@ public class Shooter extends StateMachineSubsystemBase {
       TURRET_MAX_POS_r = TURRET_ZERO_POS;
   public static final double PIVOT_MIN_POS_r = PIVOT_ZERO_POS, PIVOT_MAX_POS_r = 0.2;
   public static final double FLYWHEEL_MIN_FEED_VEL_rps = 0, FLYWHEEL_MAX_FEED_VEL_rps = 100;
-  public static final double TURRET_MIN_FEED_POS_r = -0.02, TURRET_MAX_FEED_POS_r = 0.02;
+  public static final double TURRET_MIN_FEED_POS_r = -Units.degreesToRotations(15),
+      TURRET_MAX_FEED_POS_r = -TURRET_MIN_FEED_POS_r;
   public static final double PIVOT_MIN_FEED_POS_r = PIVOT_ZERO_POS,
       PIVOT_MAX_FEED_POS_r = Units.degreesToRotations(35);
 
@@ -390,6 +391,15 @@ public class Shooter extends StateMachineSubsystemBase {
     currSetpoints.pivotPos_r =
         s.pivotPos_r == Setpoints.DEFAULT ? lastSetpoints.pivotPos_r : s.pivotPos_r;
     lastSetpoints.copy(temp);
+  }
+
+  public boolean canFeed() {
+    boolean res = true;
+
+    res &= Util.inRange(currSetpoints.turretPos_r, TURRET_MIN_FEED_POS_r, TURRET_MAX_FEED_POS_r);
+    res &= Util.inRange(currSetpoints.pivotPos_r, PIVOT_MIN_FEED_POS_r, PIVOT_MAX_FEED_POS_r);
+
+    return res;
   }
 
   public boolean isFlywheelAtSetpoint(double tol) {

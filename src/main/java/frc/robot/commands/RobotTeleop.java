@@ -85,6 +85,8 @@ public class RobotTeleop extends Command {
         ss.spit();
       } else if (OI.DR.getLeftTriggerAxis() > 0.05) {
         ss.shoot();
+      } else if (OI.XK.get(9, 7)) {
+        ss.trackTrap();
       } else if (OI.XK.get(7, 1)) {
         ss.trackAmp();
       } else if (OI.XK.get(8, 0)) {
