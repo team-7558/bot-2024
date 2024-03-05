@@ -80,7 +80,7 @@ public class Drive extends StateMachineSubsystemBase {
   public static final double CUTOFF_DISTANCE = 7.0;
 
   // ratio for the distance scaling on the standard deviation
-  private static final double APRILTAG_COEFFICIENT = 0.03; // NEEDS TO BE TUNED
+  private static final double APRILTAG_COEFFICIENT = 0.1; // NEEDS TO BE TUNED
 
   public static final Lock odometryLock = new ReentrantLock();
   public static final Queue<Double> timestampQueue = new ArrayBlockingQueue<>(100);

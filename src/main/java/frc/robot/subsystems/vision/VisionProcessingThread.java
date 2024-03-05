@@ -47,6 +47,10 @@ public class VisionProcessingThread extends Thread {
                       .getTranslation()
                       .getDistance(Drive.getInstance().getPoseEstimatorPose().getTranslation());
             }
+
+            if (latestResult.getBestTarget().getPoseAmbiguity() > 0.6) {
+              return;
+            }
             double distance =
                 (distanceSums / latestResult.targets.size())
                     * (latestResult.getBestTarget().getPoseAmbiguity() + 1);
