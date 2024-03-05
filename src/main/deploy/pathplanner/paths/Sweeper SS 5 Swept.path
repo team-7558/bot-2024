@@ -43,7 +43,7 @@
     "rotateFast": false
   },
   "reversed": false,
-  "folder": "Sweeper",
+  "folder": null,
   "previewStartingState": {
     "rotation": 8.229857099444395,
     "velocity": 0

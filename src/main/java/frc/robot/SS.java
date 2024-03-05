@@ -267,7 +267,7 @@ public class SS {
       case SHOOTING_FROM_GROUND:
         if (first) {
           shooter.setCurrentState(shooter.SHOOTING);
-          intake.setCurrentState(intake.SHOOTER_SIDE);
+          intake.setCurrentState(intake.FEEDING);
         }
         break;
       default:
@@ -464,6 +464,10 @@ public class SS {
   }
 
   // Subsystem management
+
+  public void queueSetpoints(Setpoints setpoints) {
+    shooter.queueSetpoints(setpoints);
+  }
 
   public void resetHomingFlags() {
     homedClimb = false;

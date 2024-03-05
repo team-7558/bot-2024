@@ -285,9 +285,9 @@ public class Drive extends StateMachineSubsystemBase {
             ChassisSpeeds rrSpeeds = drive(x_, y_, w_ * 0.5, throttle);
             if (llInputs.connected) {
               if (llInputs.tv) {
-                rrSpeeds.vyMetersPerSecond += 0.05 * llInputs.tx;
+                rrSpeeds.vyMetersPerSecond += -0.01 * llInputs.tx;
                 rrSpeeds.vxMetersPerSecond += 0.00 * llInputs.ty;
-                rrSpeeds.omegaRadiansPerSecond += 0.005 * llInputs.tx;
+                rrSpeeds.omegaRadiansPerSecond += -0.005 * llInputs.tx;
               }
             }
             runVelocity(rrSpeeds);

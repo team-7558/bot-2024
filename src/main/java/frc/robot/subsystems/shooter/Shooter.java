@@ -49,7 +49,7 @@ public class Shooter extends StateMachineSubsystemBase {
   public static final double TURRET_MIN_FEED_POS_r = -Units.degreesToRotations(15),
       TURRET_MAX_FEED_POS_r = -TURRET_MIN_FEED_POS_r;
   public static final double PIVOT_MIN_FEED_POS_r = PIVOT_ZERO_POS,
-      PIVOT_MAX_FEED_POS_r = Units.degreesToRotations(35);
+      PIVOT_MAX_FEED_POS_r = Units.degreesToRotations(15);
 
   private static LinearInterpolator shotTimesFromDistance =
       new LinearInterpolator(getLerpTableFromFile("shottimes.lerp"));
@@ -152,7 +152,7 @@ public class Shooter extends StateMachineSubsystemBase {
 
   private final ShooterIO io;
 
-  private final Debouncer feedDebouncer = new Debouncer(0.01, DebounceType.kRising);
+  private final Debouncer feedDebouncer = new Debouncer(0.07, DebounceType.kRising);
 
   public enum TargetMode {
     SPEAKER,
@@ -224,10 +224,10 @@ public class Shooter extends StateMachineSubsystemBase {
           @Override
           public void periodic() {
             // queueSetpoints(constrainSetpoints(shooterPipeline(), !inputs.beamBreakActivated));
-            if (inputs.beamBreakActivated) {
+            if (feedDebouncer.calculate(inputs.beamBreakActivated)) {
               setCurrentState(IDLE);
             } else {
-              queueSetpoints(new Setpoints(0, 8, 0, PIVOT_MIN_POS_r));
+              queueSetpoints(new Setpoints(0, 6.5, 0, PIVOT_MIN_POS_r));
               track();
             }
           }

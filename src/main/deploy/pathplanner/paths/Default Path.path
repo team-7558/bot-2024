@@ -8,56 +8,56 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 1.0580959597859299,
-        "y": 4.1046482092964185
+        "x": 1.0746950269392082,
+        "y": 4.25
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 1.6044717613561685,
-        "y": 4.09781851177679
+        "x": 2.007943697303323,
+        "y": 4.518745462269686
       },
       "prevControl": {
-        "x": 1.2698165828943975,
-        "y": 4.138796696894558
+        "x": 1.673288518841552,
+        "y": 4.559723647387453
       },
       "nextControl": {
-        "x": 1.766177680874048,
-        "y": 4.078017786937866
+        "x": 2.169649616821202,
+        "y": 4.498944737430762
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 2.5333106240255745,
-        "y": 4.3710064125619095
+        "x": 2.671467950605517,
+        "y": 4.0876968597595
       },
       "prevControl": {
-        "x": 2.661792966585629,
-        "y": 4.107279498886008
+        "x": 2.7344301060283525,
+        "y": 4.039264432511166
       },
       "nextControl": {
-        "x": 2.2737821182797107,
-        "y": 4.903722819092893
+        "x": 2.201781007690155,
+        "y": 4.448994508155928
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 2.396716673633015,
-        "y": 5.504736200820155
+        "x": 2.7828625332766883,
+        "y": 5.36146969639072
       },
       "prevControl": {
-        "x": 2.4030801986301475,
-        "y": 4.995654201049557
+        "x": 2.7892260582738206,
+        "y": 4.852387696620122
       },
       "nextControl": {
-        "x": 2.389886976113387,
-        "y": 6.0511120023903935
+        "x": 2.7760328357570603,
+        "y": 5.907845497960959
       },
       "isLocked": false,
       "linkedName": null
@@ -94,35 +94,30 @@
   ],
   "rotationTargets": [
     {
-      "waypointRelativePos": 1,
-      "rotationDegrees": -43.40885972880538,
-      "rotateFast": false
-    },
-    {
       "waypointRelativePos": 2.0,
-      "rotationDegrees": -28.73979529168804,
-      "rotateFast": true
-    },
-    {
-      "waypointRelativePos": 2.4,
-      "rotationDegrees": 13.931860820502335,
+      "rotationDegrees": -20.0,
       "rotateFast": false
     },
     {
-      "waypointRelativePos": 3.0,
+      "waypointRelativePos": 0.75,
       "rotationDegrees": 0,
       "rotateFast": false
     },
     {
-      "waypointRelativePos": 3.95,
-      "rotationDegrees": 29.916509578885265,
+      "waypointRelativePos": 3.0,
+      "rotationDegrees": 55.0,
+      "rotateFast": false
+    },
+    {
+      "waypointRelativePos": 3.4499999999999997,
+      "rotationDegrees": 45.0,
       "rotateFast": false
     }
   ],
   "constraintZones": [],
   "eventMarkers": [],
   "globalConstraints": {
-    "maxVelocity": 1.0,
+    "maxVelocity": 0.5,
     "maxAcceleration": 2.0,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0
@@ -133,7 +128,7 @@
     "rotateFast": false
   },
   "reversed": false,
-  "folder": "Middle Side Autos",
+  "folder": null,
   "previewStartingState": {
     "rotation": 0,
     "velocity": 0

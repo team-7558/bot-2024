@@ -60,6 +60,8 @@ public class RobotTeleop extends Command {
       } else if (OI.DR.getYButton()) {
         drive.setAutolockSetpoint(G.isRedAlliance() ? 0.5 : 0);
         drive.setCurrentState(drive.STRAFE_AUTOLOCK);
+      } else if (OI.DR.getBackButton()) {
+        drive.setCurrentState(drive.INTAKING);
       } else {
         // strafe and turn if not other state
         drive.setCurrentState(drive.STRAFE_N_TURN);
@@ -103,9 +105,13 @@ public class RobotTeleop extends Command {
         ss.trackWingPost();
       } else if (OI.XK.get(8, 6)) {
         ss.trackWingWall();
-      } else if (OI.XK.get(8, 7)) {
+      } else if (OI.XK.get(9, 0)) {
         ss.trackWallClear();
-      } else if (OI.DR.getLeftBumper()) {
+      } else if (OI.XK.get(9, 1)) {
+        ss.trackMidClear();
+      } else if (OI.XK.get(9, 2)) {
+        ss.trackCloseClear();
+      } else if (OI.DR.getLeftBumper() || OI.DR.getBackButton()) {
         ss.intake();
       } else {
         ss.idle();

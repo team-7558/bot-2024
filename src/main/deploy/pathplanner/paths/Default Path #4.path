@@ -49,7 +49,7 @@
     "rotateFast": false
   },
   "reversed": false,
-  "folder": "Middle Side Autos",
+  "folder": null,
   "previewStartingState": {
     "rotation": 90.19772745122567,
     "velocity": 0

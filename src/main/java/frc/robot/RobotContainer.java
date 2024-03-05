@@ -17,7 +17,7 @@ import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.auto.RunAltAutoCommand;
-import frc.robot.auto.Test;
+import frc.robot.auto.ampside.DefaultMovingWhileShooting;
 import frc.robot.commands.RobotTeleop;
 import frc.robot.subsystems.drive.Drive;
 
@@ -87,7 +87,7 @@ public class RobotContainer {
     //         drive // Reference to this subsystem to set requirements
     // );
 
-    return new RunAltAutoCommand(new Test());
+    return new RunAltAutoCommand(new DefaultMovingWhileShooting());
 
     /*PathPlannerPath path = PathPlannerPath.fromChoreoTrajectory("4note");
     List<PathPoint> points = path.getAllPathPoints();
