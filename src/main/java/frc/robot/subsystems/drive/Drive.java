@@ -20,7 +20,6 @@ import com.pathplanner.lib.util.ReplanningConfig;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
-import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -42,7 +41,7 @@ import frc.robot.OI;
 import frc.robot.subsystems.StateMachineSubsystemBase;
 import frc.robot.subsystems.drive.Module.Mode;
 import frc.robot.subsystems.drive.OdometryState.VisionObservation;
-import frc.robot.subsystems.vision.Vision.VisionUpdate;
+import frc.robot.subsystems.vision.Vision;
 import frc.robot.util.Util;
 import java.util.Arrays;
 import java.util.Queue;
@@ -80,7 +79,7 @@ public class Drive extends StateMachineSubsystemBase {
   public static final double CUTOFF_DISTANCE = 7.0;
 
   // ratio for the distance scaling on the standard deviation
-  private static final double APRILTAG_COEFFICIENT = 0.1; // NEEDS TO BE TUNED
+  private static final double APRILTAG_COEFFICIENT = 0.03; // NEEDS TO BE TUNED
 
   public static final Lock odometryLock = new ReentrantLock();
   public static final Queue<Double> timestampQueue = new ArrayBlockingQueue<>(100);
@@ -116,10 +115,10 @@ public class Drive extends StateMachineSubsystemBase {
           instance =
               new Drive(
                   new GyroIO() {},
-                  new ModuleIOSim(0),
-                  new ModuleIOSim(1),
-                  new ModuleIOSim(2),
-                  new ModuleIOSim(3),
+                  new ModuleIOIdeal(0),
+                  new ModuleIOIdeal(1),
+                  new ModuleIOIdeal(2),
+                  new ModuleIOIdeal(3),
                   new ObjectDetectorIO() {});
           break;
 
@@ -181,7 +180,7 @@ public class Drive extends StateMachineSubsystemBase {
       new SwerveDriveKinematics(getModuleTranslations());
   // private BetterPoseEstimator poseEstimator;
   private SwerveDrivePoseEstimator poseEstimator;
-  private double autolockSetpoint_r = 0, intermediaryAutolockSetpoint_r = 0;
+  private double autolockSetpoint_r = 0;
   private Pose2d pose;
   private Rotation2d lastGyroRotation = new Rotation2d();
   private ChassisSpeeds chassisSpeeds = new ChassisSpeeds(0, 0, 0);
@@ -202,9 +201,7 @@ public class Drive extends StateMachineSubsystemBase {
     modules[BL] = new Module(blModuleIO, BL, Mode.SETPOINT);
     modules[BR] = new Module(brModuleIO, BR, Mode.SETPOINT);
 
-    if (Constants.currentMode != Constants.Mode.SIM) {
-      PhoenixOdometryThread.getInstance();
-    }
+    PhoenixOdometryThread.getInstance();
 
     // TEMP Pathfinding.setPathfinder(new LocalADStarAK());
     PathPlannerLogging.setLogActivePathCallback(
@@ -263,11 +260,6 @@ public class Drive extends StateMachineSubsystemBase {
 
     STRAFE_AUTOLOCK =
         new State("STRAFE AUTOLOCK") {
-
-          PIDController closePID = new PIDController(3.5, 0, 0, Constants.globalDelta_sec);
-          PIDController midPID = new PIDController(2.75, 0, 0, Constants.globalDelta_sec);
-          PIDController farPID = new PIDController(2, 0, 0, Constants.globalDelta_sec);
-
           @Override
           public void periodic() {
             double throttle = 1.0;
@@ -275,17 +267,13 @@ public class Drive extends StateMachineSubsystemBase {
 
             double x_ = -OI.DR.getLeftY();
             double y_ = -OI.DR.getLeftX();
-            intermediaryAutolockSetpoint_r = autolockSetpoint_r;
             double err =
                 Math.IEEEremainder(
-                    getPose().getRotation().getRotations() - intermediaryAutolockSetpoint_r, 1.0);
-            if (Constants.verboseLogging) Logger.recordOutput("Drive/Autolock Heading Error", err);
-            double con =
-                Util.inRange(err, 0.2)
-                    ? (Util.inRange(err, 0.05) ? closePID.calculate(err) : midPID.calculate(err))
-                    : farPID.calculate(err);
+                    getPose().getRotation().getRotations() - autolockSetpoint_r, 1.0);
+            Logger.recordOutput("Drive/Autolock Heading Error", err);
+            double con = Util.inRange(err, 0.1) ? 3.5 * err : 2 * err;
             con = Util.limit(con, 0.6);
-            if (Constants.verboseLogging) Logger.recordOutput("Drive/Autolock Heading Output", con);
+            Logger.recordOutput("Drive/Autolock Heading Output", con);
             runVelocity(drive(x_, y_, -con, throttle));
           }
         };
@@ -304,10 +292,10 @@ public class Drive extends StateMachineSubsystemBase {
                 Math.IEEEremainder(
                     getPose().getRotation().getRotations() - autolockSetpoint_r, 1.0);
 
-            if (Constants.verboseLogging) Logger.recordOutput("Drive/Autolock Heading Error", err);
+            Logger.recordOutput("Drive/Autolock Heading Error", err);
             double con = Util.inRange(err, 0.1) ? 3.5 * err : 2 * err;
             con = Util.limit(con, 0.6);
-            if (Constants.verboseLogging) Logger.recordOutput("Drive/Autolock Heading Output", con);
+            Logger.recordOutput("Drive/Autolock Heading Output", con);
             runVelocity(drive(x_, y_, -con, throttle));
           }
         };
@@ -584,18 +572,26 @@ public class Drive extends StateMachineSubsystemBase {
     return OdometryState.getInstance().getEstimatedPose();
   }
 
-  public void addToPoseEstimator(VisionUpdate update) {
-    // if (update.pose().getTranslation().getDistance(getPoseEstimatorPose().getTranslation())
-    //     > POSE_DIFFERENCE) return;
+  public void addToPoseEstimator(Pose2d pose, double timestamp, double ambiguity, int[] tids) {
+
+    double distSums = 0;
+    for (int i = 0; i < tids.length; i++) {
+      try {
+        Pose2d tagPose = Vision.AT_MAP.getTagPose(i).orElseThrow().toPose2d();
+        distSums += tagPose.getTranslation().getDistance(getPose().getTranslation());
+      } catch (Exception e) {
+
+      }
+    }
+    double avgDistance = distSums / tids.length;
+
     OdometryState.getInstance()
         .addVisionObservation(
             new VisionObservation(
-                update.pose(),
-                update.timestamp(),
+                pose,
+                timestamp,
                 VecBuilder.fill(
-                    APRILTAG_COEFFICIENT * update.distance(),
-                    APRILTAG_COEFFICIENT * update.distance(),
-                    10)));
+                    APRILTAG_COEFFICIENT * avgDistance, APRILTAG_COEFFICIENT * avgDistance, 10)));
   }
 
   /** Returns the current odometry rotation. */

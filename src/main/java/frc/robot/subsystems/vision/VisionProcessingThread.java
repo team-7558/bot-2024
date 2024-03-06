@@ -1,9 +1,6 @@
 package frc.robot.subsystems.vision;
 
-import frc.robot.subsystems.drive.Drive;
-import frc.robot.subsystems.vision.Vision.VisionUpdate;
 import java.util.Optional;
-import org.littletonrobotics.junction.Logger;
 import org.photonvision.EstimatedRobotPose;
 import org.photonvision.targeting.PhotonPipelineResult;
 import org.photonvision.targeting.PhotonTrackedTarget;
@@ -24,49 +21,32 @@ public class VisionProcessingThread extends Thread {
   @Override
   public void run() {
     while (true) {
+
       try {
         if (camera.camera.isConnected()) {
           PhotonPipelineResult latestResult = camera.camera.getLatestResult();
-          camera.poseEstimator.setReferencePose(Drive.getInstance().getPoseEstimatorPose());
           Optional<EstimatedRobotPose> poseOptional = camera.poseEstimator.update(latestResult);
           if (poseOptional.isPresent()) {
-            Logger.recordOutput(
-                "Vision/Ambiguity", latestResult.getBestTarget().getPoseAmbiguity());
-
-            // System.out.println("adding pose");
-
             EstimatedRobotPose estimatedPose = poseOptional.get();
 
-            double distanceSums = 0;
-            for (PhotonTrackedTarget tag : latestResult.getTargets()) {
-              distanceSums +=
-                  Vision.AT_MAP
-                      .getTagPose(tag.getFiducialId())
-                      .get()
-                      .toPose2d()
-                      .getTranslation()
-                      .getDistance(Drive.getInstance().getPoseEstimatorPose().getTranslation());
+            camera.timestamps.offer(latestResult.getTimestampSeconds());
+
+            camera.poses.offer(estimatedPose.estimatedPose);
+
+            Integer[] tids = new Integer[camera.camera.getLatestResult().getTargets().size()];
+
+            int i = 0;
+            for (PhotonTrackedTarget target : camera.camera.getLatestResult().getTargets()) {
+              tids[i] = target.getFiducialId();
+              i++;
             }
 
-            if (latestResult.getBestTarget().getPoseAmbiguity() > 0.6) {
-              return;
-            }
-            double distance =
-                (distanceSums / latestResult.targets.size())
-                    * (latestResult.getBestTarget().getPoseAmbiguity() + 1);
-            // Logger.recordOutput("Vision/TargetDist", distance);
+            camera.tids.offer(tids);
 
-            Drive.getInstance()
-                .addToPoseEstimator(
-                    (new VisionUpdate(
-                        estimatedPose.estimatedPose.toPose2d(),
-                        latestResult.getTimestampSeconds(),
-                        distance)));
-
-            camera.recentResult = latestResult;
+            camera.ambiguity.offer(latestResult.getBestTarget().getPoseAmbiguity());
           }
         }
-        Thread.sleep(SLEEP_TIME);
+        // Thread.sleep(SLEEP_TIME);
       } catch (Exception e) {
         e.printStackTrace();
       }
