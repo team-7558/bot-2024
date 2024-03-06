@@ -36,7 +36,7 @@ import org.littletonrobotics.junction.Logger;
 
 public class Shooter extends StateMachineSubsystemBase {
 
-  private static double HEIGHT_M = 0;
+  private static double HEIGHT_M = -0.1;
 
   public static final double TURRET_ZERO_POS = 0.25;
   public static final double PIVOT_ZERO_POS = Units.degreesToRotations(-2.0);
@@ -60,7 +60,7 @@ public class Shooter extends StateMachineSubsystemBase {
   private static LinearInterpolator turretConstraintsFromPivotPos =
       new LinearInterpolator(getLerpTableFromFile("turretConstraintFromPivotPos.lerp"));
 
-  private static double TIME_TO_SHOOT = 0.25;
+  private static double TIME_TO_SHOOT = 0.05;
 
   private static final Pose3d SPEAKER_POSE_RED = new Pose3d(16.28, 5.53, 1.987, new Rotation3d());
   private static final Pose3d SPEAKER_POSE_BLUE = new Pose3d(0.28, 5.53, 1.987, new Rotation3d());
@@ -73,7 +73,7 @@ public class Shooter extends StateMachineSubsystemBase {
   private static final Pose3d TRAP_BACK_RED = new Pose3d(11.220, 4.105, 1.171, new Rotation3d());
 
   public static class Setpoints {
-    private static double DEFAULT =
+    public static double DEFAULT =
         -7558.0; // This way we can handle the behaviour of the setpoints specifically
 
     public double flywheel_rps, feederVel_rps, turretPos_r, pivotPos_r;
@@ -227,7 +227,7 @@ public class Shooter extends StateMachineSubsystemBase {
             if (feedDebouncer.calculate(inputs.beamBreakActivated)) {
               setCurrentState(IDLE);
             } else {
-              queueSetpoints(new Setpoints(0, 6.5, 0, PIVOT_MIN_POS_r));
+              queueSetpoints(new Setpoints(Setpoints.DEFAULT, 6.5, 0, PIVOT_MIN_POS_r));
               track();
             }
           }
@@ -253,12 +253,13 @@ public class Shooter extends StateMachineSubsystemBase {
         new State("SHOOTING") {
           @Override
           public void init() {
-            queueSetpoints(new Setpoints(8));
+            currSetpoints.feederVel_rps = 8;
             ShotLogger.log();
           }
 
           @Override
           public void periodic() {
+            currSetpoints.feederVel_rps = 8;
             track();
           }
 
@@ -287,7 +288,7 @@ public class Shooter extends StateMachineSubsystemBase {
                   setCurrentState(IDLE);
                 }
               } else {
-                io.setTurretVolts(1);
+                io.setTurretVolts(0.5);
               }
             }
           }
@@ -548,14 +549,14 @@ public class Shooter extends StateMachineSubsystemBase {
         delta.getX() * delta.getX() + delta.getY() * delta.getY() + delta.getZ() * delta.getZ();
     double dist = Math.sqrt(dist2);
 
-    double flywheel_rps = shotSpeedFromDistance.getInterpolatedValue(dist);
+    double flywheel_rps = 40; // shotSpeedFromDistance.getInterpolatedValue(dist);
 
     double theta =
         Math.IEEEremainder(Math.atan2(delta.getY(), delta.getX()) + Math.PI, 2 * Math.PI);
     double turretPos_r = Units.radiansToRotations(theta);
     double pivotPos_r = Units.radiansToRotations(Math.asin(delta.getZ() / dist));
 
-    return new Setpoints(flywheel_rps, turretPos_r, pivotPos_r);
+    return new Setpoints(flywheel_rps, Setpoints.DEFAULT, turretPos_r, pivotPos_r);
   }
 
   public Setpoints constrainSetpoints(Setpoints s, boolean isFeeding) { // TODO: constrain
@@ -569,9 +570,7 @@ public class Shooter extends StateMachineSubsystemBase {
       s.feederVel_rps = 0;
       s.flywheel_rps = Util.limit(s.flywheel_rps, FLYWHEEL_MIN_VEL_rps, FLYWHEEL_MAX_VEL_rps);
       s.pivotPos_r = Util.limit(s.pivotPos_r, PIVOT_MIN_POS_r, PIVOT_MAX_POS_r);
-      s.turretPos_r =
-          Util.limit(
-              s.turretPos_r, turretConstraintsFromPivotPos.getInterpolatedValue(s.pivotPos_r));
+      s.turretPos_r = Util.limit(s.turretPos_r, TURRET_MIN_POS_r, TURRET_MAX_POS_r);
     }
     return s;
   }

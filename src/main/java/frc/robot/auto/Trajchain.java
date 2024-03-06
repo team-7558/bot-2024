@@ -57,11 +57,17 @@ public class Trajchain implements IFollowable {
       for (int i = 0; i < firstPath; i++) {
         trajs.get(i).generate(initState);
       }
-      for (int i = 1; i < chainSize; i++) {
+      for (int i = 1; i <= chainSize; i++) {
+        System.out.println(i + ": " + trajs.get(i - 1).endTime());
         totalTime_s += trajs.get(i - 1).endTime();
         startTimes.add(totalTime_s);
       }
 
+      for (var time : startTimes) {
+        System.out.println(time);
+      }
+
+      System.out.println("Trajchain generated");
       generated = true;
     }
   }
@@ -73,11 +79,16 @@ public class Trajchain implements IFollowable {
 
   @Override
   public State sample(double time_s) {
+    if (time_s >= startTimes.get(chainSize)) {
+      return getEndState();
+    } else {
 
-    int i = 0;
-    while (time_s < startTimes.get(i)) i++;
+      int i = -1;
+      while (time_s >= startTimes.get(i + 1)) i++;
+      // System.out.println(i + ": " + (time_s - startTimes.get(i)));
 
-    return trajs.get(i).sample(time_s - startTimes.get(i));
+      return trajs.get(i).sample(time_s - startTimes.get(i));
+    }
   }
 
   @Override
@@ -99,7 +110,7 @@ public class Trajchain implements IFollowable {
   @Override
   public State getEndState() {
     if (generated) {
-      return trajs.get(chainSize - 1).getInitState();
+      return trajs.get(chainSize - 1).getEndState();
     }
     return null;
   }

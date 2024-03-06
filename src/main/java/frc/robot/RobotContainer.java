@@ -16,6 +16,7 @@ package frc.robot;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.auto.AltAuto;
 import frc.robot.auto.RunAltAutoCommand;
 import frc.robot.auto.ampside.DefaultMovingWhileShooting;
 import frc.robot.commands.RobotTeleop;
@@ -30,6 +31,9 @@ import frc.robot.subsystems.drive.Drive;
 public class RobotContainer {
   // Subsystems
   private final Drive drive;
+
+  private AltAuto auto = new DefaultMovingWhileShooting();
+  // private AltAuto auto = new AmpSeries();
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -55,61 +59,6 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    //   return new FollowPathHolonomic(
-    //         PathPlannerPath.fromChoreoTrajectory("LeftStart"),
-    //         drive::getPose, // Robot pose supplier
-    //         drive::getChassisSpeedsFromModuleStates, // ChassisSpeeds supplier. MUST BE ROBOT
-    // RELATIVE
-    //         drive::runVelocity, // Method that will drive the robot given ROBOT RELATIVE
-    // ChassisSpeeds
-    //         new HolonomicPathFollowerConfig( // HolonomicPathFollowerConfig, this should likely
-    // live in your Constants class
-    //                 new PIDConstants(5.0, 0.0, 0.0), // Translation PID constants
-    //                 new PIDConstants(5.0, 0.0, 0.0), // Rotation PID constants
-    //                 4.5, // Max module speed, in m/s
-    //                 0.4, // Drive base radius in meters. Distance from robot center to furthest
-    // module.
-    //                 new ReplanningConfig() // Default path replanning config. See the API for the
-    // options here
-    //         ),
-    //         () -> {
-    //             // Boolean supplier that controls when the path will be mirrored for the red
-    // alliance
-    //             // This will flip the path being followed to the red side of the field.
-    //             // THE ORIGIN WILL REMAIN ON THE BLUE SIDE
-
-    //             var alliance = DriverStation.getAlliance();
-    //             if (alliance.isPresent()) {
-    //                 return alliance.get() == DriverStation.Alliance.Red;
-    //             }
-    //             return false;
-    //         },
-    //         drive // Reference to this subsystem to set requirements
-    // );
-
-    return new RunAltAutoCommand(new DefaultMovingWhileShooting());
-
-    /*PathPlannerPath path = PathPlannerPath.fromChoreoTrajectory("4note");
-    List<PathPoint> points = path.getAllPathPoints();
-    PathPoint[] array = (PathPoint[]) points.toArray(new PathPoint[0]);
-    Translation2d[] translationArray = new Translation2d[array.length];
-    for (int i = 0; i < array.length; i++) {
-      translationArray[i] = array[i].position;
-    }
-    Logger.recordOutput("Drive/Path", translationArray);
-
-    List<PathPoint> pointsF = path.flipPath().getAllPathPoints();
-    PathPoint[] arrayF = pointsF.toArray(new PathPoint[0]);
-    Translation2d[] translationArrayF = new Translation2d[arrayF.length];
-    for (int i = 0; i < arrayF.length; i++) {
-      translationArrayF[i] = arrayF[i].position;
-    }
-    Logger.recordOutput("Drive/PathFlipped", translationArrayF);
-
-    Pose2d pose = path.getPreviewStartingHolonomicPose();
-    pose = pose.rotateBy(Rotation2d.fromDegrees(180));
-
-    drive.setPose(path.getPreviewStartingHolonomicPose());
-    return AutoBuilder.followPath(path.flipPath());*/
+    return new RunAltAutoCommand(auto);
   }
 }

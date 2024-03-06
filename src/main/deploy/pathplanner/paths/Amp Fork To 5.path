@@ -3,29 +3,45 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 1.5020262985617487,
-        "y": 0.9083497701105212
+        "x": 5.49,
+        "y": 6.28103150943144
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.5020262985617494,
-        "y": 0.9083497701105212
+        "x": 6.49,
+        "y": 6.28103150943144
       },
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "AmpSideFork"
     },
     {
       "anchor": {
-        "x": 10.31233609888185,
-        "y": 0.9083497701105212
+        "x": 8.284148348811815,
+        "y": 5.8179712328069675
       },
       "prevControl": {
-        "x": 9.31233609888185,
-        "y": 0.9083497701105212
+        "x": 7.228005407475394,
+        "y": 5.8179712328069675
+      },
+      "nextControl": {
+        "x": 9.040865919139485,
+        "y": 5.8179712328069675
+      },
+      "isLocked": false,
+      "linkedName": "Note5"
+    },
+    {
+      "anchor": {
+        "x": 5.49,
+        "y": 6.28103150943144
+      },
+      "prevControl": {
+        "x": 5.885496115897047,
+        "y": 7.5544472701487395
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "AmpSideFork"
     }
   ],
   "rotationTargets": [],
@@ -43,10 +59,10 @@
     "rotateFast": false
   },
   "reversed": false,
-  "folder": null,
+  "folder": "AmpSide",
   "previewStartingState": {
     "rotation": 0,
-    "velocity": 0
+    "velocity": 4.2
   },
   "useDefaultConstraints": true
 }

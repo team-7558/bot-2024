@@ -1,0 +1,100 @@
+{
+  "version": 1.0,
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 5.49,
+        "y": 6.28103150943144
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 6.49,
+        "y": 6.28103150943144
+      },
+      "isLocked": false,
+      "linkedName": "AmpSideFork"
+    },
+    {
+      "anchor": {
+        "x": 8.126707854759495,
+        "y": 7.438682200992622
+      },
+      "prevControl": {
+        "x": 7.265415740237975,
+        "y": 6.688524552860975
+      },
+      "nextControl": {
+        "x": 8.987999969281015,
+        "y": 8.188839849124268
+      },
+      "isLocked": false,
+      "linkedName": "Note4"
+    },
+    {
+      "anchor": {
+        "x": 5.32982378394768,
+        "y": 7.577600283979963
+      },
+      "prevControl": {
+        "x": 7.140389465549368,
+        "y": 7.64242872270739
+      },
+      "nextControl": {
+        "x": 3.2621561135839565,
+        "y": 7.503566147445201
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 2.4264358495122367,
+        "y": 7.438682200992622
+      },
+      "prevControl": {
+        "x": 2.1115548614075954,
+        "y": 8.059182971669415
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": "AltStrafe"
+    }
+  ],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 0.0,
+      "rotationDegrees": 0,
+      "rotateFast": false
+    },
+    {
+      "waypointRelativePos": 2.0,
+      "rotationDegrees": 0,
+      "rotateFast": false
+    },
+    {
+      "waypointRelativePos": 3.0,
+      "rotationDegrees": -25.0,
+      "rotateFast": false
+    }
+  ],
+  "constraintZones": [],
+  "eventMarkers": [],
+  "globalConstraints": {
+    "maxVelocity": 4.2,
+    "maxAcceleration": 2.5,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0
+  },
+  "goalEndState": {
+    "velocity": 0.5,
+    "rotation": -25.0,
+    "rotateFast": false
+  },
+  "reversed": false,
+  "folder": "AmpSide",
+  "previewStartingState": {
+    "rotation": 0,
+    "velocity": 4.2
+  },
+  "useDefaultConstraints": true
+}

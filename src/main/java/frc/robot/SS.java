@@ -83,8 +83,10 @@ public class SS {
   }
 
   public void queueState(State s) {
-    System.out.println(currState + " -> " + s);
-    nextState = s;
+    if (currState != s) {
+      System.out.println(currState + " -> " + s);
+      nextState = s;
+    }
   }
 
   private void stateInfoLog() {
@@ -229,7 +231,7 @@ public class SS {
       case PRECHAMBER:
         if (first) {
           if (!shooter.beamBroken()) {
-            shooter.queueSetpoints(new Setpoints(0, 0, 0, Shooter.PIVOT_MIN_POS_r));
+            shooter.queueSetpoints(new Setpoints(Setpoints.DEFAULT, 0, 0, Shooter.PIVOT_MIN_POS_r));
             shooter.setCurrentState(shooter.TRACKING);
           } else {
             queueState(State.CHAMBER);
@@ -260,14 +262,14 @@ public class SS {
       case SHOOTING:
         if (shooter.isAtSetpoints()) {
           hasGamePiece = false;
-          intake.setCurrentState(intake.SHOOTER_SIDE);
+          // intake.setCurrentState(intake.SHOOTER_SIDE);
           shooter.setCurrentState(shooter.SHOOTING);
         }
         break;
       case SHOOTING_FROM_GROUND:
         if (first) {
           shooter.setCurrentState(shooter.SHOOTING);
-          intake.setCurrentState(intake.FEEDING);
+          intake.setCurrentState(intake.SHOOTER_SIDE);
         }
         break;
       default:
@@ -349,8 +351,7 @@ public class SS {
 
   public void trackFromPose() {
     if (currState != State.BOOT) {
-      shooter.setTargetMode(TargetMode.SPEAKER);
-      shooter.queueSetpoints(shooter.constrainSetpoints(shooter.shooterPipeline(), hasGamePiece));
+      queueSetpointsLive();
       queueState(State.TRACKING);
     }
   }
@@ -467,6 +468,11 @@ public class SS {
 
   public void queueSetpoints(Setpoints setpoints) {
     shooter.queueSetpoints(setpoints);
+  }
+
+  public void queueSetpointsLive() {
+    shooter.setTargetMode(TargetMode.SPEAKER);
+    shooter.queueSetpoints(shooter.constrainSetpoints(shooter.shooterPipeline(), false));
   }
 
   public void resetHomingFlags() {

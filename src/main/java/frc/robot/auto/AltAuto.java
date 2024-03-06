@@ -3,6 +3,7 @@ package frc.robot.auto;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.Timer;
 import frc.robot.SS;
+import frc.robot.subsystems.LED.LED;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.util.Util;
 
@@ -14,6 +15,7 @@ public abstract class AltAuto {
 
   protected final Drive drive;
   protected final SS ss;
+  protected final LED led;
 
   private Timer t;
   private boolean forcePoseReset;
@@ -22,6 +24,7 @@ public abstract class AltAuto {
     name = s;
     drive = Drive.getInstance();
     ss = SS.getInstance();
+    led = LED.getInstance();
     trajstack = new Trajstack();
     this.forcePoseReset = forcePoseReset;
     t = new Timer();
@@ -50,6 +53,7 @@ public abstract class AltAuto {
 
   public final void execute() {
     onExecute();
+    led.drawNumber(t.get(), 16, 16, 16);
   }
 
   protected boolean before(double time_s) {

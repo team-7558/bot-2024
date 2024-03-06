@@ -79,9 +79,20 @@ public class LED {
   }
 
   public void drawPoint(int x, int y, int r, int g, int b) {
+    x = WIDTH - 1 - x;
+    y = HEIGHT - 1 - y;
     if (x >= 0 && x < WIDTH && y >= 0 && y < HEIGHT) {
       int i = (x * HEIGHT) + (x % 2 == 1 ? HEIGHT - 1 - y : y);
       setRGB(i, r, g, b);
+    }
+  }
+
+  public void scalePoint(int x, int y, int r, int g, int b) {
+    x = WIDTH - 1 - x;
+    y = HEIGHT - 1 - y;
+    if (x >= 0 && x < WIDTH && y >= 0 && y < HEIGHT) {
+      int i = (x * HEIGHT) + (x % 2 == 1 ? HEIGHT - 1 - y : y);
+      scaleRGB(i, r, g, b);
     }
   }
 
@@ -91,9 +102,21 @@ public class LED {
     }
   }
 
+  public void scaleRow(int row, int r, int g, int b) {
+    for (int i = 0; i < WIDTH; i++) {
+      scalePoint(i, row, r, g, b);
+    }
+  }
+
   public void drawCol(int col, int r, int g, int b) {
     for (int i = 0; i < HEIGHT; i++) {
       drawPoint(col, i, r, g, b);
+    }
+  }
+
+  public void scaleCol(int col, int r, int g, int b) {
+    for (int i = 0; i < HEIGHT; i++) {
+      scalePoint(col, i, r, g, b);
     }
   }
 
@@ -114,6 +137,58 @@ public class LED {
     for (int t = 0; t < 36; t++) {
       double tr = Units.degreesToRadians(t * 10);
       drawPoint(x + (int) (rad * Math.cos(tr)), y + (int) (rad * Math.sin(tr)), r, g, b);
+    }
+  }
+
+  public void drawNumber(double value, int r, int g, int b) {
+    value = Math.abs(value);
+    int iv = (int) value;
+    int tenths = (int) (10 * (value - iv));
+    int ones = iv % 10;
+    int tens = (iv / 10) % 10;
+    int hundreds = (iv / 100) % 10;
+
+    if (iv > 99) drawDigit(hundreds, 0, r, g, b);
+    if (iv > 9) drawDigit(tens, 8, r, g, b);
+    drawDigit(ones, 16, r, g, b);
+    drawPoint(24, 7, 24, 0, 24);
+    drawDigit(tenths, 24, r, g, b);
+  }
+
+  public void drawDigit(int d, int i, int r, int g, int b) {
+    switch (d) {
+      case 0:
+        draw0(i, r, g, b);
+        break;
+      case 1:
+        draw1(i, r, g, b);
+        break;
+      case 2:
+        draw2(i, r, g, b);
+        break;
+      case 3:
+        draw3(i, r, g, b);
+        break;
+      case 4:
+        draw4(i, r, g, b);
+        break;
+      case 5:
+        draw5(i, r, g, b);
+        break;
+      case 6:
+        draw6(i, r, g, b);
+        break;
+      case 7:
+        draw7(i, r, g, b);
+        break;
+      case 8:
+        draw8(i, r, g, b);
+        break;
+      case 9:
+        draw9(i, r, g, b);
+        break;
+      default:
+        break;
     }
   }
 

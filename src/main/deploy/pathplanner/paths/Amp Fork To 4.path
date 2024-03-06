@@ -3,56 +3,56 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 1.3381135580906773,
-        "y": 6.44040476100919
+        "x": 5.49,
+        "y": 6.28103150943144
       },
       "prevControl": null,
       "nextControl": {
-        "x": 7.222380549064854,
-        "y": 6.44040476100919
+        "x": 6.49,
+        "y": 6.28103150943144
       },
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "AmpSideFork"
     },
     {
       "anchor": {
-        "x": 7.7648589240606105,
-        "y": 7.458029691433759
+        "x": 8.126707854759495,
+        "y": 7.438682200992622
       },
       "prevControl": {
-        "x": 7.50309344791847,
-        "y": 7.458029691433759
+        "x": 7.265415740237975,
+        "y": 6.688524552860975
       },
       "nextControl": {
-        "x": 7.81485892406061,
-        "y": 7.458029691433759
+        "x": 8.987999969281015,
+        "y": 8.188839849124268
       },
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "Note4"
     },
     {
       "anchor": {
-        "x": 7.7648589240606105,
-        "y": 4.213923369610466
+        "x": 5.49,
+        "y": 6.28103150943144
       },
       "prevControl": {
-        "x": 7.8263262017372615,
-        "y": 5.873539866880067
+        "x": 5.051987617972997,
+        "y": 7.082125787991777
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "AmpSideFork"
     }
   ],
   "rotationTargets": [
     {
-      "waypointRelativePos": 0.7,
+      "waypointRelativePos": 0.0,
       "rotationDegrees": 0,
       "rotateFast": false
     },
     {
-      "waypointRelativePos": 1.45,
-      "rotationDegrees": -18.764871715661055,
+      "waypointRelativePos": 2.0,
+      "rotationDegrees": 0,
       "rotateFast": false
     }
   ],
@@ -66,14 +66,14 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -16.23235066115617,
+    "rotation": 0,
     "rotateFast": false
   },
   "reversed": false,
-  "folder": null,
+  "folder": "AmpSide",
   "previewStartingState": {
     "rotation": 0,
-    "velocity": 0
+    "velocity": 4.2
   },
   "useDefaultConstraints": true
 }

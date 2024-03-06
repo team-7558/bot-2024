@@ -3,56 +3,61 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 1.3381135580906773,
-        "y": 6.44040476100919
+        "x": 5.49,
+        "y": 6.28103150943144
       },
       "prevControl": null,
       "nextControl": {
-        "x": 7.222380549064854,
-        "y": 6.44040476100919
+        "x": 6.49,
+        "y": 6.28103150943144
       },
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "AmpSideFork"
     },
     {
       "anchor": {
-        "x": 7.7648589240606105,
-        "y": 7.458029691433759
+        "x": 8.284148348811815,
+        "y": 5.8179712328069675
       },
       "prevControl": {
-        "x": 7.50309344791847,
-        "y": 7.458029691433759
+        "x": 7.6543863726025325,
+        "y": 6.063393179417938
       },
       "nextControl": {
-        "x": 7.81485892406061,
-        "y": 7.458029691433759
+        "x": 8.83024174139159,
+        "y": 5.605155425404554
       },
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "Note5"
     },
     {
       "anchor": {
-        "x": 7.7648589240606105,
-        "y": 4.213923369610466
+        "x": 2.616290562928271,
+        "y": 3.2294642864761656
       },
       "prevControl": {
-        "x": 7.8263262017372615,
-        "y": 5.873539866880067
+        "x": 3.523888705112237,
+        "y": 2.067182992148739
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "StrafePoint"
     }
   ],
   "rotationTargets": [
     {
-      "waypointRelativePos": 0.7,
+      "waypointRelativePos": 0.0,
       "rotationDegrees": 0,
       "rotateFast": false
     },
     {
-      "waypointRelativePos": 1.45,
-      "rotationDegrees": -18.764871715661055,
+      "waypointRelativePos": 1.55,
+      "rotationDegrees": 0,
+      "rotateFast": false
+    },
+    {
+      "waypointRelativePos": 2.0,
+      "rotationDegrees": 25.0,
       "rotateFast": false
     }
   ],
@@ -65,15 +70,15 @@
     "maxAngularAcceleration": 720.0
   },
   "goalEndState": {
-    "velocity": 0,
-    "rotation": -16.23235066115617,
+    "velocity": 0.5,
+    "rotation": 25.0,
     "rotateFast": false
   },
   "reversed": false,
-  "folder": null,
+  "folder": "AmpSide",
   "previewStartingState": {
     "rotation": 0,
-    "velocity": 0
+    "velocity": 4.2
   },
   "useDefaultConstraints": true
 }

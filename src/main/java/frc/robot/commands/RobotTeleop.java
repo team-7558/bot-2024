@@ -4,8 +4,6 @@
 
 package frc.robot.commands;
 
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.G;
 import frc.robot.OI;
@@ -43,12 +41,7 @@ public class RobotTeleop extends Command {
     if (!drive.isState(drive.DISABLED)) {
       // slow mode
       // x stance while shooting
-      if (OI.DR.getPOV() == 180) {
-        drive.hardSetPose(
-            new Pose2d(
-                drive.getPose().getTranslation(),
-                Rotation2d.fromRotations(G.isRedAlliance() ? 0.5 : 0)));
-      } else if (OI.DR.getAButton()) {
+      if (OI.DR.getAButton()) {
         drive.setAutolockSetpoint(0.25);
         drive.setCurrentState(drive.STRAFE_AUTOLOCK);
       } else if (OI.DR.getBButton()) {

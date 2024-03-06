@@ -13,6 +13,9 @@
 
 package frc.robot;
 
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -52,6 +55,7 @@ public class Robot extends LoggedRobot {
   boolean resetPose = false;
 
   private Timer t = new Timer();
+  private Timer tt = new Timer();
 
   protected Robot() {
     super(Constants.globalDelta_sec);
@@ -81,6 +85,22 @@ public class Robot extends LoggedRobot {
       resetPose = true;
       drive.resetPose();
     }
+
+    int d0 = (int) (16 + 16 * Math.sin(6.2 * t.get()));
+    int d1 = (int) (16 + 16 * Math.sin(5.6 * t.get()));
+    int d2 = (int) (16 + 16 * Math.sin(7.9 * t.get()));
+    int d3 = (int) (16 + 16 * Math.sin(6.0 * t.get()));
+
+    led.draw7(0, d0, d0, d0);
+    led.draw5(8, d1, d1, d1);
+    led.draw5(16, d2, d2, d2);
+    led.draw8(24, d3, d3, d3);
+
+    int r = (int) (LED.HEIGHT * (0.5 + 0.5 * Math.sin(6.9 * t.get())));
+    int c = (int) (LED.WIDTH * (0.5 + 0.5 * Math.sin(4.3 * t.get())));
+    boolean red = G.isRedAlliance();
+    led.scaleRow(r, red ? 3 : 0, 0, red ? 0 : 3);
+    led.scaleCol(c, red ? 3 : 0, 0, red ? 0 : 3);
   }
 
   /**
@@ -151,7 +171,17 @@ public class Robot extends LoggedRobot {
     // This must be called from the robot's periodic block in order for anything in
     // the Command-based framework to work.
 
-    led.setBlinkin(Math.sin(t.get()));
+    double s = Math.sin(3 * t.get());
+    double c = -Math.sin(3 * t.get());
+
+    led.setBlinkin(s);
+
+    if (OI.DR.getPOV() == 180) {
+      drive.hardSetPose(
+          new Pose2d(
+              drive.getPose().getTranslation(),
+              Rotation2d.fromRotations(G.isRedAlliance() ? 0.5 : 0)));
+    }
 
     SS.getInstance().periodic();
     SS2d.periodic();
@@ -164,6 +194,7 @@ public class Robot extends LoggedRobot {
   /** This function is called once when the robot is disabled. */
   @Override
   public void disabledInit() {
+    OI.DR.setRumble(RumbleType.kBothRumble, 0);
     t.reset();
     t.start();
   }
@@ -193,11 +224,18 @@ public class Robot extends LoggedRobot {
     if (autonomousCommand != null) {
       autonomousCommand.cancel();
     }
+
+    tt.reset();
+    tt.start();
   }
 
   /** This function is called periodically during operator control. */
   @Override
-  public void teleopPeriodic() {}
+  public void teleopPeriodic() {
+    double tv = 135.0 - tt.get();
+    if (tv < 10.0) led.drawNumber(tv, 48, 0, 0);
+    else led.drawNumber(tv, 16, 16, 16);
+  }
 
   /** This function is called once when test mode is enabled. */
   @Override
