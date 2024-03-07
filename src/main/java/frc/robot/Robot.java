@@ -182,6 +182,12 @@ public class Robot extends LoggedRobot {
               Rotation2d.fromRotations(G.isRedAlliance() ? 0.5 : 0)));
     }
 
+    if (OI.XK.get(5, 3)) {
+      LED.getInstance().drawRow(0, 255, 255, 0);
+    } else if (OI.XK.get(6, 3)) {
+      LED.getInstance().drawRow(0, 128, 0, 128);
+    }
+
     SS.getInstance().periodic();
     SS2d.periodic();
     vision.periodic();

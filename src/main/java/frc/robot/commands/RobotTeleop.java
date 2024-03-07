@@ -96,6 +96,7 @@ public class RobotTeleop extends Command {
         ss.trackPreset(
             G.isRedAlliance() ? ShotPresets.RED_SIDE_POST : ShotPresets.BLUE_SIDE_POST, true);
       } else if (OI.XK.get(0, 3)) {
+        System.err.println("HUUUUH");
         ss.trackPreset(
             G.isRedAlliance() ? ShotPresets.RED_AMP_BOX : ShotPresets.BLUE_AMP_BOX, true);
       } else if (OI.XK.get(0, 4)) {
@@ -118,10 +119,6 @@ public class RobotTeleop extends Command {
             G.isRedAlliance() ? ShotPresets.RED_CLEAR_CLOSE : ShotPresets.BLUE_CLEAR_CLOSE, true);
       } else if (OI.DR.getLeftBumper() || OI.DR.getBackButton()) {
         ss.intake();
-      } else if (OI.XK.get(5, 3)) {
-        LED.getInstance().drawRow(0, 255, 255, 0);
-      } else if (OI.XK.get(6, 3)) {
-        LED.getInstance().drawRow(0, 128, 0, 128);
       } else {
         ss.idle();
       }

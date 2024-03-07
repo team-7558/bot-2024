@@ -8,17 +8,15 @@ public class AmpSeries extends AltAuto {
     trajstack
         .appendChain()
         .append("Amp Start", false)
-        .append("Amp Fork To 4", false)
-        .append("Amp Fork To 5 To Strafe", false)
+        .append("Amp Fork To 4 To Strafe", false)
         .append("Strafe Run", false);
 
     trajstack
         .appendChain()
         .append("Amp Start", false)
-        .append("Amp Fork To 5", false)
-        .append("Amp Fork To 4 To Strafe", false)
-        .append("Alt Strafe Run", false);
-    trajstack.setActiveIdx(0);
+        .append("Amp Fork To 5 To Strafe", false)
+        .append("Strafe Run", false);
+    trajstack.setActiveIdx(1);
     trajstack.generate();
   }
 
