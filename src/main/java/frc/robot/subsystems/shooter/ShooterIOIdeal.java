@@ -25,7 +25,7 @@ public class ShooterIOIdeal implements ShooterIO {
     inputs.turretAbsPosR = 0.0;
     inputs.turretVelRPS = 0.0;
     inputs.turretCurrent = 0.0;
-    inputs.beamBreakActivated = false;
+    inputs.beamBreakActivated = true;
     inputs.turretHallEffect = true;
     inputs.pivotHallEffect = true;
   }

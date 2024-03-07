@@ -89,6 +89,10 @@ public class Util {
     return (value - a) / (b - a);
   }
 
+  public static double remap(double min0, double max0, double value, double min1, double max1) {
+    return lerp(min1, max1, unlerp(min0, max0, value));
+  }
+
   public static double dist2(double x, double y) {
     return x * x + y * y;
   }

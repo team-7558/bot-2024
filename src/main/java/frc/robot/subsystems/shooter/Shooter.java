@@ -25,10 +25,11 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Filesystem;
 import frc.robot.Constants;
+import frc.robot.G;
 import frc.robot.SS2d;
 import frc.robot.subsystems.StateMachineSubsystemBase;
 import frc.robot.subsystems.drive.Drive;
-import frc.robot.util.LinearInterpolator;
+import frc.robot.util.LerpTable;
 import frc.robot.util.Util;
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -51,14 +52,12 @@ public class Shooter extends StateMachineSubsystemBase {
   public static final double PIVOT_MIN_FEED_POS_r = PIVOT_ZERO_POS,
       PIVOT_MAX_FEED_POS_r = Units.degreesToRotations(15);
 
-  private static LinearInterpolator shotTimesFromDistance =
-      new LinearInterpolator(getLerpTableFromFile("shottimes.lerp"));
+  private static LerpTable shotTimesFromDistance = new LerpTable("shottimes.lerp").compile();
   ;
-  private static LinearInterpolator shotSpeedFromDistance =
-      new LinearInterpolator(getLerpTableFromFile("shotspeeds.lerp"));
+  private static LerpTable shotSpeedFromDistance = new LerpTable("shotspeeds.lerp").compile();
 
-  private static LinearInterpolator turretConstraintsFromPivotPos =
-      new LinearInterpolator(getLerpTableFromFile("turretConstraintFromPivotPos.lerp"));
+  private static LerpTable turretConstraintsFromPivotPos =
+      new LerpTable("turretConstraintsFromPivotPos.lerp").compile();
 
   private static double TIME_TO_SHOOT = 0.05;
 
@@ -147,19 +146,19 @@ public class Shooter extends StateMachineSubsystemBase {
     return instance;
   }
 
-  public final State DISABLED, IDLE, TRACKING, SHOOTING, BEING_FED, ZEROING, MANUAL;
+  public final State DISABLED, IDLE, TRACKING, SHOOTING, BEING_FED, ZEROING, MANUAL, SPITTING;
   private final ShooterIOInputsAutoLogged inputs = new ShooterIOInputsAutoLogged();
 
   private final ShooterIO io;
 
-  private final Debouncer feedDebouncer = new Debouncer(0.07, DebounceType.kRising);
+  private final Debouncer feedDebouncer = new Debouncer(0.02, DebounceType.kRising);
 
   public enum TargetMode {
     SPEAKER,
     TRAP,
     AMP,
     CLEAR,
-    CUSTOM
+    CUSTOM,
   }
 
   private TargetMode targetMode = TargetMode.SPEAKER;
@@ -216,6 +215,20 @@ public class Shooter extends StateMachineSubsystemBase {
           public void exit() {}
         };
 
+    SPITTING =
+        new State("SPITTING") {
+          @Override
+          public void init() {
+            currSetpoints.feederVel_rps = 30;
+            currSetpoints.flywheel_rps = 10;
+          }
+
+          @Override
+          public void periodic() {
+            track();
+          }
+        };
+
     BEING_FED =
         new State("BEING_FED") {
           @Override
@@ -224,10 +237,10 @@ public class Shooter extends StateMachineSubsystemBase {
           @Override
           public void periodic() {
             // queueSetpoints(constrainSetpoints(shooterPipeline(), !inputs.beamBreakActivated));
-            if (feedDebouncer.calculate(inputs.beamBreakActivated)) {
+            if (inputs.beamBreakActivated) {
               setCurrentState(IDLE);
             } else {
-              queueSetpoints(new Setpoints(Setpoints.DEFAULT, 6.5, 0, PIVOT_MIN_POS_r));
+              queueSetpoints(new Setpoints(Setpoints.DEFAULT, 3.8, 0, PIVOT_MIN_POS_r));
               track();
             }
           }
@@ -253,13 +266,13 @@ public class Shooter extends StateMachineSubsystemBase {
         new State("SHOOTING") {
           @Override
           public void init() {
-            currSetpoints.feederVel_rps = 8;
+            currSetpoints.feederVel_rps = 30;
             ShotLogger.log();
           }
 
           @Override
           public void periodic() {
-            currSetpoints.feederVel_rps = 8;
+            currSetpoints.feederVel_rps = 30;
             track();
           }
 
@@ -417,7 +430,7 @@ public class Shooter extends StateMachineSubsystemBase {
 
   public boolean isAtSetpoints() {
     boolean res = true;
-    res &= isFlywheelAtSetpoint(1);
+    res &= isFlywheelAtSetpoint(2);
     res &= isTurretAtSetpoint(0.01);
     res &= isPivotAtSetpoint(0.01);
     Logger.recordOutput("Shooter/AtSetpoints", res);
@@ -524,7 +537,7 @@ public class Shooter extends StateMachineSubsystemBase {
           delta.getX() * delta.getX() + delta.getY() * delta.getY() + delta.getZ() * delta.getZ();
       double dist = Math.sqrt(dist2);
 
-      double shotTime_s = TIME_TO_SHOOT + shotTimesFromDistance.getInterpolatedValue(dist);
+      double shotTime_s = TIME_TO_SHOOT + shotTimesFromDistance.calcY(dist);
 
       Transform3d offset =
           new Transform3d(
@@ -549,7 +562,7 @@ public class Shooter extends StateMachineSubsystemBase {
         delta.getX() * delta.getX() + delta.getY() * delta.getY() + delta.getZ() * delta.getZ();
     double dist = Math.sqrt(dist2);
 
-    double flywheel_rps = 40; // shotSpeedFromDistance.getInterpolatedValue(dist);
+    double flywheel_rps = shotSpeedFromDistance.calcY(dist);
 
     double theta =
         Math.IEEEremainder(Math.atan2(delta.getY(), delta.getX()) + Math.PI, 2 * Math.PI);
@@ -570,9 +583,20 @@ public class Shooter extends StateMachineSubsystemBase {
       s.feederVel_rps = 0;
       s.flywheel_rps = Util.limit(s.flywheel_rps, FLYWHEEL_MIN_VEL_rps, FLYWHEEL_MAX_VEL_rps);
       s.pivotPos_r = Util.limit(s.pivotPos_r, PIVOT_MIN_POS_r, PIVOT_MAX_POS_r);
-      s.turretPos_r = Util.limit(s.turretPos_r, TURRET_MIN_POS_r, TURRET_MAX_POS_r);
+      double y = turretConstraintsFromPivotPos.calcY(s.pivotPos_r);
+      // System.out.println(s.pivotPos_r+":"+y);
+      s.turretPos_r = Util.limit(s.turretPos_r, -0.15, 0.15);
     }
     return s;
+  }
+
+  public Setpoints adjustPreset(Setpoints s) {
+    double isRed = G.isRedAlliance() ? 0.5 : 0;
+    double driveRot = Drive.getInstance().getRotation().getRotations();
+    double rotErr = Math.IEEEremainder(isRed - driveRot, 1.0);
+    Setpoints newSetpoints = new Setpoints().copy(s);
+    newSetpoints.turretPos_r += rotErr;
+    return newSetpoints;
   }
 
   public Setpoints shooterPipeline() {

@@ -2,6 +2,7 @@ package frc.robot;
 
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.Timer;
+import frc.robot.subsystems.LED.LED;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.shooter.Shooter;
@@ -35,6 +36,7 @@ public class SS {
     CHAMBER,
 
     TRACKING,
+    SHOOTER_SPIT,
     SHOOTING,
     SHOOTING_FROM_GROUND,
 
@@ -64,7 +66,7 @@ public class SS {
   private State currState;
   private State nextState;
 
-  private boolean hasGamePiece, homedShooter, homedClimb;
+  private boolean hasGamePiece, homedShooter, homedClimb, ledsBeingUsed;
 
   private SS() {
     lastState = State.DISABLED;
@@ -242,6 +244,14 @@ public class SS {
           queueState(State.CHAMBER);
         }
         break;
+      case SHOOTER_SPIT:
+        if (first) {
+
+          intake.setCurrentState(intake.FEEDING);
+          shooter.setCurrentState(shooter.SPITTING);
+          hasGamePiece = false;
+        }
+        break;
       case CHAMBER:
         if (first) {
           shooter.setCurrentState(shooter.BEING_FED);
@@ -256,7 +266,11 @@ public class SS {
         break;
       case TRACKING:
         if (first) {
-          shooter.setCurrentState(shooter.TRACKING);
+          if (shooter.beamBroken()) {
+            shooter.setCurrentState(shooter.TRACKING);
+          } else {
+            queueState(State.PRECHAMBER);
+          }
         }
         break;
       case SHOOTING:
@@ -278,12 +292,22 @@ public class SS {
 
     stateInfoLog();
 
-    if (currState == State.INTAKING && hasGamePiece) {
+    boolean flash = Math.sin(timer.get() * 20) > 0.0 ? true : false;
+
+    if ((currState == State.INTAKING && hasGamePiece)
+        || (currState == State.CHAMBER && intake.beamBroken())) {
       OI.DR.setRumble(RumbleType.kLeftRumble, 0.3);
-    } else if (currState == State.TRACKING && shooter.isAtSetpoints()) {
-      OI.DR.setRumble(RumbleType.kBothRumble, 0.6);
+      if (flash) LED.getInstance().drawRow(0, 255, 255, 255);
+    } else if (currState == State.TRACKING) {
+      if (shooter.isAtSetpoints()) {
+        OI.DR.setRumble(RumbleType.kBothRumble, 0.6);
+        if (flash) LED.getInstance().drawRow(0, 0, 255, 0);
+      } else {
+        LED.getInstance().drawRow(0, 255, 0, 0);
+      }
     } else {
       OI.DR.setRumble(RumbleType.kBothRumble, 0);
+      setLedsUsed(false);
     }
   }
 
@@ -319,6 +343,12 @@ public class SS {
     }
   }
 
+  public void shooterSpit() {
+    if (currState != State.BOOT) {
+      queueState(State.SHOOTER_SPIT);
+    }
+  }
+
   public void spit() {
     if (currState != State.BOOT) {
       queueState(State.SPITTING);
@@ -343,6 +373,14 @@ public class SS {
     }
   }
 
+  public boolean ledsUsed() {
+    return this.ledsBeingUsed;
+  }
+
+  public void setLedsUsed(boolean leds) {
+    this.ledsBeingUsed = leds;
+  }
+
   public void shoot() {
     if (currState != State.BOOT) {
       queueState(State.SHOOTING);
@@ -356,96 +394,21 @@ public class SS {
     }
   }
 
+  public void trackPreset(Setpoints s, boolean adjust) {
+    if (currState != State.BOOT) {
+      if (shooter.beamBroken()) {
+        Setpoints sp = adjust ? shooter.adjustPreset(s) : s;
+        shooter.queueSetpoints(shooter.constrainSetpoints(sp, false));
+        queueState(State.TRACKING);
+      } else if (currState != State.CHAMBER && currState != State.PRECHAMBER) {
+        queueState(State.PRECHAMBER);
+      }
+    }
+  }
+
   public void trackTrap() {
     if (currState != State.BOOT) {
       shooter.queueSetpoints(ShotPresets.TRAP_SHOT);
-      queueState(State.TRACKING);
-    }
-  }
-
-  public void trackAmp() {
-    if (currState != State.BOOT) {
-      shooter.queueSetpoints(
-          G.isRedAlliance() ? ShotPresets.RED_BUDGET_AMP : ShotPresets.BLUE_BUDGET_AMP);
-      queueState(State.TRACKING);
-    }
-  }
-
-  public void trackFender() {
-    if (currState != State.BOOT) {
-      shooter.queueSetpoints(G.isRedAlliance() ? ShotPresets.RED_FENDER : ShotPresets.BLUE_FENDER);
-      queueState(State.TRACKING);
-    }
-  }
-
-  public void trackFrontPost() {
-    if (currState != State.BOOT) {
-      shooter.queueSetpoints(
-          G.isRedAlliance() ? ShotPresets.RED_FRONT_POST : ShotPresets.BLUE_FRONT_POST);
-      queueState(State.TRACKING);
-    }
-  }
-
-  public void trackSidePost() {
-    if (currState != State.BOOT) {
-      shooter.queueSetpoints(
-          G.isRedAlliance() ? ShotPresets.RED_SIDE_POST : ShotPresets.BLUE_SIDE_POST);
-      queueState(State.TRACKING);
-    }
-  }
-
-  public void trackAmpBox() {
-    if (currState != State.BOOT) {
-      shooter.queueSetpoints(
-          G.isRedAlliance() ? ShotPresets.RED_AMP_BOX : ShotPresets.BLUE_AMP_BOX);
-      queueState(State.TRACKING);
-    }
-  }
-
-  public void trackFrontCourt() {
-    if (currState != State.BOOT) {
-      shooter.queueSetpoints(
-          G.isRedAlliance() ? ShotPresets.RED_FRONT_COURT : ShotPresets.BLUE_FRONT_COURT);
-      queueState(State.TRACKING);
-    }
-  }
-
-  public void trackWingPost() {
-    if (currState != State.BOOT) {
-      shooter.queueSetpoints(
-          G.isRedAlliance() ? ShotPresets.RED_WING_POST : ShotPresets.BLUE_WING_POST);
-      queueState(State.TRACKING);
-    }
-  }
-
-  public void trackWingWall() {
-    if (currState != State.BOOT) {
-      shooter.queueSetpoints(
-          G.isRedAlliance() ? ShotPresets.RED_WING_WALL : ShotPresets.BLUE_WING_WALL);
-      queueState(State.TRACKING);
-    }
-  }
-
-  public void trackWallClear() {
-    if (currState != State.BOOT) {
-      shooter.queueSetpoints(
-          G.isRedAlliance() ? ShotPresets.RED_CLEAR_WALL : ShotPresets.BLUE_CLEAR_WALL);
-      queueState(State.TRACKING);
-    }
-  }
-
-  public void trackMidClear() {
-    if (currState != State.BOOT) {
-      shooter.queueSetpoints(
-          G.isRedAlliance() ? ShotPresets.RED_CLEAR_MID : ShotPresets.BLUE_CLEAR_MID);
-      queueState(State.TRACKING);
-    }
-  }
-
-  public void trackCloseClear() {
-    if (currState != State.BOOT) {
-      shooter.queueSetpoints(
-          G.isRedAlliance() ? ShotPresets.RED_CLEAR_CLOSE : ShotPresets.BLUE_CLEAR_CLOSE);
       queueState(State.TRACKING);
     }
   }

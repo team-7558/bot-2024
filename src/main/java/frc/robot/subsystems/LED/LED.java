@@ -10,6 +10,10 @@ public class LED {
   public static final int HEIGHT = 8;
   public static final int NUM_LEDS = WIDTH * HEIGHT;
 
+  public int timerR = 0;
+  public int timerG = 0;
+  public int timerB = 0;
+
   private static LED instance;
 
   public static LED getInstance() {

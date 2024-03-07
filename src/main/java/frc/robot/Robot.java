@@ -173,7 +173,6 @@ public class Robot extends LoggedRobot {
 
     double s = Math.sin(3 * t.get());
     double c = -Math.sin(3 * t.get());
-
     led.setBlinkin(s);
 
     if (OI.DR.getPOV() == 180) {
@@ -234,6 +233,7 @@ public class Robot extends LoggedRobot {
   public void teleopPeriodic() {
     double tv = 135.0 - tt.get();
     if (tv < 10.0) led.drawNumber(tv, 48, 0, 0);
+    else if (shooter.beamBroken()) led.drawNumber(tv, 255, 25, 0);
     else led.drawNumber(tv, 16, 16, 16);
   }
 

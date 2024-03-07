@@ -243,8 +243,8 @@ public class Vision {
   public void periodic() {
     int id = PerfTracker.start("Vision");
     for (int i = 0; i < cameras.length; i++) {
-      cameras[i].updateInputs(visionInputs[i]);
-      Logger.processInputs("Vision/Camera" + i + "/Inputs", visionInputs[i]);
+      // cameras[i].updateInputs(visionInputs[i]);
+      // Logger.processInputs("Vision/Camera" + i + "/Inputs", visionInputs[i]);
 
       // managePipelines(i, Drive.getInstance().getPose());
     }

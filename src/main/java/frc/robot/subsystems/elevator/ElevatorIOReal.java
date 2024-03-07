@@ -4,7 +4,6 @@ import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
-import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.MotionMagicVelocityVoltage;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.controls.PositionVoltage;
@@ -80,17 +79,17 @@ public class ElevatorIOReal implements ElevatorIO {
     // Position control gains
     leaderConfig.Slot0.GravityType = GravityTypeValue.Elevator_Static;
     leaderConfig.Slot0.kG = 0.07;
-    leaderConfig.Slot0.kP = 0;
+    leaderConfig.Slot0.kP = 176;
     leaderConfig.Slot0.kI = 0;
-    leaderConfig.Slot0.kD = 0; // 16;
+    leaderConfig.Slot0.kD = 4; // 16;
 
     // MotionMagic Position gains
     leaderConfig.Slot1.GravityType = GravityTypeValue.Elevator_Static;
     leaderConfig.Slot1.kG = 0.07;
-    leaderConfig.Slot1.kV = 15;
+    leaderConfig.Slot1.kV = 38;
     leaderConfig.Slot1.kS = 0.0;
     leaderConfig.Slot1.kA = 0; // 1;
-    leaderConfig.Slot1.kP = 10;
+    leaderConfig.Slot1.kP = 23;
     leaderConfig.Slot1.kI = 0;
     leaderConfig.Slot1.kD = 0.0;
 
@@ -105,8 +104,8 @@ public class ElevatorIOReal implements ElevatorIO {
     leaderConfig.Slot2.kD = 0.0;
 
     leftFalcon.getConfigurator().apply(leaderConfig);
-
-    rightFalcon.setControl(new Follower(leftFalcon.getDeviceID(), false).withUpdateFreqHz(50));
+    rightFalcon.getConfigurator().apply(leaderConfig);
+    // rightFalcon.setControl(new Follower(leftFalcon.getDeviceID(), false).withUpdateFreqHz(50));
 
     resetPos(Elevator.MIN_HEIGHT_M);
   }
@@ -127,21 +126,25 @@ public class ElevatorIOReal implements ElevatorIO {
   public void setVel(double vel_mps) {
     double v = MathUtil.clamp(vel_mps, -Elevator.MAX_VEL_MPS, Elevator.MAX_VEL_MPS);
     leftFalcon.setControl(mmVelControl.withVelocity(v));
+    rightFalcon.setControl(mmVelControl.withVelocity(v));
   }
 
   @Override
   public void holdPos(double position) {
     leftFalcon.setControl(posControl.withPosition(position - posOffset_m));
+    rightFalcon.setControl(posControl.withPosition(position - posOffset_m));
   }
 
   @Override
   public void travelToPos(double position) {
     leftFalcon.setControl(mmPosControl.withPosition(position - posOffset_m));
+    rightFalcon.setControl(mmPosControl.withPosition(position - posOffset_m));
   }
 
   @Override
   public void setVoltage(double volts_V) {
     leftFalcon.setControl(voltageControl.withOutput(volts_V));
+    rightFalcon.setControl(voltageControl.withOutput(volts_V));
   }
 
   @Override
@@ -153,6 +156,7 @@ public class ElevatorIOReal implements ElevatorIO {
   @Override
   public void stop() {
     leftFalcon.stopMotor();
+    rightFalcon.stopMotor();
   }
 
   @Override
@@ -163,5 +167,6 @@ public class ElevatorIOReal implements ElevatorIO {
     config.NeutralMode = isBraked ? NeutralModeValue.Coast : NeutralModeValue.Brake;
     isBraked = !isBraked;
     leftFalcon.getConfigurator().apply(config);
+    rightFalcon.getConfigurator().apply(config);
   }
 }

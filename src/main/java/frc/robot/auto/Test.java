@@ -25,7 +25,6 @@ public class Test extends AltAuto {
     } else if (between(5, 7)) {
       ss.chamber();
     } else if (between(7.5, 11)) {
-      ss.trackFrontPost();
     } else {
       ss.idle();
     }
