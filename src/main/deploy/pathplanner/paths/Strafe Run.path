@@ -3,25 +3,25 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 2.616290562928271,
+        "x": 2.69,
         "y": 3.2294642864761656
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.5283091103696207,
-        "y": 5.59570230002722
+        "x": 2.690840921504851,
+        "y": 5.569729133558561
       },
       "isLocked": false,
       "linkedName": "StrafePoint"
     },
     {
       "anchor": {
-        "x": 2.4264358495122367,
+        "x": 2.69,
         "y": 7.438682200992622
       },
       "prevControl": {
-        "x": 2.5329397131358657,
-        "y": 5.5910716972609755
+        "x": 2.6859976787800175,
+        "y": 5.555199405384062
       },
       "nextControl": null,
       "isLocked": false,
@@ -32,7 +32,7 @@
   "constraintZones": [],
   "eventMarkers": [],
   "globalConstraints": {
-    "maxVelocity": 1.0,
+    "maxVelocity": 0.6,
     "maxAcceleration": 2.0,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0

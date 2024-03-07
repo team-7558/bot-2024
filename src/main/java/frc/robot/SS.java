@@ -32,6 +32,9 @@ public class SS {
 
     AMP_SCORING,
 
+    AUTOPRECHAMBER,
+    AUTOCHAMBER,
+
     PRECHAMBER,
     CHAMBER,
 
@@ -230,6 +233,41 @@ public class SS {
           elevator.setCurrentState(elevator.TRAVELLING);
         }
         break;
+      case SHOOTER_SPIT:
+        if (first) {
+
+          intake.setCurrentState(intake.FEEDING);
+          shooter.setCurrentState(shooter.SPITTING);
+          hasGamePiece = false;
+        }
+        break;
+      case AUTOPRECHAMBER:
+        if (first) {
+          if (!shooter.beamBroken()) {
+            shooter.queueSetpoints(
+                new Setpoints(Setpoints.DEFAULT, 0, 0, Shooter.PIVOT_MAX_FEED_POS_r));
+            shooter.setCurrentState(shooter.TRACKING);
+          } else {
+            queueState(State.AUTOCHAMBER);
+          }
+        }
+
+        if (shooter.isTurretAtSetpoint(0.03) && shooter.isPivotAtSetpoint(0.03)) {
+          queueState(State.AUTOCHAMBER);
+        }
+        break;
+      case AUTOCHAMBER:
+        if (first) {
+          shooter.setCurrentState(shooter.FAST_FEED);
+          if (!shooter.beamBroken()) {
+            intake.setCurrentState(intake.FAST_FEED);
+          }
+        }
+
+        if (shooter.isState(shooter.IDLE)) {
+          queueState(State.IDLE);
+        }
+        break;
       case PRECHAMBER:
         if (first) {
           if (!shooter.beamBroken()) {
@@ -242,14 +280,6 @@ public class SS {
 
         if (shooter.isTurretAtSetpoint(0.03) && shooter.isPivotAtSetpoint(0.03)) {
           queueState(State.CHAMBER);
-        }
-        break;
-      case SHOOTER_SPIT:
-        if (first) {
-
-          intake.setCurrentState(intake.FEEDING);
-          shooter.setCurrentState(shooter.SPITTING);
-          hasGamePiece = false;
         }
         break;
       case CHAMBER:
@@ -266,11 +296,8 @@ public class SS {
         break;
       case TRACKING:
         if (first) {
-          if (shooter.beamBroken()) {
-            shooter.setCurrentState(shooter.TRACKING);
-          } else {
-            queueState(State.PRECHAMBER);
-          }
+          intake.setCurrentState(intake.IDLE);
+          shooter.setCurrentState(shooter.TRACKING);
         }
         break;
       case SHOOTING:
@@ -402,6 +429,17 @@ public class SS {
         queueState(State.TRACKING);
       } else if (currState != State.CHAMBER && currState != State.PRECHAMBER) {
         queueState(State.PRECHAMBER);
+      }
+    }
+  }
+
+  public void autoPreset(Setpoints s) {
+    if (currState != State.BOOT) {
+      if (shooter.beamBroken()) {
+        shooter.queueSetpoints(s);
+        queueState(State.TRACKING);
+      } else if (currState != State.AUTOCHAMBER && currState != State.AUTOPRECHAMBER) {
+        queueState(State.AUTOPRECHAMBER);
       }
     }
   }

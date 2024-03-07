@@ -50,7 +50,7 @@ public class Shooter extends StateMachineSubsystemBase {
   public static final double TURRET_MIN_FEED_POS_r = -Units.degreesToRotations(15),
       TURRET_MAX_FEED_POS_r = -TURRET_MIN_FEED_POS_r;
   public static final double PIVOT_MIN_FEED_POS_r = PIVOT_ZERO_POS,
-      PIVOT_MAX_FEED_POS_r = Units.degreesToRotations(15);
+      PIVOT_MAX_FEED_POS_r = Units.degreesToRotations(7);
 
   private static LerpTable shotTimesFromDistance = new LerpTable("shottimes.lerp").compile();
   ;
@@ -146,7 +146,15 @@ public class Shooter extends StateMachineSubsystemBase {
     return instance;
   }
 
-  public final State DISABLED, IDLE, TRACKING, SHOOTING, BEING_FED, ZEROING, MANUAL, SPITTING;
+  public final State DISABLED,
+      IDLE,
+      TRACKING,
+      SHOOTING,
+      BEING_FED,
+      FAST_FEED,
+      ZEROING,
+      MANUAL,
+      SPITTING;
   private final ShooterIOInputsAutoLogged inputs = new ShooterIOInputsAutoLogged();
 
   private final ShooterIO io;
@@ -241,6 +249,23 @@ public class Shooter extends StateMachineSubsystemBase {
               setCurrentState(IDLE);
             } else {
               queueSetpoints(new Setpoints(Setpoints.DEFAULT, 3.8, 0, PIVOT_MIN_POS_r));
+              track();
+            }
+          }
+        };
+
+    FAST_FEED =
+        new State("FAST_FEED") {
+          @Override
+          public void init() {}
+
+          @Override
+          public void periodic() {
+            // queueSetpoints(constrainSetpoints(shooterPipeline(), !inputs.beamBreakActivated));
+            if (inputs.beamBreakActivated) {
+              setCurrentState(IDLE);
+            } else {
+              queueSetpoints(new Setpoints(Setpoints.DEFAULT, 4.0, 0, PIVOT_MAX_FEED_POS_r));
               track();
             }
           }

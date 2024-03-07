@@ -209,9 +209,9 @@ public class ShooterIOTalonFx implements ShooterIO {
     pivotConfig.Slot2.kV = 0;
     pivotConfig.Slot2.kA = 0;
 
-    pivotConfig.MotionMagic.MotionMagicCruiseVelocity = 0.55;
-    pivotConfig.MotionMagic.MotionMagicAcceleration = 0.5;
-    pivotConfig.MotionMagic.MotionMagicJerk = 2;
+    pivotConfig.MotionMagic.MotionMagicCruiseVelocity = 0.69;
+    pivotConfig.MotionMagic.MotionMagicAcceleration = 0.56;
+    pivotConfig.MotionMagic.MotionMagicJerk = 4;
 
     // TODO: tune all of that & use absolute encoder
 

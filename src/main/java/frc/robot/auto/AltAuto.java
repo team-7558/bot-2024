@@ -74,9 +74,9 @@ public abstract class AltAuto {
     return Util.unlerp(time0_s, time1_s, t.get());
   }
 
-  protected boolean near(double x, double y, double tol){
+  protected boolean near(double x, double y, double tol) {
     double dx = x - drive.getPose().getX();
     double dy = y - drive.getPose().getY();
-    return dx*dx + dy*dy < tol*tol;
+    return dx * dx + dy * dy < tol * tol;
   }
 }
