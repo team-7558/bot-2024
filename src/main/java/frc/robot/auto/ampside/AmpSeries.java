@@ -25,7 +25,6 @@ public class AmpSeries extends AltAuto {
         .append("Amp Fork To 6 To Strafe", false)
         .append("Strafe Run", false);
     trajstack.setActiveIdx(0);
-    trajstack.generate();
   }
 
   @Override

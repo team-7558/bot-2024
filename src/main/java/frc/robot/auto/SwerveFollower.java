@@ -69,11 +69,6 @@ public class SwerveFollower {
   public void step(double t) {
     PathPlannerTrajectory.State targetState = toFollow.sample(t);
 
-    /*if (G.isRedAlliance()){
-      targetSpeeds.vxMetersPerSecond *= -1.0;
-      targetSpeeds.vyMetersPerSecond *= -1.0;
-    }*/
-
     Pose2d currentPose = drive.getPose();
     ChassisSpeeds currentSpeeds = drive.getChassisSpeedsFromModuleStates();
 

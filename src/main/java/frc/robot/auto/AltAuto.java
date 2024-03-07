@@ -20,6 +20,8 @@ public abstract class AltAuto {
   private Timer t;
   private boolean forcePoseReset;
 
+  private boolean generated = false;
+
   public AltAuto(String s, boolean forcePoseReset) {
     name = s;
     drive = Drive.getInstance();
@@ -36,8 +38,8 @@ public abstract class AltAuto {
 
   public final void init() {
     System.out.println("Starting " + name);
-    if (!trajstack.isGenerated()) {
-      trajstack.generate();
+    if (!generated) {
+      generate();
     }
 
     if (forcePoseReset) {
@@ -49,6 +51,11 @@ public abstract class AltAuto {
     t.reset();
     t.start();
     onInit();
+  }
+
+  public void generate() {
+    trajstack.generate();
+    generated = true;
   }
 
   public final void execute() {

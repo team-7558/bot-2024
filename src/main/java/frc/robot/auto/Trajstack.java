@@ -2,6 +2,7 @@ package frc.robot.auto;
 
 import com.pathplanner.lib.path.PathPlannerTrajectory.State;
 import edu.wpi.first.math.MathUtil;
+import frc.robot.G;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -36,6 +37,7 @@ public class Trajstack implements IFollowable {
 
   @Override
   public void generate() {
+    System.out.println("Generating for " + (G.isRedAlliance() ? "Red" : "Blue"));
     if (activeTraj == -1) {
       System.err.println("No active paths");
     } else {
