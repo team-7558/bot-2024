@@ -2,13 +2,16 @@ package frc.robot.subsystems.vision;
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import java.io.IOException;
+import java.util.Queue;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonPoseEstimator;
 import org.photonvision.PhotonPoseEstimator.PoseStrategy;
-import org.photonvision.targeting.PhotonPipelineResult;
-import org.photonvision.targeting.PhotonTrackedTarget;
 
 public class VisionIOPhoton implements ApriltagIO {
 
@@ -16,8 +19,13 @@ public class VisionIOPhoton implements ApriltagIO {
   public final PhotonPoseEstimator poseEstimator;
   public AprilTagFieldLayout fieldLayout = null;
   public final Transform3d transform;
-  public PhotonPipelineResult recentResult;
   private final VisionProcessingThread thread;
+
+  public final Lock visionLock = new ReentrantLock();
+  public final Queue<Double> timestamps = new ArrayBlockingQueue<>(100);
+  public final Queue<Pose3d> poses = new ArrayBlockingQueue<>(100);
+  public final Queue<Integer[]> tids = new ArrayBlockingQueue<>(100);
+  public final Queue<Double> ambiguity = new ArrayBlockingQueue<>(100);
 
   public VisionIOPhoton(String camname, Transform3d camToRobot) {
     this.camera = new PhotonCamera(camname);
@@ -42,16 +50,37 @@ public class VisionIOPhoton implements ApriltagIO {
   @Override
   public void updateInputs(ApriltagIOInputs inputs) {
 
-    if (recentResult != null) {
-      PhotonPipelineResult latestResult = recentResult;
-      if (latestResult.hasTargets()) {
-        PhotonTrackedTarget target = latestResult.getBestTarget();
-        inputs.tagID = target.getFiducialId();
-        inputs.pipelineID = camera.getPipelineIndex();
-        inputs.timestamp = latestResult.getTimestampSeconds();
-        inputs.latency = latestResult.getLatencyMillis();
+    double[] timestampsArray =
+        timestamps.stream()
+            .mapToDouble(Double::doubleValue) // Convert Double to double
+            .toArray();
+    inputs.timestamps = timestampsArray;
+    inputs.poses = poses.toArray(new Pose3d[0]);
+
+    int[][] result = new int[tids.size()][];
+    int index = 0;
+
+    double[] ambiguityArray =
+        ambiguity.stream()
+            .mapToDouble(Double::doubleValue) // Convert Double to double
+            .toArray();
+    inputs.ambiguity = ambiguityArray;
+
+    while (!tids.isEmpty()) {
+      if (index >= result.length) {
+        // Handle the case where the result array is not large enough
+        break;
       }
+
+      Integer[] currentArray = tids.poll();
+      int[] intArray = new int[currentArray.length];
+      for (int i = 0; i < currentArray.length; i++) {
+        intArray[i] = currentArray[i]; // Auto-unboxing from Integer to int
+      }
+      result[index++] = intArray;
     }
+    inputs.tids = result;
+    inputs.pipelineID = camera.getPipelineIndex();
   }
 
   @Override

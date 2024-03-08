@@ -326,11 +326,17 @@ public class SS {
     if ((currState == State.INTAKING && hasGamePiece)
         || (currState == State.CHAMBER && intake.beamBroken())) {
       OI.DR.setRumble(RumbleType.kLeftRumble, 0.3);
-      if (flash) LED.getInstance().drawRow(0, 255, 255, 255);
+      if (flash) {
+        LED.getInstance().drawRow(0, 255, 255, 255);
+        LED.getInstance().setBlinkin(0.93);
+      }
     } else if (currState == State.TRACKING) {
       if (shooter.isAtSetpoints()) {
         OI.DR.setRumble(RumbleType.kBothRumble, 0.6);
-        if (flash) LED.getInstance().drawRow(0, 0, 255, 0);
+        if (flash) {
+          LED.getInstance().drawRow(0, 0, 255, 0);
+          LED.getInstance().setBlinkin(0.77);
+        }
       } else {
         LED.getInstance().drawRow(0, 255, 0, 0);
       }

@@ -165,15 +165,12 @@ public class Robot extends LoggedRobot {
   /** This function is called periodically during all modes. */
   @Override
   public void robotPeriodic() {
+    boolean blinkinBlack = false;
     // Runs the Scheduler. This is responsible for polling buttons, adding
     // newly-scheduled commands, running already-scheduled commands, removing
     // finished or interrupted commands, and running subsystem periodic() methods.
     // This must be called from the robot's periodic block in order for anything in
     // the Command-based framework to work.
-
-    double s = Math.sin(3 * t.get());
-    double c = -Math.sin(3 * t.get());
-    led.setBlinkin(s);
 
     if (OI.DR.getPOV() == 180) {
       drive.hardSetPose(
@@ -184,8 +181,16 @@ public class Robot extends LoggedRobot {
 
     if (OI.XK.get(5, 3)) {
       LED.getInstance().drawRow(0, 255, 255, 0);
+      LED.getInstance().setBlinkin(0.71);
     } else if (OI.XK.get(6, 3)) {
       LED.getInstance().drawRow(0, 128, 0, 128);
+      LED.getInstance().setBlinkin(0.91);
+    } else if (shooter.beamBroken()
+        && !(shooter.getCurrentState() == shooter.TRACKING
+            || shooter.getCurrentState() == shooter.SHOOTING)) {
+      led.setBlinkin(-0.57);
+    } else {
+      LED.getInstance().setBlinkin(0.99);
     }
 
     SS.getInstance().periodic();
@@ -239,8 +244,9 @@ public class Robot extends LoggedRobot {
   public void teleopPeriodic() {
     double tv = 135.0 - tt.get();
     if (tv < 10.0) led.drawNumber(tv, 48, 0, 0);
-    else if (shooter.beamBroken()) led.drawNumber(tv, 255, 25, 0);
-    else led.drawNumber(tv, 16, 16, 16);
+    else if (shooter.beamBroken()) {
+      led.drawNumber(tv, 255, 25, 0);
+    } else led.drawNumber(tv, 16, 16, 16);
   }
 
   /** This function is called once when test mode is enabled. */

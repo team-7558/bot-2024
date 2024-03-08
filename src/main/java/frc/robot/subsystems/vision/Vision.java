@@ -4,6 +4,7 @@ import edu.wpi.first.apriltag.AprilTag;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform2d;
@@ -12,7 +13,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
 import frc.robot.Constants;
 import frc.robot.PerfTracker;
-import frc.robot.subsystems.drive.Drive;
+import frc.robot.subsystems.vision.ApriltagIO.ApriltagIOInputs;
 import frc.robot.util.Util;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -40,10 +41,6 @@ public class Vision {
   public static final double CLEAR_DISTANCE_M = QUICK_DISTANCE_M + 0.1;
 
   public static final AprilTagFieldLayout AT_MAP;
-
-  public static record VisionUpdate(Pose2d pose, double timestamp, double distance) {}
-
-  public static List<VisionUpdate> visionUpdates = new ArrayList<>();
 
   static {
     AprilTagFieldLayout temp;
@@ -94,7 +91,7 @@ public class Vision {
           // VisionIO cam3 =
           //     new VisionIOPhoton("camera4", new Transform3d()); // TODO: update transform & name
           // LimelightIO limelight = new LimelightIOReal("limelight");
-          instance = new Vision(cam0, cam1);
+          instance = new Vision(cam1);
           break;
         case SIM:
           cam0 =
@@ -120,48 +117,23 @@ public class Vision {
   private List<Pose2d> posesToLog;
 
   private VisionIOPhoton cameras[];
-  private ApriltagIOInputsAutoLogged[] visionInputs;
+  private ApriltagIOInputs[] visionInputs;
 
   private Vision(VisionIOPhoton... cameras) {
     this.cameras = cameras;
     this.visionInputs =
-        new ApriltagIOInputsAutoLogged[] {
-          new ApriltagIOInputsAutoLogged(),
-          new ApriltagIOInputsAutoLogged(),
-          new ApriltagIOInputsAutoLogged(),
-          new ApriltagIOInputsAutoLogged()
+        new ApriltagIOInputs[] {
+          new ApriltagIOInputs(), new ApriltagIOInputs(),
+          // new ApriltagIOInputs(),
+          // new ApriltagIOInputs()
         };
     posesToLog = new ArrayList<>();
   }
 
-  public int getCameras() {
-    return cameras.length;
-  }
-
-  public void setPipeline(int camera, int pipeline) {
-    cameras[camera].setPipeline(pipeline);
-  }
-
-  public int getPipeline(int camera) {
-    return visionInputs[camera].pipelineID;
-  }
-
-  public int getTagID(int camera) {
-    return visionInputs[camera].tagID;
-  }
-
-  public double getTimestamp(int camera) {
-    return visionInputs[camera].timestamp;
-  }
-
-  public double getLatency(int camera) {
-    return visionInputs[camera].latency;
-  }
-
   public boolean hasTagInView() {
     for (int i = 0; i < visionInputs.length; i++) {
-      ApriltagIOInputsAutoLogged input = visionInputs[i];
-      if (input.tagID != 1) {
+      ApriltagIOInputs input = visionInputs[i];
+      if (input.tids.length > 0) {
         return true;
       }
     }
@@ -239,10 +211,35 @@ public class Vision {
   }
 
   public void handleFrameData() {
-    for (int i = 0; i < cameras.length; i++) {
-      cameras[i].updateInputs(visionInputs[i]);
-      // Logger.processInputs("Vision/Camera" + i + "/Inputs", visionInputs[i]);
-      managePipelines(i, Drive.getInstance().getPose());
+    try {
+      for (int i = 0; i < cameras.length; i++) {
+        cameras[i].visionLock.lock();
+        cameras[i].updateInputs(visionInputs[i]);
+        Logger.processInputs("Vision/Camera" + i + "/Inputs", visionInputs[i]);
+
+        for (int j = 0; j < visionInputs[i].poses.length; j++) {
+          double ambiguity = visionInputs[i].ambiguity[j];
+          double timestamp = visionInputs[i].timestamps[j];
+          Pose3d pose = visionInputs[i].poses[j];
+          int[] tids = new int[0];
+          if (visionInputs[i].tids.length > 0) {
+            tids = visionInputs[i].tids[j];
+          }
+          if (tids == null) continue;
+
+          if (ambiguity > 0.3) continue;
+          // Drive.getInstance().addToPoseEstimator(pose.toPose2d(), timestamp, ambiguity, tids);
+        }
+
+        // managePipelines(i, Drive.getInstance().getPose());
+
+        cameras[i].timestamps.clear();
+        cameras[i].poses.clear();
+        cameras[i].tids.clear();
+        cameras[i].visionLock.unlock();
+      }
+    } catch (Exception e) {
+      // do nothing just prevent crashing
     }
   }
 

@@ -41,7 +41,7 @@ import frc.robot.OI;
 import frc.robot.subsystems.StateMachineSubsystemBase;
 import frc.robot.subsystems.drive.Module.Mode;
 import frc.robot.subsystems.drive.OdometryState.VisionObservation;
-import frc.robot.subsystems.vision.Vision.VisionUpdate;
+import frc.robot.subsystems.vision.Vision;
 import frc.robot.util.Util;
 import java.util.Arrays;
 import java.util.Queue;
@@ -572,18 +572,25 @@ public class Drive extends StateMachineSubsystemBase {
     return OdometryState.getInstance().getEstimatedPose();
   }
 
-  public void addToPoseEstimator(VisionUpdate update) {
-    // if (update.pose().getTranslation().getDistance(getPoseEstimatorPose().getTranslation())
-    //     > POSE_DIFFERENCE) return;
+  public void addToPoseEstimator(Pose2d pose, double timestamp, double ambiguity, int[] tids) {
+    double distSums = 0;
+    for (int i = 0; i < tids.length; i++) {
+      try {
+        Pose2d tagPose = Vision.AT_MAP.getTagPose(i).orElseThrow().toPose2d();
+        distSums += tagPose.getTranslation().getDistance(getPose().getTranslation());
+      } catch (Exception e) {
+
+      }
+    }
+    double avgDistance = distSums / tids.length;
+
     OdometryState.getInstance()
         .addVisionObservation(
             new VisionObservation(
-                update.pose(),
-                update.timestamp(),
+                pose,
+                timestamp,
                 VecBuilder.fill(
-                    APRILTAG_COEFFICIENT * update.distance(),
-                    APRILTAG_COEFFICIENT * update.distance(),
-                    10)));
+                    APRILTAG_COEFFICIENT * avgDistance, APRILTAG_COEFFICIENT * avgDistance, 10)));
   }
 
   /** Returns the current odometry rotation. */

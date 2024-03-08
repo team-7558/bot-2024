@@ -11,6 +11,7 @@ public class LEDIOReal implements LEDIO {
   private Spark blinkin = new Spark(9);
 
   public LEDIOReal() {
+    blinkin.setSafetyEnabled(false);
     m_led.setLength(m_ledBuffer.getLength());
     m_led.setData(m_ledBuffer);
     m_led.start();
