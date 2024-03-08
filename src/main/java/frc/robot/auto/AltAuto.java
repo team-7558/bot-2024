@@ -61,7 +61,7 @@ public abstract class AltAuto {
   public final void execute() {
     onExecute();
     double time = t.get();
-    if (time < 15.0) led.drawNumber(time, 16, 16, 16);
+    if (time < 15.0) led.drawPreciseNumber(time, 16, 16, 16);
     else led.drawNumber(time, 48, 0, 0);
   }
 

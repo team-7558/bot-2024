@@ -1,5 +1,7 @@
 package frc.robot.auto;
 
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.subsystems.LED.LED;
 import java.util.ArrayList;
 import java.util.List;
@@ -54,5 +56,17 @@ public class AutoSelector {
     if (size == 0) return;
     Struct s = autos.get(currIdx);
     LED.getInstance().drawRow(0, s.r, s.g, s.b);
+    if (generatedIdx > -1) {
+      Struct g = autos.get(generatedIdx);
+      LED.getInstance().drawCol(0, g.r, g.g, g.b);
+    }
+  }
+
+  public Command getCommand() {
+    if (size == 0) return new WaitCommand(15.0);
+    if (generatedIdx == -1) {
+      generate();
+    }
+    return new RunAltAutoCommand(autos.get(generatedIdx).auto);
   }
 }
