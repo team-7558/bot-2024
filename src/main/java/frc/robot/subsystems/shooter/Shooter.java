@@ -317,7 +317,7 @@ public class Shooter extends StateMachineSubsystemBase {
           public void periodic() {
 
             if (inputs.pivotHallEffect) {
-              io.setPivotVolts(0);
+              io.setPivotVolts(-0.5);
               if (inputs.turretHallEffect) {
                 io.setTurretVolts(0);
                 io.zero();

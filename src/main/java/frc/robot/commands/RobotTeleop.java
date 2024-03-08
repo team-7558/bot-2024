@@ -12,17 +12,21 @@ import frc.robot.SS.State;
 import frc.robot.SS2d;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.shooter.ShotPresets;
+import frc.robot.subsystems.vision.Vision;
 
 public class RobotTeleop extends Command {
 
   private final Drive drive;
   private final SS ss;
+  private final Vision v;
 
   /** Creates a new DriveTeleop. */
   public RobotTeleop() {
+
     // Use addRequirements() here to declare subsystem dependencies.
     drive = Drive.getInstance();
     ss = SS.getInstance();
+    v = Vision.getInstance();
 
     addRequirements(drive);
   }
@@ -47,7 +51,7 @@ public class RobotTeleop extends Command {
         drive.setAutolockSetpoint(0.25);
         drive.setCurrentState(drive.STRAFE_AUTOLOCK);
       } else if (OI.DR.getBButton()) {
-        drive.setAutolockSetpoint(G.isRedAlliance() ? 0.15 : -0.35);
+        drive.setAutolockSetpoint(G.isRedAlliance() ? 0.172 : -0.35);
         drive.setCurrentState(drive.STRAFE_AUTOLOCK);
       } else if (OI.DR.getXButton()) {
         drive.setAutolockSetpoint(G.isRedAlliance() ? -0.15 : -0.35);
