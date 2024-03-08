@@ -26,7 +26,8 @@ public interface ShooterIO {
     public double turretVelRPS = 0.0;
     public double turretCurrent = 0.0;
 
-    public boolean beamBreakActivated = false;
+    public boolean beamBreakInActivated = false;
+    public boolean beamBreakOutActivated = false;
     public boolean turretHallEffect = false;
     public boolean pivotHallEffect = false;
   }

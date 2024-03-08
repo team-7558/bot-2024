@@ -19,8 +19,6 @@ import frc.robot.util.Util;
 
 public class ShooterIOTalonFx implements ShooterIO {
 
-  private static final double TMRMIN = 0, TMRMAX = 0;
-
   private static final double FLYWHEEL_GEAR_RATIO = 1.66;
   private static final double TURRET_GEAR_RATIO = 5.0 * 160.0 / 14.0; // TODO SET
   private static final double FEEDER_GEAR_RATIO = 1; // TODO: SET
@@ -37,7 +35,8 @@ public class ShooterIOTalonFx implements ShooterIO {
   private final TalonFX pivot = new TalonFX(7); // TODO: update
   private final TalonFX feeder = new TalonFX(8);
 
-  private final DigitalInput beambreak = new DigitalInput(2);
+  private final DigitalInput beambreakIn = new DigitalInput(2);
+  private final DigitalInput beambreakOut = new DigitalInput(2);
   private final DigitalInput tLimit = new DigitalInput(8);
   private final DigitalInput pLimit = new DigitalInput(9);
 
@@ -398,7 +397,8 @@ public class ShooterIOTalonFx implements ShooterIO {
     inputs.turretAbsPosR = 0;
     inputs.turretVelRPS = TVelocity.getValueAsDouble();
     inputs.turretCurrent = TCurrent.getValueAsDouble();
-    inputs.beamBreakActivated = beambreak.get();
+    inputs.beamBreakInActivated = beambreakIn.get();
+    inputs.beamBreakOutActivated = beambreakOut.get();
     inputs.turretHallEffect = !tLimit.get();
     inputs.pivotHallEffect = !pLimit.get();
   }

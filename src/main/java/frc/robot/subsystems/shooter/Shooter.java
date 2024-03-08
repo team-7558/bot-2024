@@ -245,8 +245,11 @@ public class Shooter extends StateMachineSubsystemBase {
           @Override
           public void periodic() {
             // queueSetpoints(constrainSetpoints(shooterPipeline(), !inputs.beamBreakActivated));
-            if (inputs.beamBreakActivated) {
+            if (inputs.beamBreakOutActivated) {
               setCurrentState(IDLE);
+            } else if(inputs.beamBreakInActivated) {
+              queueSetpoints(new Setpoints(Setpoints.DEFAULT, 10, 0, PIVOT_MIN_POS_r));
+              track();
             } else {
               queueSetpoints(new Setpoints(Setpoints.DEFAULT, 3.8, 0, PIVOT_MIN_POS_r));
               track();
@@ -262,8 +265,11 @@ public class Shooter extends StateMachineSubsystemBase {
           @Override
           public void periodic() {
             // queueSetpoints(constrainSetpoints(shooterPipeline(), !inputs.beamBreakActivated));
-            if (inputs.beamBreakActivated) {
+            if (inputs.beamBreakOutActivated) {
               setCurrentState(IDLE);
+            } else if(inputs.beamBreakInActivated) {
+              queueSetpoints(new Setpoints(Setpoints.DEFAULT, 10, 0, PIVOT_MIN_POS_r));
+              track();
             } else {
               queueSetpoints(new Setpoints(Setpoints.DEFAULT, 4.0, 0, PIVOT_MAX_FEED_POS_r));
               track();
@@ -465,7 +471,7 @@ public class Shooter extends StateMachineSubsystemBase {
 
   /** Returns the current velocity in RPM. */
   public boolean beamBroken() {
-    return inputs.beamBreakActivated;
+    return inputs.beamBreakOutActivated;
   }
 
   /** Runs forwards at the commanded voltage. */
