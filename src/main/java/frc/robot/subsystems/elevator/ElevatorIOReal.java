@@ -107,6 +107,9 @@ public class ElevatorIOReal implements ElevatorIO {
     rightFalcon.getConfigurator().apply(leaderConfig);
     // rightFalcon.setControl(new Follower(leftFalcon.getDeviceID(), false).withUpdateFreqHz(50));
 
+    leftFalcon.optimizeBusUtilization();
+    rightFalcon.optimizeBusUtilization();
+
     resetPos(Elevator.MIN_HEIGHT_M);
   }
 

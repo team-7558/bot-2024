@@ -241,10 +241,10 @@ public class ShooterIOTalonFx implements ShooterIO {
         FAppliedVolts,
         FVelocity,
         FCurrent);
-    // flywheelL.optimizeBusUtilization();
-    // flywheelR.optimizeBusUtilization();
-    // turret.optimizeBusUtilization();
-    // feeder.optimizeBusUtilization();
+    flywheelL.optimizeBusUtilization();
+    flywheelR.optimizeBusUtilization();
+    turret.optimizeBusUtilization();
+    feeder.optimizeBusUtilization();
   }
 
   @Override

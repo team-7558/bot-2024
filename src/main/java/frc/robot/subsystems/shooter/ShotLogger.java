@@ -6,7 +6,7 @@ import frc.robot.subsystems.shooter.Shooter.Setpoints;
 import org.littletonrobotics.junction.Logger;
 
 public class ShotLogger {
-  private static final boolean ENABLED = false;
+  private static final boolean ENABLED = true;
 
   public static final void log() {
     if (ENABLED) {

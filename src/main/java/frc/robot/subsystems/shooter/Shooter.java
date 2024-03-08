@@ -280,7 +280,7 @@ public class Shooter extends StateMachineSubsystemBase {
               queueSetpoints(new Setpoints(Setpoints.DEFAULT, 10, 0, PIVOT_MIN_POS_r));
               track();
             } else {
-              queueSetpoints(new Setpoints(Setpoints.DEFAULT, 4.0, 0, PIVOT_MAX_FEED_POS_r));
+              queueSetpoints(new Setpoints(Setpoints.DEFAULT, 4.0, 0, 0.1));
               track();
             }
           }
