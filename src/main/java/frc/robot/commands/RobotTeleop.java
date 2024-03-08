@@ -12,17 +12,21 @@ import frc.robot.SS.State;
 import frc.robot.SS2d;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.shooter.ShotPresets;
+import frc.robot.subsystems.vision.Vision;
 
 public class RobotTeleop extends Command {
 
   private final Drive drive;
   private final SS ss;
+  private final Vision v;
 
   /** Creates a new DriveTeleop. */
   public RobotTeleop() {
+
     // Use addRequirements() here to declare subsystem dependencies.
     drive = Drive.getInstance();
     ss = SS.getInstance();
+    v = Vision.getInstance();
 
     addRequirements(drive);
   }

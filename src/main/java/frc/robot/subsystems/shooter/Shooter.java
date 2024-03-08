@@ -279,7 +279,7 @@ public class Shooter extends StateMachineSubsystemBase {
 
           @Override
           public void periodic() {
-            // queueSetpoints(constrainSetpoints(shooterPipeline(), false));
+            queueSetpoints(constrainSetpoints(shooterPipeline(), false));
             track();
           }
 

@@ -273,6 +273,8 @@ public class SS {
           if (!shooter.beamBroken()) {
             shooter.queueSetpoints(new Setpoints(Setpoints.DEFAULT, 0, 0, Shooter.PIVOT_MIN_POS_r));
             shooter.setCurrentState(shooter.TRACKING);
+            shooter.queueSetpoints(new Setpoints(0, 0, 0, 0.0));
+            shooter.setCurrentState(shooter.BEING_FED);
           } else {
             queueState(State.CHAMBER);
           }
@@ -411,6 +413,12 @@ public class SS {
   public void shoot() {
     if (currState != State.BOOT) {
       queueState(State.SHOOTING);
+    }
+  }
+
+  public void track() {
+    if (currState != State.BOOT) {
+      queueState(State.TRACKING);
     }
   }
 

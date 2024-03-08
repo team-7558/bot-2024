@@ -5,12 +5,14 @@ import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
 import frc.robot.Constants;
 import frc.robot.PerfTracker;
+import frc.robot.subsystems.drive.Drive;
 import frc.robot.util.Util;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -32,12 +34,16 @@ public class Vision {
   public static final double AT_FOV_RAD = Units.degreesToRadians(140); // TODO: TUNE
 
   // Distance for quick
-  public static final double QUICK_DISTANCE_M = 3.0;
+  public static final double QUICK_DISTANCE_M = 1.0;
 
   // Distance for clear
   public static final double CLEAR_DISTANCE_M = QUICK_DISTANCE_M + 0.1;
 
   public static final AprilTagFieldLayout AT_MAP;
+
+  public static record VisionUpdate(Pose2d pose, double timestamp, double distance) {}
+
+  public static List<VisionUpdate> visionUpdates = new ArrayList<>();
 
   static {
     AprilTagFieldLayout temp;
@@ -55,43 +61,56 @@ public class Vision {
   public static Vision getInstance() {
     if (instance == null) {
 
-      VisionIO cam0, cam1, cam2, cam3;
+      VisionIOPhoton cam0, cam1, cam2, cam3;
 
-      switch (Constants.currentMode) {
+      switch (Constants.currentMode) { // TODO: SET BACK TO NORMAL
         case REAL:
-          cam0 = new VisionIOPhoton("camera0", new Transform3d()); // TODO: update transform &
-          // name
-          // VisionIO cam1 =
-          //     new VisionIOPhoton("camera2", new Transform3d()); // TODO: update transform &
-          // name
+          cam0 =
+              new VisionIOPhoton(
+                  "BL",
+                  new Transform3d(
+                      0.65,
+                      -0.28,
+                      -0.3,
+                      new Rotation3d(
+                          Units.degreesToRadians(-10),
+                          Units.degreesToRadians(-10),
+                          Units.degreesToRadians(130)))); // TODO: update transform & name later
+          cam1 =
+              new VisionIOPhoton(
+                  "BR",
+                  new Transform3d(
+                      0.65,
+                      0.28,
+                      -0.3,
+                      new Rotation3d(
+                          Units.degreesToRadians(10),
+                          Units.degreesToRadians(-10),
+                          Units.degreesToRadians(-130))));
+          // VisionIO cam1 =7
+          //     new VisionIOPhoton("camera2", new Transform3d()); // TODO: update transform & name
           // VisionIO cam2 =
-          //     new VisionIOPhoton("camera3", new Transform3d()); // TODO: update transform &
-          // name
+          //     new VisionIOPhoton("camera3", new Transform3d()); // TODO: update transform & name
           // VisionIO cam3 =
-          //     new VisionIOPhoton("camera4", new Transform3d()); // TODO: update transform &
-          // name
-          // VisionIO limelight = new VisionIOLimelight("limelight"); // TODO: update name
-          instance = new Vision(/*cam0*/ new VisionIOSim("camera0", new Transform3d()));
+          //     new VisionIOPhoton("camera4", new Transform3d()); // TODO: update transform & name
+          // LimelightIO limelight = new LimelightIOReal("limelight");
+          instance = new Vision(cam0, cam1);
           break;
         case SIM:
-          cam0 = new VisionIOSim("camera0", new Transform3d());
-          // VisionIOSim camone =
-          //     new VisionIOSim("camera1", new Transform3d(-0.3, 0.1, 0.3, new Rotation3d(0, 90,
-          // 90)));
-          // VisionIOSim camtwo =
-          //     new VisionIOSim("camera1", new Transform3d(0.3, 0.1, -0.3, new Rotation3d(0, 90,
-          // 0)));
-          // VisionIOSim camthree =
-          //     new VisionIOSim("camera1", new Transform3d(-0.3, 0.1, -0.3, new Rotation3d(0, 90,
-          // 0)));
+          cam0 =
+              new VisionIOPhoton(
+                  "camera0",
+                  new Transform3d(
+                      0, 0, 0, new Rotation3d())); // TODO: update transform & name later
           instance = new Vision(cam0);
+          // no sim
           break;
         case REPLAY:
           // idk yet
 
         default:
           // nothing yet
-          instance = new Vision(new VisionIOSim("camera0", new Transform3d()));
+          //
       }
     }
 
@@ -100,32 +119,23 @@ public class Vision {
 
   private List<Pose2d> posesToLog;
 
-  private VisionIO cameras[];
-  private VisionIOInputsAutoLogged[] visionInputs;
+  private VisionIOPhoton cameras[];
+  private ApriltagIOInputsAutoLogged[] visionInputs;
 
-  private Vision(VisionIO... cameras) {
+  private Vision(VisionIOPhoton... cameras) {
     this.cameras = cameras;
     this.visionInputs =
-        new VisionIOInputsAutoLogged[] {
-          new VisionIOInputsAutoLogged(),
-          new VisionIOInputsAutoLogged(),
-          new VisionIOInputsAutoLogged(),
-          new VisionIOInputsAutoLogged()
+        new ApriltagIOInputsAutoLogged[] {
+          new ApriltagIOInputsAutoLogged(),
+          new ApriltagIOInputsAutoLogged(),
+          new ApriltagIOInputsAutoLogged(),
+          new ApriltagIOInputsAutoLogged()
         };
-
     posesToLog = new ArrayList<>();
   }
 
   public int getCameras() {
     return cameras.length;
-  }
-
-  public Pose2d[] getPoses() {
-    Pose2d[] poses = new Pose2d[cameras.length];
-    for (int i = 0; i < cameras.length; i++) {
-      poses[i] = visionInputs[i].pose;
-    }
-    return poses;
   }
 
   public void setPipeline(int camera, int pipeline) {
@@ -136,20 +146,8 @@ public class Vision {
     return visionInputs[camera].pipelineID;
   }
 
-  public double getXOffset(int camera) {
-    return visionInputs[camera].xOffset;
-  }
-
-  public double getYOffset(int camera) {
-    return visionInputs[camera].yOffset;
-  }
-
   public int getTagID(int camera) {
     return visionInputs[camera].tagID;
-  }
-
-  public Pose2d getPose(int camera) {
-    return visionInputs[camera].pose;
   }
 
   public double getTimestamp(int camera) {
@@ -162,7 +160,7 @@ public class Vision {
 
   public boolean hasTagInView() {
     for (int i = 0; i < visionInputs.length; i++) {
-      VisionIOInputsAutoLogged input = visionInputs[i];
+      ApriltagIOInputsAutoLogged input = visionInputs[i];
       if (input.tagID != 1) {
         return true;
       }
@@ -171,7 +169,7 @@ public class Vision {
   }
 
   public void managePipelines(int camID, Pose2d botpose) {
-    VisionIO cam = cameras[camID];
+    ApriltagIO cam = cameras[camID];
     boolean shouldSwitchToQuick = false;
     boolean shouldSwitchToClear = false;
 
@@ -236,20 +234,33 @@ public class Vision {
     }
 
     if (shouldSwitchToClear) { // TODO: implement for noise reduction
-      // cam.setPipeline(CLEAR_PIPELINE_ID);
+      cam.setPipeline(CLEAR_PIPELINE_ID);
+    }
+  }
+
+  public void handleFrameData() {
+    for (int i = 0; i < cameras.length; i++) {
+      cameras[i].updateInputs(visionInputs[i]);
+      // Logger.processInputs("Vision/Camera" + i + "/Inputs", visionInputs[i]);
+      managePipelines(i, Drive.getInstance().getPose());
     }
   }
 
   public void periodic() {
     int id = PerfTracker.start("Vision");
-    for (int i = 0; i < cameras.length; i++) {
-      // cameras[i].updateInputs(visionInputs[i]);
-      // Logger.processInputs("Vision/Camera" + i + "/Inputs", visionInputs[i]);
-
-      // managePipelines(i, Drive.getInstance().getPose());
-    }
-    // Logger.recordOutput("Vision/TagSet", posesToLog.toArray(new Pose2d[0]));
+    handleFrameData();
+    Logger.recordOutput("Vision/TagSet", posesToLog.toArray(new Pose2d[0]));
     PerfTracker.end(id);
-    posesToLog.clear();
+  }
+
+  public static class TimestampedPose {
+
+    public Pose2d pose;
+    public double timestamp;
+
+    public TimestampedPose(Pose2d pose, double timestamp) {
+      this.pose = pose;
+      this.timestamp = timestamp;
+    }
   }
 }

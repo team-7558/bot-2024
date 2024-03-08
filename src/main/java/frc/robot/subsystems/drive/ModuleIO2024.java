@@ -37,8 +37,6 @@ public class ModuleIO2024 implements ModuleIO {
   private final TalonFX turnTalon;
   private final CANcoder cancoder;
 
-  private final Queue<Double> timestampQueue;
-
   private final StatusSignal<Double> drivePosition;
   private final Queue<Double> drivePositionQueue;
   private final StatusSignal<Double> driveVelocity;
@@ -162,8 +160,6 @@ public class ModuleIO2024 implements ModuleIO {
     turnConfig.ClosedLoopGeneral.ContinuousWrap = true;
     turnTalon.getConfigurator().apply(turnConfig);
 
-    timestampQueue = PhoenixOdometryThread.getInstance().makeTimestampQueue();
-
     drivePosition = driveTalon.getPosition();
     drivePositionQueue =
         PhoenixOdometryThread.getInstance().registerSignal(driveTalon, driveTalon.getPosition());
@@ -221,15 +217,12 @@ public class ModuleIO2024 implements ModuleIO {
     inputs.turnVolts_V = turnAppliedVolts.getValueAsDouble();
     inputs.turnCurrent_A = new double[] {turnCurrent.getValueAsDouble()};
 
-    inputs.odometryTimestamps =
-        timestampQueue.stream().mapToDouble((Double value) -> value).toArray();
     inputs.odometryDrivePos_r =
         drivePositionQueue.stream().mapToDouble((Double value) -> value).toArray();
     inputs.odometryTurnPos_rot2d =
         turnPositionQueue.stream()
             .map((Double value) -> Rotation2d.fromRotations(value))
             .toArray(Rotation2d[]::new);
-    timestampQueue.clear();
     drivePositionQueue.clear();
     turnPositionQueue.clear();
   }
