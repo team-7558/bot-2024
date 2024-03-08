@@ -1,5 +1,6 @@
 package frc.robot.auto.ampside;
 
+import frc.robot.G;
 import frc.robot.SS.State;
 import frc.robot.auto.AltAuto;
 import frc.robot.subsystems.shooter.Shooter.Setpoints;
@@ -19,17 +20,14 @@ public class AmpSeries extends AltAuto {
         .append("Amp Fork To 5 To Strafe", false)
         .append("Strafe Run", false);
 
-    trajstack
-        .appendChain()
-        .append("Amp Start", false)
-        .append("Amp Fork To 6 To Strafe", false)
-        .append("Strafe Run", false);
+    trajstack.appendChain().append("Strafe Run", false);
     trajstack.setActiveIdx(idx);
   }
 
   @Override
   public void onInit() {
-    ss.autoPreset(new Setpoints(42, 0, -0.02, 0.09));
+    double i = G.isRedAlliance() ? 1.0 : -1.0;
+    ss.autoPreset(new Setpoints(42, 0, -0.02 * i, 0.09));
   }
 
   @Override

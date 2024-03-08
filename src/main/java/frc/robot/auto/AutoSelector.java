@@ -49,6 +49,8 @@ public class AutoSelector {
       System.err.println("No Autos to generate");
     } else {
       generatedIdx = currIdx;
+      System.out.println("Generating: " + autos.get(generatedIdx).auto);
+      autos.get(generatedIdx).auto.generate();
     }
   }
 

@@ -66,7 +66,7 @@ public class Traj implements IFollowable {
       this.initState.accelerationMpsSq = 0;
       this.initState.headingAngularVelocityRps = 0;
       this.initState.holonomicAngularVelocityRps = Optional.of(0.0);
-      this.initState.curvatureRadPerMeter = 0;
+      this.initState.curvatureRadPerMeter = -7558.0;
       System.err.println("Why am I here");
     }
     this.generated = true;
@@ -99,7 +99,7 @@ public class Traj implements IFollowable {
       this.initState.accelerationMpsSq = 0;
       this.initState.headingAngularVelocityRps = 0;
       this.initState.holonomicAngularVelocityRps = Optional.of(0.0);
-      this.initState.curvatureRadPerMeter = 0;
+      this.initState.curvatureRadPerMeter = -7558.0;
     }
 
     this.generated = true;

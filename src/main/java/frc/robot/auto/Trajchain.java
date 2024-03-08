@@ -58,13 +58,13 @@ public class Trajchain implements IFollowable {
         trajs.get(i).generate(initState);
       }
       for (int i = 1; i <= chainSize; i++) {
-        System.out.println(i + ": " + trajs.get(i - 1).endTime());
+        // System.out.println(i + ": " + trajs.get(i - 1).endTime());
         totalTime_s += trajs.get(i - 1).endTime();
         startTimes.add(totalTime_s);
       }
 
       for (var time : startTimes) {
-        System.out.println(time);
+        // System.out.println(time);
       }
 
       System.out.println("Trajchain generated");

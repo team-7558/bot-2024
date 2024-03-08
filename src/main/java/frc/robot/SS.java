@@ -69,7 +69,7 @@ public class SS {
   private State currState;
   private State nextState;
 
-  private boolean hasGamePiece, homedShooter, homedClimb, ledsBeingUsed;
+  private boolean hasGamePiece, homedShooter, homedClimb, constrained;
 
   private SS() {
     lastState = State.DISABLED;
@@ -85,6 +85,7 @@ public class SS {
     hasGamePiece = false;
     homedShooter = false;
     homedClimb = false;
+    constrained = false;
   }
 
   public void queueState(State s) {
@@ -222,14 +223,16 @@ public class SS {
       case CLIMBING_UP:
         if (first) {
           elevator.setTargetHeight(Elevator.CLIMB_HEIGHT_M);
-          elevator.setCurrentState(elevator.TRAVELLING);
-          shooter.queueSetpoints(new Setpoints(0, 0, 0, 0.15));
+          shooter.queueSetpoints(new Setpoints(0, 0, 0, 0.05));
           shooter.setCurrentState(shooter.TRACKING);
+          elevator.setCurrentState(elevator.TRAVELLING);
         }
         break;
       case CLIMBING_DOWN:
         if (first) {
           elevator.setTargetHeight(Elevator.MIN_HEIGHT_M);
+          shooter.queueSetpoints(new Setpoints(0, 0, 0, 0.14));
+          shooter.setCurrentState(shooter.TRACKING);
           elevator.setCurrentState(elevator.TRAVELLING);
         }
         break;
@@ -331,7 +334,7 @@ public class SS {
         LED.getInstance().setBlinkin(0.93);
       }
     } else if (currState == State.TRACKING) {
-      if (shooter.isAtSetpoints()) {
+      if (shooter.isAtSetpoints() && !constrained) {
         OI.DR.setRumble(RumbleType.kBothRumble, 0.6);
         if (flash) {
           LED.getInstance().drawRow(0, 0, 255, 0);
@@ -342,7 +345,18 @@ public class SS {
       }
     } else {
       OI.DR.setRumble(RumbleType.kBothRumble, 0);
-      setLedsUsed(false);
+    }
+
+    if (!homedShooter) {
+      LED.getInstance().drawRow(5, 128, 0, 0);
+      LED.getInstance().drawRow(6, 0, 128, 0);
+      LED.getInstance().drawRow(7, 0, 0, 128);
+    }
+
+    if (!homedClimb) {
+      LED.getInstance().drawRow(2, 128, 0, 0);
+      LED.getInstance().drawRow(3, 0, 128, 0);
+      LED.getInstance().drawRow(4, 0, 0, 128);
     }
   }
 
@@ -408,14 +422,6 @@ public class SS {
     }
   }
 
-  public boolean ledsUsed() {
-    return this.ledsBeingUsed;
-  }
-
-  public void setLedsUsed(boolean leds) {
-    this.ledsBeingUsed = leds;
-  }
-
   public void shoot() {
     if (currState != State.BOOT) {
       queueState(State.SHOOTING);
@@ -439,7 +445,9 @@ public class SS {
     if (currState != State.BOOT) {
       if (shooter.beamBroken()) {
         Setpoints sp = adjust ? shooter.adjustPreset(s) : s;
-        shooter.queueSetpoints(shooter.constrainSetpoints(sp, false));
+        Setpoints cs = shooter.constrainSetpoints(sp, false);
+        shooter.queueSetpoints(cs);
+        constrained = !cs.equals(sp);
         queueState(State.TRACKING);
       } else if (currState != State.CHAMBER && currState != State.PRECHAMBER) {
         queueState(State.PRECHAMBER);
@@ -450,7 +458,9 @@ public class SS {
   public void autoPreset(Setpoints s) {
     if (currState != State.BOOT) {
       if (shooter.beamBroken()) {
-        shooter.queueSetpoints(s);
+        Setpoints cs = shooter.constrainSetpoints(s, false);
+        shooter.queueSetpoints(cs);
+        constrained = !cs.equals(s);
         queueState(State.TRACKING);
       } else if (currState != State.AUTOCHAMBER && currState != State.AUTOPRECHAMBER) {
         queueState(State.AUTOPRECHAMBER);
@@ -461,6 +471,7 @@ public class SS {
   public void trackTrap() {
     if (currState != State.BOOT) {
       shooter.queueSetpoints(ShotPresets.TRAP_SHOT);
+      constrained = false;
       queueState(State.TRACKING);
     }
   }
@@ -482,12 +493,17 @@ public class SS {
   // Subsystem management
 
   public void queueSetpoints(Setpoints setpoints) {
-    shooter.queueSetpoints(setpoints);
+    Setpoints cs = shooter.constrainSetpoints(setpoints, false);
+    shooter.queueSetpoints(cs);
+    constrained = !cs.equals(setpoints);
   }
 
   public void queueSetpointsLive() {
     shooter.setTargetMode(TargetMode.SPEAKER);
-    shooter.queueSetpoints(shooter.constrainSetpoints(shooter.shooterPipeline(), false));
+    Setpoints ps = shooter.shooterPipeline();
+    Setpoints cs = shooter.constrainSetpoints(ps, false);
+    shooter.queueSetpoints(cs);
+    constrained = !cs.equals(ps);
   }
 
   public void resetHomingFlags() {

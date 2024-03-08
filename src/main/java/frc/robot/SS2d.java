@@ -64,6 +64,8 @@ public class SS2d {
   private final MechanismLigament2d turretBase;
   private final MechanismLigament2d turret;
 
+  private final MechanismLigament2d turretLimA, turretLimB, turretFeedLimA, turretFeedLimB;
+
   private SS2d() {
     mech = new Mechanism2d(SCENE_WIDTH_M, SCENE_HEIGHT_M, COLOR_BG);
 
@@ -127,14 +129,18 @@ public class SS2d {
     turretBase =
         turretOffset.append(new MechanismLigament2d("turret base", 0.01, 180, 1, COLOR_REF));
     turret = turretBase.append(new MechanismLigament2d("turret", 0.4, 0, 2.5, COLOR_NEUTRAL));
-    turretBase.append(
-        new MechanismLigament2d("mech limit A", 0.5, TURRET_MECH_LIMIT_A, 1, COLOR_FRAME));
-    turretBase.append(
-        new MechanismLigament2d("mech limit B", 0.5, TURRET_MECH_LIMIT_B, 1, COLOR_FRAME));
-    turretBase.append(
-        new MechanismLigament2d("feed limit A", 0.6, TURRET_FEED_LIMIT_A, 1, COLOR_FWD));
-    turretBase.append(
-        new MechanismLigament2d("feed limit B", 0.6, TURRET_FEED_LIMIT_B, 1, COLOR_REV));
+    turretLimA =
+        turretBase.append(
+            new MechanismLigament2d("mech limit A", 0.5, TURRET_MECH_LIMIT_A, 1, COLOR_FRAME));
+    turretLimB =
+        turretBase.append(
+            new MechanismLigament2d("mech limit B", 0.5, TURRET_MECH_LIMIT_B, 1, COLOR_FRAME));
+    turretFeedLimA =
+        turretBase.append(
+            new MechanismLigament2d("feed limit A", 0.6, TURRET_FEED_LIMIT_A, 1, COLOR_FWD));
+    turretFeedLimB =
+        turretBase.append(
+            new MechanismLigament2d("feed limit B", 0.6, TURRET_FEED_LIMIT_B, 1, COLOR_REV));
   }
 
   public void setIntakeMotors(double intake, double dir) {
@@ -161,6 +167,14 @@ public class SS2d {
   public void setTurretBaseAngle(Rotation2d angle_r2d) {
     turretBase.setAngle(
         G.isRedAlliance() ? angle_r2d : angle_r2d.minus(Rotation2d.fromRotations(0.5)));
+  }
+
+  public void setTurretConstraints(double cons, double feedCons) {
+    // System.out.println((cons / 360.0) + " " + (feedCons/360.0));
+    turretLimA.setAngle(cons);
+    turretLimB.setAngle(-cons);
+    turretFeedLimA.setAngle(feedCons);
+    turretFeedLimB.setAngle(-feedCons);
   }
 
   public static void periodic() {

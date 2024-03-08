@@ -29,7 +29,6 @@ public class VisionIOPhoton implements ApriltagIO {
 
   public VisionIOPhoton(String camname, Transform3d camToRobot) {
     this.camera = new PhotonCamera(camname);
-    thread = new VisionProcessingThread(this);
 
     // this is a listener for any changes on the photonvision networktable. might need to change
     // this later. this is async
@@ -45,6 +44,7 @@ public class VisionIOPhoton implements ApriltagIO {
         new PhotonPoseEstimator(fieldLayout, PoseStrategy.LOWEST_AMBIGUITY, camToRobot);
     this.poseEstimator.setMultiTagFallbackStrategy(PoseStrategy.LOWEST_AMBIGUITY);
     this.transform = camToRobot;
+    thread = new VisionProcessingThread(this);
   }
 
   @Override

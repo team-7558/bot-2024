@@ -35,7 +35,7 @@ public class ShooterIOTalonFx implements ShooterIO {
   private final TalonFX pivot = new TalonFX(7); // TODO: update
   private final TalonFX feeder = new TalonFX(8);
 
-  private final DigitalInput beambreakIn = new DigitalInput(2);
+  private final DigitalInput beambreakIn = new DigitalInput(1);
   private final DigitalInput beambreakOut = new DigitalInput(2);
   private final DigitalInput tLimit = new DigitalInput(8);
   private final DigitalInput pLimit = new DigitalInput(9);
@@ -148,12 +148,12 @@ public class ShooterIOTalonFx implements ShooterIO {
     turretConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
 
     // posHold
-    turretConfig.Slot0.kP = 90;
+    turretConfig.Slot0.kP = 115;
     turretConfig.Slot0.kI = 0;
     turretConfig.Slot0.kD = 0;
 
     // mmPosMove
-    turretConfig.Slot1.kP = 90;
+    turretConfig.Slot1.kP = 115;
     turretConfig.Slot1.kI = 0;
     turretConfig.Slot1.kD = 0;
     turretConfig.Slot1.kS = 0;
@@ -168,9 +168,9 @@ public class ShooterIOTalonFx implements ShooterIO {
     turretConfig.Slot2.kV = 0;
     turretConfig.Slot2.kA = 0;
 
-    turretConfig.MotionMagic.MotionMagicCruiseVelocity = 1;
-    turretConfig.MotionMagic.MotionMagicAcceleration = 1.8;
-    turretConfig.MotionMagic.MotionMagicJerk = 4;
+    turretConfig.MotionMagic.MotionMagicCruiseVelocity = 1.7;
+    turretConfig.MotionMagic.MotionMagicAcceleration = 2.3;
+    turretConfig.MotionMagic.MotionMagicJerk = 8;
 
     var pivotConfig = new TalonFXConfiguration();
     pivotConfig.Feedback.SensorToMechanismRatio = PIVOT_GEAR_RATIO;

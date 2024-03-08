@@ -16,7 +16,6 @@ package frc.robot;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -48,10 +47,10 @@ public class Robot extends LoggedRobot {
 
   private final AutoSelector AS =
       new AutoSelector()
-          .add(new DefaultMovingWhileShooting(), 0, 24, 24)
-          .add(new AmpSeries(0), 16, 16, 16)
-          .add(new AmpSeries(1), 8, 32, 8)
-          .add(new AmpSeries(2), 32, 0, 8);
+          .add(new DefaultMovingWhileShooting(), 16, 16, 16)
+          .add(new AmpSeries(0), 48, 0, 0)
+          .add(new AmpSeries(1), 0, 48, 0)
+          .add(new AmpSeries(2), 0, 0, 48);
 
   private Command autonomousCommand;
   private Drive drive;
@@ -60,8 +59,6 @@ public class Robot extends LoggedRobot {
   private Intake intake;
   private Vision vision;
   private LED led;
-
-  boolean lastState = false;
 
   boolean resetPose = false;
 
@@ -79,6 +76,10 @@ public class Robot extends LoggedRobot {
     led = LED.getInstance();
   }
 
+  boolean brake = true;
+  boolean lastState = false;
+  boolean lastAS = false;
+
   @Override
   public void disabledPeriodic() {
     boolean buttonPressed = RobotController.getUserButton();
@@ -88,6 +89,7 @@ public class Robot extends LoggedRobot {
       shooter.toggleBrake();
       elevator.toggleBrake();
       intake.toggleBrake();
+      brake = !brake;
     }
 
     lastState = buttonPressed;
@@ -95,6 +97,26 @@ public class Robot extends LoggedRobot {
     if (!resetPose && t.get() > 0.2) {
       resetPose = true;
       drive.resetPose();
+    }
+
+    if (!lastAS && OI.XK.get(2, 0)) {
+      lastAS = true;
+      AS.setCurrIdx(0);
+      AS.generate();
+    } else if (!lastAS && OI.XK.get(3, 0)) {
+      lastAS = true;
+      AS.setCurrIdx(1);
+      AS.generate();
+    } else if (!lastAS && OI.XK.get(4, 0)) {
+      lastAS = true;
+      AS.setCurrIdx(2);
+      AS.generate();
+    } else if (!lastAS && OI.XK.get(5, 0)) {
+      lastAS = true;
+      AS.setCurrIdx(3);
+      AS.generate();
+    } else if (!OI.XK.get(2, 0) && !OI.XK.get(3, 0) && !OI.XK.get(4, 0) && !OI.XK.get(5, 0)) {
+      lastAS = false;
     }
 
     int d0 = (int) (16 + 16 * Math.sin(6.2 * t.get()));
@@ -204,6 +226,12 @@ public class Robot extends LoggedRobot {
       LED.getInstance().setBlinkin(0.99);
     }
 
+    if (!brake) {
+      for (int i = 1; i < LED.WIDTH; i += 2) {
+        LED.getInstance().drawCol(i, 16, 0, 16);
+      }
+    }
+
     SS.getInstance().periodic();
     SS2d.periodic();
     vision.periodic();
@@ -232,7 +260,7 @@ public class Robot extends LoggedRobot {
 
   /** This function is called once when teleop is enabled. */
   @Override
-  public void teleopInit() {    
+  public void teleopInit() {
     tt.reset();
     tt.start();
     // This makes sure that the autonomous stops running when

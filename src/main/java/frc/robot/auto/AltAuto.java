@@ -53,6 +53,11 @@ public abstract class AltAuto {
     onInit();
   }
 
+  @Override
+  public String toString() {
+    return name;
+  }
+
   public void generate() {
     trajstack.generate();
     generated = true;

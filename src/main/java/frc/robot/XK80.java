@@ -16,49 +16,16 @@ public class XK80 extends GenericHID {
 
   public boolean get(int x, int y) {
     if (x < 5) {
+      if (x == 2) {
+        x = 3;
+      } else if (x == 3) {
+        x = 2;
+      }
       int res = (int) ((getRawAxis(x) + 0.7890625) * 5.07);
       return res == y + 1;
     } else if (x < 9) {
       int res = 0, colshift = (1 - x % 2) * 4, rowshift = ((x - 6) > 0 ? 8 : 0);
       return getRawButton((x * 8 + y) - 39);
-      // res |= getRawButton(colshift + rowshift + 1) ? 1 << 0 : 0;
-      // res |= getRawButton(colshift + rowshift + 2) ? 1 << 1 : 0;
-      // res |= getRawButton(colshift + rowshift + 3) ? 1 << 2 : 0;
-      // res |= getRawButton(colshift + rowshift + 4) ? 1 << 3 : 0;
-      // return res == y + 1;
-    } else {
-      int pov = getPOV();
-      if (pov < 0) return false;
-      return (pov / 45) == y;
-    }
-  }
-
-  public boolean getPressed(int x, int y) {
-    if (x < 5) {
-      int res = (int) ((getRawAxis(x) + 0.7890625) * 5.07);
-      return res == y + 1;
-    } else if (x < 9) {
-      int res = 0, colshift = (1 - x % 2) * 4, rowshift = ((x - 6) > 0 ? 8 : 0);
-      return getRawButtonPressed((x * 8 + y) - 39);
-      // res |= getRawButton(colshift + rowshift + 1) ? 1 << 0 : 0;
-      // res |= getRawButton(colshift + rowshift + 2) ? 1 << 1 : 0;
-      // res |= getRawButton(colshift + rowshift + 3) ? 1 << 2 : 0;
-      // res |= getRawButton(colshift + rowshift + 4) ? 1 << 3 : 0;
-      // return res == y + 1;
-    } else {
-      int pov = getPOV();
-      if (pov < 0) return false;
-      return (pov / 45) == y;
-    }
-  }
-
-  public boolean getReleased(int x, int y) {
-    if (x < 5) {
-      int res = (int) ((getRawAxis(x) + 0.7890625) * 5.07);
-      return res == y + 1;
-    } else if (x < 9) {
-      int res = 0, colshift = (1 - x % 2) * 4, rowshift = ((x - 6) > 0 ? 8 : 0);
-      return getRawButtonReleased((x * 8 + y) - 39);
       // res |= getRawButton(colshift + rowshift + 1) ? 1 << 0 : 0;
       // res |= getRawButton(colshift + rowshift + 2) ? 1 << 1 : 0;
       // res |= getRawButton(colshift + rowshift + 3) ? 1 << 2 : 0;

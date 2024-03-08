@@ -11,7 +11,7 @@ public class DefaultMovingWhileShooting extends AltAuto {
     super("DefaultMovingWhileShooting", true);
     trajstack.appendChain().append("Default Path", false);
     trajstack.setActiveIdx(0);
-    trajstack.generate();
+    // trajstack.generate();
   }
 
   @Override

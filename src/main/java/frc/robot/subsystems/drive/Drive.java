@@ -100,7 +100,7 @@ public class Drive extends StateMachineSubsystemBase {
                   new ModuleIO2024(1),
                   new ModuleIO2024(2),
                   new ModuleIO2024(3),
-                  new ObjectDetectorIOReal());
+                  new ObjectDetectorIO() {});
           break;
 
         case SIM:
@@ -163,7 +163,7 @@ public class Drive extends StateMachineSubsystemBase {
   public static final HolonomicPathFollowerConfig HPFG =
       new HolonomicPathFollowerConfig(
           new PIDConstants(2),
-          new PIDConstants(2),
+          new PIDConstants(3),
           MAX_LINEAR_SPEED_MPS,
           DRIVE_BASE_RADIUS,
           new ReplanningConfig(),

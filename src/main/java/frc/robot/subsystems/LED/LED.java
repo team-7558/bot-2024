@@ -156,7 +156,7 @@ public class LED {
     if (iv > 99) drawDigit(hundreds, 0, r, g, b);
     if (iv > 9) drawDigit(tens, 8, r, g, b);
     drawDigit(ones, 16, r, g, b);
-    if(G.isRedAlliance()) drawPoint(24, 7, 48, 0, 0);
+    if (G.isRedAlliance()) drawPoint(24, 7, 48, 0, 0);
     else drawPoint(24, 7, 0, 0, 48);
     drawDigit(tenths, 24, r, g, b);
   }
@@ -171,7 +171,7 @@ public class LED {
 
     if (iv > 9) drawDigit(tens, 0, r, g, b);
     drawDigit(ones, 8, r, g, b);
-    if(G.isRedAlliance()) drawPoint(16, 7, 48, 0, 0);
+    if (G.isRedAlliance()) drawPoint(16, 7, 48, 0, 0);
     else drawPoint(16, 7, 0, 0, 48);
     drawDigit(tenths, 16, r, g, b);
     drawDigit(hundreths, 24, r, g, b);
