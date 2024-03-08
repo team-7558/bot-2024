@@ -5,7 +5,7 @@ import frc.robot.auto.AltAuto;
 import frc.robot.subsystems.shooter.Shooter.Setpoints;
 
 public class AmpSeries extends AltAuto {
-  public AmpSeries() {
+  public AmpSeries(int idx) {
     super("AmpSeries", true);
     trajstack
         .appendChain()
@@ -24,7 +24,7 @@ public class AmpSeries extends AltAuto {
         .append("Amp Start", false)
         .append("Amp Fork To 6 To Strafe", false)
         .append("Strafe Run", false);
-    trajstack.setActiveIdx(0);
+    trajstack.setActiveIdx(idx);
   }
 
   @Override

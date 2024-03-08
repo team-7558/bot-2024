@@ -609,7 +609,7 @@ public class Shooter extends StateMachineSubsystemBase {
       s.flywheel_rps = Util.limit(s.flywheel_rps, FLYWHEEL_MIN_VEL_rps, FLYWHEEL_MAX_VEL_rps);
       s.pivotPos_r = Util.limit(s.pivotPos_r, PIVOT_MIN_POS_r, PIVOT_MAX_POS_r);
       double y = turretConstraintsFromPivotPos.calcY(s.pivotPos_r);
-      // System.out.println(s.pivotPos_r+":"+y);
+      System.out.println(s.pivotPos_r+":"+y);
       s.turretPos_r = Util.limit(s.turretPos_r, -0.15, 0.15);
     }
     return s;

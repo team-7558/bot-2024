@@ -86,7 +86,19 @@ public class SwerveFollower {
       }
     }*/
 
-    ChassisSpeeds targetSpeeds = con.calculateRobotRelativeSpeeds(currentPose, targetState);
+    double dist2 = 7558;
+    if (targetState.velocityMps == 0) {
+      double dx = targetState.positionMeters.getX() - currentPose.getX();
+      double dy = targetState.positionMeters.getY() - currentPose.getY();
+      dist2 = dx * dx + dy * dy;
+    }
+    
+    ChassisSpeeds targetSpeeds;
+    if (dist2 > 0.05 * 0.05) {
+      targetSpeeds = con.calculateRobotRelativeSpeeds(currentPose, targetState);
+    } else {
+      targetSpeeds = new ChassisSpeeds(0, 0, 0);
+    }
 
     /*if (G.isRedAlliance()){
       targetSpeeds.vxMetersPerSecond *= -1.0;

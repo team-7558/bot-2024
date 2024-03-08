@@ -16,10 +16,15 @@ package frc.robot;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.robot.auto.AutoSelector;
+import frc.robot.auto.ampside.AmpSeries;
+import frc.robot.auto.ampside.DefaultMovingWhileShooting;
+import frc.robot.commands.RobotTeleop;
 import frc.robot.subsystems.LED.LED;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.elevator.Elevator;
@@ -41,8 +46,14 @@ import org.littletonrobotics.junction.wpilog.WPILOGWriter;
  */
 public class Robot extends LoggedRobot {
 
+  private final AutoSelector AS =
+      new AutoSelector()
+          .add(new DefaultMovingWhileShooting(), 0, 24, 24)
+          .add(new AmpSeries(0), 16, 16, 16)
+          .add(new AmpSeries(1), 8, 32, 8)
+          .add(new AmpSeries(2), 32, 0, 8);
+
   private Command autonomousCommand;
-  private RobotContainer robotContainer;
   private Drive drive;
   private Elevator elevator;
   private Shooter shooter;
@@ -159,7 +170,7 @@ public class Robot extends LoggedRobot {
 
     // Instantiate our RobotContainer. This will perform all our button bindings,
     // and put our autonomous chooser on the dashboard.
-    robotContainer = new RobotContainer();
+    drive.setDefaultCommand(new RobotTeleop());
   }
 
   /** This function is called periodically during all modes. */
@@ -207,12 +218,7 @@ public class Robot extends LoggedRobot {
   /** This autonomous runs the autonomous command selected by your {@link RobotContainer} class. */
   @Override
   public void autonomousInit() {
-    autonomousCommand = robotContainer.getAutonomousCommand();
-
-    // schedule the autonomous command (example)
-    if (autonomousCommand != null) {
-      autonomousCommand.schedule();
-    }
+    AS.getCommand().schedule();
   }
 
   /** This function is called periodically during autonomous. */
@@ -221,7 +227,9 @@ public class Robot extends LoggedRobot {
 
   /** This function is called once when teleop is enabled. */
   @Override
-  public void teleopInit() {
+  public void teleopInit() {    
+    tt.reset();
+    tt.start();
     // This makes sure that the autonomous stops running when
     // teleop starts running. If you want the autonomous to
     // continue until interrupted by another command, remove
@@ -229,9 +237,6 @@ public class Robot extends LoggedRobot {
     if (autonomousCommand != null) {
       autonomousCommand.cancel();
     }
-
-    tt.reset();
-    tt.start();
   }
 
   /** This function is called periodically during operator control. */
