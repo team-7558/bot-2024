@@ -126,16 +126,16 @@ public class Intake extends StateMachineSubsystemBase {
         new State("SHOOTER_SIDE") {
           @Override
           public void init() {
-            directionSpeed = -0.34;
-            intakeSpeed = 0.34;
+            directionSpeed = -0.36;
+            intakeSpeed = 0.36;
           }
         };
     FAST_FEED =
         new State("FAST_FEED") {
           @Override
           public void init() {
-            directionSpeed = -0.40;
-            intakeSpeed = 0.40;
+            directionSpeed = -0.41;
+            intakeSpeed = 0.41;
           }
         };
     FEEDING =

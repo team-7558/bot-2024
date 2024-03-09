@@ -4,18 +4,18 @@ import frc.robot.subsystems.shooter.Shooter.Setpoints;
 
 public class ShotPresets {
 
-  public static final Setpoints TRAP_SHOT = new Setpoints(20, 0, 0, 0.18);
+  public static final Setpoints TRAP_SHOT = new Setpoints(18, 0, 0, 0.18);
 
-  public static final Setpoints RED_BUDGET_AMP = new Setpoints(13.5, 0, 0, 0.18);
-  public static final Setpoints RED_FENDER = new Setpoints(32, 0, 0, 0.186);
-  public static final Setpoints RED_FRONT_POST = new Setpoints(45, 0, 0.09, 0.13);
-  public static final Setpoints RED_SIDE_POST = new Setpoints(45, 0, 0.09, 0.120);
-  public static final Setpoints RED_AMP_BOX = new Setpoints(45, 0, -0.134, 0.135);
-  public static final Setpoints RED_FRONT_COURT = new Setpoints(45, 0, -0.02, 0.12);
-  public static final Setpoints RED_WING_POST = new Setpoints(47, 0, -0.023, 0.10);
-  public static final Setpoints RED_WING_WALL = new Setpoints(48, 0, -0.080, 0.095);
-  public static final Setpoints RED_CLEAR_WALL = new Setpoints(30, 0, 0.08, 0.145);
-  public static final Setpoints RED_CLEAR_MID = new Setpoints(20, 0, 0.02, 0.145);
+  public static final Setpoints RED_BUDGET_AMP = new Setpoints(10.5, 0, 0, 0.18);
+  public static final Setpoints RED_FENDER = new Setpoints(29, 0, 0, 0.186);
+  public static final Setpoints RED_FRONT_POST = new Setpoints(42, 0, 0.087, 0.13);
+  public static final Setpoints RED_SIDE_POST = new Setpoints(42, 0, 0.092, 0.102);
+  public static final Setpoints RED_AMP_BOX = new Setpoints(42, 0, -0.134, 0.13);
+  public static final Setpoints RED_FRONT_COURT = new Setpoints(42, 0, 0, 0.12);
+  public static final Setpoints RED_WING_POST = new Setpoints(44, 0, -0.023, 0.10);
+  public static final Setpoints RED_WING_WALL = new Setpoints(45, 0, -0.080, 0.095);
+  public static final Setpoints RED_CLEAR_WALL = new Setpoints(22, 0, 0.08, 0.145);
+  public static final Setpoints RED_CLEAR_MID = new Setpoints(17, 0, 0.02, 0.145);
   public static final Setpoints RED_CLEAR_CLOSE =
       new Setpoints(36, 0, 0.1, Shooter.PIVOT_MIN_POS_r);
 
