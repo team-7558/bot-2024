@@ -29,47 +29,49 @@ public class SourceSeries extends AltAuto {
   @Override
   public void onInit() {
     double i = G.isRedAlliance() ? 1.0 : -1.0;
-    ss.autoPreset(new Setpoints(28, 0, 0.12 * i, 0.05));
+    ss.autoPreset(new Setpoints(30, 0, 0.118 * i, 0.059));
   }
 
   @Override
   public void onExecute() {
     double i = G.isRedAlliance() ? 1.0 : -1.0;
 
-    if(trajstack.getActiveIdx() == 0){
-      if (after(1.4)) {
+    if (trajstack.getActiveIdx() == 0) {
+      if (before(1.4)) {
+
+      } else if (before(2.2)) {
         ss.queueState(State.SHOOTING);
-      } else if (after(2.2)) {
-        ss.autoPreset(new Setpoints(28, 0, 0.12 * i, 0.05));
-      } else if (after(6.0)) {
+      } else if (before(6.05)) {
+        ss.autoPreset(new Setpoints(36, 0, 0.08 * i, 0.122));
+      } else if (before(6.55)) {
         ss.queueState(State.SHOOTING);
-      } else if (after(6.5)) {
-        ss.autoPreset(new Setpoints(28, 0, 0.12 * i, 0.05));
-      } else if (after(11.0)) {
+      } else if (before(11.05)) {
+        ss.autoPreset(new Setpoints(36, 0, 0.08 * i, 0.12));
+      } else if (before(11.55)) {
         ss.queueState(State.SHOOTING);
-      } else if (after(11.5)) {
-        ss.autoPreset(new Setpoints(28, 0, 0.12 * i, 0.05));
+      } else if (before(15)) {
+        ss.autoPreset(new Setpoints(36, 0, 0.08 * i, 0.12));
       } else if (after(15)) {
         ss.queueState(State.IDLE);
       }
     } else {
-      if (after(1.4)) {
+      if (before(1.4)) {
+
+      } else if (before(2.2)) {
         ss.queueState(State.SHOOTING);
-      } else if (after(2.2)) {
-        ss.autoPreset(new Setpoints(28, 0, 0.12 * i, 0.05));
-      } else if (after(6.0)) {
+      } else if (before(6.05)) {
+        ss.autoPreset(new Setpoints(36, 0, 0.08 * i, 0.12));
+      } else if (before(6.55)) {
         ss.queueState(State.SHOOTING);
-      } else if (after(6.5)) {
-        ss.autoPreset(new Setpoints(28, 0, 0.12 * i, 0.05));
-      } else if (after(11.0)) {
+      } else if (before(11.05)) {
+        ss.autoPreset(new Setpoints(36, 0, 0.08 * i, 0.12));
+      } else if (before(11.55)) {
         ss.queueState(State.SHOOTING);
-      } else if (after(11.5)) {
-        ss.autoPreset(new Setpoints(28, 0, 0.12 * i, 0.05));
-      }else if (after(15)) {
+      } else if (before(15)) {
+        ss.autoPreset(new Setpoints(36, 0, 0.08 * i, 0.12));
+      } else if (after(15)) {
         ss.queueState(State.IDLE);
       }
-    }     
-
-    
+    }
   }
 }

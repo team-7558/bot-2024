@@ -26,7 +26,7 @@ public class DefaultMovingWhileShooting extends AltAuto {
       ss.queueState(State.SHOOTING);
     } else if (before(6.7)) {
       // ss.queueSetpoints(new Setpoints(37, 0, 0.02, 0.15));
-      ss.autoPreset(new Setpoints(33, 0, 0.02 * i, 0.16 * 1.15));
+      ss.autoPreset(new Setpoints(33, 0, 0.02 * i, 0.181));
     } else if (before(7.5)) {
       ss.queueState(State.SHOOTING);
     } else if (before(10.3)) {

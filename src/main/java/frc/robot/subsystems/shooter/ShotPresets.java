@@ -12,11 +12,11 @@ public class ShotPresets {
       new Setpoints(38, 0, 0.087, 0.15); // potentially make higher
   public static final Setpoints RED_SIDE_POST = new Setpoints(38, 0, 0.092, 0.128);
   public static final Setpoints RED_AMP_BOX = new Setpoints(38, 0, -0.134, 0.14);
-  public static final Setpoints RED_FRONT_COURT = new Setpoints(36, 0, 0, 0.15);
-  public static final Setpoints RED_WING_POST = new Setpoints(44, 0, -0.023, 0.10);
-  public static final Setpoints RED_WING_WALL = new Setpoints(45, 0, -0.080, 0.095);
-  public static final Setpoints RED_CLEAR_WALL = new Setpoints(20, 0, 0.08, 0.145);
-  public static final Setpoints RED_CLEAR_MID = new Setpoints(15, 0, 0.02, 0.145);
+  public static final Setpoints RED_FRONT_COURT = new Setpoints(36, 0, 0, 0.137);
+  public static final Setpoints RED_WING_POST = new Setpoints(44, 0, -0.023, 0.11);
+  public static final Setpoints RED_WING_WALL = new Setpoints(45, 0, -0.080, 0.11);
+  public static final Setpoints RED_CLEAR_WALL = new Setpoints(30, 0, 0.08, 0.145);
+  public static final Setpoints RED_CLEAR_MID = new Setpoints(22, 0, 0.02, 0.145);
   public static final Setpoints RED_CLEAR_CLOSE =
       new Setpoints(36, 0, 0.1, Shooter.PIVOT_MIN_POS_r);
 
