@@ -150,7 +150,7 @@ public class ModuleIO2024 implements ModuleIO {
     turnConfig.Slot1 = steerGainsTorque;
     turnConfig.CurrentLimits.SupplyCurrentLimit = 20.0;
     turnConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
-    // turnConfig.ClosedLoopRamps.VoltageClosedLoopRampPeriod = 0.3;
+    // turnConfig.ClosedLoopRamps.VoltageClosedLoopRampPeriod = 0.3;[]
     turnConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
     turnConfig.MotorOutput.Inverted =
         isTurnMotorInverted

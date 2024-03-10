@@ -40,7 +40,7 @@ public class Shooter extends StateMachineSubsystemBase {
 
   private static double HEIGHT_M = -0.1;
 
-  public static final double TURRET_ZERO_POS = 0; // 0.2506;
+  public static final double TURRET_ZERO_POS = 0.2506;
   public static final double PIVOT_ZERO_POS = Units.degreesToRotations(-1.0);
 
   public static final double FLYWHEEL_MIN_VEL_rps = 0, FLYWHEEL_MAX_VEL_rps = 100;
