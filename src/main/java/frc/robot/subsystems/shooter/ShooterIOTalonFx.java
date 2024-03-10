@@ -317,24 +317,24 @@ public class ShooterIOTalonFx implements ShooterIO {
 
   /** Run open loop at the specified voltage. */
   public void setTurretVolts(double volts) {
-    double v = Util.limit(volts, 12.0);
-    turret.setControl(tVolts.withOutput(v));
+    // double v = Util.limit(volts, 12.0);
+    // turret.setControl(tVolts.withOutput(v));
   }
 
   /** Run closed loop at the specified velocity. */
   public void setTurretPos(double pos_r) {
-    if (Util.inRange(pos_r - TPosition.getValueAsDouble(), TURRET_POS_SWITCH_THRESHOLD)) {
-      turret.setControl(tPos.withPosition(pos_r));
-      turret.setControl(tPos.withPosition(pos_r));
-    } else {
-      turret.setControl(tMmPos.withPosition(pos_r));
-      turret.setControl(tMmPos.withPosition(pos_r));
-    }
+    // if (Util.inRange(pos_r - TPosition.getValueAsDouble(), TURRET_POS_SWITCH_THRESHOLD)) {
+    //   turret.setControl(tPos.withPosition(pos_r));
+    //   turret.setControl(tPos.withPosition(pos_r));
+    // } else {
+    //   turret.setControl(tMmPos.withPosition(pos_r));
+    //   turret.setControl(tMmPos.withPosition(pos_r));
+    // }
   }
 
   /** Run closed loop at the specified velocity. */
   public void setTurretVel(double vel_rps) {
-    turret.setControl(tMmVel.withVelocity(vel_rps));
+    // turret.setControl(tMmVel.withVelocity(vel_rps));
   }
 
   /** Run open loop at the specified voltage. */
@@ -399,7 +399,7 @@ public class ShooterIOTalonFx implements ShooterIO {
     inputs.turretCurrent = TCurrent.getValueAsDouble();
     inputs.beamBreakInActivated = beambreakIn.get();
     inputs.beamBreakOutActivated = beambreakOut.get();
-    inputs.turretHallEffect = !tLimit.get();
+    inputs.turretHallEffect = true;
     inputs.pivotHallEffect = !pLimit.get();
   }
 

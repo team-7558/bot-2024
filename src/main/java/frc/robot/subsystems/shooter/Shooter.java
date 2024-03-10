@@ -40,7 +40,7 @@ public class Shooter extends StateMachineSubsystemBase {
 
   private static double HEIGHT_M = -0.1;
 
-  public static final double TURRET_ZERO_POS = 0.2506;
+  public static final double TURRET_ZERO_POS = 0; // 0.2506;
   public static final double PIVOT_ZERO_POS = Units.degreesToRotations(-1.0);
 
   public static final double FLYWHEEL_MIN_VEL_rps = 0, FLYWHEEL_MAX_VEL_rps = 100;
@@ -257,7 +257,7 @@ public class Shooter extends StateMachineSubsystemBase {
             if (inputs.beamBreakOutActivated) {
               setCurrentState(IDLE);
             } else if (!inputs.beamBreakInActivated) {
-              queueSetpoints(new Setpoints(Setpoints.DEFAULT, 8.5, 0, PIVOT_MIN_POS_r));
+              queueSetpoints(new Setpoints(Setpoints.DEFAULT, 7.5, 0, PIVOT_MIN_POS_r));
               track();
             } else {
               queueSetpoints(new Setpoints(Setpoints.DEFAULT, 3.4, 0, PIVOT_MIN_POS_r));
@@ -277,10 +277,10 @@ public class Shooter extends StateMachineSubsystemBase {
             if (inputs.beamBreakOutActivated) {
               setCurrentState(IDLE);
             } else if (!inputs.beamBreakInActivated) {
-              queueSetpoints(new Setpoints(Setpoints.DEFAULT, 10, 0, PIVOT_MIN_POS_r));
+              queueSetpoints(new Setpoints(Setpoints.DEFAULT, 8.5, 0, PIVOT_MIN_POS_r));
               track();
             } else {
-              queueSetpoints(new Setpoints(Setpoints.DEFAULT, 4.0, 0, 0.1));
+              queueSetpoints(new Setpoints(Setpoints.DEFAULT, 3.0, 0, 0.1));
               track();
             }
           }

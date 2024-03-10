@@ -51,10 +51,10 @@ public class RobotTeleop extends Command {
         drive.setAutolockSetpoint(0.25);
         drive.setCurrentState(drive.STRAFE_AUTOLOCK);
       } else if (OI.DR.getBButton()) {
-        drive.setAutolockSetpoint(G.isRedAlliance() ? 0.172 : -0.35);
+        drive.setAutolockSetpoint(G.isRedAlliance() ? -0.35 : 0.172);
         drive.setCurrentState(drive.STRAFE_AUTOLOCK);
       } else if (OI.DR.getXButton()) {
-        drive.setAutolockSetpoint(G.isRedAlliance() ? -0.15 : -0.35);
+        drive.setAutolockSetpoint(G.isRedAlliance() ? 0.35 : -0.172);
         drive.setCurrentState(drive.STRAFE_AUTOLOCK);
       } else if (OI.DR.getYButton()) {
         drive.setAutolockSetpoint(G.isRedAlliance() ? 0.5 : 0);
@@ -73,7 +73,7 @@ public class RobotTeleop extends Command {
 
     if (!ss.isDisabled()) {
 
-      if (OI.DR.getPOV() == 90 || OI.XK.get(0, 7)) {
+      if (OI.DR.getPOV() == 90 && OI.DR.getStartButton()) {
         ss.resetHomingFlags();
         ss.queueState(State.BOOT);
       } else if (OI.DR.getRightBumper()) {
@@ -101,13 +101,13 @@ public class RobotTeleop extends Command {
       } else if (OI.XK.get(0, 3)) {
         ss.trackPreset(
             G.isRedAlliance() ? ShotPresets.RED_AMP_BOX : ShotPresets.BLUE_AMP_BOX, true);
-      } else if (OI.XK.get(0, 4)) {
-        ss.trackPreset(
-            G.isRedAlliance() ? ShotPresets.RED_FRONT_COURT : ShotPresets.BLUE_FRONT_COURT, true);
       } else if (OI.XK.get(0, 5)) {
         ss.trackPreset(
-            G.isRedAlliance() ? ShotPresets.RED_WING_POST : ShotPresets.BLUE_WING_POST, true);
+            G.isRedAlliance() ? ShotPresets.RED_FRONT_COURT : ShotPresets.BLUE_FRONT_COURT, true);
       } else if (OI.XK.get(0, 6)) {
+        ss.trackPreset(
+            G.isRedAlliance() ? ShotPresets.RED_WING_POST : ShotPresets.BLUE_WING_POST, true);
+      } else if (OI.XK.get(0, 7)) {
         ss.trackPreset(
             G.isRedAlliance() ? ShotPresets.RED_WING_WALL : ShotPresets.BLUE_WING_WALL, true);
       } else if (OI.XK.get(9, 0)) {

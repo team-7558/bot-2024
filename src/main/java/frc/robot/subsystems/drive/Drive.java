@@ -108,10 +108,10 @@ public class Drive extends StateMachineSubsystemBase {
           instance =
               new Drive(
                   new GyroIO() {},
-                  new ModuleIOSim(0),
-                  new ModuleIOSim(1),
-                  new ModuleIOSim(2),
-                  new ModuleIOSim(3),
+                  new ModuleIOIdeal(0),
+                  new ModuleIOIdeal(1),
+                  new ModuleIOIdeal(2),
+                  new ModuleIOIdeal(3),
                   new ObjectDetectorIO() {});
           break;
 
@@ -249,7 +249,7 @@ public class Drive extends StateMachineSubsystemBase {
             double y_ = -OI.DR.getLeftX();
             double w_ = -Util.sqInput(OI.DR.getRightX());
 
-            runVelocity(drive(x_, y_, w_ * 0.5, throttle));
+            runVelocity(drive(x_, y_, w_ * 0.505, throttle));
           }
         };
 

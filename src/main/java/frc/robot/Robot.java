@@ -21,8 +21,8 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.auto.AutoSelector;
+import frc.robot.auto.NoTurret;
 import frc.robot.auto.ampside.AmpSeries;
-import frc.robot.auto.ampside.DefaultMovingWhileShooting;
 import frc.robot.commands.RobotTeleop;
 import frc.robot.subsystems.LED.LED;
 import frc.robot.subsystems.drive.Drive;
@@ -47,7 +47,7 @@ public class Robot extends LoggedRobot {
 
   private final AutoSelector AS =
       new AutoSelector()
-          .add(new DefaultMovingWhileShooting(), 16, 16, 16)
+          .add(new NoTurret(), 16, 16, 16)
           .add(new AmpSeries(0), 48, 0, 0)
           .add(new AmpSeries(1), 0, 48, 0)
           .add(new AmpSeries(2), 0, 0, 48);
