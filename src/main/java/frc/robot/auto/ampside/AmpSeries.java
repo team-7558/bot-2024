@@ -36,6 +36,8 @@ public class AmpSeries extends AltAuto {
       ss.queueState(State.SHOOTING);
     } else if (after(2.2)) {
       ss.queueState(State.IDLE);
+    } else if (after(15)) {
+      ss.queueState(State.IDLE);
     }
   }
 }
