@@ -47,7 +47,9 @@ public class SourceSeries extends AltAuto {
         ss.autoPreset(new Setpoints(28, 0, 0.12 * i, 0.05));
       } else if (after(11.0)) {
         ss.queueState(State.SHOOTING);
-      }else if (after(15)) {
+      } else if (after(11.5)) {
+        ss.autoPreset(new Setpoints(28, 0, 0.12 * i, 0.05));
+      } else if (after(15)) {
         ss.queueState(State.IDLE);
       }
     } else {
@@ -61,6 +63,8 @@ public class SourceSeries extends AltAuto {
         ss.autoPreset(new Setpoints(28, 0, 0.12 * i, 0.05));
       } else if (after(11.0)) {
         ss.queueState(State.SHOOTING);
+      } else if (after(11.5)) {
+        ss.autoPreset(new Setpoints(28, 0, 0.12 * i, 0.05));
       }else if (after(15)) {
         ss.queueState(State.IDLE);
       }
