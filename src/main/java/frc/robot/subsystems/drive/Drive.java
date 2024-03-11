@@ -70,16 +70,16 @@ public class Drive extends StateMachineSubsystemBase {
   public static final Matrix<N3, N1> odometryStdDevs = VecBuilder.fill(0.005, 0.005, 0.001);
 
   // maximum distance on high fps, low res before we switch the camera to high res lower fps
-  public static final double MAX_DISTANCE = 3.0;
+  public static final double MAX_DISTANCE = 2.0;
 
   // minimum distance to be on low fps high res before we switch the camera to high fps low res
-  public static final double MIN_DISTANCE = 3.1;
+  public static final double MIN_DISTANCE = 2.1;
 
   // distance to cut off all pose estimation because its too inaccurate
-  public static final double CUTOFF_DISTANCE = 7.0;
+  public static final double CUTOFF_DISTANCE = 5.0;
 
   // ratio for the distance scaling on the standard deviation
-  private static final double APRILTAG_COEFFICIENT = 0.1; // NEEDS TO BE TUNED
+  private static final double APRILTAG_COEFFICIENT = 0.01; // NEEDS TO BE TUNED
 
   public static final Lock odometryLock = new ReentrantLock();
   public static final Queue<Double> timestampQueue = new ArrayBlockingQueue<>(100);
@@ -573,6 +573,7 @@ public class Drive extends StateMachineSubsystemBase {
   }
 
   public void addToPoseEstimator(Pose2d pose, double timestamp, double ambiguity, int[] tids) {
+    if(pose.getTranslation().getDistance(getPose().getTranslation()) > CUTOFF_DISTANCE) return;
     double distSums = 0;
     for (int i = 0; i < tids.length; i++) {
       try {

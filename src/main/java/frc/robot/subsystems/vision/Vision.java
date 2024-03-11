@@ -13,6 +13,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
 import frc.robot.Constants;
 import frc.robot.PerfTracker;
+import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.vision.ApriltagIO.ApriltagIOInputs;
 import frc.robot.util.Util;
 import java.io.IOException;
@@ -40,6 +41,14 @@ public class Vision {
   // Distance for clear
   public static final double CLEAR_DISTANCE_M = QUICK_DISTANCE_M + 0.1;
 
+  public static final int SPEAKER_LEFT_BLUE = 8, SPEAKER_RIGHT_BLUE = 7;
+  public static final int SPEAKER_LEFT_RED = 4, SPEAKER_RIGHT_RED = 3;
+  public static final int STAGE_BLUE_1 = 16, STAGE_BLUE_2 = 15, STAGE_BLUE_3 = 14;
+  public static final int STAGE_RED_1 = 11, STAGE_RED_2 = 13, STAGE_RED_3 = 12;
+  public static final int AMP_RED = 5, AMP_BLUE = 6;
+  public static final int SOURCE_RED_1 = 9, SOURCE_RED_2 = 10;
+  public static final int SOURCE_BLUE_1 = 1, SOURCE_BLUE_2 = 2;
+
   public static final AprilTagFieldLayout AT_MAP;
 
   static {
@@ -61,7 +70,7 @@ public class Vision {
       VisionIOPhoton cam0, cam1, cam2, cam3;
 
       switch (Constants.currentMode) { // TODO: SET BACK TO NORMAL
-        case REAL:
+        case SIM:
           cam0 =
               new VisionIOPhoton(
                   "BL",
@@ -84,16 +93,9 @@ public class Vision {
                           Units.degreesToRadians(10),
                           Units.degreesToRadians(-10),
                           Units.degreesToRadians(-130))));
-          // VisionIO cam1 =7
-          //     new VisionIOPhoton("camera2", new Transform3d()); // TODO: update transform & name
-          // VisionIO cam2 =
-          //     new VisionIOPhoton("camera3", new Transform3d()); // TODO: update transform & name
-          // VisionIO cam3 =
-          //     new VisionIOPhoton("camera4", new Transform3d()); // TODO: update transform & name
-          // LimelightIO limelight = new LimelightIOReal("limelight");
           instance = new Vision(cam1);
           break;
-        case SIM:
+        case REAL:
           cam0 =
               new VisionIOPhoton(
                   "camera0",
@@ -211,35 +213,41 @@ public class Vision {
   }
 
   public void handleFrameData() {
-    try {
-      for (int i = 0; i < cameras.length; i++) {
-        cameras[i].visionLock.lock();
-        cameras[i].updateInputs(visionInputs[i]);
-        Logger.processInputs("Vision/Camera" + i + "/Inputs", visionInputs[i]);
+    for (int i = 0; i < cameras.length; i++) {
+      cameras[i].visionLock.lock();
+      cameras[i].updateInputs(visionInputs[i]);
+      Logger.processInputs("Vision/Camera" + i + "/Inputs", visionInputs[i]);
 
-        for (int j = 0; j < visionInputs[i].poses.length; j++) {
+      for (int j = 0; j < visionInputs[i].poses.length; j++) {
+        try {
           double ambiguity = visionInputs[i].ambiguity[j];
           double timestamp = visionInputs[i].timestamps[j];
           Pose3d pose = visionInputs[i].poses[j];
-          int[] tids = new int[0];
-          if (visionInputs[i].tids.length > 0) {
-            tids = visionInputs[i].tids[j];
-          }
+          int[] tids = visionInputs[i].tids[j];
           if (tids == null) continue;
 
-          if (ambiguity > 0.3) continue;
-          // Drive.getInstance().addToPoseEstimator(pose.toPose2d(), timestamp, ambiguity, tids);
+          boolean blacklisted = false;
+          for (int tid : tids)
+            if (tid == SPEAKER_LEFT_BLUE
+                || tid == SPEAKER_RIGHT_BLUE
+                || tid == SPEAKER_LEFT_RED
+                || tid == SPEAKER_RIGHT_RED
+                || tid == AMP_BLUE
+                || tid == AMP_RED) blacklisted = true;
+          if (blacklisted) continue;
+
+          if (ambiguity > 0.2) continue;
+
+          Drive.getInstance().addToPoseEstimator(pose.toPose2d(), timestamp, ambiguity, tids);
+        } catch (Exception e) {
         }
-
-        // managePipelines(i, Drive.getInstance().getPose());
-
-        cameras[i].timestamps.clear();
-        cameras[i].poses.clear();
-        cameras[i].tids.clear();
-        cameras[i].visionLock.unlock();
       }
-    } catch (Exception e) {
-      // do nothing just prevent crashing
+
+      managePipelines(i, Drive.getInstance().getPose());
+      cameras[i].timestamps.clear();
+      cameras[i].poses.clear();
+      cameras[i].tids.clear();
+      cameras[i].visionLock.unlock();
     }
   }
 

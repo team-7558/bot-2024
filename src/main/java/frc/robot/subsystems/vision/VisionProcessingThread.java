@@ -1,5 +1,6 @@
 package frc.robot.subsystems.vision;
 
+
 import java.util.Optional;
 import org.photonvision.EstimatedRobotPose;
 import org.photonvision.targeting.PhotonPipelineResult;
@@ -25,6 +26,8 @@ public class VisionProcessingThread extends Thread {
       try {
         if (camera.camera.isConnected()) {
           PhotonPipelineResult latestResult = camera.camera.getLatestResult();
+          // this removes blacklisted tags from the vision result
+
           Optional<EstimatedRobotPose> poseOptional = camera.poseEstimator.update(latestResult);
           if (poseOptional.isPresent()) {
             EstimatedRobotPose estimatedPose = poseOptional.get();
@@ -46,7 +49,7 @@ public class VisionProcessingThread extends Thread {
             camera.ambiguity.offer(latestResult.getBestTarget().getPoseAmbiguity());
           }
         }
-        // Thread.sleep(SLEEP_TIME);
+        Thread.sleep(SLEEP_TIME);
       } catch (Exception e) {
         e.printStackTrace();
       }
