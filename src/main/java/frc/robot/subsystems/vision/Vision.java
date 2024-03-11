@@ -49,6 +49,9 @@ public class Vision {
   public static final int SOURCE_RED_1 = 9, SOURCE_RED_2 = 10;
   public static final int SOURCE_BLUE_1 = 1, SOURCE_BLUE_2 = 2;
 
+  public static final double MAX_HEIGHT = 1.5; // m
+  public static final double MAX_AMBIGUITY = 0.2; // .2 reccomended by photon
+
   public static final AprilTagFieldLayout AT_MAP;
 
   static {
@@ -69,33 +72,55 @@ public class Vision {
 
       VisionIOPhoton cam0, cam1, cam2, cam3;
 
-      switch (Constants.currentMode) { // TODO: SET BACK TO NORMAL
-        case SIM:
+      switch (Constants.currentMode) {
+        case REAL:
           cam0 =
               new VisionIOPhoton(
                   "BL",
                   new Transform3d(
-                      0.65,
-                      -0.28,
-                      -0.3,
+                      0,
+                      0,
+                      0,
                       new Rotation3d(
-                          Units.degreesToRadians(-10),
-                          Units.degreesToRadians(-10),
-                          Units.degreesToRadians(130)))); // TODO: update transform & name later
+                          Units.degreesToRadians(0),
+                          Units.degreesToRadians(0),
+                          Units.degreesToRadians(0)))); //TODO: needs to be found
           cam1 =
               new VisionIOPhoton(
                   "BR",
                   new Transform3d(
-                      0.65,
-                      0.28,
-                      -0.3,
+                      0,
+                      0,
+                      0,
                       new Rotation3d(
-                          Units.degreesToRadians(10),
-                          Units.degreesToRadians(-10),
-                          Units.degreesToRadians(-130))));
-          instance = new Vision(cam1);
+                          Units.degreesToRadians(0),
+                          Units.degreesToRadians(0),
+                          Units.degreesToRadians(0)))); //TODO: needs to be found
+          cam2 =
+              new VisionIOPhoton(
+                  "FL",
+                  new Transform3d(
+                      0,
+                      0,
+                      0,
+                      new Rotation3d(
+                          Units.degreesToRadians(0),
+                          Units.degreesToRadians(0),
+                          Units.degreesToRadians(0)))); //TODO: needs to be found
+          cam3 =
+              new VisionIOPhoton(
+                  "FR",
+                  new Transform3d(
+                      0,
+                      0,
+                      0,
+                      new Rotation3d(
+                          Units.degreesToRadians(0),
+                          Units.degreesToRadians(0),
+                          Units.degreesToRadians(0)))); //TODO: needs to be found
+          instance = new Vision(cam0, cam1, cam2, cam3);
           break;
-        case REAL:
+        case SIM:
           cam0 =
               new VisionIOPhoton(
                   "camera0",
@@ -234,9 +259,19 @@ public class Vision {
                 || tid == SPEAKER_RIGHT_RED
                 || tid == AMP_BLUE
                 || tid == AMP_RED) blacklisted = true;
+
+          // noise reduction checks
           if (blacklisted) continue;
 
-          if (ambiguity > 0.2) continue;
+          if (ambiguity > MAX_AMBIGUITY) continue;
+
+          if (pose.getZ() > MAX_HEIGHT)
+            continue; // reject impossible pose off the ground (more than hanging)
+
+          if (pose.getX() > AT_MAP.getFieldLength()
+              || pose.getX() > AT_MAP.getFieldWidth()
+              || pose.getX() < 0
+              || pose.getY() < 0) continue; // if outside dont add to pose estimator
 
           Drive.getInstance().addToPoseEstimator(pose.toPose2d(), timestamp, ambiguity, tids);
         } catch (Exception e) {

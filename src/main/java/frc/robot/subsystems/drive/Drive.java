@@ -573,7 +573,7 @@ public class Drive extends StateMachineSubsystemBase {
   }
 
   public void addToPoseEstimator(Pose2d pose, double timestamp, double ambiguity, int[] tids) {
-    if(pose.getTranslation().getDistance(getPose().getTranslation()) > CUTOFF_DISTANCE) return;
+    if (pose.getTranslation().getDistance(getPose().getTranslation()) > CUTOFF_DISTANCE) return;
     double distSums = 0;
     for (int i = 0; i < tids.length; i++) {
       try {
