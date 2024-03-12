@@ -572,7 +572,8 @@ public class Drive extends StateMachineSubsystemBase {
     return OdometryState.getInstance().getEstimatedPose();
   }
 
-  public void addToPoseEstimator(Pose2d pose, double timestamp, double ambiguity, double blacklistCoeff, int[] tids) {
+  public void addToPoseEstimator(
+      Pose2d pose, double timestamp, double ambiguity, double blacklistCoeff, int[] tids) {
     if (pose.getTranslation().getDistance(getPose().getTranslation()) > CUTOFF_DISTANCE) return;
     double distSums = 0;
     for (int i = 0; i < tids.length; i++) {
@@ -591,7 +592,9 @@ public class Drive extends StateMachineSubsystemBase {
                 pose,
                 timestamp,
                 VecBuilder.fill(
-                    (APRILTAG_COEFFICIENT * avgDistance) * blacklistCoeff, (APRILTAG_COEFFICIENT * avgDistance) * blacklistCoeff, 10)));
+                    (APRILTAG_COEFFICIENT * avgDistance) * blacklistCoeff,
+                    (APRILTAG_COEFFICIENT * avgDistance) * blacklistCoeff,
+                    10)));
   }
 
   /** Returns the current odometry rotation. */

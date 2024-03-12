@@ -84,7 +84,7 @@ public class Vision {
                       new Rotation3d(
                           Units.degreesToRadians(0),
                           Units.degreesToRadians(0),
-                          Units.degreesToRadians(0)))); //TODO: needs to be found
+                          Units.degreesToRadians(0)))); // TODO: needs to be found
           cam1 =
               new VisionIOPhoton(
                   "BR",
@@ -95,7 +95,7 @@ public class Vision {
                       new Rotation3d(
                           Units.degreesToRadians(0),
                           Units.degreesToRadians(0),
-                          Units.degreesToRadians(0)))); //TODO: needs to be found
+                          Units.degreesToRadians(0)))); // TODO: needs to be found
           cam2 =
               new VisionIOPhoton(
                   "FL",
@@ -106,7 +106,7 @@ public class Vision {
                       new Rotation3d(
                           Units.degreesToRadians(0),
                           Units.degreesToRadians(0),
-                          Units.degreesToRadians(0)))); //TODO: needs to be found
+                          Units.degreesToRadians(0)))); // TODO: needs to be found
           cam3 =
               new VisionIOPhoton(
                   "FR",
@@ -117,7 +117,7 @@ public class Vision {
                       new Rotation3d(
                           Units.degreesToRadians(0),
                           Units.degreesToRadians(0),
-                          Units.degreesToRadians(0)))); //TODO: needs to be found
+                          Units.degreesToRadians(0)))); // TODO: needs to be found
           instance = new Vision(cam0, cam1, cam2, cam3);
           break;
         case SIM:
@@ -253,11 +253,19 @@ public class Vision {
 
           // weight bad tags
           double blacklistCoeff = 1;
-          for (int tid : tids){
-            if(tid == SPEAKER_LEFT_BLUE || tid == SPEAKER_RIGHT_BLUE || tid == SPEAKER_LEFT_RED || tid == SPEAKER_RIGHT_RED) { // not flat
-              blacklistCoeff+= 10;
-            } else if(tid == STAGE_BLUE_1 || tid == STAGE_BLUE_2 || tid == STAGE_BLUE_3 || tid == STAGE_RED_1 || tid == STAGE_RED_2 || tid == STAGE_RED_3) { // tilts
-              blacklistCoeff+= 0.5;
+          for (int tid : tids) {
+            if (tid == SPEAKER_LEFT_BLUE
+                || tid == SPEAKER_RIGHT_BLUE
+                || tid == SPEAKER_LEFT_RED
+                || tid == SPEAKER_RIGHT_RED) { // not flat
+              blacklistCoeff += 10;
+            } else if (tid == STAGE_BLUE_1
+                || tid == STAGE_BLUE_2
+                || tid == STAGE_BLUE_3
+                || tid == STAGE_RED_1
+                || tid == STAGE_RED_2
+                || tid == STAGE_RED_3) { // stage sometimes tilts
+              blacklistCoeff += 0.5;
             }
           }
 
@@ -273,7 +281,8 @@ public class Vision {
               || pose.getX() < 0
               || pose.getY() < 0) continue; // if outside dont add to pose estimator
 
-          Drive.getInstance().addToPoseEstimator(pose.toPose2d(), timestamp, ambiguity, blacklistCoeff,tids);
+          Drive.getInstance()
+              .addToPoseEstimator(pose.toPose2d(), timestamp, ambiguity, blacklistCoeff, tids);
         } catch (Exception e) {
         }
       }

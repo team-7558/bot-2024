@@ -1,6 +1,5 @@
 package frc.robot.subsystems.vision;
 
-
 import java.util.Optional;
 import org.photonvision.EstimatedRobotPose;
 import org.photonvision.targeting.PhotonPipelineResult;
