@@ -251,17 +251,17 @@ public class Vision {
           int[] tids = visionInputs[i].tids[j];
           if (tids == null) continue;
 
-          boolean blacklisted = false;
-          for (int tid : tids)
-            if (tid == SPEAKER_LEFT_BLUE
-                || tid == SPEAKER_RIGHT_BLUE
-                || tid == SPEAKER_LEFT_RED
-                || tid == SPEAKER_RIGHT_RED
-                || tid == AMP_BLUE
-                || tid == AMP_RED) blacklisted = true;
+          // weight bad tags
+          double blacklistCoeff = 1;
+          for (int tid : tids){
+            if(tid == SPEAKER_LEFT_BLUE || tid == SPEAKER_RIGHT_BLUE || tid == SPEAKER_LEFT_RED || tid == SPEAKER_RIGHT_RED) { // not flat
+              blacklistCoeff+= 10;
+            } else if(tid == STAGE_BLUE_1 || tid == STAGE_BLUE_2 || tid == STAGE_BLUE_3 || tid == STAGE_RED_1 || tid == STAGE_RED_2 || tid == STAGE_RED_3) { // tilts
+              blacklistCoeff+= 0.5;
+            }
+          }
 
           // noise reduction checks
-          if (blacklisted) continue;
 
           if (ambiguity > MAX_AMBIGUITY) continue;
 
@@ -273,7 +273,7 @@ public class Vision {
               || pose.getX() < 0
               || pose.getY() < 0) continue; // if outside dont add to pose estimator
 
-          Drive.getInstance().addToPoseEstimator(pose.toPose2d(), timestamp, ambiguity, tids);
+          Drive.getInstance().addToPoseEstimator(pose.toPose2d(), timestamp, ambiguity, blacklistCoeff,tids);
         } catch (Exception e) {
         }
       }
