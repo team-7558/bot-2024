@@ -22,12 +22,12 @@ public class ShooterIOTalonFx implements ShooterIO {
   private static final double FLYWHEEL_GEAR_RATIO = 1.66;
   private static final double TURRET_GEAR_RATIO = 5.0 * 160.0 / 14.0; // TODO SET
   private static final double FEEDER_GEAR_RATIO = 1; // TODO: SET
-  private static final double PIVOT_GEAR_RATIO = 81; // TODO: SET
+  private static final double PIVOT_GEAR_RATIO = (60.0 / 24.0) * 4.0 * 9.0; // TODO: SET
 
   private static final double FLYWHEEL_VEL_SWITCH_THRESHOLD = 50.0;
   private static final double FEEDER_VEL_SWITCH_THRESHOLD = 50.0;
-  private static final double TURRET_POS_SWITCH_THRESHOLD = 0.01;
-  private static final double PIVOT_POS_SWITCH_THRESHOLD = 0.01;
+  private static final double TURRET_POS_SWITCH_THRESHOLD = 0.03;
+  private static final double PIVOT_POS_SWITCH_THRESHOLD = 0.05;
 
   private final TalonFX flywheelL = new TalonFX(9);
   private final TalonFX flywheelR = new TalonFX(10);
@@ -100,10 +100,10 @@ public class ShooterIOTalonFx implements ShooterIO {
     config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
 
     // Strong hold
-    config.Slot0.kP = 0.2;
-    config.Slot0.kI = 0;
+    config.Slot0.kP = 0.15;
+    config.Slot0.kI = 0.0001;
     config.Slot0.kD = 0;
-    config.Slot0.kV = 0.22;
+    config.Slot0.kV = 0.21;
 
     // mm Fast ramp
     config.Slot1.kP = 0;
@@ -128,7 +128,7 @@ public class ShooterIOTalonFx implements ShooterIO {
     feederConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
 
     // mmVel
-    feederConfig.Slot0.kP = 0.1;
+    feederConfig.Slot0.kP = 0.2;
     feederConfig.Slot0.kI = 0;
     feederConfig.Slot0.kD = 0;
     feederConfig.Slot0.kA = 0;
@@ -157,7 +157,7 @@ public class ShooterIOTalonFx implements ShooterIO {
     turretConfig.Slot1.kI = 0;
     turretConfig.Slot1.kD = 0;
     turretConfig.Slot1.kS = 0;
-    turretConfig.Slot1.kV = 2.5;
+    turretConfig.Slot1.kV = 1;
     turretConfig.Slot1.kA = 0.1;
 
     // mmVel
@@ -168,8 +168,8 @@ public class ShooterIOTalonFx implements ShooterIO {
     turretConfig.Slot2.kV = 0;
     turretConfig.Slot2.kA = 0;
 
-    turretConfig.MotionMagic.MotionMagicCruiseVelocity = 1.7;
-    turretConfig.MotionMagic.MotionMagicAcceleration = 2.3;
+    turretConfig.MotionMagic.MotionMagicCruiseVelocity = 2.3;
+    turretConfig.MotionMagic.MotionMagicAcceleration = 2.8;
     turretConfig.MotionMagic.MotionMagicJerk = 6;
 
     var pivotConfig = new TalonFXConfiguration();
@@ -177,11 +177,11 @@ public class ShooterIOTalonFx implements ShooterIO {
     pivotConfig.CurrentLimits.SupplyCurrentLimit = 20.0;
     pivotConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
     pivotConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
-    pivotConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
+    pivotConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
 
     // posHold
     pivotConfig.Slot0.GravityType = GravityTypeValue.Arm_Cosine;
-    pivotConfig.Slot0.kG = 0.35;
+    pivotConfig.Slot0.kG = 0; // 0.35;
     pivotConfig.Slot0.kP = 254;
     pivotConfig.Slot0.kI = 0;
     pivotConfig.Slot0.kD = 0;
@@ -191,7 +191,7 @@ public class ShooterIOTalonFx implements ShooterIO {
 
     // mmPosMove
     pivotConfig.Slot1.GravityType = GravityTypeValue.Arm_Cosine;
-    pivotConfig.Slot1.kG = 0.35;
+    pivotConfig.Slot1.kG = 0; // 0.35;
     pivotConfig.Slot1.kP = 176;
     pivotConfig.Slot1.kI = 0;
     pivotConfig.Slot1.kD = 0;
@@ -208,8 +208,8 @@ public class ShooterIOTalonFx implements ShooterIO {
     pivotConfig.Slot2.kV = 0;
     pivotConfig.Slot2.kA = 0;
 
-    pivotConfig.MotionMagic.MotionMagicCruiseVelocity = 0.69;
-    pivotConfig.MotionMagic.MotionMagicAcceleration = 0.56;
+    pivotConfig.MotionMagic.MotionMagicCruiseVelocity = 0.6; // 0.69;
+    pivotConfig.MotionMagic.MotionMagicAcceleration = 0.6; // 0.56;
     pivotConfig.MotionMagic.MotionMagicJerk = 4;
 
     // TODO: tune all of that & use absolute encoder
@@ -248,15 +248,12 @@ public class ShooterIOTalonFx implements ShooterIO {
   }
 
   @Override
-  public void zero() {
-    // System.out.println(
-    //     "tAbs Offset: " + -(tAbsEnc.getAbsolutePosition() - tAbsEnc.getPositionOffset()));
-    // System.out.println(
-    //     "pAbs Offset: " + -(pAbsEnc.getAbsolutePosition() - pAbsEnc.getPositionOffset()));
-    // turret.setPosition(-(tAbsEnc.getAbsolutePosition() - tAbsEnc.getPositionOffset()));
-    // pivot.setPosition(-(pAbsEnc.getAbsolutePosition() - pAbsEnc.getPositionOffset()));
-
+  public void zeroTurret() {
     turret.setPosition(Shooter.TURRET_ZERO_POS); // TODO
+  }
+
+  @Override
+  public void zeroPivot() {
     pivot.setPosition(Shooter.PIVOT_ZERO_POS);
   }
 

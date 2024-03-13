@@ -41,7 +41,7 @@ public class Shooter extends StateMachineSubsystemBase {
   private static double HEIGHT_M = -0.1;
 
   public static final double TURRET_ZERO_POS = 0.2506;
-  public static final double PIVOT_ZERO_POS = Units.degreesToRotations(-1.0);
+  public static final double PIVOT_ZERO_POS = 12.0 / 360.0;
 
   public static final double FLYWHEEL_MIN_VEL_rps = 0, FLYWHEEL_MAX_VEL_rps = 100;
   public static final double TURRET_MIN_POS_r = -TURRET_ZERO_POS,
@@ -257,10 +257,10 @@ public class Shooter extends StateMachineSubsystemBase {
             if (inputs.beamBreakOutActivated) {
               setCurrentState(IDLE);
             } else if (!inputs.beamBreakInActivated) {
-              queueSetpoints(new Setpoints(Setpoints.DEFAULT, 7.5, 0, PIVOT_MIN_POS_r));
+              queueSetpoints(new Setpoints(Setpoints.DEFAULT, 6.5, 0, PIVOT_MIN_POS_r));
               track();
             } else {
-              queueSetpoints(new Setpoints(Setpoints.DEFAULT, 3.4, 0, PIVOT_MIN_POS_r));
+              queueSetpoints(new Setpoints(Setpoints.DEFAULT, 2, 0, PIVOT_MIN_POS_r));
               track();
             }
           }
@@ -274,13 +274,13 @@ public class Shooter extends StateMachineSubsystemBase {
           @Override
           public void periodic() {
             // queueSetpoints(constrainSetpoints(shooterPipeline(), !inputs.beamBreakActivated));
-            if (inputs.beamBreakOutActivated) {
+            if (inputs.beamBreakInActivated) {
               setCurrentState(IDLE);
             } else if (!inputs.beamBreakInActivated) {
-              queueSetpoints(new Setpoints(Setpoints.DEFAULT, 8.5, 0, PIVOT_MIN_POS_r));
+              queueSetpoints(new Setpoints(Setpoints.DEFAULT, 6.5, 0, PIVOT_MIN_POS_r));
               track();
             } else {
-              queueSetpoints(new Setpoints(Setpoints.DEFAULT, 3.0, 0, 0.1));
+              queueSetpoints(new Setpoints(Setpoints.DEFAULT, 2, 0, 0.1));
               track();
             }
           }
@@ -306,13 +306,12 @@ public class Shooter extends StateMachineSubsystemBase {
         new State("SHOOTING") {
           @Override
           public void init() {
-            currSetpoints.feederVel_rps = 30;
             ShotLogger.log();
           }
 
           @Override
           public void periodic() {
-            currSetpoints.feederVel_rps = 30;
+            currSetpoints.feederVel_rps = 35;
             track();
           }
 
@@ -325,17 +324,18 @@ public class Shooter extends StateMachineSubsystemBase {
 
           @Override
           public void init() {
-            io.setPivotVolts(-1.);
+            io.setPivotVolts(-1);
           }
 
           @Override
           public void periodic() {
 
             if (inputs.pivotHallEffect) {
-              io.setPivotVolts(-0.5);
+              io.setPivotVolts(-.5);
+              io.zeroPivot();
               if (inputs.turretHallEffect) {
                 io.setTurretVolts(0);
-                io.zero();
+                io.zeroTurret();
                 if (Util.inRange(inputs.turretPosR - TURRET_ZERO_POS, 0.005)
                     && Util.inRange(inputs.pivotPosR - PIVOT_ZERO_POS, 0.005)) {
                   setCurrentState(IDLE);
@@ -420,7 +420,8 @@ public class Shooter extends StateMachineSubsystemBase {
   }
 
   public void zero() {
-    io.zero();
+    io.zeroTurret();
+    io.zeroPivot();
   }
 
   public TargetMode getTargetMode() {

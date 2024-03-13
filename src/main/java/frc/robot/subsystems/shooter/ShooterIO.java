@@ -67,7 +67,9 @@ public interface ShooterIO {
   /** Stop in open loop. */
   public default void stop() {}
 
-  public default void zero() {}
+  public default void zeroTurret() {}
+
+  public default void zeroPivot() {}
 
   public default void toggleBrake() {}
 }

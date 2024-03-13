@@ -297,7 +297,7 @@ public class Vision {
 
   public void periodic() {
     int id = PerfTracker.start("Vision");
-    handleFrameData();
+    // handleFrameData();
     Logger.recordOutput("Vision/TagSet", posesToLog.toArray(new Pose2d[0]));
     PerfTracker.end(id);
   }

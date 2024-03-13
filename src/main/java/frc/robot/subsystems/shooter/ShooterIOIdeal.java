@@ -63,8 +63,12 @@ public class ShooterIOIdeal implements ShooterIO {
   }
 
   @Override
-  public void zero() {
+  public void zeroTurret() {
     turretPos_r = Shooter.TURRET_ZERO_POS;
+  }
+
+  @Override
+  public void zeroPivot() {
     pivotPos_r = Shooter.PIVOT_ZERO_POS;
   }
 }

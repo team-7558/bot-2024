@@ -64,20 +64,21 @@ public class ShooterBringup extends Command {
         shooter.setCurrentState(shooter.MANUAL);
       } else if (OI.DR.getAButton()) {
         intake.setCurrentState(intake.FEEDING);
-        shooter.queueSetpoints(shooter.constrainSetpoints(new Setpoints(25, 0.0, 0.12), false));
+        shooter.queueSetpoints(shooter.constrainSetpoints(new Setpoints(30, 30, 0.0, 0.06), false));
         // if (shooter.isTurretAtSetpoint(0.03)) {
         //   shooter.queueSetpoints(new Setpoints(40, 0, 0.075));
         // }
         shooter.setCurrentState(shooter.SHOOTING);
       } else if (OI.DR.getBButton()) {
         intake.setCurrentState(intake.FEEDING);
-        shooter.queueSetpoints(shooter.constrainSetpoints(new Setpoints(25, 0, 0.0, 0.13), false));
+        shooter.queueSetpoints(shooter.constrainSetpoints(new Setpoints(30, 30, 0.0, 0.13), false));
         // if (shooter.isTurretAtSetpoint(0.03)) {
         //   shooter.queueSetpoints(new Setpoints(40, 40, 0, 0.075));
         // }
         shooter.setCurrentState(shooter.SHOOTING);
       } else if (OI.DR.getXButton()) {
-        shooter.queueSetpoints(shooter.constrainSetpoints(new Setpoints(0, 0, 0.0, 0.0), false));
+        shooter.queueSetpoints(
+            shooter.constrainSetpoints(new Setpoints(0, 0, 0.0, Shooter.PIVOT_ZERO_POS), false));
         // if (shooter.isTurretAtSetpoint(0.03)) {
         //   shooter.queueSetpoints(new Setpoints(40, 40, 0, 0.075));
         // }

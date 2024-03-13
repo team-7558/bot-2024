@@ -92,7 +92,6 @@ public class Robot extends LoggedRobot {
       intake.toggleBrake();
       brake = !brake;
     }
-    AS.drawLEDS();
 
     lastState = buttonPressed;
 
@@ -136,6 +135,8 @@ public class Robot extends LoggedRobot {
     boolean red = G.isRedAlliance();
     led.scaleRow(r, red ? 3 : 0, 0, red ? 0 : 3);
     led.scaleCol(c, red ? 3 : 0, 0, red ? 0 : 3);
+
+    AS.drawLEDS();
   }
 
   /**

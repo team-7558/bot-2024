@@ -231,7 +231,7 @@ public class SS {
       case CLIMBING_DOWN:
         if (first) {
           elevator.setTargetHeight(Elevator.MIN_HEIGHT_M);
-          shooter.queueSetpoints(new Setpoints(0, 0, 0, 0.14));
+          shooter.queueSetpoints(new Setpoints(0, 0, 0, 0.11));
           shooter.setCurrentState(shooter.TRACKING);
           elevator.setCurrentState(elevator.TRAVELLING);
         }
