@@ -216,7 +216,7 @@ public class Robot extends LoggedRobot {
     }
 
     if (OI.XK.get(5, 3)) {
-      LED.getInstance().drawRow(0, 255, 255, 0);
+      LED.getInstance().drawRow(0, 128, 128, 0);
       LED.getInstance().setBlinkin(0.71);
     } else if (OI.XK.get(6, 3)) {
       LED.getInstance().drawRow(0, 128, 0, 128);

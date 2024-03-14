@@ -54,7 +54,7 @@ import org.littletonrobotics.junction.Logger;
 
 public class Drive extends StateMachineSubsystemBase {
   public static final int FL = 0, FR = 1, BL = 2, BR = 3;
-  public static final double MAX_LINEAR_SPEED_MPS = 4.23;
+  public static final double MAX_LINEAR_SPEED_MPS = 4.975;
   public static final double TRACK_WIDTH_X = Units.inchesToMeters(18.75);
   public static final double TRACK_WIDTH_Y = Units.inchesToMeters(18.75);
   private static final double SKEW_CONSTANT = 0.06;

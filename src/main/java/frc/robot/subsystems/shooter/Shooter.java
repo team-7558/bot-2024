@@ -41,16 +41,17 @@ public class Shooter extends StateMachineSubsystemBase {
   private static double HEIGHT_M = -0.1;
 
   public static final double TURRET_ZERO_POS = 0.2506;
-  public static final double PIVOT_ZERO_POS = 12.0 / 360.0;
+  public static final double PIVOT_ZERO_POS = 0.03466796875;
 
-  public static final double FLYWHEEL_MIN_VEL_rps = 0, FLYWHEEL_MAX_VEL_rps = 100;
+  public static final double FEEDER_MIN_VEL_rps = 0, FEEDER_MAX_VEL_rps = 50;
+  public static final double FLYWHEEL_MIN_VEL_rps = 0, FLYWHEEL_MAX_VEL_rps = 50;
   public static final double TURRET_MIN_POS_r = -TURRET_ZERO_POS,
       TURRET_MAX_POS_r = TURRET_ZERO_POS;
-  public static final double PIVOT_MIN_POS_r = PIVOT_ZERO_POS, PIVOT_MAX_POS_r = 0.2;
-  public static final double FLYWHEEL_MIN_FEED_VEL_rps = 0, FLYWHEEL_MAX_FEED_VEL_rps = 100;
-  public static final double TURRET_MIN_FEED_POS_r = -Units.degreesToRotations(15),
+  public static final double PIVOT_MIN_POS_r = PIVOT_ZERO_POS, PIVOT_MAX_POS_r = 0.12;
+  public static final double FLYWHEEL_MIN_FEED_VEL_rps = 0, FLYWHEEL_MAX_FEED_VEL_rps = 50;
+  public static final double TURRET_MIN_FEED_POS_r = -Units.degreesToRotations(14),
       TURRET_MAX_FEED_POS_r = -TURRET_MIN_FEED_POS_r;
-  public static final double PIVOT_MIN_FEED_POS_r = PIVOT_ZERO_POS, PIVOT_MAX_FEED_POS_r = 0.13;
+  public static final double PIVOT_MIN_FEED_POS_r = PIVOT_ZERO_POS, PIVOT_MAX_FEED_POS_r = 0.05;
 
   private static LerpTable shotTimesFromDistance = new LerpTable("shottimes.lerp").compile();
   ;
@@ -157,6 +158,7 @@ public class Shooter extends StateMachineSubsystemBase {
 
   public final State DISABLED,
       IDLE,
+      HOLD,
       TRACKING,
       SHOOTING,
       BEING_FED,
@@ -232,6 +234,21 @@ public class Shooter extends StateMachineSubsystemBase {
           public void exit() {}
         };
 
+    HOLD =
+        new State("HOLD") {
+
+          @Override
+          public void init() {
+            hold();
+          }
+
+          @Override
+          public void periodic() {}
+
+          @Override
+          public void exit() {}
+        };
+
     SPITTING =
         new State("SPITTING") {
           @Override
@@ -253,16 +270,17 @@ public class Shooter extends StateMachineSubsystemBase {
 
           @Override
           public void periodic() {
-            // queueSetpoints(constrainSetpoints(shooterPipeline(), !inputs.beamBreakActivated));
+            // queueSetpoints(constrainSetpoints(shooterPipeline(), !inputs.beamBreakInActivated));
+            Setpoints s = new Setpoints().copy(currSetpoints);
             if (inputs.beamBreakOutActivated) {
               setCurrentState(IDLE);
             } else if (!inputs.beamBreakInActivated) {
-              queueSetpoints(new Setpoints(Setpoints.DEFAULT, 6.5, 0, PIVOT_MIN_POS_r));
-              track();
+              s.feederVel_rps = 7.5;
             } else {
-              queueSetpoints(new Setpoints(Setpoints.DEFAULT, 2, 0, PIVOT_MIN_POS_r));
-              track();
+              s.feederVel_rps = 2.2;
             }
+            queueSetpoints(constrainSetpoints(s, true));
+            track();
           }
         };
 
@@ -273,11 +291,11 @@ public class Shooter extends StateMachineSubsystemBase {
 
           @Override
           public void periodic() {
-            // queueSetpoints(constrainSetpoints(shooterPipeline(), !inputs.beamBreakActivated));
+            // queueSetpoints(constrainSetpoints(shooterPipeline(), !inputs.beamBreakInActivated));
             if (inputs.beamBreakInActivated) {
               setCurrentState(IDLE);
             } else if (!inputs.beamBreakInActivated) {
-              queueSetpoints(new Setpoints(Setpoints.DEFAULT, 6.5, 0, PIVOT_MIN_POS_r));
+              queueSetpoints(new Setpoints(Setpoints.DEFAULT, 8, 0, PIVOT_MIN_POS_r));
               track();
             } else {
               queueSetpoints(new Setpoints(Setpoints.DEFAULT, 2, 0, 0.1));
@@ -322,8 +340,11 @@ public class Shooter extends StateMachineSubsystemBase {
     ZEROING =
         new State("ZEROING") {
 
+          boolean zeroedPivot = false;
+
           @Override
           public void init() {
+            zeroedPivot = false;
             io.setPivotVolts(-1);
           }
 
@@ -332,7 +353,10 @@ public class Shooter extends StateMachineSubsystemBase {
 
             if (inputs.pivotHallEffect) {
               io.setPivotVolts(-.5);
-              io.zeroPivot();
+              if (!zeroedPivot) {
+                io.zeroPivot();
+                zeroedPivot = false;
+              }
               if (inputs.turretHallEffect) {
                 io.setTurretVolts(0);
                 io.zeroTurret();
@@ -439,6 +463,13 @@ public class Shooter extends StateMachineSubsystemBase {
     io.setPivotPos(currSetpoints.pivotPos_r);
   }
 
+  private void hold() {
+    io.setFeederVel(0);
+    io.setFlywheelVel(0);
+    io.setTurretPos(inputs.turretPosR);
+    io.setPivotPos(inputs.pivotPosR);
+  }
+
   public Setpoints getMeasuredSetpoints() {
     return new Setpoints(
         inputs.flywheelVelRPS, inputs.feederVelRPS, inputs.turretPosR, inputs.pivotPosR);
@@ -446,16 +477,17 @@ public class Shooter extends StateMachineSubsystemBase {
 
   public void queueSetpoints(Setpoints s) {
     // System.out.println(s);
-    Setpoints temp = new Setpoints().copy(currSetpoints);
-    currSetpoints.flywheel_rps =
-        s.flywheel_rps == Setpoints.DEFAULT ? lastSetpoints.flywheel_rps : s.flywheel_rps;
-    currSetpoints.feederVel_rps =
-        s.feederVel_rps == Setpoints.DEFAULT ? lastSetpoints.feederVel_rps : s.feederVel_rps;
-    currSetpoints.turretPos_r =
-        s.turretPos_r == Setpoints.DEFAULT ? lastSetpoints.turretPos_r : s.turretPos_r;
-    currSetpoints.pivotPos_r =
-        s.pivotPos_r == Setpoints.DEFAULT ? lastSetpoints.pivotPos_r : s.pivotPos_r;
-    lastSetpoints.copy(temp);
+    // Setpoints temp = new Setpoints().copy(currSetpoints);
+    // currSetpoints.flywheel_rps =
+    //     s.flywheel_rps == Setpoints.DEFAULT ? lastSetpoints.flywheel_rps : s.flywheel_rps;
+    // currSetpoints.feederVel_rps =
+    //     s.feederVel_rps == Setpoints.DEFAULT ? lastSetpoints.feederVel_rps : s.feederVel_rps;
+    // currSetpoints.turretPos_r =
+    //     s.turretPos_r == Setpoints.DEFAULT ? lastSetpoints.turretPos_r : s.turretPos_r;
+    // currSetpoints.pivotPos_r =
+    //     s.pivotPos_r == Setpoints.DEFAULT ? lastSetpoints.pivotPos_r : s.pivotPos_r;
+    // lastSetpoints.copy(temp);
+    currSetpoints.copy(s);
   }
 
   public boolean canFeed() {
@@ -484,7 +516,7 @@ public class Shooter extends StateMachineSubsystemBase {
 
   public boolean isAtSetpoints() {
     boolean res = true;
-    res &= isFlywheelAtSetpoint(2);
+    res &= isFlywheelAtSetpoint(0.5);
     res &= isTurretAtSetpoint(0.01);
     res &= isPivotAtSetpoint(0.01);
     Logger.recordOutput("Shooter/AtSetpoints", res);
@@ -629,19 +661,20 @@ public class Shooter extends StateMachineSubsystemBase {
   public Setpoints constrainSetpoints(Setpoints s, boolean isFeeding) { // TODO: constrain
     Setpoints p = new Setpoints().copy(s);
     if (isFeeding) {
-      p.feederVel_rps = 0;
+      p.feederVel_rps = Util.limit(s.feederVel_rps, FEEDER_MIN_VEL_rps, FEEDER_MAX_VEL_rps);
       p.flywheel_rps =
           Util.limit(s.flywheel_rps, FLYWHEEL_MIN_FEED_VEL_rps, FLYWHEEL_MAX_FEED_VEL_rps);
       p.pivotPos_r = Util.limit(s.pivotPos_r, PIVOT_MIN_FEED_POS_r, PIVOT_MAX_FEED_POS_r);
       double y = turretFeedConstraintsFromPivotPos.calcY(p.pivotPos_r);
-      p.turretPos_r = Util.limit(s.turretPos_r, y);
+      // System.out.println(p.pivotPos_r + ":" + y);
+      p.turretPos_r = Util.limit(s.turretPos_r, -y, y);
+      // p.turretPos_r = s.turretPos_r;
     } else {
       p.feederVel_rps = 0;
       p.flywheel_rps = Util.limit(s.flywheel_rps, FLYWHEEL_MIN_VEL_rps, FLYWHEEL_MAX_VEL_rps);
       p.pivotPos_r = Util.limit(s.pivotPos_r, PIVOT_MIN_POS_r, PIVOT_MAX_POS_r);
       double y = turretConstraintsFromPivotPos.calcY(p.pivotPos_r);
-      // System.out.println(p.pivotPos_r + ":" + y);
-      p.turretPos_r = Util.limit(s.turretPos_r, y);
+      p.turretPos_r = Util.limit(s.turretPos_r, -y, y);
     }
     // System.out.println(p);
     return p;

@@ -26,8 +26,8 @@ public class ShooterIOTalonFx implements ShooterIO {
 
   private static final double FLYWHEEL_VEL_SWITCH_THRESHOLD = 50.0;
   private static final double FEEDER_VEL_SWITCH_THRESHOLD = 50.0;
-  private static final double TURRET_POS_SWITCH_THRESHOLD = 0.03;
-  private static final double PIVOT_POS_SWITCH_THRESHOLD = 0.05;
+  private static final double TURRET_POS_SWITCH_THRESHOLD = 0.04;
+  private static final double PIVOT_POS_SWITCH_THRESHOLD = 0.01;
 
   private final TalonFX flywheelL = new TalonFX(9);
   private final TalonFX flywheelR = new TalonFX(10);
@@ -100,7 +100,7 @@ public class ShooterIOTalonFx implements ShooterIO {
     config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
 
     // Strong hold
-    config.Slot0.kP = 0.15;
+    config.Slot0.kP = 0.18;
     config.Slot0.kI = 0.0001;
     config.Slot0.kD = 0;
     config.Slot0.kV = 0.21;
@@ -168,8 +168,8 @@ public class ShooterIOTalonFx implements ShooterIO {
     turretConfig.Slot2.kV = 0;
     turretConfig.Slot2.kA = 0;
 
-    turretConfig.MotionMagic.MotionMagicCruiseVelocity = 2.3;
-    turretConfig.MotionMagic.MotionMagicAcceleration = 2.8;
+    turretConfig.MotionMagic.MotionMagicCruiseVelocity = 4.3;
+    turretConfig.MotionMagic.MotionMagicAcceleration = 3.3;
     turretConfig.MotionMagic.MotionMagicJerk = 6;
 
     var pivotConfig = new TalonFXConfiguration();
@@ -208,8 +208,8 @@ public class ShooterIOTalonFx implements ShooterIO {
     pivotConfig.Slot2.kV = 0;
     pivotConfig.Slot2.kA = 0;
 
-    pivotConfig.MotionMagic.MotionMagicCruiseVelocity = 0.6; // 0.69;
-    pivotConfig.MotionMagic.MotionMagicAcceleration = 0.6; // 0.56;
+    pivotConfig.MotionMagic.MotionMagicCruiseVelocity = 1.3; // 0.69;
+    pivotConfig.MotionMagic.MotionMagicAcceleration = 0.8; // 0.56;
     pivotConfig.MotionMagic.MotionMagicJerk = 4;
 
     // TODO: tune all of that & use absolute encoder
@@ -405,7 +405,7 @@ public class ShooterIOTalonFx implements ShooterIO {
     var pconfig = new MotorOutputConfigs();
     var tconfig = new MotorOutputConfigs();
     var fconfig = new MotorOutputConfigs();
-    pconfig.Inverted = InvertedValue.CounterClockwise_Positive;
+    pconfig.Inverted = InvertedValue.Clockwise_Positive;
     tconfig.Inverted = InvertedValue.Clockwise_Positive;
     fconfig.Inverted = InvertedValue.CounterClockwise_Positive;
     pconfig.NeutralMode = isBraked ? NeutralModeValue.Coast : NeutralModeValue.Brake;

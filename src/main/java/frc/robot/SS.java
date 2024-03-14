@@ -122,7 +122,7 @@ public class SS {
         break;
       case IDLE:
         if (first) {
-          shooter.setCurrentState(shooter.IDLE);
+          shooter.setCurrentState(shooter.HOLD);
           elevator.setCurrentState(elevator.IDLE);
         }
         if (hasGamePiece) {
@@ -274,10 +274,7 @@ public class SS {
       case PRECHAMBER:
         if (first) {
           if (!shooter.beamBroken()) {
-            shooter.queueSetpoints(new Setpoints(Setpoints.DEFAULT, 0, 0, Shooter.PIVOT_MIN_POS_r));
             shooter.setCurrentState(shooter.TRACKING);
-            shooter.queueSetpoints(new Setpoints(0, 0, 0, 0.0));
-            shooter.setCurrentState(shooter.BEING_FED);
           } else {
             queueState(State.CHAMBER);
           }
@@ -418,7 +415,12 @@ public class SS {
 
   public void chamber() {
     if (currState != State.BOOT && currState != State.CHAMBER && currState != State.PRECHAMBER) {
-      queueState(State.PRECHAMBER);
+      if (shooter.beamBroken()) {
+        queueState(State.IDLE);
+      } else {
+        queueSetpoints(new Setpoints(0, 0, 0, Shooter.PIVOT_MIN_FEED_POS_r));
+        queueState(State.PRECHAMBER);
+      }
     }
   }
 
@@ -443,14 +445,21 @@ public class SS {
 
   public void trackPreset(Setpoints s, boolean adjust) {
     if (currState != State.BOOT) {
+      Setpoints sp = adjust ? shooter.adjustPreset(s) : s;
       if (shooter.beamBroken()) {
-        Setpoints sp = adjust ? shooter.adjustPreset(s) : s;
         Setpoints cs = shooter.constrainSetpoints(sp, false);
         shooter.queueSetpoints(cs);
         constrained = !cs.equals(sp);
         queueState(State.TRACKING);
       } else if (currState != State.CHAMBER && currState != State.PRECHAMBER) {
+        Setpoints cs = shooter.constrainSetpoints(sp, true);
+        shooter.queueSetpoints(cs);
+        constrained = !cs.equals(sp);
         queueState(State.PRECHAMBER);
+      } else if (currState == State.CHAMBER) {
+        Setpoints cs = shooter.constrainSetpoints(sp, true);
+        shooter.queueSetpoints(cs);
+        constrained = !cs.equals(sp);
       }
     }
   }
