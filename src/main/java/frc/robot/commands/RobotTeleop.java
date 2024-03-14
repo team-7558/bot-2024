@@ -51,10 +51,10 @@ public class RobotTeleop extends Command {
         drive.setAutolockSetpoint(0.25);
         drive.setCurrentState(drive.STRAFE_AUTOLOCK);
       } else if (OI.DR.getBButton()) {
-        drive.setAutolockSetpoint(G.isRedAlliance() ? -0.35 : 0.172);
+        drive.setAutolockSetpoint(G.isRedAlliance() ? 0.172 : -0.35);
         drive.setCurrentState(drive.STRAFE_AUTOLOCK);
       } else if (OI.DR.getXButton()) {
-        drive.setAutolockSetpoint(G.isRedAlliance() ? 0.35 : -0.172);
+        drive.setAutolockSetpoint(G.isRedAlliance() ? -0.172 : 0.35);
         drive.setCurrentState(drive.STRAFE_AUTOLOCK);
       } else if (OI.DR.getYButton()) {
         drive.setAutolockSetpoint(G.isRedAlliance() ? 0.5 : 0);
