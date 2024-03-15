@@ -87,7 +87,7 @@ public class ModuleIO2024 implements ModuleIO {
         turnTalon = new TalonFX(1, "Optimus");
         cancoder = new CANcoder(2, "Optimus"); // todo change
         driveTalon = new TalonFX(3, "Optimus");
-        absoluteEncoderOffset = Rotation2d.fromRadians(0.934); // MUST BE CALIBRATED
+        absoluteEncoderOffset = Rotation2d.fromRadians(0.917); // MUST BE CALIBRATED
         // absoluteEncoderOffset = Rotation2d.fromRotations(0.148); // MUST BE CALIBRATED
         // absoluteEncoderOffset = Rotation2d.fromRotations(0.3564453125); // MUST BE CALIBRATED
         break;
@@ -95,7 +95,7 @@ public class ModuleIO2024 implements ModuleIO {
         driveTalon = new TalonFX(6, "Optimus");
         cancoder = new CANcoder(5, "Optimus"); // todo change
         turnTalon = new TalonFX(4, "Optimus");
-        absoluteEncoderOffset = Rotation2d.fromRadians(1.786); // MUST BE CALIBRATED
+        absoluteEncoderOffset = Rotation2d.fromRadians(1.789); // MUST BE CALIBRATED
         // absoluteEncoderOffset = Rotation2d.fromRotations(0.283); // MUST BE CALIBRATED
         // absoluteEncoderOffset = Rotation2d.fromRotations(0.210205078125); // MUST BE CALIBRATED
         break;
@@ -104,7 +104,7 @@ public class ModuleIO2024 implements ModuleIO {
         cancoder = new CANcoder(8, "Optimus"); // todo change
         turnTalon = new TalonFX(7, "Optimus");
         // absoluteEncoderOffset = Rotation2d.fromRotations(0.20751953125); // MUST BE CALIBRATED
-        absoluteEncoderOffset = Rotation2d.fromRadians(1.418); // MUST BE CALIBRATED
+        absoluteEncoderOffset = Rotation2d.fromRadians(0.756); // MUST BE CALIBRATED
         // absoluteEncoderOffset = Rotation2d.fromRotations(0.294); // MUST BE CALIBRATED
         break;
       case Drive.BL:
@@ -112,7 +112,7 @@ public class ModuleIO2024 implements ModuleIO {
         cancoder = new CANcoder(11, "Optimus"); // todo change
         turnTalon = new TalonFX(10, "Optimus");
         // absoluteEncoderOffset = Rotation2d.fromRotations(0.20751953125); // MUST BE CALIBRATED
-        absoluteEncoderOffset = Rotation2d.fromRadians(-0.038); // MUST BE CALIBRATED
+        absoluteEncoderOffset = Rotation2d.fromRadians(-0.086); // MUST BE CALIBRATED
         // absoluteEncoderOffset = Rotation2d.fromRotations(-0.014); // MUST BE CALIBRATED
         break;
       default:

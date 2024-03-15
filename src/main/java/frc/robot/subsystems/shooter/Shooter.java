@@ -51,7 +51,7 @@ public class Shooter extends StateMachineSubsystemBase {
   public static final double FLYWHEEL_MIN_FEED_VEL_rps = 0, FLYWHEEL_MAX_FEED_VEL_rps = 50;
   public static final double TURRET_MIN_FEED_POS_r = -Units.degreesToRotations(14),
       TURRET_MAX_FEED_POS_r = -TURRET_MIN_FEED_POS_r;
-  public static final double PIVOT_MIN_FEED_POS_r = PIVOT_ZERO_POS, PIVOT_MAX_FEED_POS_r = 0.05;
+  public static final double PIVOT_MIN_FEED_POS_r = PIVOT_ZERO_POS, PIVOT_MAX_FEED_POS_r = 0.045;
 
   private static LerpTable shotTimesFromDistance = new LerpTable("shottimes.lerp").compile();
   ;
@@ -275,7 +275,7 @@ public class Shooter extends StateMachineSubsystemBase {
             if (inputs.beamBreakOutActivated) {
               setCurrentState(IDLE);
             } else if (!inputs.beamBreakInActivated) {
-              s.feederVel_rps = 7.5;
+              s.feederVel_rps = 8;
             } else {
               s.feederVel_rps = 2.2;
             }
@@ -298,7 +298,7 @@ public class Shooter extends StateMachineSubsystemBase {
               queueSetpoints(new Setpoints(Setpoints.DEFAULT, 8, 0, PIVOT_MIN_POS_r));
               track();
             } else {
-              queueSetpoints(new Setpoints(Setpoints.DEFAULT, 2, 0, 0.1));
+              queueSetpoints(new Setpoints(Setpoints.DEFAULT, 2.5, 0, 0.1));
               track();
             }
           }
@@ -527,6 +527,10 @@ public class Shooter extends StateMachineSubsystemBase {
   /** Returns the current velocity in RPM. */
   public boolean beamBroken() {
     return inputs.beamBreakOutActivated;
+  }
+
+  public boolean beamBrokenIn() {
+    return inputs.beamBreakInActivated;
   }
 
   /** Runs forwards at the commanded voltage. */

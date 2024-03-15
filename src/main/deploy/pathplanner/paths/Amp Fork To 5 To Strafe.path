@@ -4,12 +4,12 @@
     {
       "anchor": {
         "x": 5.49,
-        "y": 6.28103150943144
+        "y": 6.48
       },
       "prevControl": null,
       "nextControl": {
         "x": 6.49,
-        "y": 6.28103150943144
+        "y": 6.48
       },
       "isLocked": false,
       "linkedName": "AmpSideFork"
@@ -17,15 +17,15 @@
     {
       "anchor": {
         "x": 8.284148348811815,
-        "y": 5.8179712328069675
+        "y": 5.67
       },
       "prevControl": {
         "x": 7.6543863726025325,
-        "y": 6.063393179417938
+        "y": 5.91542194661097
       },
       "nextControl": {
         "x": 8.83024174139159,
-        "y": 5.605155425404554
+        "y": 5.457184192597587
       },
       "isLocked": false,
       "linkedName": "Note5"
@@ -64,8 +64,8 @@
   "constraintZones": [],
   "eventMarkers": [],
   "globalConstraints": {
-    "maxVelocity": 4.0,
-    "maxAcceleration": 2.0,
+    "maxVelocity": 4.2,
+    "maxAcceleration": 4.0,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0
   },

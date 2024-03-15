@@ -280,14 +280,14 @@ public class SS {
           }
         }
 
-        if (shooter.isTurretAtSetpoint(0.03) && shooter.isPivotAtSetpoint(0.03)) {
+        if (shooter.isTurretAtSetpoint(0.01) && shooter.isPivotAtSetpoint(0.01)) {
           queueState(State.CHAMBER);
         }
         break;
       case CHAMBER:
         if (first) {
           shooter.setCurrentState(shooter.BEING_FED);
-          if (!shooter.beamBroken()) {
+          if (!shooter.beamBroken() && !shooter.beamBrokenIn()) {
             intake.setCurrentState(intake.SHOOTER_SIDE);
           }
         }

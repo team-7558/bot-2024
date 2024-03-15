@@ -162,7 +162,7 @@ public class Drive extends StateMachineSubsystemBase {
 
   public static final HolonomicPathFollowerConfig HPFG =
       new HolonomicPathFollowerConfig(
-          new PIDConstants(2),
+          new PIDConstants(2.5),
           new PIDConstants(3),
           MAX_LINEAR_SPEED_MPS,
           DRIVE_BASE_RADIUS,
@@ -249,7 +249,7 @@ public class Drive extends StateMachineSubsystemBase {
             double y_ = -OI.DR.getLeftX();
             double w_ = -Util.sqInput(OI.DR.getRightX());
 
-            runVelocity(drive(x_, y_, w_ * 0.65, throttle));
+            runVelocity(drive(x_, y_, w_ * 0.7, throttle));
           }
         };
 
@@ -271,7 +271,7 @@ public class Drive extends StateMachineSubsystemBase {
                 Math.IEEEremainder(
                     getRotation().getRotations() - intermediaryAutolockSetpoint_r, 1.0);
             if (Constants.verboseLogging) Logger.recordOutput("Drive/Autolock Heading Error", err);
-            double con = 5 * err;
+            double con = 6 * err;
             con = Util.limit(con, Util.lerp(0.8, 0.2, mag * scaler));
             if (Constants.verboseLogging) Logger.recordOutput("Drive/Autolock Heading Output", con);
             runVelocity(drive(x_, y_, -con, throttle));

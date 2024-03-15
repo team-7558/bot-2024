@@ -3,53 +3,96 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 5.39,
-        "y": 1.3800000000000001
+        "x": 5.76,
+        "y": 1.375480933852722
       },
       "prevControl": null,
       "nextControl": {
-        "x": 8.23833073027848,
-        "y": 1.404895259956775
+        "x": 3.1218895240150357,
+        "y": 2.2472646243227574
       },
       "isLocked": false,
       "linkedName": "SourceSideFork"
     },
     {
       "anchor": {
-        "x": 8.17,
-        "y": 4.14
+        "x": 4.695943409585933,
+        "y": 3.9520860634641624
       },
       "prevControl": {
-        "x": 6.721870425274772,
-        "y": 4.691196528978726
+        "x": 4.105067797156243,
+        "y": 3.554940160027813
       },
       "nextControl": {
-        "x": 9.10719755883006,
-        "y": 3.783277749166553
+        "x": 5.293737873559384,
+        "y": 4.353882342528286
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 5.39,
-        "y": 1.3800000000000001
+        "x": 7.224116111949038,
+        "y": 4.068323888860167
       },
       "prevControl": {
-        "x": 5.788741866935022,
-        "y": 0.9140513667348349
+        "x": 6.402656884522608,
+        "y": 4.0976617184111115
+      },
+      "nextControl": {
+        "x": 7.902170093425733,
+        "y": 4.044107675235999
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 8.381651123184252,
+        "y": 3.9520860634641624
+      },
+      "prevControl": {
+        "x": 8.124959258768076,
+        "y": 4.097383345209168
+      },
+      "nextControl": {
+        "x": 9.273620566946063,
+        "y": 3.4471976990706845
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 4.264894807075749,
+        "y": 5.003069734753039
+      },
+      "prevControl": {
+        "x": 5.281975779290791,
+        "y": 3.0754591302692926
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "SourceSideFork"
+      "linkedName": "UnderStageShot"
     }
   ],
-  "rotationTargets": [],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 0.6,
+      "rotationDegrees": 0,
+      "rotateFast": false
+    },
+    {
+      "waypointRelativePos": 1.85,
+      "rotationDegrees": 1.4816163848282875,
+      "rotateFast": false
+    }
+  ],
   "constraintZones": [],
   "eventMarkers": [],
   "globalConstraints": {
-    "maxVelocity": 4.0,
-    "maxAcceleration": 2.0,
+    "maxVelocity": 4.2,
+    "maxAcceleration": 4.0,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0
   },

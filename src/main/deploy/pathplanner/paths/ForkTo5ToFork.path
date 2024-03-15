@@ -3,77 +3,77 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 5.49,
-        "y": 6.48
+        "x": 4.264894807075749,
+        "y": 5.003069734753039
       },
       "prevControl": null,
       "nextControl": {
-        "x": 7.404333823225317,
-        "y": 6.317928903181436
+        "x": 5.5531973718766245,
+        "y": 3.3176212665158116
       },
       "isLocked": false,
-      "linkedName": "AmpSideFork"
+      "linkedName": "UnderStageShot"
     },
     {
       "anchor": {
-        "x": 8.05261821049958,
-        "y": 3.97
+        "x": 7.141780985622023,
+        "y": 5.443804822717733
       },
       "prevControl": {
-        "x": 6.955165354899578,
-        "y": 4.437690879390717
+        "x": 6.691207649802939,
+        "y": 4.880588152970165
       },
       "nextControl": {
-        "x": 9.251015259285056,
-        "y": 3.459290709167372
-      },
-      "isLocked": false,
-      "linkedName": "Note6"
-    },
-    {
-      "anchor": {
-        "x": 5.232581125856542,
-        "y": 3.697155165866882
-      },
-      "prevControl": {
-        "x": 7.1126058489519,
-        "y": 3.7897672211917772
-      },
-      "nextControl": {
-        "x": 4.245017532273276,
-        "y": 3.6485067129810065
+        "x": 7.432375549121722,
+        "y": 5.807048027075403
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 2.69,
-        "y": 3.2294642864761656
+        "x": 8.260570055063413,
+        "y": 5.753772357102236
       },
       "prevControl": {
-        "x": 2.7687202470261596,
-        "y": 2.0532911838500048
+        "x": 7.98338031972363,
+        "y": 5.548892987500272
+      },
+      "nextControl": {
+        "x": 9.040332133756769,
+        "y": 6.3301182413622685
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 5.509608187357967,
+        "y": 6.28
+      },
+      "prevControl": {
+        "x": 6.822126965787853,
+        "y": 6.246097300926166
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "StrafePoint"
+      "linkedName": null
     }
   ],
   "rotationTargets": [
     {
-      "waypointRelativePos": 0.0,
+      "waypointRelativePos": 1.7,
       "rotationDegrees": 0,
       "rotateFast": false
     },
     {
-      "waypointRelativePos": 2.0,
+      "waypointRelativePos": 1.0,
       "rotationDegrees": 0,
       "rotateFast": false
     },
     {
-      "waypointRelativePos": 3.0,
-      "rotationDegrees": 25.0,
+      "waypointRelativePos": 2.8,
+      "rotationDegrees": 0,
       "rotateFast": false
     }
   ],
@@ -86,12 +86,12 @@
     "maxAngularAcceleration": 720.0
   },
   "goalEndState": {
-    "velocity": 0.5,
-    "rotation": 25.0,
+    "velocity": 0,
+    "rotation": 0,
     "rotateFast": false
   },
   "reversed": false,
-  "folder": "AmpSide",
+  "folder": "SourceSide",
   "previewStartingState": {
     "rotation": 0,
     "velocity": 0

@@ -3,41 +3,41 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 5.39,
-        "y": 1.3800000000000001
+        "x": 5.76,
+        "y": 1.38
       },
       "prevControl": null,
       "nextControl": {
-        "x": 6.39,
-        "y": 1.38
+        "x": 6.76,
+        "y": 1.3799999999999997
       },
       "isLocked": false,
       "linkedName": "SourceSideFork"
     },
     {
       "anchor": {
-        "x": 8.18,
-        "y": 0.47
+        "x": 8.279943025962748,
+        "y": 0.68
       },
       "prevControl": {
-        "x": 7.037585160492343,
-        "y": 0.5073567576126287
+        "x": 7.137528186455091,
+        "y": 0.7173567576126287
       },
       "nextControl": {
-        "x": 9.160256961588132,
-        "y": 0.43794577552238256
+        "x": 9.26019998755088,
+        "y": 0.6479457755223826
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 5.39,
-        "y": 1.38
+        "x": 5.76,
+        "y": 1.375480933852722
       },
       "prevControl": {
-        "x": 6.441656856975528,
-        "y": 1.6086417816715441
+        "x": 6.811656856975528,
+        "y": 1.6041227155242659
       },
       "nextControl": null,
       "isLocked": false,
@@ -48,8 +48,8 @@
   "constraintZones": [],
   "eventMarkers": [],
   "globalConstraints": {
-    "maxVelocity": 4.0,
-    "maxAcceleration": 2.0,
+    "maxVelocity": 4.2,
+    "maxAcceleration": 4.0,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0
   },

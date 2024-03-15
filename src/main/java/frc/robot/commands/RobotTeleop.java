@@ -108,14 +108,12 @@ public class RobotTeleop extends Command {
         ss.trackPreset(
             G.isRedAlliance() ? ShotPresets.RED_WING_POST : ShotPresets.BLUE_WING_POST, true);
       } else if (OI.XK.get(0, 7)) {
-        ss.trackPreset(
-            G.isRedAlliance() ? ShotPresets.RED_WING_WALL : ShotPresets.BLUE_WING_WALL, true);
+        ss.trackPreset(G.isRedAlliance() ? ShotPresets.OP_SHOT : ShotPresets.BLUE_OP_SHOT, true);
       } else if (OI.XK.get(9, 0)) {
         ss.trackPreset(
             G.isRedAlliance() ? ShotPresets.RED_CLEAR_WALL : ShotPresets.BLUE_CLEAR_WALL, true);
       } else if (OI.XK.get(9, 1)) {
-        ss.trackPreset(
-            G.isRedAlliance() ? ShotPresets.RED_CLEAR_MID : ShotPresets.BLUE_CLEAR_MID, true);
+        ss.trackPreset(G.isRedAlliance() ? ShotPresets.SNIPE : ShotPresets.BLUE_SNIPE, true);
       } else if (OI.XK.get(9, 2)) {
         ss.trackPreset(
             G.isRedAlliance() ? ShotPresets.RED_CLEAR_CLOSE : ShotPresets.BLUE_CLEAR_CLOSE, true);
