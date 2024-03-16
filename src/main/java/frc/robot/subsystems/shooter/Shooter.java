@@ -30,6 +30,8 @@ import frc.robot.OI;
 import frc.robot.SS2d;
 import frc.robot.subsystems.StateMachineSubsystemBase;
 import frc.robot.subsystems.drive.Drive;
+import frc.robot.subsystems.vision.limelight.LimelightIO;
+import frc.robot.subsystems.vision.limelight.LimelightIOInputsAutoLogged;
 import frc.robot.util.LerpTable;
 import frc.robot.util.Util;
 import java.io.BufferedReader;
@@ -51,7 +53,7 @@ public class Shooter extends StateMachineSubsystemBase {
   public static final double FLYWHEEL_MIN_FEED_VEL_rps = 0, FLYWHEEL_MAX_FEED_VEL_rps = 50;
   public static final double TURRET_MIN_FEED_POS_r = -Units.degreesToRotations(14),
       TURRET_MAX_FEED_POS_r = -TURRET_MIN_FEED_POS_r;
-  public static final double PIVOT_MIN_FEED_POS_r = PIVOT_ZERO_POS, PIVOT_MAX_FEED_POS_r = 0.045;
+  public static final double PIVOT_MIN_FEED_POS_r = PIVOT_ZERO_POS, PIVOT_MAX_FEED_POS_r = 0.04;
 
   private static LerpTable shotTimesFromDistance = new LerpTable("shottimes.lerp").compile();
   ;
@@ -168,6 +170,10 @@ public class Shooter extends StateMachineSubsystemBase {
       SPITTING;
   private final ShooterIOInputsAutoLogged inputs = new ShooterIOInputsAutoLogged();
 
+  private final LimelightIO limelightIO;
+
+  private final LimelightIOInputsAutoLogged limelightInputs = new LimelightIOInputsAutoLogged();
+
   private final ShooterIO io;
 
   private final Debouncer feedDebouncer = new Debouncer(0.02, DebounceType.kRising);
@@ -194,6 +200,7 @@ public class Shooter extends StateMachineSubsystemBase {
   private Shooter(ShooterIO io) {
     super("Shooter");
 
+    this.limelightIO = new LimelightIO() {};
     this.io = io;
     // Switch constants based on mode (the physics simulator is treated as a
     // separate robot with different tuning)
@@ -402,7 +409,9 @@ public class Shooter extends StateMachineSubsystemBase {
   @Override
   public void inputPeriodic() {
     io.updateInputs(inputs);
+    limelightIO.updateInputs(limelightInputs);
     Logger.processInputs("Shooter", inputs);
+    Logger.processInputs("Limelight", limelightInputs);
   }
 
   @Override
@@ -454,6 +463,20 @@ public class Shooter extends StateMachineSubsystemBase {
 
   public void setTargetMode(TargetMode mode) {
     targetMode = mode;
+  }
+
+  public void limelightPipeline() {
+    TargetMode targetMode = this.targetMode;
+
+    if (targetMode == TargetMode.SPEAKER) {
+      double tid = limelightInputs.tid;
+      if (tid == 4 || tid == 3) {
+        double tx = limelightInputs.tx;
+        double ty = limelightInputs.ty;
+      }
+    } else if (targetMode == TargetMode.TRAP) {
+
+    }
   }
 
   private void track() {

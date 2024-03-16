@@ -467,10 +467,7 @@ public class SS {
   public void autoPreset(Setpoints s) {
     if (currState != State.BOOT) {
       if (shooter.beamBroken()) {
-        Setpoints cs = shooter.constrainSetpoints(s, false);
-        shooter.queueSetpoints(cs);
-        constrained = !cs.equals(s);
-        queueState(State.TRACKING);
+        trackPreset(shooter.constrainSetpoints(s, false), true);
       } else if (currState != State.AUTOCHAMBER && currState != State.AUTOPRECHAMBER) {
         queueState(State.AUTOPRECHAMBER);
       }
