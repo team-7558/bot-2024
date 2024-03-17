@@ -1,7 +1,6 @@
 package frc.robot.auto.ampside;
 
 import frc.robot.G;
-import frc.robot.SS.State;
 import frc.robot.auto.AltAuto;
 import frc.robot.subsystems.shooter.Shooter.Setpoints;
 
@@ -9,38 +8,53 @@ public class DefaultMovingWhileShooting extends AltAuto {
 
   public DefaultMovingWhileShooting() {
     super("DefaultMovingWhileShooting", true);
-    trajstack.appendChain().append("Default Path", false);
+    trajstack.appendChain().append(0.3).append("Default Path", false);
     trajstack.setActiveIdx(0);
     // trajstack.generate();
   }
 
   @Override
-  public void onInit() {}
+  public void onInit() {
+    ss.autoPresetNoTurret(new Setpoints(28, 0, 0, 0.14));
+  }
 
   @Override
   public void onExecute() {
     double i = G.isRedAlliance() ? 1.0 : -1.0;
-    if (before(2.0)) {
-      ss.autoPreset(new Setpoints(30, 0, 0.07 * i, 0.175));
-    } else if (before(2.7)) {
-      ss.queueState(State.SHOOTING);
-    } else if (before(6.7)) {
-      // ss.queueSetpoints(new Setpoints(37, 0, 0.02, 0.15));
-      ss.autoPreset(new Setpoints(33, 0, 0.02 * i, 0.181));
-    } else if (before(7.5)) {
-      ss.queueState(State.SHOOTING);
-    } else if (before(10.3)) {
-      // ss.queueSetpoints(new Setpoints(37, 0, -0.04, 0.155));
-      ss.autoPreset(new Setpoints(33, 0, -0.02 * i, 0.167));
-    } else if (before(10.95)) {
-      ss.queueState(State.SHOOTING);
-    } else if (before(14.2)) {
-      // ss.queueSetpoints(new Setpoints(45, 0, -0.06, 0.125));
-      ss.autoPreset(new Setpoints(39, 0, -0.02 * i, 0.13));
-    } else if (before(15.0)) {
-      ss.queueState(State.SHOOTING);
-    } else {
-      ss.queueState(State.IDLE);
+
+    if (between(0.3, 0.9)) {
+      ss.autoPresetNoTurret(new Setpoints(28, 0, 0, 0.14));
+    }
+
+    if (between(1, 1.4)) {
+      ss.shoot();
+    }
+
+    if (between(1.5, 5.9)) {
+      ss.autoPresetNoTurret(new Setpoints(33, 0, 0, 0.12));
+    }
+    if (between(6.2, 6.9)) {
+      ss.shoot();
+    }
+
+    if (between(6.9, 8.6)) {
+      ss.autoPresetNoTurret(new Setpoints(32, 0, 0, 0.12));
+    }
+
+    if (between(8.5, 8.7)) {
+      ss.shoot();
+    }
+
+    if (between(8.8, 12.5)) {
+      ss.autoPresetNoTurret(new Setpoints(30, 0, 0, 0.089));
+    }
+
+    if (between(12.6, 13)) {
+      ss.shoot();
+    }
+
+    if (between(14, 15)) {
+      ss.chamber();
     }
   }
 }

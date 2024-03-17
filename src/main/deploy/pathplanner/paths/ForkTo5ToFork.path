@@ -4,12 +4,12 @@
     {
       "anchor": {
         "x": 4.264894807075749,
-        "y": 5.003069734753039
+        "y": 5.01
       },
       "prevControl": null,
       "nextControl": {
         "x": 5.5531973718766245,
-        "y": 3.3176212665158116
+        "y": 3.3245515317627725
       },
       "isLocked": false,
       "linkedName": "UnderStageShot"
@@ -77,11 +77,23 @@
       "rotateFast": false
     }
   ],
-  "constraintZones": [],
+  "constraintZones": [
+    {
+      "name": "New Constraints Zone",
+      "minWaypointRelativePos": 2.9,
+      "maxWaypointRelativePos": 3.0,
+      "constraints": {
+        "maxVelocity": 0.5,
+        "maxAcceleration": 3.0,
+        "maxAngularVelocity": 540.0,
+        "maxAngularAcceleration": 720.0
+      }
+    }
+  ],
   "eventMarkers": [],
   "globalConstraints": {
     "maxVelocity": 4.2,
-    "maxAcceleration": 3.5,
+    "maxAcceleration": 4.0,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0
   },

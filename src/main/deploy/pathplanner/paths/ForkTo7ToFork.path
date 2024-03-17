@@ -3,45 +3,45 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 5.76,
-        "y": 1.375480933852722
+        "x": 4.264894807075749,
+        "y": 5.01
       },
       "prevControl": null,
       "nextControl": {
-        "x": 6.76,
-        "y": 1.3754809338527219
+        "x": 5.742083838149976,
+        "y": 4.557491404068354
       },
       "isLocked": false,
-      "linkedName": "SourceSideFork"
+      "linkedName": "UnderStageShot"
     },
     {
       "anchor": {
         "x": 8.39,
-        "y": 2.49
+        "y": 2.38
       },
       "prevControl": {
-        "x": 7.329591966529958,
-        "y": 2.5316754248962026
+        "x": 7.577672830861886,
+        "y": 2.2666375952220923
       },
       "nextControl": {
-        "x": 9.370024327916433,
-        "y": 2.451483760038219
+        "x": 9.361367848329422,
+        "y": 2.5155569521666985
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 5.76,
-        "y": 1.375480933852722
+        "x": 4.264894807075749,
+        "y": 5.01
       },
       "prevControl": {
-        "x": 6.908899515066667,
-        "y": 0.830812053561397
+        "x": 5.688808168176808,
+        "y": 4.630140044940857
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "SourceSideFork"
+      "linkedName": "UnderStageShot"
     }
   ],
   "rotationTargets": [
@@ -65,7 +65,7 @@
   "eventMarkers": [],
   "globalConstraints": {
     "maxVelocity": 4.2,
-    "maxAcceleration": 3.5,
+    "maxAcceleration": 4.0,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0
   },

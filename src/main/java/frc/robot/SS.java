@@ -42,6 +42,7 @@ public class SS {
     SHOOTER_SPIT,
     SHOOTING,
     SHOOTING_FROM_GROUND,
+    SOURCE_FEEDING,
 
     CLIMBING_UP,
     CLIMBING_DOWN,
@@ -101,6 +102,7 @@ public class SS {
     Logger.recordOutput("SS/nextState", lastState);
     Logger.recordOutput("SS/stateTime", timer.get());
     Logger.recordOutput("SS/hasGamepiece", hasGamePiece);
+    Logger.recordOutput("SS/Constrained", constrained);
   }
 
   public void periodic() {
@@ -220,6 +222,31 @@ public class SS {
         }
 
         break;
+
+      case SOURCE_FEEDING:
+        if (intake.beamBroken()) {
+          hasGamePiece = true;
+        }
+
+        if (hasGamePiece && !intake.beamBroken()) {
+          // queueState(State.IDLE);
+          intake.setCurrentState(intake.GHOSTING);
+        } else if (!hasGamePiece) {
+          intake.setCurrentState(intake.SOURCE_FEEDING);
+        }
+
+        if (hasGamePiece) {
+          intake.setCurrentState(intake.FAST_SHOOTER);
+        }
+
+        if (shooter.beamBroken() || shooter.beamBrokenIn()) {
+          hasGamePiece = false;
+        }
+
+        shooter.setCurrentState(shooter.SOURCE_FEEDING);
+
+        break;
+
       case CLIMBING_UP:
         if (first) {
           elevator.setTargetHeight(Elevator.CLIMB_HEIGHT_M);
@@ -436,6 +463,12 @@ public class SS {
     }
   }
 
+  public void sourceFeed() {
+    if (currState != State.BOOT) {
+      queueState(State.SOURCE_FEEDING);
+    }
+  }
+
   public void trackFromPose() {
     if (currState != State.BOOT) {
       queueSetpointsLive();
@@ -447,17 +480,17 @@ public class SS {
     if (currState != State.BOOT) {
       Setpoints sp = adjust ? shooter.adjustPreset(s) : s;
       if (shooter.beamBroken()) {
-        Setpoints cs = shooter.constrainSetpoints(sp, false);
+        Setpoints cs = shooter.constrainSetpoints(sp, false, false);
         shooter.queueSetpoints(cs);
         constrained = !cs.equals(sp);
         queueState(State.TRACKING);
       } else if (currState != State.CHAMBER && currState != State.PRECHAMBER) {
-        Setpoints cs = shooter.constrainSetpoints(sp, true);
+        Setpoints cs = shooter.constrainSetpoints(sp, true, false);
         shooter.queueSetpoints(cs);
         constrained = !cs.equals(sp);
         queueState(State.PRECHAMBER);
       } else if (currState == State.CHAMBER) {
-        Setpoints cs = shooter.constrainSetpoints(sp, true);
+        Setpoints cs = shooter.constrainSetpoints(sp, true, false);
         shooter.queueSetpoints(cs);
         constrained = !cs.equals(sp);
       }
@@ -467,7 +500,19 @@ public class SS {
   public void autoPreset(Setpoints s) {
     if (currState != State.BOOT) {
       if (shooter.beamBroken()) {
-        trackPreset(shooter.constrainSetpoints(s, false), true);
+        trackPreset(shooter.constrainSetpoints(s, false, false), true);
+      } else if (currState != State.AUTOCHAMBER && currState != State.AUTOPRECHAMBER) {
+        queueState(State.AUTOPRECHAMBER);
+      }
+    }
+  }
+
+  public void autoPresetNoTurret(Setpoints s) {
+    if (currState != State.BOOT) {
+      if (shooter.beamBroken()) {
+        // trackPreset(shooter.constrainSetpoints(s, false, false), false);
+        shooter.queueSetpoints(s);
+        queueState(State.TRACKING);
       } else if (currState != State.AUTOCHAMBER && currState != State.AUTOPRECHAMBER) {
         queueState(State.AUTOPRECHAMBER);
       }
@@ -499,7 +544,7 @@ public class SS {
   // Subsystem management
 
   public void queueSetpoints(Setpoints setpoints) {
-    Setpoints cs = shooter.constrainSetpoints(setpoints, false);
+    Setpoints cs = shooter.constrainSetpoints(setpoints, false, false);
     shooter.queueSetpoints(cs);
     constrained = !cs.equals(setpoints);
   }
@@ -507,7 +552,7 @@ public class SS {
   public void queueSetpointsLive() {
     shooter.setTargetMode(TargetMode.SPEAKER);
     Setpoints ps = shooter.shooterPipeline();
-    Setpoints cs = shooter.constrainSetpoints(ps, false);
+    Setpoints cs = shooter.constrainSetpoints(ps, false, false);
     shooter.queueSetpoints(cs);
     constrained = !cs.equals(ps);
   }

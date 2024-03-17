@@ -43,17 +43,17 @@ public class Shooter extends StateMachineSubsystemBase {
   private static double HEIGHT_M = -0.1;
 
   public static final double TURRET_ZERO_POS = 0.2506;
-  public static final double PIVOT_ZERO_POS = 0.03466796875;
+  public static final double PIVOT_ZERO_POS = 0.016666;
 
   public static final double FEEDER_MIN_VEL_rps = 0, FEEDER_MAX_VEL_rps = 50;
   public static final double FLYWHEEL_MIN_VEL_rps = 0, FLYWHEEL_MAX_VEL_rps = 50;
   public static final double TURRET_MIN_POS_r = -TURRET_ZERO_POS,
       TURRET_MAX_POS_r = TURRET_ZERO_POS;
-  public static final double PIVOT_MIN_POS_r = PIVOT_ZERO_POS, PIVOT_MAX_POS_r = 0.12;
+  public static final double PIVOT_MIN_POS_r = PIVOT_ZERO_POS, PIVOT_MAX_POS_r = 0.16;
   public static final double FLYWHEEL_MIN_FEED_VEL_rps = 0, FLYWHEEL_MAX_FEED_VEL_rps = 50;
   public static final double TURRET_MIN_FEED_POS_r = -Units.degreesToRotations(14),
       TURRET_MAX_FEED_POS_r = -TURRET_MIN_FEED_POS_r;
-  public static final double PIVOT_MIN_FEED_POS_r = PIVOT_ZERO_POS, PIVOT_MAX_FEED_POS_r = 0.04;
+  public static final double PIVOT_MIN_FEED_POS_r = PIVOT_ZERO_POS, PIVOT_MAX_FEED_POS_r = 0.02;
 
   private static LerpTable shotTimesFromDistance = new LerpTable("shottimes.lerp").compile();
   ;
@@ -167,6 +167,7 @@ public class Shooter extends StateMachineSubsystemBase {
       FAST_FEED,
       ZEROING,
       MANUAL,
+      SOURCE_FEEDING,
       SPITTING;
   private final ShooterIOInputsAutoLogged inputs = new ShooterIOInputsAutoLogged();
 
@@ -286,7 +287,7 @@ public class Shooter extends StateMachineSubsystemBase {
             } else {
               s.feederVel_rps = 2.2;
             }
-            queueSetpoints(constrainSetpoints(s, true));
+            queueSetpoints(constrainSetpoints(s, true, false));
             track();
           }
         };
@@ -302,12 +303,28 @@ public class Shooter extends StateMachineSubsystemBase {
             if (inputs.beamBreakInActivated) {
               setCurrentState(IDLE);
             } else if (!inputs.beamBreakInActivated) {
-              queueSetpoints(new Setpoints(Setpoints.DEFAULT, 8, 0, PIVOT_MIN_POS_r));
+              queueSetpoints(new Setpoints(Setpoints.DEFAULT, 8.5, 0, PIVOT_MIN_POS_r));
               track();
             } else {
               queueSetpoints(new Setpoints(Setpoints.DEFAULT, 2.5, 0, 0.1));
               track();
             }
+          }
+        };
+
+    SOURCE_FEEDING =
+        new State("SOURCE_FEEDING") {
+
+          int i = G.isRedAlliance() ? -1 : 1;
+
+          @Override
+          public void init() {}
+
+          public void periodic() {
+            queueSetpoints(
+                constrainSetpoints(
+                    (new Setpoints(40, 40, i * 0.027, PIVOT_MIN_POS_r)), false, true));
+            track();
           }
         };
 
@@ -685,8 +702,18 @@ public class Shooter extends StateMachineSubsystemBase {
     return new Setpoints(flywheel_rps, Setpoints.DEFAULT, turretPos_r, pivotPos_r);
   }
 
-  public Setpoints constrainSetpoints(Setpoints s, boolean isFeeding) { // TODO: constrain
+  public Setpoints constrainSetpoints(
+      Setpoints s, boolean isFeeding, boolean source) { // TODO: constrain
     Setpoints p = new Setpoints().copy(s);
+
+    if (source) {
+      p.flywheel_rps = Util.limit(s.flywheel_rps, FLYWHEEL_MIN_VEL_rps, FLYWHEEL_MAX_VEL_rps);
+      p.pivotPos_r = Util.limit(s.pivotPos_r, PIVOT_MIN_POS_r, PIVOT_MAX_POS_r);
+      double y = turretConstraintsFromPivotPos.calcY(p.pivotPos_r);
+      p.turretPos_r = Util.limit(s.turretPos_r, -y, y);
+      return p;
+    }
+
     if (isFeeding) {
       p.feederVel_rps = Util.limit(s.feederVel_rps, FEEDER_MIN_VEL_rps, FEEDER_MAX_VEL_rps);
       p.flywheel_rps =
@@ -703,6 +730,7 @@ public class Shooter extends StateMachineSubsystemBase {
       double y = turretConstraintsFromPivotPos.calcY(p.pivotPos_r);
       p.turretPos_r = Util.limit(s.turretPos_r, -y, y);
     }
+
     // System.out.println(p);
     return p;
   }

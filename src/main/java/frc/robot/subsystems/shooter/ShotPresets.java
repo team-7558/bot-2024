@@ -12,13 +12,14 @@ public class ShotPresets {
       new Setpoints(38, 0, 0.087, 0.1); // potentially make higher
   public static final Setpoints RED_SIDE_POST = new Setpoints(45, 0, 0.092, 0.09);
   public static final Setpoints RED_AMP_BOX = new Setpoints(38, 0, -0.134, 0.11);
-  public static final Setpoints RED_FRONT_COURT = new Setpoints(36, 0, 0, 0.107);
+  public static final Setpoints RED_FRONT_COURT = new Setpoints(36, 0, 0, 0.105);
   public static final Setpoints RED_WING_POST = new Setpoints(49, 0, -0.02, 0.069);
-  public static final Setpoints OP_SHOT = new Setpoints(43, 0, 0.02, 0.081);
+  public static final Setpoints OP_SHOT = new Setpoints(43, 0, 0.02, 0.077);
   public static final Setpoints RED_CLEAR_WALL = new Setpoints(30, 0, 0.08, 0.115);
-  public static final Setpoints SNIPE = new Setpoints(49, 0, 0.095, 0.065);
+  public static final Setpoints SNIPE = new Setpoints(49, 0, 0.095, 0.066);
   public static final Setpoints RED_CLEAR_CLOSE =
       new Setpoints(36, 0, 0.1, Shooter.PIVOT_MIN_POS_r);
+  public static final Setpoints CLEAR_FLAT = new Setpoints(49, 0, 0, 0.04);
 
   public static final Setpoints BLUE_BUDGET_AMP = new Setpoints().copyAndFlipTurret(RED_BUDGET_AMP);
   public static final Setpoints BLUE_FENDER = new Setpoints().copyAndFlipTurret(RED_FENDER);
@@ -33,4 +34,5 @@ public class ShotPresets {
   public static final Setpoints BLUE_OP_SHOT = new Setpoints().copyAndFlipTurret(OP_SHOT);
   public static final Setpoints BLUE_CLEAR_CLOSE =
       new Setpoints().copyAndFlipTurret(RED_CLEAR_CLOSE);
+  public static final Setpoints BLUE_CLEAR_FLAT = new Setpoints().copyAndFlipTurret(CLEAR_FLAT);
 }

@@ -14,12 +14,6 @@
         {
           "type": "path",
           "data": {
-            "pathName": "ForkTo8ToFork"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
             "pathName": "ForkTo7ToFork"
           }
         },
@@ -27,12 +21,6 @@
           "type": "path",
           "data": {
             "pathName": "ForkTo6ToFork"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "ForkTo5ToFork"
           }
         }
       ]

@@ -10,9 +10,7 @@ public class SourceSeries extends AltAuto {
     super("SourceSeries", true);
     trajstack
         .appendChain()
-        .append(0.5)
         .append("SourceStart", false)
-        .append("ForkTo8ToFork", false)
         // .append(0.1)
         .append("ForkTo7ToFork", false)
         // .append(0.1)
@@ -33,57 +31,51 @@ public class SourceSeries extends AltAuto {
   @Override
   public void onInit() {
     double i = G.isRedAlliance() ? 1.0 : -1.0;
-    ss.autoPreset(new Setpoints(38, 0, i * 0.082, 0.068));
+    ss.autoPreset(new Setpoints(38, 0, 0.102, 0.092));
   }
 
   @Override
   public void onExecute() {
     boolean critical = false;
     double i = G.isRedAlliance() ? 1.0 : -1.0;
+    if (between(0, 1.2)) {
+      ss.autoPreset(new Setpoints(35, 0, i * 0.102, 0.092));
+    }
 
-    if (between(2.1, 2.3)) {
+    if (between(1.2, 1.8)) {
       ss.shoot();
-      critical = true;
     }
 
-    if (between(2.4, 5.2)) {
-      ss.autoPreset(new Setpoints(39, 0, i * 0.105, 0.064));
+    if (between(1.9, 6)) {
+      ss.autoPreset(new Setpoints(39, 0, i * 0.02, 0.083));
     }
 
-
-    if (between(5.3, 5.6)) {
+    if (between(6.1, 6.4)) {
       ss.shoot();
-      critical = true;
     }
 
-    if (between(5.6, 5.7)) {
-      ss.shooterSpit();
+    if (between(6.5, 10.3)) {
+      ss.autoPreset(new Setpoints(39, 0, i * 0.02, 0.083));
     }
 
-    if (between(5.7, 8.7)) {
-      ss.autoPreset(new Setpoints(40, 0, i * 0.105, 0.064));
-    }
-
-    if (between(8.8, 9.4)) {
+    if (between(10.4, 11)) {
       ss.shoot();
-      critical = true;
     }
 
-    if (between(9.5, 14.5)) {
-      ss.autoPreset(new Setpoints(40, 0, i * 0.02, 0.085));
+    if (between(11.1, 14.7)) {
+      ss.autoPreset(new Setpoints(39, 0, i * 0.02, 0.083));
     }
 
-    if (between(14.6, 15)) {
+    if (between(14.8, 15)) {
       ss.shoot();
-      critical = true;
     }
 
-    if (between(15.2, 15)) {
-      ss.chamber();
-    }
-
-    org.littletonrobotics.junction.Logger.getInstance()
-        .recordOutput("Drive/ShootingPoint", critical);
+    // intake 3.2
+    // shoot 5.6-6
+    // intake 5.7-10
+    // shoot 10-10,5
+    // intake 10.6-14.4
+    // shoot 14-15
 
     // if(trajstack.getActiveIdx() == 0) {
     //   if(before)
