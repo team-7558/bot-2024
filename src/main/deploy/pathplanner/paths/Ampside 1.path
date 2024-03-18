@@ -1,0 +1,107 @@
+{
+  "version": 1.0,
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 1.5216232234266267,
+        "y": 6.794856832956909
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 2.5385405725766406,
+        "y": 6.924282677394184
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 3.000775731281192,
+        "y": 6.988995599612821
+      },
+      "prevControl": {
+        "x": 2.000775731281192,
+        "y": 6.988995599612821
+      },
+      "nextControl": {
+        "x": 4.000775731281192,
+        "y": 6.988995599612821
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 8.279501243687172,
+        "y": 7.432741351969191
+      },
+      "prevControl": {
+        "x": 7.808021381808529,
+        "y": 7.70083774401783
+      },
+      "nextControl": {
+        "x": 8.825616964941396,
+        "y": 7.122204961452082
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 4.3135235820021185,
+        "y": 5.962833547288716
+      },
+      "prevControl": {
+        "x": 7.343082033010911,
+        "y": 6.640008054790885
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": "Ampside2ndShot"
+    }
+  ],
+  "rotationTargets": [],
+  "constraintZones": [
+    {
+      "name": "first shot",
+      "minWaypointRelativePos": 0.0,
+      "maxWaypointRelativePos": 1.0,
+      "constraints": {
+        "maxVelocity": 1.0,
+        "maxAcceleration": 2.0,
+        "maxAngularVelocity": 540.0,
+        "maxAngularAcceleration": 720.0
+      }
+    },
+    {
+      "name": "second shot",
+      "minWaypointRelativePos": 0.85,
+      "maxWaypointRelativePos": 1.2000000000000002,
+      "constraints": {
+        "maxVelocity": 1.0,
+        "maxAcceleration": 2.0,
+        "maxAngularVelocity": 540.0,
+        "maxAngularAcceleration": 720.0
+      }
+    }
+  ],
+  "eventMarkers": [],
+  "globalConstraints": {
+    "maxVelocity": 4.2,
+    "maxAcceleration": 4.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": 0,
+    "rotateFast": false
+  },
+  "reversed": false,
+  "folder": "AmpSide",
+  "previewStartingState": {
+    "rotation": 0,
+    "velocity": 0
+  },
+  "useDefaultConstraints": true
+}

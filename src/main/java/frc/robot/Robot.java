@@ -50,8 +50,8 @@ public class Robot extends LoggedRobot {
       new AutoSelector()
           .add(new DefaultMovingWhileShooting(), 16, 16, 16)
           .add(new SourceSeries(0), 48, 0, 0)
-          .add(new SourceSeries(1), 0, 48, 0)
-          .add(new AmpSeries(1), 0, 0, 48);
+          .add(new SourceSeries(0), 0, 48, 0)
+          .add(new AmpSeries(), 0, 0, 48);
 
   private Command autonomousCommand;
   private Drive drive;

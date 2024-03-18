@@ -46,7 +46,7 @@ public class SwerveFollower {
         ChassisSpeeds.fromRobotRelativeSpeeds(currentSpeeds, currentPose.getRotation());
     Rotation2d currentHeading =
         new Rotation2d(fieldSpeeds.vxMetersPerSecond, fieldSpeeds.vyMetersPerSecond);
-    Rotation2d targetHeading = toFollow.getInitState().heading; // TODO: check if this is correct
+    Rotation2d targetHeading = toFollow.getInitState().heading; 
     Rotation2d headingError = currentHeading.minus(targetHeading);
     boolean onHeading =
         Math.hypot(currentSpeeds.vxMetersPerSecond, currentSpeeds.vyMetersPerSecond) < 0.25

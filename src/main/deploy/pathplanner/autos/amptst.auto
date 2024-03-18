@@ -8,25 +8,19 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Amp Start"
+            "pathName": "Ampside 1"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "Amp Fork To 4"
+            "pathName": "Ampside 2"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "Amp Fork To 5"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "Amp Fork To 6 To Strafe"
+            "pathName": "Ampside 3"
           }
         }
       ]

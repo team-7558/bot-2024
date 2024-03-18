@@ -61,8 +61,6 @@ public class Drive extends StateMachineSubsystemBase {
   public static final double DRIVE_BASE_RADIUS =
       Math.hypot(TRACK_WIDTH_X / 2.0, TRACK_WIDTH_Y / 2.0);
   public static final double MAX_ANGULAR_SPEED_RADPS = MAX_LINEAR_SPEED_MPS / DRIVE_BASE_RADIUS;
-
-  // TODO: tune all this
   // -- VISION CONSTANTS --
 
   // public static final double POSE_DIFFERENCE = 1.0;
@@ -422,7 +420,6 @@ public class Drive extends StateMachineSubsystemBase {
 
     // Be wary about using Timer.getFPGATimestamp in AK
 
-    // TODO: figure out if needs to be moved into 250Hz processing loop
     chassisSpeeds = getFieldRelativeSpeeds();
     Logger.recordOutput("Drive/Speeds", chassisSpeeds);
   }
@@ -447,7 +444,6 @@ public class Drive extends StateMachineSubsystemBase {
             .transformBy(new Transform2d(linearMagnitude, 0.0, new Rotation2d()))
             .getTranslation();
 
-    // TODO: SKEW CORRECTION
 
     // Convert to field relative speeds & send command
 

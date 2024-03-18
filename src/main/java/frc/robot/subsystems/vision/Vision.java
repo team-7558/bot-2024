@@ -33,7 +33,7 @@ public class Vision {
   public static final double CAM_FOV_RAD = Units.degreesToRadians(120);
 
   // Angle of apriltag view horizontal FOV
-  public static final double AT_FOV_RAD = Units.degreesToRadians(140); // TODO: TUNE
+  public static final double AT_FOV_RAD = Units.degreesToRadians(140); 
 
   // Distance for quick
   public static final double QUICK_DISTANCE_M = 1.0;
@@ -125,7 +125,7 @@ public class Vision {
               new VisionIOPhoton(
                   "camera0",
                   new Transform3d(
-                      0, 0, 0, new Rotation3d())); // TODO: update transform & name later
+                      0, 0, 0, new Rotation3d())); 
           instance = new Vision(cam0);
           // no sim
           break;
@@ -182,7 +182,7 @@ public class Vision {
 
     Logger.recordOutput("Vision/campose", v0);
 
-    double fov = CAM_FOV_RAD; // TODO: TUNE rad;
+    double fov = CAM_FOV_RAD;
 
     double theta1 = v0.getRotation().getRadians() - (fov * 0.5);
     double theta2 = v0.getRotation().getRadians() + (fov * 0.5);
@@ -232,7 +232,7 @@ public class Vision {
       Logger.recordOutput("Vision/Camera" + camID + "/Quick?", false);
     }
 
-    if (shouldSwitchToClear) { // TODO: implement for noise reduction
+    if (shouldSwitchToClear) {
       cam.setPipeline(CLEAR_PIPELINE_ID);
     }
   }

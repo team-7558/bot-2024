@@ -384,7 +384,6 @@ public class SS {
     }
   }
 
-  // TODO: replace example based on what you wanna do, ex. shoot(double x, double y)
   public void action(State s) {
     queueState(State.TEST_2);
   }
