@@ -216,8 +216,6 @@ public class SS {
       case AMP_SCORING:
         if (first) {
           hasGamePiece = false;
-          elevator.setTargetHeight(Elevator.MIN_HEIGHT_M);
-          elevator.setCurrentState(elevator.TRAVELLING);
           intake.setCurrentState(intake.AMP_SCORING);
         }
 

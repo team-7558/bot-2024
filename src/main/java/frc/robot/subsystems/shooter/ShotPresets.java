@@ -4,9 +4,9 @@ import frc.robot.subsystems.shooter.Shooter.Setpoints;
 
 public class ShotPresets {
 
-  public static final Setpoints TRAP_SHOT = new Setpoints(16, 0, 0, 0.15);
+  public static final Setpoints TRAP_SHOT = new Setpoints(16, 0, 0, 0.14);
 
-  public static final Setpoints RED_BUDGET_AMP = new Setpoints(10.5, 0, 0, 0.15);
+  public static final Setpoints RED_BUDGET_AMP = new Setpoints(10.5, 0, 0, 0.14);
   public static final Setpoints RED_FENDER = new Setpoints(29, 0, 0, 0.14);
   public static final Setpoints RED_FRONT_POST =
       new Setpoints(38, 0, 0.087, 0.1); // potentially make higher
