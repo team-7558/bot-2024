@@ -1,0 +1,31 @@
+{
+  "version": 1.0,
+  "startingPose": null,
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "path",
+          "data": {
+            "pathName": "AltSourceStart"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "AltForkTo5ToFork"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "ForkTo6ToFork"
+          }
+        }
+      ]
+    }
+  },
+  "folder": null,
+  "choreoAuto": false
+}
