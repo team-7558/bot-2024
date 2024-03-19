@@ -33,6 +33,7 @@ public class SS {
     AMP_SCORING,
 
     AUTOPRECHAMBER,
+    AUTOSHOOTING,
     AUTOCHAMBER,
 
     PRECHAMBER,
@@ -334,6 +335,12 @@ public class SS {
           shooter.setCurrentState(shooter.SHOOTING);
         }
         break;
+
+      case AUTOSHOOTING:
+        hasGamePiece = false;
+        // intake.setCurrentState(intake.SHOOTER_SIDE);
+        shooter.setCurrentState(shooter.SHOOTING);
+        break;
       case SHOOTING_FROM_GROUND:
         if (first) {
           shooter.setCurrentState(shooter.SHOOTING);
@@ -452,6 +459,12 @@ public class SS {
   public void shoot() {
     if (currState != State.BOOT) {
       queueState(State.SHOOTING);
+    }
+  }
+
+  public void autoShoot() {
+    if (currState != State.BOOT) {
+      queueState(State.AUTOSHOOTING);
     }
   }
 

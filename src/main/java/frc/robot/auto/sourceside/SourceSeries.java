@@ -51,7 +51,7 @@ public class SourceSeries extends AltAuto {
     }
 
     if (between(6.1, 6.4)) {
-      ss.shoot();
+      ss.autoShoot();
     }
 
     if (between(6.5, 10.3)) {
@@ -59,7 +59,7 @@ public class SourceSeries extends AltAuto {
     }
 
     if (between(10.4, 11)) {
-      ss.shoot();
+      ss.autoShoot();
     }
 
     if (between(11.1, 14.7)) {
@@ -67,7 +67,7 @@ public class SourceSeries extends AltAuto {
     }
 
     if (between(14.8, 15)) {
-      ss.shoot();
+      ss.autoShoot();
     }
 
     // intake 3.2
