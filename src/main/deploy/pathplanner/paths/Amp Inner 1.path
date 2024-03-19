@@ -3,61 +3,56 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 5.49,
-        "y": 6.48
+        "x": 4.26,
+        "y": 5.01
       },
       "prevControl": null,
       "nextControl": {
-        "x": 7.383943121868544,
-        "y": 5.962031794270078
+        "x": 3.010020434455283,
+        "y": 4.992139714009158
       },
       "isLocked": false,
-      "linkedName": "AmpSideFork"
+      "linkedName": "UnderStageShot"
     },
     {
       "anchor": {
-        "x": 8.05261821049958,
-        "y": 3.97
+        "x": 2.8898392931920998,
+        "y": 6.683920394867817
       },
       "prevControl": {
-        "x": 6.362018906928669,
-        "y": 4.312724451852297
+        "x": 3.140403154745237,
+        "y": 6.1827926717615425
       },
       "nextControl": {
-        "x": 9.329329568521253,
-        "y": 3.7111804207967216
+        "x": 2.5755193852730045,
+        "y": 7.312560210706008
       },
       "isLocked": false,
-      "linkedName": "Note6"
+      "linkedName": null
     },
     {
       "anchor": {
-        "x": 4.269738049800583,
-        "y": 4.8141832684845305
+        "x": 2.2981782900502736,
+        "y": 5.500598388584165
       },
       "prevControl": {
-        "x": 4.255208321626082,
-        "y": 3.4241726064573075
+        "x": 2.076305413872089,
+        "y": 6.277153455207811
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "ShootInnerFirstAmp"
     }
   ],
   "rotationTargets": [
     {
-      "waypointRelativePos": 0.0,
-      "rotationDegrees": 0,
+      "waypointRelativePos": 0.5,
+      "rotationDegrees": 90.0,
       "rotateFast": false
     },
     {
-      "waypointRelativePos": 1.5,
-      "rotationDegrees": 0,
-      "rotateFast": false
-    },
-    {
-      "waypointRelativePos": 2.0,
-      "rotationDegrees": 0.0,
+      "waypointRelativePos": 1.45,
+      "rotationDegrees": 90.0,
       "rotateFast": false
     }
   ],
@@ -70,7 +65,7 @@
     "maxAngularAcceleration": 720.0
   },
   "goalEndState": {
-    "velocity": 0.0,
+    "velocity": 0,
     "rotation": 0.0,
     "rotateFast": false
   },

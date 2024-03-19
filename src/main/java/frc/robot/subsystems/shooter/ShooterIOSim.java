@@ -42,6 +42,8 @@ public class ShooterIOSim implements ShooterIO {
     inputs.flywheelCurrent = new double[] {sim.getCurrentDrawAmps(), sim.getCurrentDrawAmps()};
 
     inputs.turretHallEffect = true;
+    inputs.beamBreakInActivated = true;
+    inputs.beamBreakOutActivated = true;
     inputs.pivotHallEffect = true;
   }
 

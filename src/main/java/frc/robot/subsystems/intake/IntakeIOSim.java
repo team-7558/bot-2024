@@ -32,6 +32,7 @@ public class IntakeIOSim implements IntakeIO {
 
     inputs.directionVelocityMPS = simDirection.getAngularVelocityRadPerSec();
     inputs.directionAppliedVolts = appliedVolts;
+    inputs.beamBreakActivated = true;
   }
 
   /** Run open loop at the specified voltage. */

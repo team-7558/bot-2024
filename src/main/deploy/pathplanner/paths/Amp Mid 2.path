@@ -3,59 +3,48 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 5.49,
-        "y": 6.48
+        "x": 4.26,
+        "y": 5.01
       },
       "prevControl": null,
       "nextControl": {
-        "x": 6.49,
-        "y": 6.48
+        "x": 4.692556412139851,
+        "y": 4.104648209296419
       },
       "isLocked": false,
-      "linkedName": "AmpSideFork"
+      "linkedName": "UnderStageShot"
     },
     {
       "anchor": {
-        "x": 8.126707854759495,
-        "y": 7.52
+        "x": 8.279501243687172,
+        "y": 4.095403506122328
       },
       "prevControl": {
-        "x": 7.199899898324869,
-        "y": 6.9597397955857865
+        "x": 7.724166177805477,
+        "y": 4.240848404329439
       },
       "nextControl": {
-        "x": 9.104165539028868,
-        "y": 8.110878226921685
+        "x": 9.056056310310819,
+        "y": 3.892020036292325
       },
       "isLocked": false,
-      "linkedName": "Note4"
+      "linkedName": null
     },
     {
       "anchor": {
-        "x": 5.49,
-        "y": 6.48
+        "x": 4.26,
+        "y": 5.01
       },
       "prevControl": {
-        "x": 5.051987617972997,
-        "y": 7.281094278560338
+        "x": 4.350502394698482,
+        "y": 3.892020036292325
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "AmpSideFork"
+      "linkedName": "UnderStageShot"
     }
   ],
-  "rotationTargets": [
-    {
-      "waypointRelativePos": 0.0,
-      "rotationDegrees": 0,
-      "rotateFast": false
-    },
-    {
-      "waypointRelativePos": 2.0,
-      "rotationDegrees": 0,
-      "rotateFast": false
-    }
-  ],
+  "rotationTargets": [],
   "constraintZones": [],
   "eventMarkers": [],
   "globalConstraints": {
@@ -73,7 +62,7 @@
   "folder": "AmpSide",
   "previewStartingState": {
     "rotation": 0,
-    "velocity": 4.2
+    "velocity": 0
   },
   "useDefaultConstraints": true
 }

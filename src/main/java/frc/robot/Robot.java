@@ -51,7 +51,7 @@ public class Robot extends LoggedRobot {
           .add(new DefaultMovingWhileShooting(), 16, 16, 16)
           .add(new SourceSeries(0), 48, 0, 0)
           .add(new SourceSeries(1), 0, 48, 0)
-          .add(new AmpSeries(1), 0, 0, 48);
+          .add(new AmpSeries(), 0, 0, 48);
 
   private Command autonomousCommand;
   private Drive drive;
@@ -112,7 +112,8 @@ public class Robot extends LoggedRobot {
       lastAS = true;
       AS.setCurrIdx(2);
       AS.generate();
-    } else if (!lastAS && OI.XK.get(5, 0)) {
+    } else if (!lastAS
+        && (OI.XK.get(5, 0) || (OI.DR.getLeftBumper() && OI.DR.getRightTriggerAxis() > 0))) {
       lastAS = true;
       AS.setCurrIdx(3);
       AS.generate();

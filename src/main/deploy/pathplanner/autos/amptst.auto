@@ -14,19 +14,25 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Amp Fork To 4"
+            "pathName": "Amp Mid 1"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "Amp Fork To 5"
+            "pathName": "Amp Mid 2"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "Amp Fork To 6 To Strafe"
+            "pathName": "Amp Inner 1"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Amp Inner 2"
           }
         }
       ]
