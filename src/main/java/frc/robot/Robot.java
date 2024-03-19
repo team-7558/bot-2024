@@ -113,7 +113,7 @@ public class Robot extends LoggedRobot {
       AS.setCurrIdx(2);
       AS.generate();
     } else if (!lastAS
-        && (OI.XK.get(5, 0) || (OI.DR.getLeftBumper() && OI.DR.getRightTriggerAxis() > 0))) {
+        && OI.XK.get(5, 0)) {
       lastAS = true;
       AS.setCurrIdx(3);
       AS.generate();
