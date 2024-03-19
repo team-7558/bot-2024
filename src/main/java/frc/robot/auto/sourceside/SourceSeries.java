@@ -31,7 +31,7 @@ public class SourceSeries extends AltAuto {
   @Override
   public void onInit() {
     double i = G.isRedAlliance() ? 1.0 : -1.0;
-    ss.autoPreset(new Setpoints(38, 0, 0.102, 0.092));
+    ss.autoPreset(new Setpoints(38, 0, 0.1025, G.isRedAlliance() ? 0.092 : 0.09));
   }
 
   @Override
@@ -42,7 +42,7 @@ public class SourceSeries extends AltAuto {
     if (trajstack.getActiveIdx() == 0) {
 
       if (between(0, 1.2)) {
-        ss.autoPreset(new Setpoints(35, 0, i * 0.102, 0.092));
+        ss.autoPreset(new Setpoints(35, 0, i * 0.1025, G.isRedAlliance() ? 0.092 : 0.09));
       }
 
       if (between(1.2, 1.8)) {
@@ -66,7 +66,7 @@ public class SourceSeries extends AltAuto {
       }
 
       if (between(11.1, 14.7)) {
-        ss.autoPreset(new Setpoints(39, 0, i * 0.02, 0.083));
+        ss.autoPreset(new Setpoints(39, 0, i * 0.02, G.isRedAlliance() ? 0.083 : 0.081));
       }
 
       if (between(14.7, 15)) {

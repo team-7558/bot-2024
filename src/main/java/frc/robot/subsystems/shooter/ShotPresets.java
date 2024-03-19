@@ -16,7 +16,7 @@ public class ShotPresets {
   public static final Setpoints RED_WING_POST = new Setpoints(49, 0, -0.02, 0.068);
   public static final Setpoints OP_SHOT = new Setpoints(43, 0, 0.02, 0.076);
   public static final Setpoints RED_CLEAR_WALL = new Setpoints(30, 0, 0.08, 0.115);
-  public static final Setpoints SNIPE = new Setpoints(49, 0, 0.095, 0.066);
+  public static final Setpoints SNIPE = new Setpoints(49, 0, 0.095, 0.064);
   public static final Setpoints RED_CLEAR_CLOSE =
       new Setpoints(36, 0, 0.1, Shooter.PIVOT_MIN_POS_r);
   public static final Setpoints CLEAR_FLAT = new Setpoints(49, 0, 0, 0.04);
