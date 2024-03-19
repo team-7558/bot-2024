@@ -3,29 +3,29 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 1.491054090730802,
-        "y": 6.48
+        "x": 1.272016237726169,
+        "y": 5.556066607628711
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.4910540907308047,
-        "y": 6.48
+        "x": 2.27201623772617,
+        "y": 5.556066607628711
       },
       "isLocked": false,
       "linkedName": "AmpSideStart"
     },
     {
       "anchor": {
-        "x": 5.49,
-        "y": 6.48
+        "x": 3.1579356852407394,
+        "y": 5.556066607628711
       },
       "prevControl": {
-        "x": 4.49,
-        "y": 6.48
+        "x": 2.1579356852407394,
+        "y": 5.556066607628711
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "AmpSideFork"
+      "linkedName": "AmpsideStart2"
     }
   ],
   "rotationTargets": [
@@ -40,7 +40,30 @@
       "rotateFast": false
     }
   ],
-  "constraintZones": [],
+  "constraintZones": [
+    {
+      "name": "shoot",
+      "minWaypointRelativePos": 0,
+      "maxWaypointRelativePos": 0.15,
+      "constraints": {
+        "maxVelocity": 0.5,
+        "maxAcceleration": 4.0,
+        "maxAngularVelocity": 540.0,
+        "maxAngularAcceleration": 720.0
+      }
+    },
+    {
+      "name": "pickup",
+      "minWaypointRelativePos": 0.75,
+      "maxWaypointRelativePos": 0.85,
+      "constraints": {
+        "maxVelocity": 1.0,
+        "maxAcceleration": 4.0,
+        "maxAngularVelocity": 540.0,
+        "maxAngularAcceleration": 720.0
+      }
+    }
+  ],
   "eventMarkers": [],
   "globalConstraints": {
     "maxVelocity": 4.2,
@@ -49,15 +72,12 @@
     "maxAngularAcceleration": 720.0
   },
   "goalEndState": {
-    "velocity": 4.2,
+    "velocity": 0.5,
     "rotation": 0,
     "rotateFast": false
   },
   "reversed": false,
   "folder": "AmpSide",
-  "previewStartingState": {
-    "rotation": 0,
-    "velocity": 0
-  },
+  "previewStartingState": null,
   "useDefaultConstraints": true
 }

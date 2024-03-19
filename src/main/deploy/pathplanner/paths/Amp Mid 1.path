@@ -3,45 +3,45 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 5.49,
-        "y": 6.48
+        "x": 3.1579356852407394,
+        "y": 5.556066607628711
       },
       "prevControl": null,
       "nextControl": {
-        "x": 6.49,
-        "y": 6.48
+        "x": 5.746452573986229,
+        "y": 6.794856832956909
       },
       "isLocked": false,
-      "linkedName": "AmpSideFork"
+      "linkedName": "AmpsideStart2"
     },
     {
       "anchor": {
-        "x": 8.284148348811815,
-        "y": 5.67
+        "x": 8.150075399249896,
+        "y": 5.768694780632805
       },
       "prevControl": {
-        "x": 7.228005407475394,
-        "y": 5.67
+        "x": 7.207115675492612,
+        "y": 6.1292382044223555
       },
       "nextControl": {
-        "x": 9.040865919139485,
-        "y": 5.67
+        "x": 8.552230633326781,
+        "y": 5.614929544073996
       },
       "isLocked": false,
-      "linkedName": "Note5"
+      "linkedName": "AltStrafe"
     },
     {
       "anchor": {
-        "x": 5.49,
-        "y": 6.48
+        "x": 4.26,
+        "y": 5.01
       },
       "prevControl": {
-        "x": 5.885496115897047,
-        "y": 7.7534157607173
+        "x": 4.803492850228944,
+        "y": 3.2633802204541347
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "AmpSideFork"
+      "linkedName": "UnderStageShot"
     }
   ],
   "rotationTargets": [],
@@ -55,14 +55,11 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 0,
+    "rotation": 0.0,
     "rotateFast": false
   },
   "reversed": false,
   "folder": "AmpSide",
-  "previewStartingState": {
-    "rotation": 0,
-    "velocity": 4.2
-  },
-  "useDefaultConstraints": true
+  "previewStartingState": null,
+  "useDefaultConstraints": false
 }
