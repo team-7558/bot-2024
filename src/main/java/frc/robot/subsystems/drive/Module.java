@@ -23,7 +23,7 @@ import frc.robot.Constants;
 import org.littletonrobotics.junction.Logger;
 
 public class Module {
-  public static final double FUDGE_FACTOR = 1.0 / 1.0420382;
+  public static final double FUDGE_FACTOR = 1.0 / 1.020382;
   public static final double WHEEL_RADIUS = FUDGE_FACTOR * Units.inchesToMeters(2.0);
   public static final double RPS_TO_MPS = WHEEL_RADIUS * Math.PI * 2.0;
   public static final double ODOMETRY_FREQUENCY = 250.0;

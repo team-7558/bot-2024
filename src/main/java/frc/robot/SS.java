@@ -219,6 +219,8 @@ public class SS {
         if (first) {
           hasGamePiece = false;
           intake.setCurrentState(intake.AMP_SCORING);
+          // elevator.setTargetHeight(Elevator.MIN_HEIGHT_M + 0.02);
+          // elevator.setCurrentState(elevator.TRAVELLING);
         }
 
         break;
