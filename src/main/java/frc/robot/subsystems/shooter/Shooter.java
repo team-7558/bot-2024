@@ -336,7 +336,9 @@ public class Shooter extends StateMachineSubsystemBase {
 
           @Override
           public void periodic() {
-            // queueSetpoints(constrainSetpoints(shooterPipeline(), false));
+            // queueSetpoints(
+            //     constrainSetpoints(
+            //         shooterPipeline(), false, false)); 
             track();
           }
 
@@ -460,7 +462,6 @@ public class Shooter extends StateMachineSubsystemBase {
 
   /** Stops Everything */
   public void stop() {
-    // TODO: fgure out who  is ghost calling this
     // queueSetpoints(new Setpoints(0, 0));
     io.stop();
   }
@@ -703,7 +704,7 @@ public class Shooter extends StateMachineSubsystemBase {
   }
 
   public Setpoints constrainSetpoints(
-      Setpoints s, boolean isFeeding, boolean source) { // TODO: constrain
+      Setpoints s, boolean isFeeding, boolean source) { 
     Setpoints p = new Setpoints().copy(s);
 
     if (source) {

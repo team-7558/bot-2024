@@ -185,7 +185,7 @@ public class Intake extends StateMachineSubsystemBase {
   }
 
   public boolean beamBroken() {
-    return inputs.beamBreakActivated; // TODO: determine if this needs a debouncer
+    return inputs.beamBreakActivated; 
   }
 
   @Override

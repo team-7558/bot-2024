@@ -9,18 +9,17 @@ public class AmpSeries extends AltAuto {
     super("AmpSeries", true);
     trajstack
         .appendChain()
-        .append("Amp Start", false)
-        .append("Amp Mid 1", false)
-        .append("Amp Mid 2", false)
-        .append("Amp Inner 1", false)
-        .append("Amp Inner 2", false);
+        .append(0.5)
+        .append("Ampside 1", false)
+        .append("Ampside 2", false)
+        .append("Ampside 3", false);
 
     trajstack.setActiveIdx(0);
   }
 
   @Override
   public void onInit() {
-    ss.autoPreset(new Setpoints(24, 0, 0, 0.138)); // fender shot
+    double i = G.isRedAlliance() ? 1.0 : -1.0;
   }
 
   @Override
