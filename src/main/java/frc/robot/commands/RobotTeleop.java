@@ -89,24 +89,18 @@ public class RobotTeleop extends Command {
       } else if (OI.DR.getLeftTriggerAxis() > 0.05) {
         ss.shoot();
       } else if (OI.XK.get(9, 7)) {
-        ss.trackPreset(ShotPresets.TRAP_SHOT, false);
+        ss.sourceShoot();
       } else if (OI.XK.get(0, 0)) {
         ss.trackPreset(G.isRedAlliance() ? ShotPresets.RED_FENDER : ShotPresets.BLUE_FENDER, true);
       } else if (OI.XK.get(0, 1)) {
         ss.trackPreset(
-            G.isRedAlliance() ? ShotPresets.RED_FRONT_POST : ShotPresets.BLUE_FRONT_POST, true);
-      } else if (OI.XK.get(0, 2)) {
-        ss.trackPreset(
             G.isRedAlliance() ? ShotPresets.RED_SIDE_POST : ShotPresets.BLUE_SIDE_POST, true);
       } else if (OI.XK.get(0, 3)) {
         ss.trackPreset(
-            G.isRedAlliance() ? ShotPresets.RED_AMP_BOX : ShotPresets.BLUE_AMP_BOX, true);
+            G.isRedAlliance() ? ShotPresets.RED_FRONT_POST : ShotPresets.BLUE_FRONT_POST, true);
       } else if (OI.XK.get(0, 5)) {
         ss.trackPreset(
             G.isRedAlliance() ? ShotPresets.RED_FRONT_COURT : ShotPresets.BLUE_FRONT_COURT, true);
-      } else if (OI.XK.get(0, 6)) {
-        ss.trackPreset(
-            G.isRedAlliance() ? ShotPresets.RED_WING_POST : ShotPresets.BLUE_WING_POST, true);
       } else if (OI.XK.get(0, 7)) {
         ss.trackPreset(G.isRedAlliance() ? ShotPresets.OP_SHOT : ShotPresets.BLUE_OP_SHOT, true);
       } else if (OI.XK.get(9, 0)) {

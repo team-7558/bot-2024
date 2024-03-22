@@ -3,29 +3,29 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 4.264894807075749,
+        "x": 4.26,
         "y": 5.01
       },
       "prevControl": null,
       "nextControl": {
-        "x": 5.742083838149976,
-        "y": 4.557491404068354
+        "x": 4.692556412139851,
+        "y": 4.104648209296419
       },
       "isLocked": false,
       "linkedName": "UnderStageShot"
     },
     {
       "anchor": {
-        "x": 8.39,
-        "y": 2.38
+        "x": 8.279501243687172,
+        "y": 4.095403506122328
       },
       "prevControl": {
-        "x": 7.577672830861886,
-        "y": 2.2666375952220923
+        "x": 7.724166177805477,
+        "y": 4.240848404329439
       },
       "nextControl": {
-        "x": 9.361367848329422,
-        "y": 2.5155569521666985
+        "x": 9.056056310310819,
+        "y": 3.892020036292325
       },
       "isLocked": false,
       "linkedName": null
@@ -36,31 +36,15 @@
         "y": 5.01
       },
       "prevControl": {
-        "x": 5.683913361101059,
-        "y": 4.630140044940857
+        "x": 4.350502394698482,
+        "y": 3.892020036292325
       },
       "nextControl": null,
       "isLocked": false,
       "linkedName": "UnderStageShot"
     }
   ],
-  "rotationTargets": [
-    {
-      "waypointRelativePos": 0.2,
-      "rotationDegrees": 0,
-      "rotateFast": false
-    },
-    {
-      "waypointRelativePos": 1.05,
-      "rotationDegrees": 0,
-      "rotateFast": false
-    },
-    {
-      "waypointRelativePos": 1.85,
-      "rotationDegrees": 0,
-      "rotateFast": false
-    }
-  ],
+  "rotationTargets": [],
   "constraintZones": [],
   "eventMarkers": [],
   "globalConstraints": {
@@ -75,7 +59,7 @@
     "rotateFast": false
   },
   "reversed": false,
-  "folder": "SourceSide",
+  "folder": "AmpSide",
   "previewStartingState": {
     "rotation": 0,
     "velocity": 0

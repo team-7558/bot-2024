@@ -8,31 +8,19 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Ampside 1"
+            "pathName": "AltSourceStart"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "Amp Mid 1"
+            "pathName": "AltForkTo5ToFork"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "Amp Mid 2"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "Amp Inner 1"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "Amp Inner 2"
+            "pathName": "ForkTo6ToFork"
           }
         }
       ]
