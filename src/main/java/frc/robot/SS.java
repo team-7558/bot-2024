@@ -127,7 +127,7 @@ public class SS {
       case IDLE:
         if (first) {
           shooter.setCurrentState(shooter.HOLD);
-          if(!elevator.atHeight(Elevator.MIN_HEIGHT_M, 0.01)) { // zero after going up
+          if (!elevator.atHeight(Elevator.MIN_HEIGHT_M, 0.01)) { // zero after going up
             elevator.setTargetHeight(Elevator.MIN_HEIGHT_M);
             elevator.setCurrentState(elevator.TRAVELLING);
           } else {
@@ -201,6 +201,17 @@ public class SS {
         }
         break;
       case INTAKING_DEEP:
+        if (intake.beamBroken()) {
+          hasGamePiece = true;
+        }
+
+        if (hasGamePiece && !intake.beamBroken()) {
+          intake.setCurrentState(intake.GHOSTING);
+        } else if (!hasGamePiece) {
+          intake.setCurrentState(intake.AMP_READY);
+        }
+
+        break;
       case INTAKING_CORAL:
       case INTAKING:
         if (first) {
@@ -222,12 +233,14 @@ public class SS {
         break;
       case AMP_SCORING:
         if (first) {
-          hasGamePiece = false;
-          intake.setCurrentState(intake.AMP_SCORING);
           elevator.setTargetHeight(Elevator.AMP_HEIGHT_M);
           elevator.setCurrentState(elevator.TRAVELLING);
         }
 
+        if (elevator.isState(elevator.HOLDING)) {
+          hasGamePiece = false;
+          intake.setCurrentState(intake.AMP_SCORING);
+        }
 
         break;
 
@@ -453,7 +466,11 @@ public class SS {
 
   public void amp() {
     if (currState != State.BOOT) {
-      queueState(State.AMP_SCORING);
+      if (hasGamePiece()) {
+        queueState(State.AMP_SCORING);
+      } else {
+        queueState(State.INTAKING_DEEP);
+      }
     }
   }
 

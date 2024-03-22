@@ -338,7 +338,7 @@ public class Shooter extends StateMachineSubsystemBase {
           public void periodic() {
             // queueSetpoints(
             //     constrainSetpoints(
-            //         shooterPipeline(), false, false)); 
+            //         shooterPipeline(), false, false));
             track();
           }
 
@@ -703,8 +703,7 @@ public class Shooter extends StateMachineSubsystemBase {
     return new Setpoints(flywheel_rps, Setpoints.DEFAULT, turretPos_r, pivotPos_r);
   }
 
-  public Setpoints constrainSetpoints(
-      Setpoints s, boolean isFeeding, boolean source) { 
+  public Setpoints constrainSetpoints(Setpoints s, boolean isFeeding, boolean source) {
     Setpoints p = new Setpoints().copy(s);
 
     if (source) {

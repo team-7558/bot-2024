@@ -33,7 +33,7 @@ public class Vision {
   public static final double CAM_FOV_RAD = Units.degreesToRadians(120);
 
   // Angle of apriltag view horizontal FOV
-  public static final double AT_FOV_RAD = Units.degreesToRadians(140); 
+  public static final double AT_FOV_RAD = Units.degreesToRadians(140);
 
   // Distance for quick
   public static final double QUICK_DISTANCE_M = 1.0;
@@ -121,11 +121,7 @@ public class Vision {
           instance = new Vision(cam0, cam1, cam2, cam3);
           break;
         case SIM:
-          cam0 =
-              new VisionIOPhoton(
-                  "camera0",
-                  new Transform3d(
-                      0, 0, 0, new Rotation3d())); 
+          cam0 = new VisionIOPhoton("camera0", new Transform3d(0, 0, 0, new Rotation3d()));
           instance = new Vision(cam0);
           // no sim
           break;

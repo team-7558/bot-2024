@@ -45,6 +45,7 @@ public class Intake extends StateMachineSubsystemBase {
       IDLE,
       GHOSTING,
       INTAKING,
+      AMP_READY,
       FEEDING,
       SHOOTER_SIDE,
       FAST_FEED,
@@ -126,12 +127,21 @@ public class Intake extends StateMachineSubsystemBase {
           }
         };
 
+    AMP_READY =
+        new State("AMP_READY") {
+          @Override
+          public void periodic() {
+            intakeSpeed = beamBroken() ? 0.7 : 0.50;
+            directionSpeed = beamBroken() ? 0.7 : 0.50;
+          }
+        };
+
     AMP_SCORING =
         new State("AMP_SCORING") {
           @Override
           public void init() {
-            directionSpeed = 0.39; // 0.39 works on comp amp
-            intakeSpeed = 0.39;
+            directionSpeed = 0.45; // 0.39 works on comp amp
+            intakeSpeed = 0.2;
           }
         };
     SHOOTER_SIDE =
@@ -185,7 +195,7 @@ public class Intake extends StateMachineSubsystemBase {
   }
 
   public boolean beamBroken() {
-    return inputs.beamBreakActivated; 
+    return inputs.beamBreakActivated;
   }
 
   @Override

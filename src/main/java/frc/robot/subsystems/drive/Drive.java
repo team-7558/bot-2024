@@ -444,7 +444,6 @@ public class Drive extends StateMachineSubsystemBase {
             .transformBy(new Transform2d(linearMagnitude, 0.0, new Rotation2d()))
             .getTranslation();
 
-
     // Convert to field relative speeds & send command
 
     double x_ = (linearVelocity.getX() * MAX_LINEAR_SPEED_MPS) * throttle;

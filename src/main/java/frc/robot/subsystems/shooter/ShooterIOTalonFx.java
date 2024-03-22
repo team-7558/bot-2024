@@ -20,9 +20,9 @@ import frc.robot.util.Util;
 public class ShooterIOTalonFx implements ShooterIO {
 
   private static final double FLYWHEEL_GEAR_RATIO = 1.66;
-  private static final double TURRET_GEAR_RATIO = 5.0 * 160.0 / 14.0; 
-  private static final double FEEDER_GEAR_RATIO = 1; 
-  private static final double PIVOT_GEAR_RATIO = (60.0 / 24.0) * 4.0 * 9.0; 
+  private static final double TURRET_GEAR_RATIO = 5.0 * 160.0 / 14.0;
+  private static final double FEEDER_GEAR_RATIO = 1;
+  private static final double PIVOT_GEAR_RATIO = (60.0 / 24.0) * 4.0 * 9.0;
 
   private static final double FLYWHEEL_VEL_SWITCH_THRESHOLD = 50.0;
   private static final double FEEDER_VEL_SWITCH_THRESHOLD = 50.0;
@@ -31,8 +31,8 @@ public class ShooterIOTalonFx implements ShooterIO {
 
   private final TalonFX flywheelL = new TalonFX(9);
   private final TalonFX flywheelR = new TalonFX(10);
-  private final TalonFX turret = new TalonFX(5); 
-  private final TalonFX pivot = new TalonFX(7); 
+  private final TalonFX turret = new TalonFX(5);
+  private final TalonFX pivot = new TalonFX(7);
   private final TalonFX feeder = new TalonFX(8);
 
   private final DigitalInput beambreakIn = new DigitalInput(1);
@@ -141,7 +141,7 @@ public class ShooterIOTalonFx implements ShooterIO {
 
     var turretConfig = new TalonFXConfiguration();
     turretConfig.Feedback.SensorToMechanismRatio = TURRET_GEAR_RATIO;
-    turretConfig.CurrentLimits.SupplyCurrentLimit = 20.0; 
+    turretConfig.CurrentLimits.SupplyCurrentLimit = 20.0;
     turretConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
     turretConfig.ClosedLoopRamps.VoltageClosedLoopRampPeriod = 0.1;
     turretConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
@@ -212,11 +212,9 @@ public class ShooterIOTalonFx implements ShooterIO {
     pivotConfig.MotionMagic.MotionMagicAcceleration = 0.8; // 0.56;
     pivotConfig.MotionMagic.MotionMagicJerk = 4;
 
-
     feeder.getConfigurator().apply(feederConfig);
     turret.getConfigurator().apply(turretConfig);
     pivot.getConfigurator().apply(pivotConfig);
-
 
     // talonL.setControl(new Follower(talonR.getDeviceID(), false));
 

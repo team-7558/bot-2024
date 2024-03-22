@@ -1,7 +1,6 @@
 package frc.robot.auto;
 
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
-import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.path.PathPlannerTrajectory;
 import com.pathplanner.lib.util.PPLibTelemetry;
 import com.pathplanner.lib.util.PathPlannerLogging;
@@ -47,7 +46,7 @@ public class SwerveFollower {
         ChassisSpeeds.fromRobotRelativeSpeeds(currentSpeeds, currentPose.getRotation());
     Rotation2d currentHeading =
         new Rotation2d(fieldSpeeds.vxMetersPerSecond, fieldSpeeds.vyMetersPerSecond);
-    Rotation2d targetHeading = toFollow.getInitState().heading; 
+    Rotation2d targetHeading = toFollow.getInitState().heading;
     Rotation2d headingError = currentHeading.minus(targetHeading);
     boolean onHeading =
         Math.hypot(currentSpeeds.vxMetersPerSecond, currentSpeeds.vyMetersPerSecond) < 0.25
