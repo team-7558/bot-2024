@@ -283,9 +283,9 @@ public class Shooter extends StateMachineSubsystemBase {
             if (inputs.beamBreakOutActivated) {
               setCurrentState(IDLE);
             } else if (!inputs.beamBreakInActivated) {
-              s.feederVel_rps = 8;
+              s.feederVel_rps = 7.1;
             } else {
-              s.feederVel_rps = 2.2;
+              s.feederVel_rps = 2.1;
             }
             queueSetpoints(constrainSetpoints(s, true, false));
             track();
@@ -306,7 +306,7 @@ public class Shooter extends StateMachineSubsystemBase {
               queueSetpoints(new Setpoints(Setpoints.DEFAULT, 8.5, 0, PIVOT_MIN_POS_r));
               track();
             } else {
-              queueSetpoints(new Setpoints(Setpoints.DEFAULT, 2.5, 0, 0.1));
+              queueSetpoints(new Setpoints(Setpoints.DEFAULT, 2.5, 0, PIVOT_MIN_POS_r));
               track();
             }
           }

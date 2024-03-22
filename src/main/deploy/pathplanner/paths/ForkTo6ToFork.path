@@ -3,13 +3,13 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 4.264894807075749,
-        "y": 5.0
+        "x": 4.26,
+        "y": 5.01
       },
       "prevControl": null,
       "nextControl": {
-        "x": 5.524137915532468,
-        "y": 4.203934685155506
+        "x": 5.519243108456719,
+        "y": 4.213934685155506
       },
       "isLocked": false,
       "linkedName": "UnderStageShot"

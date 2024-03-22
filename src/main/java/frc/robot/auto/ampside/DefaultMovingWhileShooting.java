@@ -15,18 +15,18 @@ public class DefaultMovingWhileShooting extends AltAuto {
 
   @Override
   public void onInit() {
-    ss.autoPresetNoTurret(new Setpoints(28, 0, 0, 0.14));
+    ss.autoPresetNoTurret(new Setpoints(26, 0, 0, 0.14));
   }
 
   @Override
   public void onExecute() {
     double i = G.isRedAlliance() ? 1.0 : -1.0;
 
-    if (between(0.3, 0.9)) {
-      ss.autoPresetNoTurret(new Setpoints(28, 0, 0, 0.14));
+    if (between(0.3, 0.8)) {
+      ss.autoPresetNoTurret(new Setpoints(26, 0, 0, 0.14));
     }
 
-    if (between(1, 1.4)) {
+    if (between(0.9, 1.4)) {
       ss.shoot();
     }
 

@@ -56,10 +56,10 @@ public class ElevatorIOReal implements ElevatorIO {
     rightFalcon = new TalonFX(4);
     hallEffect = new DigitalInput(5);
 
-    pos_m = leftFalcon.getPosition();
-    vel_mps = leftFalcon.getVelocity();
-    acc_mps2 = leftFalcon.getAcceleration();
-    leftCurrent_A = leftFalcon.getStatorCurrent();
+    pos_m = rightFalcon.getPosition();
+    vel_mps = rightFalcon.getVelocity();
+    acc_mps2 = rightFalcon.getAcceleration();
+    leftCurrent_A = rightFalcon.getStatorCurrent();
     rightCurrent_A = rightFalcon.getStatorCurrent();
     volts_V = leftFalcon.getMotorVoltage();
 
@@ -106,7 +106,8 @@ public class ElevatorIOReal implements ElevatorIO {
     leftFalcon.getConfigurator().apply(leaderConfig);
     rightFalcon.getConfigurator().apply(leaderConfig);
     // rightFalcon.setControl(new Follower(leftFalcon.getDeviceID(), false).withUpdateFreqHz(50));
-
+    BaseStatusSignal.setUpdateFrequencyForAll(
+        50.0, pos_m, vel_mps, volts_V, leftCurrent_A, rightCurrent_A);
     leftFalcon.optimizeBusUtilization();
     rightFalcon.optimizeBusUtilization();
 

@@ -5,7 +5,7 @@ import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj.motorcontrol.Spark;
 
 public class LEDIOReal implements LEDIO {
-  private AddressableLED m_led = new AddressableLED(8);
+  private AddressableLED m_led = new AddressableLED(7);
   private AddressableLEDBuffer m_ledBuffer = new AddressableLEDBuffer(LED.NUM_LEDS);
 
   private Spark blinkin = new Spark(9);

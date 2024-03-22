@@ -33,6 +33,7 @@ public class SS {
     AMP_SCORING,
 
     AUTOPRECHAMBER,
+    AUTOSHOOTING,
     AUTOCHAMBER,
 
     PRECHAMBER,
@@ -43,6 +44,7 @@ public class SS {
     SHOOTING,
     SHOOTING_FROM_GROUND,
     SOURCE_FEEDING,
+    SOURCE_SHOOTING,
 
     CLIMBING_UP,
     CLIMBING_DOWN,
@@ -197,8 +199,8 @@ public class SS {
       case INTAKING_CORAL:
       case INTAKING:
         if (first) {
-          elevator.setTargetHeight(Elevator.MIN_HEIGHT_M);
-          elevator.setCurrentState(elevator.TRAVELLING);
+          // elevator.setTargetHeight(Elevator.MIN_HEIGHT_M);
+          // elevator.setCurrentState(elevator.TRAVELLING);
         }
 
         if (intake.beamBroken()) {
@@ -216,14 +218,18 @@ public class SS {
       case AMP_SCORING:
         if (first) {
           hasGamePiece = false;
-          elevator.setTargetHeight(Elevator.MIN_HEIGHT_M);
-          elevator.setCurrentState(elevator.TRAVELLING);
           intake.setCurrentState(intake.AMP_SCORING);
+          // elevator.setTargetHeight(Elevator.MIN_HEIGHT_M + 0.02);
+          // elevator.setCurrentState(elevator.TRAVELLING);
         }
 
         break;
 
       case SOURCE_FEEDING:
+        if (first) {
+          elevator.setTargetHeight(elevator.MIN_HEIGHT_M + 0.115);
+          elevator.setCurrentState(elevator.TRAVELLING);
+        }
         if (intake.beamBroken()) {
           hasGamePiece = true;
         }
@@ -336,6 +342,12 @@ public class SS {
           shooter.setCurrentState(shooter.SHOOTING);
         }
         break;
+
+      case AUTOSHOOTING:
+        hasGamePiece = false;
+        // intake.setCurrentState(intake.SHOOTER_SIDE);
+        shooter.setCurrentState(shooter.SHOOTING);
+        break;
       case SHOOTING_FROM_GROUND:
         if (first) {
           shooter.setCurrentState(shooter.SHOOTING);
@@ -407,11 +419,11 @@ public class SS {
         || currState == State.SHOOTING_FROM_GROUND
         || currState == State.PRECHAMBER
         || currState == State.CHAMBER) {
-      if (!elevator.atHeight(Elevator.MIN_HEIGHT_M, 0.01)) {
-        queueState(State.RESETTING_ELEVATOR);
-      } else {
-        queueState(State.IDLE);
-      }
+      // if (!elevator.atHeight(Elevator.MIN_HEIGHT_M, 0.01)) {
+      //   queueState(State.RESETTING_ELEVATOR);
+      // } else {
+      //   queueState(State.IDLE);
+      // }
     }
   }
 
@@ -456,6 +468,12 @@ public class SS {
     }
   }
 
+  public void autoShoot() {
+    if (currState != State.BOOT) {
+      queueState(State.AUTOSHOOTING);
+    }
+  }
+
   public void track() {
     if (currState != State.BOOT) {
       queueState(State.TRACKING);
@@ -465,6 +483,12 @@ public class SS {
   public void sourceFeed() {
     if (currState != State.BOOT) {
       queueState(State.SOURCE_FEEDING);
+    }
+  }
+
+  public void sourceShoot() {
+    if (currState != State.BOOT) {
+      queueState(State.SOURCE_SHOOTING);
     }
   }
 

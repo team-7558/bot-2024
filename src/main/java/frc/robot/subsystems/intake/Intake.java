@@ -130,8 +130,8 @@ public class Intake extends StateMachineSubsystemBase {
         new State("AMP_SCORING") {
           @Override
           public void init() {
-            directionSpeed = 0.44; // 0.39 works on comp amp
-            intakeSpeed = 0.44;
+            directionSpeed = 0.39; // 0.39 works on comp amp
+            intakeSpeed = 0.39;
           }
         };
     SHOOTER_SIDE =
