@@ -1,5 +1,7 @@
 package frc.robot.auto;
 
+import com.pathplanner.lib.path.EventMarker;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.Timer;
 import frc.robot.SS;
@@ -77,6 +79,26 @@ public abstract class AltAuto {
   protected boolean after(double time_s) {
     return t.get() > time_s;
   }
+
+  /**
+   * Only to be used for single-file choreo trajectories
+   * @return
+   */
+  protected int getLastEventMarkerIndex() {
+    int eventMarkerIndex = 0;
+    for(IFollowable followable : trajstack.trajs) {
+
+      Traj traj = (Traj) followable;
+      for(EventMarker m : traj.getPath().getEventMarkers()) {
+        if(m.getWaypointRelativePos() <= t.get()) {
+          eventMarkerIndex++;
+        }
+
+      }
+    }
+    return eventMarkerIndex;
+  }
+
 
   protected boolean between(double time0_s, double time1_s) {
     return after(time0_s) && before(time1_s);

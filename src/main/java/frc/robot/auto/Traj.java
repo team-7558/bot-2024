@@ -23,6 +23,7 @@ public class Traj implements IFollowable {
   private double delay_s;
 
   private PathPlannerTrajectory traj;
+  private PathPlannerPath path;
   private State initState;
 
   private boolean generated = false;
@@ -48,7 +49,7 @@ public class Traj implements IFollowable {
               ? PathPlannerPath.fromChoreoTrajectory(filename)
               : PathPlannerPath.fromPathFile(filename);
       ChassisSpeeds cs = new ChassisSpeeds();
-
+      this.path = pppath;
       double startrad = 0;
       if (G.isRedAlliance()) {
         pppath = pppath.flipPath();
@@ -117,6 +118,10 @@ public class Traj implements IFollowable {
     } else {
       return initState.timeSeconds;
     }
+  }
+
+  public PathPlannerPath getPath() {
+    return this.path;
   }
 
   @Override
