@@ -127,9 +127,11 @@ public class SS {
       case IDLE:
         if (first) {
           shooter.setCurrentState(shooter.HOLD);
-          if(lastState == State.AMP_SCORING) { // zero after going up
+          if(!elevator.atHeight(Elevator.MIN_HEIGHT_M, 0.01)) { // zero after going up
             elevator.setTargetHeight(Elevator.MIN_HEIGHT_M);
             elevator.setCurrentState(elevator.TRAVELLING);
+          } else {
+            elevator.setCurrentState(elevator.IDLE);
           }
         }
         if (hasGamePiece) {
