@@ -142,7 +142,7 @@
                     "controlIntervalCount": 13
                 },
                 {
-                    "x": 6.168493270874023,
+                    "x": 6.1027936935424805,
                     "y": 6.4540300369262695,
                     "heading": 0,
                     "isInitialGuess": false,
@@ -2306,7 +2306,7 @@
                     }
                 }
             ],
-            "isTrajectoryStale": false
+            "isTrajectoryStale": true
         }
     },
     "splitTrajectoriesAtStopPoints": false,

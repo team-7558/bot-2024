@@ -40,7 +40,7 @@ import org.littletonrobotics.junction.Logger;
 
 public class Shooter extends StateMachineSubsystemBase {
 
-  private static double HEIGHT_M = -0.1;
+  private static double HEIGHT_M = 0;
 
   public static final double TURRET_ZERO_POS = 0.2506;
   public static final double PIVOT_ZERO_POS = 0.016666;
@@ -59,13 +59,15 @@ public class Shooter extends StateMachineSubsystemBase {
   ;
   private static LerpTable shotSpeedFromDistance = new LerpTable("shotspeeds.lerp").compile();
 
+  private static LerpTable pivotAngleFromDistance_r = new LerpTable("pivotheights.lerp").compile();
+
   private static LerpTable turretConstraintsFromPivotPos =
       new LerpTable("turretConstraintsFromPivotPos.lerp").compile();
 
   private static LerpTable turretFeedConstraintsFromPivotPos =
       new LerpTable("turretFeedConstraintsFromPivotPos.lerp").compile();
 
-  private static double TIME_TO_SHOOT = 0.05;
+  private static double TIME_TO_SHOOT = 0.2;
 
   private static final Pose3d SPEAKER_POSE_RED = new Pose3d(16.28, 5.53, 1.987, new Rotation3d());
   private static final Pose3d SPEAKER_POSE_BLUE = new Pose3d(0.28, 5.53, 1.987, new Rotation3d());
@@ -336,9 +338,7 @@ public class Shooter extends StateMachineSubsystemBase {
 
           @Override
           public void periodic() {
-            // queueSetpoints(
-            //     constrainSetpoints(
-            //         shooterPipeline(), false, false));
+            // queueSetpoints(constrainSetpoints(shooterPipeline(), false, false));
             track();
           }
 
@@ -668,7 +668,7 @@ public class Shooter extends StateMachineSubsystemBase {
           delta.getX() * delta.getX() + delta.getY() * delta.getY() + delta.getZ() * delta.getZ();
       double dist = Math.sqrt(dist2);
 
-      double shotTime_s = TIME_TO_SHOOT + shotTimesFromDistance.calcY(dist);
+      double shotTime_s = TIME_TO_SHOOT;
 
       Transform3d offset =
           new Transform3d(
@@ -698,7 +698,7 @@ public class Shooter extends StateMachineSubsystemBase {
     double theta =
         Math.IEEEremainder(Math.atan2(delta.getY(), delta.getX()) + Math.PI, 2 * Math.PI);
     double turretPos_r = Units.radiansToRotations(theta);
-    double pivotPos_r = Units.radiansToRotations(Math.asin(delta.getZ() / dist));
+    double pivotPos_r = pivotAngleFromDistance_r.calcY(dist);
 
     return new Setpoints(flywheel_rps, Setpoints.DEFAULT, turretPos_r, pivotPos_r);
   }

@@ -463,7 +463,6 @@ public class Drive extends StateMachineSubsystemBase {
 
     // Be wary about using Timer.getFPGATimestamp in AK
 
-    chassisSpeeds = getFieldRelativeSpeeds();
     Logger.recordOutput("Drive/Speeds", chassisSpeeds);
   }
 
@@ -686,11 +685,7 @@ public class Drive extends StateMachineSubsystemBase {
 
   /** Returns field relative chassis speeds * */
   public ChassisSpeeds getFieldRelativeSpeeds() {
-    return ChassisSpeeds.fromRobotRelativeSpeeds(
-        chassisSpeeds.vxMetersPerSecond,
-        chassisSpeeds.vyMetersPerSecond,
-        chassisSpeeds.omegaRadiansPerSecond,
-        getRotation());
+    return ChassisSpeeds.fromRobotRelativeSpeeds(getChassisSpeedsFromModuleStates(), getRotation());
   }
 
   public static Pose2d getAmpPose() {
