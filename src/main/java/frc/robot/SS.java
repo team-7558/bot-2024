@@ -1,8 +1,11 @@
 package frc.robot;
 
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.Timer;
 import frc.robot.subsystems.LED.LED;
+import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.shooter.Shooter;
@@ -31,6 +34,7 @@ public class SS {
     INTAKING_CORAL,
 
     AMP_SCORING,
+    AUTO_AMP_LINEUP,
 
     AUTOPRECHAMBER,
     AUTOSHOOTING,
@@ -67,6 +71,7 @@ public class SS {
   private Intake intake;
   private Shooter shooter;
   private Elevator elevator;
+  private Drive drive;
 
   private State lastState;
   private State currState;
@@ -84,6 +89,7 @@ public class SS {
     intake = Intake.getInstance();
     shooter = Shooter.getInstance();
     elevator = Elevator.getInstance();
+    drive = Drive.getInstance();
 
     hasGamePiece = false;
     homedShooter = false;
@@ -126,6 +132,7 @@ public class SS {
         break;
       case IDLE:
         if (first) {
+          drive.setCurrentState(drive.STRAFE_N_TURN);
           shooter.setCurrentState(shooter.HOLD);
           if (!elevator.atHeight(Elevator.MIN_HEIGHT_M, 0.01)) { // zero after going up
             elevator.setTargetHeight(Elevator.MIN_HEIGHT_M);
@@ -240,6 +247,18 @@ public class SS {
         if (elevator.isState(elevator.HOLDING)) {
           hasGamePiece = false;
           intake.setCurrentState(intake.AMP_SCORING);
+        }
+
+        break;
+
+      case AUTO_AMP_LINEUP:
+        if (drive.closeToPose(
+            Drive.AMP_SCORING_POSE, new Pose2d(0.05, 0.05, Rotation2d.fromDegrees(1)))) {
+
+          drive.setCurrentState(drive.STRAFE_N_TURN);
+          queueState(State.AMP_SCORING);
+        } else {
+          drive.setCurrentState(drive.AMP_SCORING);
         }
 
         break;
@@ -471,6 +490,12 @@ public class SS {
       } else {
         queueState(State.INTAKING_DEEP);
       }
+    }
+  }
+
+  public void autoAmp() {
+    if (currState != State.BOOT && currState != State.AMP_SCORING) {
+      queueState(State.AUTO_AMP_LINEUP);
     }
   }
 

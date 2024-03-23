@@ -56,9 +56,6 @@ public class RobotTeleop extends Command {
       } else if (OI.DR.getXButton()) {
         drive.setAutolockSetpoint(G.isRedAlliance() ? -0.172 : 0.35);
         drive.setCurrentState(drive.STRAFE_AUTOLOCK);
-      } else if (OI.DR.getYButton()) {
-        drive.setAutolockSetpoint(G.isRedAlliance() ? 0.5 : 0);
-        drive.setCurrentState(drive.STRAFE_AUTOLOCK);
       } else if (OI.DR.getBackButton()) {
         drive.setCurrentState(drive.INTAKING);
       } else {
@@ -78,38 +75,43 @@ public class RobotTeleop extends Command {
         ss.queueState(State.BOOT);
       } else if (OI.DR.getRightBumper()) {
         ss.amp();
-      } else if (OI.XK.get(7, 7)) {
-        ss.climbUp();
-      } else if (OI.XK.get(7, 0)) {
-        ss.chamber();
-      } else if (OI.XK.get(7, 2)) {
-        ss.spit();
-      } else if (OI.XK.get(7, 4)) {
-        ss.shooterSpit();
-      } else if (OI.DR.getLeftTriggerAxis() > 0.05) {
-        ss.shoot();
-      } else if (OI.XK.get(9, 7)) {
-        ss.sourceShoot();
-      } else if (OI.XK.get(0, 0)) {
-        ss.trackPreset(G.isRedAlliance() ? ShotPresets.RED_FENDER : ShotPresets.BLUE_FENDER, true);
-      } else if (OI.XK.get(0, 1)) {
-        ss.trackPreset(
-            G.isRedAlliance() ? ShotPresets.RED_SIDE_POST : ShotPresets.BLUE_SIDE_POST, true);
-      } else if (OI.XK.get(0, 3)) {
-        ss.trackPreset(
-            G.isRedAlliance() ? ShotPresets.RED_FRONT_POST : ShotPresets.BLUE_FRONT_POST, true);
-      } else if (OI.XK.get(0, 5)) {
-        ss.trackPreset(
-            G.isRedAlliance() ? ShotPresets.RED_FRONT_COURT : ShotPresets.BLUE_FRONT_COURT, true);
-      } else if (OI.XK.get(0, 7)) {
-        ss.trackPreset(G.isRedAlliance() ? ShotPresets.OP_SHOT : ShotPresets.BLUE_OP_SHOT, true);
-      } else if (OI.XK.get(9, 0)) {
-        ss.trackPreset(
-            G.isRedAlliance() ? ShotPresets.RED_CLEAR_WALL : ShotPresets.BLUE_CLEAR_WALL, true);
-      } else if (OI.XK.get(9, 1)) {
-        ss.trackPreset(G.isRedAlliance() ? ShotPresets.SNIPE : ShotPresets.BLUE_SNIPE, true);
-      } else if (OI.XK.get(9, 2)) {
-        ss.sourceFeed();
+        } else if (OI.XK.get(7, 7)) {
+          ss.climbUp();
+        } else if (OI.XK.get(7, 0)) {
+          ss.chamber();
+        } else if (OI.XK.get(7, 2)) {
+          ss.spit();
+        } else if (OI.XK.get(7, 4)) {
+          ss.shooterSpit();
+        } else if (OI.DR.getLeftTriggerAxis() > 0.05) {
+          ss.shoot();
+        } else if (OI.XK.get(9, 7)) {
+          ss.sourceShoot();
+        } else if (OI.XK.get(0, 0)) {
+          ss.trackPreset(G.isRedAlliance() ? ShotPresets.RED_FENDER : ShotPresets.BLUE_FENDER,
+        true);
+        } else if (OI.XK.get(0, 1)) {
+          ss.trackPreset(
+              G.isRedAlliance() ? ShotPresets.RED_SIDE_POST : ShotPresets.BLUE_SIDE_POST, true);
+        } else if (OI.XK.get(0, 3)) {
+          ss.trackPreset(
+              G.isRedAlliance() ? ShotPresets.RED_FRONT_POST : ShotPresets.BLUE_FRONT_POST,
+        true);
+        } else if (OI.XK.get(0, 5)) {
+          ss.trackPreset(
+              G.isRedAlliance() ? ShotPresets.RED_FRONT_COURT : ShotPresets.BLUE_FRONT_COURT,
+        true);
+        } else if (OI.XK.get(0, 7)) {
+          ss.trackPreset(G.isRedAlliance() ? ShotPresets.OP_SHOT : ShotPresets.BLUE_OP_SHOT,
+        true);
+        } else if (OI.XK.get(9, 0)) {
+          ss.trackPreset(
+              G.isRedAlliance() ? ShotPresets.RED_CLEAR_WALL : ShotPresets.BLUE_CLEAR_WALL,
+        true);
+        } else if (OI.XK.get(9, 1)) {
+          ss.trackPreset(G.isRedAlliance() ? ShotPresets.SNIPE : ShotPresets.BLUE_SNIPE, true);
+        } else if (OI.XK.get(9, 2)) {
+          ss.sourceFeed();
       } else if (OI.DR.getLeftBumper() || OI.DR.getBackButton()) {
         ss.intake();
       } else {
