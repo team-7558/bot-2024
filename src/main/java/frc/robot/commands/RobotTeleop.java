@@ -109,7 +109,7 @@ public class RobotTeleop extends Command {
       } else if (OI.XK.get(9, 1)) {
         ss.trackPreset(G.isRedAlliance() ? ShotPresets.SNIPE : ShotPresets.BLUE_SNIPE, true);
       } else if (OI.XK.get(9, 2)) {
-        ss.sourceFeed();
+        ss.limelightTrack();
       } else if (OI.DR.getLeftBumper() || OI.DR.getBackButton()) {
         ss.intake();
       } else {

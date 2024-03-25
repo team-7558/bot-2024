@@ -135,13 +135,7 @@ public class Drive extends StateMachineSubsystemBase {
     public double[] timestamps = new double[] {};
   }
 
-  public final State DISABLED,
-      SHOOTING,
-      PATHING,
-      STRAFE_N_TURN,
-      STRAFE_AUTOLOCK,
-      STRAFE_AUTOLOCK_NEW,
-      INTAKING;
+  public final State DISABLED, SHOOTING, PATHING, STRAFE_N_TURN, STRAFE_AUTOLOCK, INTAKING;
 
   // IO
   private final GyroIO gyroIO;
@@ -270,31 +264,9 @@ public class Drive extends StateMachineSubsystemBase {
                     getRotation().getRotations() - intermediaryAutolockSetpoint_r, 1.0);
             if (Constants.verboseLogging) Logger.recordOutput("Drive/Autolock Heading Error", err);
             double con = 6 * err;
-            con = Util.limit(con, Util.lerp(0.8, 0.2, mag * scaler));
+            con = Util.limit(con, Util.lerp(0.7, 0.2, mag * scaler));
             if (Constants.verboseLogging) Logger.recordOutput("Drive/Autolock Heading Output", con);
             runVelocity(drive(x_, y_, -con, throttle));
-          }
-        };
-
-    STRAFE_AUTOLOCK_NEW =
-        new State("STRAFE AUTOLOCK NEW") {
-          @Override
-          public void periodic() {
-            double throttle = 1.0;
-            throttle = Util.lerp(1, 0.4, OI.DR.getRightTriggerAxis() * OI.DR.getRightTriggerAxis());
-
-            double x_ = -OI.DR.getLeftY();
-            double y_ = -OI.DR.getLeftX();
-
-            double err =
-                Math.IEEEremainder(
-                    getPose().getRotation().getRotations() - autolockSetpoint_r, 1.0);
-
-            if (Constants.verboseLogging) Logger.recordOutput("Drive/Autolock Heading Error", err);
-            double con = Util.inRange(err, 0.1) ? 3.5 * err : 2 * err;
-            con = Util.limit(con, 0.6);
-            if (Constants.verboseLogging) Logger.recordOutput("Drive/Autolock Heading Output", con);
-            runVelocity(drive(x_, y_, con, throttle));
           }
         };
 

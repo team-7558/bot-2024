@@ -30,11 +30,18 @@ public class SS {
     INTAKING_DEEP,
     INTAKING_CORAL,
 
-    AMP_SCORING,
+    AMP_SCORING_UP,
+    AMP_SCORING_RELEASE,
+    AMP_SCORING_DOWN,
 
     AUTOPRECHAMBER,
     AUTOSHOOTING,
     AUTOCHAMBER,
+
+    GHOST,
+    PREUNCHAMBER,
+    UNCHAMBER,
+    PREP_AMP,
 
     PRECHAMBER,
     CHAMBER,
@@ -104,6 +111,9 @@ public class SS {
     Logger.recordOutput("SS/nextState", lastState);
     Logger.recordOutput("SS/stateTime", timer.get());
     Logger.recordOutput("SS/hasGamepiece", hasGamePiece);
+    Logger.recordOutput("SS/isInShooter", isInShooter());
+    Logger.recordOutput("SS/isAtTopIntake", isAtTopIntake());
+    Logger.recordOutput("SS/isAtBottomIntake", isAtBottomIntake());
     Logger.recordOutput("SS/Constrained", constrained);
   }
 
@@ -134,11 +144,7 @@ public class SS {
             elevator.setCurrentState(elevator.IDLE);
           }
         }
-        if (hasGamePiece) {
-          intake.setCurrentState(intake.GHOSTING);
-        } else {
-          intake.setCurrentState(intake.IDLE);
-        }
+        intake.setCurrentState(intake.IDLE);
 
         break;
       case BOOT:
@@ -200,14 +206,15 @@ public class SS {
           hasGamePiece = false;
         }
         break;
+      case PREP_AMP:
+        if (first) intake.setCurrentState(intake.AMP_READY);
+        break;
       case INTAKING_DEEP:
         if (intake.beamBroken()) {
           hasGamePiece = true;
         }
 
-        if (hasGamePiece && !intake.beamBroken()) {
-          intake.setCurrentState(intake.GHOSTING);
-        } else if (!hasGamePiece) {
+        if (!hasGamePiece) {
           intake.setCurrentState(intake.AMP_READY);
         }
 
@@ -231,22 +238,41 @@ public class SS {
         }
 
         break;
-      case AMP_SCORING:
+      case AMP_SCORING_UP:
         if (first) {
           elevator.setTargetHeight(Elevator.AMP_HEIGHT_M);
           elevator.setCurrentState(elevator.TRAVELLING);
         }
 
-        if (elevator.isState(elevator.HOLDING)) {
-          hasGamePiece = false;
+        break;
+      case AMP_SCORING_RELEASE:
+        if (first) {
           intake.setCurrentState(intake.AMP_SCORING);
+          hasGamePiece = false;
+        }
+
+        if (after(0.1)) {
+          queueState(State.AMP_SCORING_DOWN);
+        }
+
+        break;
+      case AMP_SCORING_DOWN:
+        if (first) {
+          elevator.setTargetHeight(Elevator.RESET_HEIGHT_M);
+          elevator.setCurrentState(elevator.TRAVELLING);
+          hasGamePiece = false;
+        }
+
+        if (after(0.1) && elevator.isState(elevator.HOLDING)) {
+          homedClimb = false;
+          queueState(State.RESETTING_ELEVATOR);
         }
 
         break;
 
       case SOURCE_FEEDING:
         if (first) {
-          elevator.setTargetHeight(elevator.MIN_HEIGHT_M + 0.115);
+          elevator.setTargetHeight(Elevator.MIN_HEIGHT_M + 0.115);
           elevator.setCurrentState(elevator.TRAVELLING);
         }
         if (intake.beamBroken()) {
@@ -323,6 +349,38 @@ public class SS {
           queueState(State.IDLE);
         }
         break;
+      case GHOST:
+        if (first) {
+          shooter.setCurrentState(shooter.TRACKING);
+          intake.setCurrentState(intake.GHOSTING);
+        }
+
+        if (isAtBottomIntake()) {
+          queueState(State.PRECHAMBER);
+        }
+        break;
+      case PREUNCHAMBER:
+        if (first) {
+          if (!isInShooter()) {
+            shooter.setCurrentState(shooter.TRACKING);
+          } else {
+            queueState(State.UNCHAMBER);
+          }
+        }
+
+        if (shooter.isTurretAtSetpoint(0.01) && shooter.isPivotAtSetpoint(0.01)) {
+          queueState(State.UNCHAMBER);
+        }
+        break;
+      case UNCHAMBER:
+        if (first) {
+          shooter.setCurrentState(shooter.REV_FEED);
+        }
+
+        if (isAtBottomIntake()) {
+          queueState(State.PREP_AMP);
+        }
+        break;
       case PRECHAMBER:
         if (first) {
           if (!shooter.beamBroken()) {
@@ -381,7 +439,7 @@ public class SS {
 
     boolean flash = Math.sin(timer.get() * 20) > 0.0 ? true : false;
 
-    if ((currState == State.INTAKING && hasGamePiece)
+    if (((currState == State.INTAKING || currState == State.INTAKING_DEEP) && hasGamePiece)
         || (currState == State.CHAMBER && intake.beamBroken())) {
       OI.DR.setRumble(RumbleType.kLeftRumble, 0.3);
       if (flash) {
@@ -420,11 +478,15 @@ public class SS {
   }
 
   public void idle() {
-    if (currState != State.IDLE && currState != State.BOOT) {
+    if (currState != State.IDLE && !resetting()) {
       if (currState == State.CLIMBING_UP) {
         queueState(State.CLIMBING_DOWN);
       } else if (currState == State.CLIMBING_DOWN) {
         // queueState(State.CLIMBING_DOWN);
+      } else if (currState == State.AMP_SCORING_UP) {
+        queueState(State.AMP_SCORING_RELEASE);
+      } else if (currState == State.AMP_SCORING_DOWN || currState == State.AMP_SCORING_RELEASE) {
+        // queueState(State.AMP_SCORING_DOWN);
       } else if (!elevator.atHeight(Elevator.MIN_HEIGHT_M, 0.01)) {
         queueState(State.RESETTING_ELEVATOR);
       } else {
@@ -447,77 +509,100 @@ public class SS {
   }
 
   public void shooterSpit() {
-    if (currState != State.BOOT) {
+    if (!resetting()) {
       queueState(State.SHOOTER_SPIT);
     }
   }
 
   public void spit() {
-    if (currState != State.BOOT) {
+    if (!resetting()) {
       queueState(State.SPITTING);
     }
   }
 
   public void intake() {
-    if (currState != State.BOOT) {
-      queueState(State.INTAKING);
-    }
-  }
+    if (!resetting() && currState != State.PREUNCHAMBER && currState != State.UNCHAMBER) {
 
-  public void amp() {
-    if (currState != State.BOOT) {
-      if (hasGamePiece()) {
-        queueState(State.AMP_SCORING);
+      /*if (isInShooter()) {
+        Setpoints s = new Setpoints().copy(shooter.getCurrSetpoints());
+        s.turretPos_r = 0;
+        s.pivotPos_r = Shooter.PIVOT_MIN_FEED_POS_r;
+        queueSetpoints(s);
+        queueState(State.PREUNCHAMBER);
+      } else*/ if (hasGamePiece) {
+        queueState(State.PREP_AMP);
       } else {
         queueState(State.INTAKING_DEEP);
       }
     }
   }
 
+  public void amp() {
+    if (!resetting() && currState != State.AMP_SCORING_UP) {
+      queueState(State.AMP_SCORING_UP);
+    }
+  }
+
   public void chamber() {
-    if (currState != State.BOOT && currState != State.CHAMBER && currState != State.PRECHAMBER) {
-      if (shooter.beamBroken()) {
+    if (!resetting() && currState != State.CHAMBER && currState != State.PRECHAMBER) {
+      if (isInShooter()) {
         queueState(State.IDLE);
+      } else if (isAtTopIntake()) {
+        queueState(State.GHOST);
       } else {
-        queueSetpoints(new Setpoints(0, 0, 0, Shooter.PIVOT_MIN_FEED_POS_r));
+        Setpoints s = new Setpoints().copy(shooter.getCurrSetpoints());
+        s.turretPos_r = 0;
+        s.pivotPos_r = Shooter.PIVOT_MIN_FEED_POS_r;
+        queueSetpoints(s);
         queueState(State.PRECHAMBER);
       }
     }
   }
 
   public void shoot() {
-    if (currState != State.BOOT) {
+    if (!resetting()) {
       queueState(State.SHOOTING);
     }
   }
 
   public void autoShoot() {
-    if (currState != State.BOOT) {
+    if (!resetting()) {
       queueState(State.AUTOSHOOTING);
     }
   }
 
   public void track() {
-    if (currState != State.BOOT) {
+    if (!resetting()) {
       queueState(State.TRACKING);
     }
   }
 
   public void sourceFeed() {
-    if (currState != State.BOOT) {
+    if (!resetting()) {
       queueState(State.SOURCE_FEEDING);
     }
   }
 
   public void sourceShoot() {
-    if (currState != State.BOOT) {
+    if (!resetting()) {
       queueState(State.SOURCE_SHOOTING);
     }
   }
 
   public void trackFromPose() {
-    if (currState != State.BOOT) {
+    if (!resetting()) {
       queueSetpointsLive();
+      queueState(State.TRACKING);
+    }
+  }
+
+  public void limelightTrack() {
+    if (!resetting()) {
+      shooter.setTargetMode(TargetMode.SPEAKER);
+      Setpoints ps = shooter.limelightPipeline();
+      Setpoints cs = shooter.constrainSetpoints(ps, false, false);
+      shooter.queueSetpoints(cs);
+      constrained = !cs.equals(ps);
       queueState(State.TRACKING);
     }
   }
@@ -601,6 +686,24 @@ public class SS {
     Setpoints cs = shooter.constrainSetpoints(ps, false, false);
     shooter.queueSetpoints(cs);
     constrained = !cs.equals(ps);
+  }
+
+  public boolean isInShooter() {
+    return hasGamePiece && shooter.beamBroken() || shooter.beamBrokenIn();
+  }
+
+  public boolean isAtBottomIntake() {
+    return hasGamePiece && intake.beamBroken();
+  }
+
+  public boolean isAtTopIntake() {
+    return hasGamePiece
+        && !intake.beamBroken()
+        && !(shooter.beamBroken() || shooter.beamBrokenIn());
+  }
+
+  public boolean resetting() {
+    return currState == State.BOOT || currState == State.RESETTING_ELEVATOR;
   }
 
   public void resetHomingFlags() {

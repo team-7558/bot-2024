@@ -30,8 +30,6 @@ import frc.robot.OI;
 import frc.robot.SS2d;
 import frc.robot.subsystems.StateMachineSubsystemBase;
 import frc.robot.subsystems.drive.Drive;
-import frc.robot.subsystems.vision.limelight.LimelightIO;
-import frc.robot.subsystems.vision.limelight.LimelightIOInputsAutoLogged;
 import frc.robot.util.LerpTable;
 import frc.robot.util.Util;
 import java.io.BufferedReader;
@@ -42,8 +40,12 @@ public class Shooter extends StateMachineSubsystemBase {
 
   private static double HEIGHT_M = -0.1;
 
+  public static final double LIMELIGHT_ANGLE = Units.degreesToRadians(30);
+  public static final double TARGET_HEIGHT = getTargetHeight();
+  public static final double LIMELIGHT_HEIGHT = Units.inchesToMeters(11);
+
   public static final double TURRET_ZERO_POS = 0.2506;
-  public static final double PIVOT_ZERO_POS = 0.016666;
+  public static final double PIVOT_ZERO_POS = 0.01944; // 0.016666;
 
   public static final double FEEDER_MIN_VEL_rps = 0, FEEDER_MAX_VEL_rps = 50;
   public static final double FLYWHEEL_MIN_VEL_rps = 0, FLYWHEEL_MAX_VEL_rps = 50;
@@ -58,6 +60,8 @@ public class Shooter extends StateMachineSubsystemBase {
   private static LerpTable shotTimesFromDistance = new LerpTable("shottimes.lerp").compile();
   ;
   private static LerpTable shotSpeedFromDistance = new LerpTable("shotspeeds.lerp").compile();
+
+  public static LerpTable pivotHeightFromDistance = new LerpTable("pivotheights.lerp").compile();
 
   private static LerpTable turretConstraintsFromPivotPos =
       new LerpTable("turretConstraintsFromPivotPos.lerp").compile();
@@ -141,16 +145,16 @@ public class Shooter extends StateMachineSubsystemBase {
     if (instance == null) {
       switch (Constants.currentMode) {
         case REAL:
-          instance = new Shooter(new ShooterIOTalonFx());
+          instance = new Shooter(new ShooterIOTalonFx(), new TurretCamIOReal());
           break;
         case SIM:
           // Sim robot, instantiate physics sim IO implementations
-          instance = new Shooter(new ShooterIOIdeal());
+          instance = new Shooter(new ShooterIOIdeal(), new TurretCamIO() {});
           break;
 
         default:
           // Replayed robot, disable IO implementations
-          instance = new Shooter(new ShooterIO() {});
+          instance = new Shooter(new ShooterIO() {}, new TurretCamIO() {});
           break;
       }
     }
@@ -165,15 +169,16 @@ public class Shooter extends StateMachineSubsystemBase {
       SHOOTING,
       BEING_FED,
       FAST_FEED,
+      REV_FEED,
       ZEROING,
       MANUAL,
       SOURCE_FEEDING,
       SPITTING;
   private final ShooterIOInputsAutoLogged inputs = new ShooterIOInputsAutoLogged();
 
-  private final LimelightIO limelightIO;
+  private final TurretCamIO llIO;
 
-  private final LimelightIOInputsAutoLogged limelightInputs = new LimelightIOInputsAutoLogged();
+  private final TurretCamIOInputsAutoLogged llInputs = new TurretCamIOInputsAutoLogged();
 
   private final ShooterIO io;
 
@@ -198,11 +203,11 @@ public class Shooter extends StateMachineSubsystemBase {
   // degrees turret so 90 seems like it would be ok
 
   /** Creates a new Flywheel. */
-  private Shooter(ShooterIO io) {
+  private Shooter(ShooterIO io, TurretCamIO llIO) {
     super("Shooter");
 
-    this.limelightIO = new LimelightIO() {};
     this.io = io;
+    this.llIO = llIO;
     // Switch constants based on mode (the physics simulator is treated as a
     // separate robot with different tuning)
 
@@ -309,6 +314,18 @@ public class Shooter extends StateMachineSubsystemBase {
               queueSetpoints(new Setpoints(Setpoints.DEFAULT, 2.5, 0, PIVOT_MIN_POS_r));
               track();
             }
+          }
+        };
+
+    REV_FEED =
+        new State("REV_FEED") {
+          @Override
+          public void init() {}
+
+          @Override
+          public void periodic() {
+            queueSetpoints(new Setpoints(Setpoints.DEFAULT, -8.5, 0, PIVOT_MIN_POS_r));
+            track();
           }
         };
 
@@ -428,9 +445,9 @@ public class Shooter extends StateMachineSubsystemBase {
   @Override
   public void inputPeriodic() {
     io.updateInputs(inputs);
-    limelightIO.updateInputs(limelightInputs);
+    llIO.updateInputs(llInputs);
     Logger.processInputs("Shooter", inputs);
-    Logger.processInputs("Limelight", limelightInputs);
+    Logger.processInputs("TurretCam", llInputs);
   }
 
   @Override
@@ -479,22 +496,53 @@ public class Shooter extends StateMachineSubsystemBase {
     return targetMode;
   }
 
+  public static double getTargetHeight() {
+    return G.isRedAlliance() ? Units.inchesToMeters(57.13) : 0; // TODO: find for blue
+  }
+
   public void setTargetMode(TargetMode mode) {
     targetMode = mode;
   }
 
-  public void limelightPipeline() {
+  public Setpoints limelightPipeline() {
     TargetMode targetMode = this.targetMode;
 
     if (targetMode == TargetMode.SPEAKER) {
-      double tid = limelightInputs.tid;
-      if (tid == 4 || tid == 3) {
-        double tx = limelightInputs.tx;
-        double ty = limelightInputs.ty;
+      double tid = llInputs.tid;
+      if (tid == 4 || tid == 7) {
+        double kP = 0.45;
+
+        double tx = llInputs.tx;
+        double ty = llInputs.ty;
+
+        if (Math.abs(tx) < 0.2 || llInputs.tx == 0) {
+          return new Setpoints(
+              lastSetpoints.flywheel_rps,
+              lastSetpoints.feederVel_rps,
+              lastSetpoints.turretPos_r,
+              lastSetpoints.pivotPos_r);
+        }
+
+        double angleToGoal = LIMELIGHT_ANGLE + Units.degreesToRadians(ty);
+
+        // TODO: fix target height for blue side
+
+        double distToTarget = (TARGET_HEIGHT - LIMELIGHT_HEIGHT) / Math.tan(angleToGoal);
+
+        double flywheelRps = shotSpeedFromDistance.calcY(distToTarget);
+        double turretPos = inputs.turretPosR - Units.degreesToRotations(tx * kP);
+
+        double pivotHeight_r = pivotHeightFromDistance.calcY(distToTarget);
+
+        Logger.recordOutput("Shooter/TargetDist", distToTarget);
+
+        return constrainSetpoints(
+            new Setpoints(flywheelRps, 0, turretPos, pivotHeight_r), false, false);
       }
     } else if (targetMode == TargetMode.TRAP) {
 
     }
+    return lastSetpoints;
   }
 
   private void track() {
@@ -828,5 +876,9 @@ public class Shooter extends StateMachineSubsystemBase {
 
   public void setManualPivotVel(double vel_rps) {
     manualPivotVel = vel_rps;
+  }
+
+  public Setpoints getCurrSetpoints() {
+    return currSetpoints;
   }
 }

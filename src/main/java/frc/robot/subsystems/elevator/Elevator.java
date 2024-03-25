@@ -18,7 +18,7 @@ public class Elevator extends StateMachineSubsystemBase {
   public static final double STROKE_M = MAX_HEIGHT_M - MIN_HEIGHT_M;
 
   public static final double INTAKE_HEIGHT_M = MIN_HEIGHT_M;
-  public static final double RESET_HEIGHT_M = MIN_HEIGHT_M + 0.04;
+  public static final double RESET_HEIGHT_M = MIN_HEIGHT_M + 0.01;
   public static final double MIN_FEED_HEIGHT_M = MIN_HEIGHT_M;
   public static final double MAX_FEED_HEIGHT_M = MIN_HEIGHT_M;
   public static final double AMP_HEIGHT_M =

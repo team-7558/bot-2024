@@ -4,6 +4,8 @@
 
 package frc.robot.subsystems.intake;
 
+import edu.wpi.first.math.filter.Debouncer;
+import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import frc.robot.Constants;
 import frc.robot.SS2d;
 import frc.robot.subsystems.StateMachineSubsystemBase;
@@ -94,17 +96,11 @@ public class Intake extends StateMachineSubsystemBase {
     GHOSTING =
         new State("GHOSTING") {
           @Override
-          public void init() {
-            directionSpeed = 0;
-            intakeSpeed = 0;
-          }
-
-          @Override
           public void periodic() {
             if (beamBroken()) stop();
             else {
-              intakeSpeed = -0.0;
-              directionSpeed = -0.0;
+              intakeSpeed = -0.2;
+              directionSpeed = -0.2;
             }
           }
         };
@@ -129,10 +125,27 @@ public class Intake extends StateMachineSubsystemBase {
 
     AMP_READY =
         new State("AMP_READY") {
+          boolean tripped;
+          Debouncer db = new Debouncer(0.02, DebounceType.kFalling);
+
+          @Override
+          public void init() {
+            tripped = false;
+          }
+
           @Override
           public void periodic() {
-            intakeSpeed = beamBroken() ? 0.7 : 0.50;
-            directionSpeed = beamBroken() ? 0.7 : 0.50;
+            if (beamBroken()) {
+              tripped = true;
+            }
+
+            if (tripped && !db.calculate(beamBroken())) {
+              intakeSpeed = 0;
+              directionSpeed = 0;
+            } else {
+              intakeSpeed = tripped ? 0.4 : 0.70;
+              directionSpeed = tripped ? 0.4 : 0.70;
+            }
           }
         };
 
@@ -140,7 +153,7 @@ public class Intake extends StateMachineSubsystemBase {
         new State("AMP_SCORING") {
           @Override
           public void init() {
-            directionSpeed = 0.45; // 0.39 works on comp amp
+            directionSpeed = 0.65; // 0.39 works on comp amp
             intakeSpeed = 0.2;
           }
         };
@@ -148,32 +161,32 @@ public class Intake extends StateMachineSubsystemBase {
         new State("SHOOTER_SIDE") {
           @Override
           public void init() {
-            directionSpeed = -0.32;
-            intakeSpeed = 0.32;
+            directionSpeed = -0.38;
+            intakeSpeed = 0.38;
           }
         };
     FAST_FEED =
         new State("FAST_FEED") {
           @Override
           public void init() {
-            directionSpeed = -0.49;
-            intakeSpeed = 0.49;
+            directionSpeed = -0.59;
+            intakeSpeed = 0.69;
           }
         };
     FEEDING =
         new State("FEEDING") {
           @Override
           public void init() {
-            directionSpeed = -0.48;
-            intakeSpeed = 0.33;
+            directionSpeed = -0.5;
+            intakeSpeed = 0.5;
           }
         };
     SPITTING =
         new State("SPITTING") {
           @Override
           public void init() {
-            intakeSpeed = -0.25;
-            directionSpeed = -0.25;
+            intakeSpeed = 0.25;
+            directionSpeed = 0.25;
           }
         };
     SOURCE_FEEDING =
