@@ -22,6 +22,6 @@ public interface TurretCamIO {
   enum Pipeline {
     NEAR,
     FAR,
-    AMP
+    TRAP
   }
 }

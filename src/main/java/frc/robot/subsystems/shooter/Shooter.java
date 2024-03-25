@@ -30,6 +30,7 @@ import frc.robot.OI;
 import frc.robot.SS2d;
 import frc.robot.subsystems.StateMachineSubsystemBase;
 import frc.robot.subsystems.drive.Drive;
+import frc.robot.subsystems.shooter.TurretCamIO.Pipeline;
 import frc.robot.util.LerpTable;
 import frc.robot.util.Util;
 import java.io.BufferedReader;
@@ -198,6 +199,9 @@ public class Shooter extends StateMachineSubsystemBase {
 
   private double manualTurretVel = 0;
   private double manualPivotVel = 0;
+
+  private boolean ll_enabled = true;
+  private boolean mws_enabled = false;
 
   // hoodangle at 1 rad because angle of hood at max height is around 60 degrees, turret is 180
   // degrees turret so 90 seems like it would be ok
@@ -479,6 +483,14 @@ public class Shooter extends StateMachineSubsystemBase {
   public void stop() {
     // queueSetpoints(new Setpoints(0, 0));
     io.stop();
+  }
+
+  public void toggleCamera(){
+    ll_enabled = !ll_enabled;
+  }  
+
+  public void toggleMovingWhileShooting(){
+    mws_enabled = !mws_enabled;
   }
 
   public void toggleBrake() {
@@ -788,6 +800,23 @@ public class Shooter extends StateMachineSubsystemBase {
     Setpoints newSetpoints = new Setpoints().copy(s);
     newSetpoints.turretPos_r += rotErr;
     return newSetpoints;
+  }
+
+  public Setpoints llTakeover(Setpoints s, Pipeline p){
+    if(ll_enabled && llInputs.connected && llInputs.tv){
+      Setpoints ns = new Setpoints().copy(s);
+
+      if(p == Pipeline.TRAP){       
+      } else {
+        if((G.isRedAlliance() && llInputs.tid == 4) || (!G.isRedAlliance() && llInputs.tid == 7)){
+          ns.turretPos_r -= llInputs.tx;
+        }
+      }
+
+      return ns;
+    } else {
+      return s;
+    }
   }
 
   public Setpoints shooterPipeline() {
