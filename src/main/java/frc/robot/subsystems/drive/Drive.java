@@ -13,6 +13,9 @@
 
 package frc.robot.subsystems.drive;
 
+import com.pathplanner.lib.controllers.PPHolonomicDriveController;
+import com.pathplanner.lib.path.PathConstraints;
+import com.pathplanner.lib.path.PathPlannerTrajectory;
 import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
 import com.pathplanner.lib.util.PIDConstants;
 import com.pathplanner.lib.util.PathPlannerLogging;
@@ -135,7 +138,13 @@ public class Drive extends StateMachineSubsystemBase {
     public double[] timestamps = new double[] {};
   }
 
-  public final State DISABLED, SHOOTING, PATHING, STRAFE_N_TURN, STRAFE_AUTOLOCK, INTAKING;
+  public final State DISABLED,
+      SHOOTING,
+      PATHING,
+      STRAFE_N_TURN,
+      STRAFE_AUTOLOCK,
+      INTAKING,
+      AMP_SCORING;
 
   // IO
   private final GyroIO gyroIO;
@@ -146,6 +155,8 @@ public class Drive extends StateMachineSubsystemBase {
 
   private SwerveDriveWheelPositions lastPositions = null;
   private double lastTime = 0.0;
+
+  public static final Pose2d AMP_SCORING_POSE = getAmpPose();
 
   private final ObjectDetectorIO llIO;
   private final ObjectDetectorIOInputsAutoLogged llInputs = new ObjectDetectorIOInputsAutoLogged();
@@ -292,6 +303,43 @@ public class Drive extends StateMachineSubsystemBase {
             runVelocity(rrSpeeds);
           }
         };
+    AMP_SCORING =
+        new State("AMP_SCORING") {
+          PPHolonomicDriveController con =
+              new PPHolonomicDriveController(
+                  Drive.HPFG.translationConstants,
+                  Drive.HPFG.rotationConstants,
+                  Constants.globalDelta_sec,
+                  Drive.MAX_LINEAR_SPEED_MPS,
+                  Drive.DRIVE_BASE_RADIUS);
+
+          @Override
+          public void init() {}
+
+          @Override
+          public void periodic() {
+            if (closeToPose(
+                Drive.AMP_SCORING_POSE, new Pose2d(0.05, 0.05, Rotation2d.fromDegrees(1)))) {}
+
+            PathPlannerTrajectory.State state = new PathPlannerTrajectory.State();
+            state.accelerationMpsSq = 0;
+            state.constraints =
+                new PathConstraints(3.0, 1.5, MAX_ANGULAR_SPEED_RADPS, MAX_ANGULAR_SPEED_RADPS / 2);
+            state.curvatureRadPerMeter = 0;
+            state.velocityMps = 0;
+            state.targetHolonomicRotation = AMP_SCORING_POSE.getRotation();
+            state.positionMeters = AMP_SCORING_POSE.getTranslation();
+
+            ChassisSpeeds speedsNeeded = con.calculateRobotRelativeSpeeds(getPose(), state);
+            System.out.println(
+                speedsNeeded.vxMetersPerSecond + " " + speedsNeeded.vyMetersPerSecond);
+            runVelocity(speedsNeeded);
+          }
+
+          public void exit() {
+            runVelocity(new ChassisSpeeds());
+          }
+        };
     setCurrentState(DISABLED);
 
     resetPose();
@@ -392,7 +440,6 @@ public class Drive extends StateMachineSubsystemBase {
 
     // Be wary about using Timer.getFPGATimestamp in AK
 
-    chassisSpeeds = getFieldRelativeSpeeds();
     Logger.recordOutput("Drive/Speeds", chassisSpeeds);
   }
 
@@ -494,6 +541,16 @@ public class Drive extends StateMachineSubsystemBase {
     for (int i = 0; i < 4; i++) {
       modules[i].runCharacterization(volts);
     }
+  }
+
+  public boolean closeToPose(Pose2d reference, Pose2d tolerance) {
+    Pose2d m_poseError = reference.relativeTo(getPose());
+    Rotation2d m_rotationError = reference.getRotation().minus(getPose().getRotation());
+    final var eTranslate = m_poseError.getTranslation();
+    final var eRotate = m_rotationError;
+    return Math.abs(eTranslate.getX()) < tolerance.getX()
+        && Math.abs(eTranslate.getY()) < tolerance.getY()
+        && Math.abs(eRotate.getRadians()) < tolerance.getRotation().getRadians();
   }
 
   /** Returns the average drive velocity in radians/sec. */
@@ -605,11 +662,14 @@ public class Drive extends StateMachineSubsystemBase {
 
   /** Returns field relative chassis speeds * */
   public ChassisSpeeds getFieldRelativeSpeeds() {
-    return ChassisSpeeds.fromRobotRelativeSpeeds(
-        chassisSpeeds.vxMetersPerSecond,
-        chassisSpeeds.vyMetersPerSecond,
-        chassisSpeeds.omegaRadiansPerSecond,
-        getRotation());
+    return ChassisSpeeds.fromRobotRelativeSpeeds(getChassisSpeedsFromModuleStates(), getRotation());
+  }
+
+  public static Pose2d getAmpPose() {
+    return G.isRedAlliance()
+        ? new Pose2d(1.76, 7.71, Rotation2d.fromDegrees(90))
+        : new Pose2d(1.76, 7.71, Rotation2d.fromDegrees(90));
+    // TODO: fill
   }
 
   /** Returns an array of module translations. */
