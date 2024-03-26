@@ -4,6 +4,8 @@ import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Transform3d;
+import frc.robot.subsystems.drive.Drive;
+
 import java.io.IOException;
 import java.util.Queue;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -30,9 +32,6 @@ public class VisionIOPhoton implements ApriltagIO {
   public VisionIOPhoton(String camname, Transform3d camToRobot) {
     this.camera = new PhotonCamera(camname);
 
-    // this is a listener for any changes on the photonvision networktable. might need to change
-    // this later. this is async
-    // maybe change this to just a while true loop in a thread
     try {
       fieldLayout =
           AprilTagFieldLayout.loadFromResource(AprilTagFields.k2024Crescendo.m_resourceFile);
@@ -41,8 +40,8 @@ public class VisionIOPhoton implements ApriltagIO {
       e.printStackTrace();
     }
     this.poseEstimator =
-        new PhotonPoseEstimator(fieldLayout, PoseStrategy.LOWEST_AMBIGUITY, camToRobot);
-    this.poseEstimator.setMultiTagFallbackStrategy(PoseStrategy.LOWEST_AMBIGUITY);
+        new PhotonPoseEstimator(fieldLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, camToRobot);
+    this.poseEstimator.setMultiTagFallbackStrategy(PoseStrategy.CLOSEST_TO_REFERENCE_POSE);
     this.transform = camToRobot;
     thread = new VisionProcessingThread(this);
   }
@@ -81,6 +80,7 @@ public class VisionIOPhoton implements ApriltagIO {
     }
     inputs.tids = result;
     inputs.pipelineID = camera.getPipelineIndex();
+    poseEstimator.setReferencePose(Drive.getInstance().getPose());
   }
 
   @Override
