@@ -215,10 +215,10 @@ public class Robot extends LoggedRobot {
               Rotation2d.fromRotations(G.isRedAlliance() ? 0.5 : 0)));
     }
 
-    if (OI.XK.get(5, 3)) {
+    if (OI.XK.get(1, 5)) {
       LED.getInstance().drawRow(0, 128, 128, 0);
       LED.getInstance().setBlinkin(0.71);
-    } else if (OI.XK.get(6, 3)) {
+    } else if (OI.XK.get(2, 5)) {
       LED.getInstance().drawRow(0, 128, 0, 128);
       LED.getInstance().setBlinkin(0.91);
     } else if (shooter.beamBroken()
@@ -273,7 +273,6 @@ public class Robot extends LoggedRobot {
     if (autonomousCommand != null) {
       autonomousCommand.cancel();
     }
-
   }
 
   /** This function is called periodically during operator control. */

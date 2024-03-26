@@ -46,7 +46,7 @@ public class Shooter extends StateMachineSubsystemBase {
   public static final double LIMELIGHT_HEIGHT = Units.inchesToMeters(11);
 
   public static final double TURRET_ZERO_POS = 0.2506;
-  public static final double PIVOT_ZERO_POS = 0.01944; // 0.016666;
+  public static final double PIVOT_ZERO_POS = 0.016666;
 
   public static final double FEEDER_MIN_VEL_rps = 0, FEEDER_MAX_VEL_rps = 50;
   public static final double FLYWHEEL_MIN_VEL_rps = 0, FLYWHEEL_MAX_VEL_rps = 50;
@@ -370,6 +370,7 @@ public class Shooter extends StateMachineSubsystemBase {
           @Override
           public void init() {
             ShotLogger.log();
+            llIO.snapshot();
           }
 
           @Override
@@ -410,7 +411,7 @@ public class Shooter extends StateMachineSubsystemBase {
                   setCurrentState(IDLE);
                 }
               } else {
-                if (OI.XK.get(3, 7)) {
+                if (OI.XK.get(8, 0)) {
                   io.setTurretVolts(-0.5);
                 } else {
                   io.setTurretVolts(0.5);
@@ -485,11 +486,15 @@ public class Shooter extends StateMachineSubsystemBase {
     io.stop();
   }
 
-  public void toggleCamera(){
-    ll_enabled = !ll_enabled;
-  }  
+  public void setLLPipeline(Pipeline p) {
+    llIO.setPipeline(p);
+  }
 
-  public void toggleMovingWhileShooting(){
+  public void toggleCamera() {
+    ll_enabled = !ll_enabled;
+  }
+
+  public void toggleMovingWhileShooting() {
     mws_enabled = !mws_enabled;
   }
 
@@ -802,14 +807,14 @@ public class Shooter extends StateMachineSubsystemBase {
     return newSetpoints;
   }
 
-  public Setpoints llTakeover(Setpoints s, Pipeline p){
-    if(ll_enabled && llInputs.connected && llInputs.tv){
+  public Setpoints llTakeover(Setpoints s, Pipeline p) {
+    if (ll_enabled && llInputs.connected && llInputs.tv) {
       Setpoints ns = new Setpoints().copy(s);
 
-      if(p == Pipeline.TRAP){       
+      if (p == Pipeline.TRAP) {
       } else {
-        if((G.isRedAlliance() && llInputs.tid == 4) || (!G.isRedAlliance() && llInputs.tid == 7)){
-          ns.turretPos_r -= llInputs.tx;
+        if ((G.isRedAlliance() && llInputs.tid == 4) || (!G.isRedAlliance() && llInputs.tid == 7)) {
+          ns.turretPos_r -= Units.degreesToRotations(llInputs.tx);
         }
       }
 

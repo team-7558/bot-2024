@@ -12,6 +12,7 @@ import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.subsystems.shooter.Shooter.Setpoints;
 import frc.robot.subsystems.shooter.Shooter.TargetMode;
 import frc.robot.subsystems.shooter.ShotPresets;
+import frc.robot.subsystems.shooter.TurretCamIO.Pipeline;
 import frc.robot.util.Util;
 import org.littletonrobotics.junction.Logger;
 
@@ -565,7 +566,7 @@ public class SS {
 
   public void chamber() {
     if (!resetting() && currState != State.CHAMBER && currState != State.PRECHAMBER) {
-      if (isInShooter()) {
+      if (shooter.beamBroken()) {
         queueState(State.IDLE);
       } else if (isAtTopIntake()) {
         queueState(State.GHOST);
@@ -620,20 +621,23 @@ public class SS {
     if (!resetting()) {
       shooter.setTargetMode(TargetMode.SPEAKER);
       Setpoints ps = shooter.limelightPipeline();
-      Setpoints cs = shooter.constrainSetpoints(ps, false, false);
+      Setpoints cs =
+          shooter.constrainSetpoints(ps, !shooter.beamBroken() || !shooter.beamBrokenIn(), false);
       shooter.queueSetpoints(cs);
       constrained = !cs.equals(ps);
       queueState(State.TRACKING);
     }
   }
 
-  public void trackPreset(Setpoints s, boolean adjust) {
+  public void trackPreset(Setpoints s, Pipeline p, boolean adjust) {
     if (currState != State.BOOT) {
+      shooter.setLLPipeline(p);
       Setpoints sp = adjust ? shooter.adjustPreset(s) : s;
       if (shooter.beamBroken()) {
         Setpoints cs = shooter.constrainSetpoints(sp, false, false);
         shooter.queueSetpoints(cs);
         constrained = !cs.equals(sp);
+
         queueState(State.TRACKING);
       } else if (currState != State.CHAMBER && currState != State.PRECHAMBER) {
         Setpoints cs = shooter.constrainSetpoints(sp, true, false);
@@ -644,14 +648,20 @@ public class SS {
         Setpoints cs = shooter.constrainSetpoints(sp, true, false);
         shooter.queueSetpoints(cs);
         constrained = !cs.equals(sp);
+      } else if (isAtTopIntake()) {
+        Setpoints cs = shooter.constrainSetpoints(sp, true, false);
+        shooter.queueSetpoints(cs);
+        constrained = !cs.equals(sp);
+        queueState(State.GHOST);
       }
     }
   }
 
   public void autoPreset(Setpoints s) {
     if (currState != State.BOOT) {
+      shooter.setLLPipeline(Pipeline.FAR);
       if (shooter.beamBroken()) {
-        trackPreset(shooter.constrainSetpoints(s, false, false), true);
+        trackPreset(shooter.constrainSetpoints(s, false, false), Pipeline.FAR, true);
       } else if (currState != State.AUTOCHAMBER && currState != State.AUTOPRECHAMBER) {
         queueState(State.AUTOPRECHAMBER);
       }
