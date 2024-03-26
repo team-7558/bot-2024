@@ -814,7 +814,15 @@ public class Shooter extends StateMachineSubsystemBase {
       if (p == Pipeline.TRAP) {
       } else {
         if ((G.isRedAlliance() && llInputs.tid == 4) || (!G.isRedAlliance() && llInputs.tid == 7)) {
-          ns.turretPos_r -= Units.degreesToRotations(llInputs.tx);
+
+          double angleToGoal = LIMELIGHT_ANGLE + Units.degreesToRadians(llInputs.ty);
+
+          double distToTarget = (TARGET_HEIGHT - LIMELIGHT_HEIGHT) / Math.tan(angleToGoal);
+          Logger.recordOutput("Shooter/TargetDist", distToTarget);
+
+          ns.flywheel_rps = shotSpeedFromDistance.calcY(distToTarget);
+          ns.turretPos_r -= llInputs.tx;
+          ns.pivotPos_r = pivotHeightFromDistance.calcY(distToTarget);
         }
       }
 

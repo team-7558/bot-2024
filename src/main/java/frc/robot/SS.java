@@ -632,13 +632,20 @@ public class SS {
   public void trackPreset(Setpoints s, Pipeline p, boolean adjust) {
     if (currState != State.BOOT) {
       shooter.setLLPipeline(p);
+      shooter.setTargetMode(TargetMode.SPEAKER);
       Setpoints sp = adjust ? shooter.adjustPreset(s) : s;
+
       if (shooter.beamBroken()) {
         Setpoints cs = shooter.constrainSetpoints(sp, false, false);
         shooter.queueSetpoints(cs);
         constrained = !cs.equals(sp);
 
         queueState(State.TRACKING);
+      } else if (isAtTopIntake()) {
+        Setpoints cs = shooter.constrainSetpoints(sp, true, false);
+        shooter.queueSetpoints(cs);
+        constrained = !cs.equals(sp);
+        queueState(State.GHOST);
       } else if (currState != State.CHAMBER && currState != State.PRECHAMBER) {
         Setpoints cs = shooter.constrainSetpoints(sp, true, false);
         shooter.queueSetpoints(cs);
