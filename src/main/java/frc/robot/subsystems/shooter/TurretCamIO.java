@@ -7,6 +7,8 @@ public interface TurretCamIO {
   public static class TurretCamIOInputs {
     public boolean connected = false;
     public boolean tv = false;
+    public double latency = 0.0;
+    public int ids = 0;
     public double tx = 0.0;
     public double ty = 0.0;
     public double ta = 0.0;

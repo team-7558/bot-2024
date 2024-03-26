@@ -485,11 +485,11 @@ public class Shooter extends StateMachineSubsystemBase {
     io.stop();
   }
 
-  public void toggleCamera(){
+  public void toggleCamera() {
     ll_enabled = !ll_enabled;
-  }  
+  }
 
-  public void toggleMovingWhileShooting(){
+  public void toggleMovingWhileShooting() {
     mws_enabled = !mws_enabled;
   }
 
@@ -802,14 +802,22 @@ public class Shooter extends StateMachineSubsystemBase {
     return newSetpoints;
   }
 
-  public Setpoints llTakeover(Setpoints s, Pipeline p){
-    if(ll_enabled && llInputs.connected && llInputs.tv){
+  public Setpoints llTakeover(Setpoints s, Pipeline p) {
+    if (ll_enabled && llInputs.connected && llInputs.tv) {
       Setpoints ns = new Setpoints().copy(s);
 
-      if(p == Pipeline.TRAP){       
+      if (p == Pipeline.TRAP) {
       } else {
-        if((G.isRedAlliance() && llInputs.tid == 4) || (!G.isRedAlliance() && llInputs.tid == 7)){
+        if ((G.isRedAlliance() && llInputs.tid == 4) || (!G.isRedAlliance() && llInputs.tid == 7)) {
+
+          double angleToGoal = LIMELIGHT_ANGLE + Units.degreesToRadians(llInputs.ty);
+
+          double distToTarget = (TARGET_HEIGHT - LIMELIGHT_HEIGHT) / Math.tan(angleToGoal);
+          Logger.recordOutput("Shooter/TargetDist", distToTarget);
+
+          ns.flywheel_rps = shotSpeedFromDistance.calcY(distToTarget);
           ns.turretPos_r -= llInputs.tx;
+          ns.pivotPos_r = pivotHeightFromDistance.calcY(distToTarget);
         }
       }
 

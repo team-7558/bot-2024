@@ -7,7 +7,10 @@ package frc.robot.subsystems.shooter;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
-import frc.robot.G;
+import edu.wpi.first.wpilibj.Preferences;
+import frc.robot.util.LimelightHelpers;
+import frc.robot.util.LimelightHelpers.LimelightResults;
+import frc.robot.util.LimelightHelpers.LimelightTarget_Fiducial;
 
 /** Add your docs here. */
 public class TurretCamIOReal implements TurretCamIO {
@@ -18,33 +21,46 @@ public class TurretCamIOReal implements TurretCamIO {
   NetworkTableEntry ty = table.getEntry("ty");
   NetworkTableEntry ta = table.getEntry("ta");
   NetworkTableEntry tid = table.getEntry("tid");
-  NetworkTableEntry pipeline = table.getEntry("pipeline");
   NetworkTableEntry sc = table.getEntry("snapshot");
+
+  LimelightResults res;
 
   @Override
   public void updateInputs(TurretCamIOInputs inputs) {
+    res = LimelightHelpers.getLatestResults("");
+
+    LimelightTarget_Fiducial[] fids = res.targetingResults.targets_Fiducials;
+
+    boolean v = res.targetingResults.valid;
+
     inputs.connected = true;
-    inputs.tv = tv.getDouble(0) != 0 ? true : false;
-    inputs.tx = tx.getDouble(0);
-    inputs.ty = ty.getDouble(0);
-    inputs.ta = ta.getDouble(0);
-    inputs.tid = tid.getDouble(0);
-    sc.setDouble(0);
+    inputs.tv = v;
+    inputs.latency =
+        res.targetingResults.latency_pipeline
+            + res.targetingResults.latency_capture
+            + res.targetingResults.latency_jsonParse;
+    inputs.ids = fids.length;
+    inputs.tx = v ? fids[0].tx : 0;
+    inputs.ty = v ? fids[0].ty : 0;
+    inputs.ta = v ? fids[0].ta : 0;
+    inputs.tid = v ? fids[0].fiducialID : 0;
   }
+
+  Pipeline pipeline = Pipeline.FAR;
 
   @Override
   public void setPipeline(Pipeline pipeline) {
-    if(pipeline == Pipeline.FAR) {
-      this.pipeline.setDouble(0);
-    } else if(pipeline == Pipeline.NEAR) {
-      this.pipeline.setDouble(1);
-    } else if(pipeline == Pipeline.TRAP) {
-      this.pipeline.setDouble(2);
+    if (pipeline == Pipeline.FAR) {
+      LimelightHelpers.setPipelineIndex("", 0);
+    } else if (pipeline == Pipeline.NEAR) {
+      LimelightHelpers.setPipelineIndex("", 1);
+    } else if (pipeline == Pipeline.TRAP) {
+      LimelightHelpers.setPipelineIndex("", 2);
     }
   }
 
   @Override
   public void snapshot() {
-    sc.setDouble(1);
+    LimelightHelpers.takeSnapshot("", "Shot_" + Preferences.getLong("shotUUID", -1));
   }
 }
