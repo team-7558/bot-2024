@@ -18,7 +18,6 @@ public class TurretCamIOReal implements TurretCamIO {
   NetworkTableEntry ty = table.getEntry("ty");
   NetworkTableEntry ta = table.getEntry("ta");
   NetworkTableEntry tid = table.getEntry("tid");
-  NetworkTableEntry pid = table.getEntry("priorityid");
   NetworkTableEntry pipeline = table.getEntry("pipeline");
   NetworkTableEntry sc = table.getEntry("snapshot");
 
@@ -35,14 +34,11 @@ public class TurretCamIOReal implements TurretCamIO {
 
   @Override
   public void setPipeline(Pipeline pipeline) {
-    if (pipeline == Pipeline.NEAR) {
-      pid.setDouble(G.isRedAlliance() ? 4 : 7);
+    if(pipeline == Pipeline.FAR) {
       this.pipeline.setDouble(0);
-    } else if (pipeline == Pipeline.FAR) {
-      pid.setDouble(G.isRedAlliance() ? 4 : 7);
+    } else if(pipeline == Pipeline.NEAR) {
       this.pipeline.setDouble(1);
-    } else {
-      pid.setDouble(G.isRedAlliance() ? 5 : 6);
+    } else if(pipeline == Pipeline.TRAP) {
       this.pipeline.setDouble(2);
     }
   }
