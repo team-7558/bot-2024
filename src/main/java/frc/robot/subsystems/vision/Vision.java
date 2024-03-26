@@ -253,8 +253,8 @@ public class Vision {
             if (tid == SPEAKER_LEFT_BLUE
                 || tid == SPEAKER_RIGHT_BLUE
                 || tid == SPEAKER_LEFT_RED
-                || tid == SPEAKER_RIGHT_RED) { // not flat
-              blacklistCoeff += 10;
+                || tid == SPEAKER_RIGHT_RED) { // not flat sometimes
+              blacklistCoeff += 3;
             } else if (tid == STAGE_BLUE_1
                 || tid == STAGE_BLUE_2
                 || tid == STAGE_BLUE_3

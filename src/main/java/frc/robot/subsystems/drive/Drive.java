@@ -80,7 +80,7 @@ public class Drive extends StateMachineSubsystemBase {
   public static final double CUTOFF_DISTANCE = 5.0;
 
   // ratio for the distance scaling on the standard deviation
-  private static final double APRILTAG_COEFFICIENT = 0.01; // NEEDS TO BE TUNED
+  private static final double APRILTAG_COEFFICIENT = 0.05; // NEEDS TO BE TUNED
 
   public static final Lock odometryLock = new ReentrantLock();
   public static final Queue<Double> timestampQueue = new ArrayBlockingQueue<>(100);
@@ -616,8 +616,8 @@ public class Drive extends StateMachineSubsystemBase {
                 pose,
                 timestamp,
                 VecBuilder.fill(
-                    (APRILTAG_COEFFICIENT * avgDistance) * blacklistCoeff,
-                    (APRILTAG_COEFFICIENT * avgDistance) * blacklistCoeff,
+                    ((blacklistCoeff * avgDistance) - tids.length) * APRILTAG_COEFFICIENT,
+                    ((blacklistCoeff * avgDistance) - tids.length) * APRILTAG_COEFFICIENT,
                     10)));
   }
 
