@@ -820,8 +820,16 @@ public class Shooter extends StateMachineSubsystemBase {
           double distToTarget = (TARGET_HEIGHT - LIMELIGHT_HEIGHT) / Math.tan(angleToGoal);
           Logger.recordOutput("Shooter/TargetDist", distToTarget);
 
-          ns.flywheel_rps = shotSpeedFromDistance.calcY(distToTarget);
-          ns.turretPos_r -= llInputs.tx;
+          double minDamp = 0.8;
+          double maxDamp = 0.4;
+          double minLat = 20;
+          double maxLat = 200;
+
+          // ns.flywheel_rps = shotSpeedFromDistance.calcY(distToTarget);
+          ns.turretPos_r =
+              inputs.turretPosR
+                  - Units.degreesToRotations(llInputs.tx)
+                      * Util.remap(minLat, maxLat, llInputs.latency, minDamp, maxDamp);
           ns.pivotPos_r = pivotHeightFromDistance.calcY(distToTarget);
         }
       }

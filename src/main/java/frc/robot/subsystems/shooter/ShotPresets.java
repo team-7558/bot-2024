@@ -9,14 +9,14 @@ public class ShotPresets {
   public static final Setpoints RED_BUDGET_AMP = new Setpoints(10.5, 0, 0, 0.14);
   public static final Setpoints RED_FENDER = new Setpoints(29, 0, 0, 0.14);
   public static final Setpoints RED_FRONT_POST =
-      new Setpoints(38, 0, 0.087, 0.1); // potentially make higher
-  public static final Setpoints RED_SIDE_POST = new Setpoints(45, 0, 0.092, 0.09);
+      new Setpoints(38, 0, 0.087, 0.085); // potentially make higher
+  public static final Setpoints RED_SIDE_POST = new Setpoints(45, 0, 0.092, 0.080);
   public static final Setpoints RED_AMP_BOX = new Setpoints(38, 0, -0.134, 0.11);
   public static final Setpoints RED_FRONT_COURT = new Setpoints(36, 0, 0, 0.103);
   public static final Setpoints RED_WING_POST = new Setpoints(49, 0, -0.02, 0.068);
   public static final Setpoints OP_SHOT = new Setpoints(43, 0, 0.02, 0.076);
-  public static final Setpoints RED_CLEAR_WALL = new Setpoints(30, 0, 0.08, 0.115);
-  public static final Setpoints SNIPE = new Setpoints(49, 0, 0.095, 0.064);
+  public static final Setpoints RED_CLEAR_WALL = new Setpoints(25, 0, 0.08, 0.1);
+  public static final Setpoints SNIPE = new Setpoints(49, 0, 0.095, 0.054);
   public static final Setpoints RED_CLEAR_CLOSE =
       new Setpoints(36, 0, 0.1, Shooter.PIVOT_MIN_POS_r);
   public static final Setpoints CLEAR_FLAT = new Setpoints(49, 0, 0, 0.04);

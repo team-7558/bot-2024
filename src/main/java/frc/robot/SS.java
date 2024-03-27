@@ -460,7 +460,7 @@ public class SS {
 
     boolean flash = Math.sin(timer.get() * 20) > 0.0 ? true : false;
 
-    if (((currState == State.INTAKING || currState == State.INTAKING_DEEP) && hasGamePiece)
+    if (((currState == State.INTAKING_DEEP || currState == State.PREP_AMP) && hasGamePiece)
         || (currState == State.CHAMBER && intake.beamBroken())) {
       OI.DR.setRumble(RumbleType.kLeftRumble, 0.3);
       if (flash) {
@@ -482,15 +482,15 @@ public class SS {
     }
 
     if (!homedShooter) {
-      LED.getInstance().drawRow(5, 128, 0, 0);
-      LED.getInstance().drawRow(6, 0, 128, 0);
-      LED.getInstance().drawRow(7, 0, 0, 128);
+      LED.getInstance().drawRow(5, 32, 0, 0);
+      LED.getInstance().drawRow(6, 0, 32, 0);
+      LED.getInstance().drawRow(7, 0, 0, 32);
     }
 
     if (!homedClimb) {
-      LED.getInstance().drawRow(2, 128, 0, 0);
-      LED.getInstance().drawRow(3, 0, 128, 0);
-      LED.getInstance().drawRow(4, 0, 0, 128);
+      LED.getInstance().drawRow(2, 32, 0, 0);
+      LED.getInstance().drawRow(3, 0, 32, 0);
+      LED.getInstance().drawRow(4, 0, 0, 32);
     }
   }
 
@@ -636,7 +636,7 @@ public class SS {
       Setpoints sp = adjust ? shooter.adjustPreset(s) : s;
 
       if (shooter.beamBroken()) {
-        Setpoints cs = shooter.constrainSetpoints(sp, false, false);
+        Setpoints cs = shooter.constrainSetpoints(shooter.llTakeover(sp, p), false, false);
         shooter.queueSetpoints(cs);
         constrained = !cs.equals(sp);
 

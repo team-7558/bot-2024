@@ -50,9 +50,9 @@ public class TurretCamIOReal implements TurretCamIO {
 
   @Override
   public void setPipeline(Pipeline pipeline) {
-    if (pipeline == Pipeline.FAR) {
+    if (pipeline == Pipeline.NEAR) {
       LimelightHelpers.setPipelineIndex("", 0);
-    } else if (pipeline == Pipeline.NEAR) {
+    } else if (pipeline == Pipeline.FAR) {
       LimelightHelpers.setPipelineIndex("", 1);
     } else if (pipeline == Pipeline.TRAP) {
       LimelightHelpers.setPipelineIndex("", 2);
