@@ -271,7 +271,7 @@ public class Shooter extends StateMachineSubsystemBase {
           @Override
           public void init() {
             currSetpoints.feederVel_rps = 30;
-            currSetpoints.flywheel_rps = 10;
+            currSetpoints.flywheel_rps = 20;
           }
 
           @Override

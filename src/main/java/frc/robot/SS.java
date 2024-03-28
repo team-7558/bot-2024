@@ -219,6 +219,10 @@ public class SS {
         if (first) intake.setCurrentState(intake.AMP_READY);
         break;
       case INTAKING_DEEP:
+        if (first) {
+          shooter.queueSetpoints(new Setpoints(0, 0, 0, Shooter.PIVOT_MIN_FEED_POS_r));
+          shooter.setCurrentState(shooter.TRACKING);
+        }
         if (intake.beamBroken()) {
           hasGamePiece = true;
         }
@@ -231,6 +235,8 @@ public class SS {
       case INTAKING_CORAL:
       case INTAKING:
         if (first) {
+          shooter.queueSetpoints(new Setpoints(0, 0, 0, Shooter.PIVOT_MIN_FEED_POS_r));
+          shooter.setCurrentState(shooter.TRACKING);
           // elevator.setTargetHeight(Elevator.MIN_HEIGHT_M);
           // elevator.setCurrentState(elevator.TRAVELLING);
         }
@@ -249,6 +255,8 @@ public class SS {
         break;
       case AMP_SCORING_UP:
         if (first) {
+          shooter.queueSetpoints(new Setpoints(0, 0, 0, Shooter.PIVOT_MIN_FEED_POS_r));
+          shooter.setCurrentState(shooter.TRACKING);
           elevator.setTargetHeight(Elevator.AMP_HEIGHT_M);
           elevator.setCurrentState(elevator.TRAVELLING);
         }

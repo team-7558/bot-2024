@@ -51,6 +51,9 @@ public class RobotTeleop extends Command {
       if (OI.DR.getAButton()) {
         drive.setAutolockSetpoint(0.25);
         drive.setCurrentState(drive.STRAFE_AUTOLOCK);
+      } else if (OI.DR.getYButton()) {
+        drive.setAutolockSetpoint(G.isRedAlliance() ? 0.5 : 0);
+        drive.setCurrentState(drive.STRAFE_AUTOLOCK);
       } else if (OI.DR.getBButton()) {
         drive.setAutolockSetpoint(G.isRedAlliance() ? 0.172 : -0.35);
         drive.setCurrentState(drive.STRAFE_AUTOLOCK);
@@ -78,14 +81,14 @@ public class RobotTeleop extends Command {
         ss.amp();
       } else if (OI.XK.get(5, 7)) {
         ss.climbUp();
-      } else if (OI.XK.get(4, 5)) {
-        ss.chamber();
       } else if (OI.XK.get(7, 3)) {
         ss.spit();
       } else if (OI.XK.get(8, 3)) {
         ss.shooterSpit();
       } else if (OI.DR.getLeftTriggerAxis() > 0.05) {
         ss.shoot();
+      } else if (OI.XK.get(4, 5)) {
+        ss.chamber();
       } else if (OI.XK.get(9, 7)) {
         ss.sourceShoot();
       } else if (OI.XK.get(3, 3)) {
