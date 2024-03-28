@@ -461,7 +461,7 @@ public class SS {
     boolean flash = Math.sin(timer.get() * 20) > 0.0 ? true : false;
 
     if (((currState == State.INTAKING_DEEP || currState == State.PREP_AMP) && hasGamePiece)
-        || (currState == State.CHAMBER && intake.beamBroken())) {
+        || (currState == State.CHAMBER && hasGamePiece)) {
       OI.DR.setRumble(RumbleType.kLeftRumble, 0.3);
       if (flash) {
         LED.getInstance().drawRow(0, 255, 255, 255);

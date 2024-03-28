@@ -198,10 +198,11 @@ public class Robot extends LoggedRobot {
     drive.setDefaultCommand(new RobotTeleop());
   }
 
+  boolean lastLLDisable = false;
+
   /** This function is called periodically during all modes. */
   @Override
   public void robotPeriodic() {
-    boolean blinkinBlack = false;
     // Runs the Scheduler. This is responsible for polling buttons, adding
     // newly-scheduled commands, running already-scheduled commands, removing
     // finished or interrupted commands, and running subsystem periodic() methods.
@@ -213,6 +214,13 @@ public class Robot extends LoggedRobot {
           new Pose2d(
               drive.getPose().getTranslation(),
               Rotation2d.fromRotations(G.isRedAlliance() ? 0.5 : 0)));
+    }
+
+    if (!lastLLDisable && OI.XK.get(9, 0)) {
+      lastLLDisable = true;
+      shooter.toggleCamera();
+    } else if (!OI.XK.get(9, 0)) {
+      lastLLDisable = false;
     }
 
     if (OI.XK.get(1, 5)) {

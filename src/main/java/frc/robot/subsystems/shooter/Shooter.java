@@ -45,8 +45,8 @@ public class Shooter extends StateMachineSubsystemBase {
   public static final double TARGET_HEIGHT = getTargetHeight();
   public static final double LIMELIGHT_HEIGHT = Units.inchesToMeters(11);
 
-  public static final double TURRET_ZERO_POS = 0.2506;
-  public static final double PIVOT_ZERO_POS = 0.016666;
+  public static final double TURRET_ZERO_POS = 0.2506; // 0.3;
+  public static final double PIVOT_ZERO_POS = 0.01389;
 
   public static final double FEEDER_MIN_VEL_rps = 0, FEEDER_MAX_VEL_rps = 50;
   public static final double FLYWHEEL_MIN_VEL_rps = 0, FLYWHEEL_MAX_VEL_rps = 50;
@@ -412,9 +412,9 @@ public class Shooter extends StateMachineSubsystemBase {
                 }
               } else {
                 if (OI.XK.get(8, 0)) {
-                  io.setTurretVolts(-0.5);
+                  io.setTurretVolts(-0.85);
                 } else {
-                  io.setTurretVolts(0.5);
+                  io.setTurretVolts(0.85);
                 }
               }
             }
