@@ -24,6 +24,7 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
+import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
@@ -181,6 +182,8 @@ public class Drive extends StateMachineSubsystemBase {
   private Rotation2d lastGyroRotation = new Rotation2d();
   private ChassisSpeeds chassisSpeeds = new ChassisSpeeds(0, 0, 0);
 
+  private SlewRateLimiter throttleLimit = new SlewRateLimiter(3.0, -0.9, 0.0);
+
   private Drive(
       GyroIO gyroIO,
       ModuleIO flModuleIO,
@@ -252,7 +255,7 @@ public class Drive extends StateMachineSubsystemBase {
             double y_ = -OI.DR.getLeftX();
             double w_ = -Util.sqInput(OI.DR.getRightX());
 
-            runVelocity(drive(x_, y_, w_ * 0.75, throttle));
+            runVelocity(drive(x_, y_, w_ * 0.75, throttleLimit.calculate(throttle)));
           }
         };
 
@@ -277,7 +280,7 @@ public class Drive extends StateMachineSubsystemBase {
             double con = 6 * err;
             con = Util.limit(con, Util.lerp(0.7, 0.2, mag * scaler));
             if (Constants.verboseLogging) Logger.recordOutput("Drive/Autolock Heading Output", con);
-            runVelocity(drive(x_, y_, -con, throttle));
+            runVelocity(drive(x_, y_, -con, throttleLimit.calculate(throttle)));
           }
         };
 

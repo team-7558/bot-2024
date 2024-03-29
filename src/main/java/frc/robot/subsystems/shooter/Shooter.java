@@ -624,7 +624,7 @@ public class Shooter extends StateMachineSubsystemBase {
 
   public boolean isAtSetpoints() {
     boolean res = true;
-    res &= isFlywheelAtSetpoint(0.5);
+    res &= isFlywheelAtSetpoint(2);
     res &= isTurretAtSetpoint(0.01);
     res &= isPivotAtSetpoint(0.01);
     Logger.recordOutput("Shooter/AtSetpoints", res);
@@ -811,7 +811,7 @@ public class Shooter extends StateMachineSubsystemBase {
     return newSetpoints;
   }
 
-  Debouncer lldb = new Debouncer(0.2, DebounceType.kFalling);
+  Debouncer lldb = new Debouncer(0.4, DebounceType.kFalling);
 
   public Setpoints llTakeover(Setpoints s, Pipeline p) {
     if (ll_enabled && lldb.calculate(llInputs.connected && llInputs.tv)) {
@@ -826,8 +826,8 @@ public class Shooter extends StateMachineSubsystemBase {
           double distToTarget = (TARGET_HEIGHT - LIMELIGHT_HEIGHT) / Math.tan(angleToGoal);
           Logger.recordOutput("Shooter/TargetDist", distToTarget);
 
-          double minDamp = 0.8;
-          double maxDamp = 0.5;
+          double minDamp = 0.9;
+          double maxDamp = 0.6;
           double minLat = 20;
           double maxLat = 200;
 
@@ -838,7 +838,7 @@ public class Shooter extends StateMachineSubsystemBase {
                       * Util.remap(minLat, maxLat, llInputs.latency, minDamp, maxDamp);
           ns.pivotPos_r = pivotHeightFromDistance.calcY(distToTarget);
 
-          if (Math.abs(llInputs.tx) < 4.0) llIO.setLEDs(LEDStatus.HI);
+          if (llOnTarget()) llIO.setLEDs(LEDStatus.HI);
           else llIO.setLEDs(LEDStatus.LOW);
         }
       }
@@ -848,6 +848,10 @@ public class Shooter extends StateMachineSubsystemBase {
       llIO.setLEDs(LEDStatus.OFF);
       return s;
     }
+  }
+
+  public boolean llOnTarget() {
+    return llInputs.connected && llInputs.tv && Math.abs(llInputs.tx) < 2.6;
   }
 
   public Setpoints shooterPipeline() {

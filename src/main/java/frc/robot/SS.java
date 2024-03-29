@@ -431,6 +431,10 @@ public class SS {
           }
         }
 
+        if (intake.beamBroken()) {
+          hasGamePiece = true;
+        }
+
         if (shooter.isState(shooter.IDLE)) {
           queueState(State.IDLE);
         }
@@ -476,13 +480,14 @@ public class SS {
         LED.getInstance().setBlinkin(0.93);
       }
     } else if (currState == State.TRACKING) {
-      if (shooter.isAtSetpoints() && !constrained) {
+      if (shooter.isAtSetpoints() && (!constrained || shooter.llOnTarget())) {
         OI.DR.setRumble(RumbleType.kBothRumble, 0.6);
         if (flash) {
           LED.getInstance().drawRow(0, 0, 255, 0);
           LED.getInstance().setBlinkin(0.77);
         }
       } else {
+        OI.DR.setRumble(RumbleType.kBothRumble, 0.0);
         LED.getInstance().drawRow(0, 255, 0, 0);
       }
     } else {
@@ -649,11 +654,6 @@ public class SS {
         constrained = !cs.equals(sp);
 
         queueState(State.TRACKING);
-      } else if (isAtTopIntake()) {
-        Setpoints cs = shooter.constrainSetpoints(sp, true, false);
-        shooter.queueSetpoints(cs);
-        constrained = !cs.equals(sp);
-        queueState(State.GHOST);
       } else if (currState != State.CHAMBER && currState != State.PRECHAMBER) {
         Setpoints cs = shooter.constrainSetpoints(sp, true, false);
         shooter.queueSetpoints(cs);
