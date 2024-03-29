@@ -271,13 +271,12 @@ public class Vision {
 
   public void periodic() {
     int id = PerfTracker.start("Vision");
-    handleFrameData();
-    Logger.recordOutput("Vision/TagSet", posesToLog.toArray(new Pose2d[0]));
+    // handleFrameData();
+    // Logger.recordOutput("Vision/TagSet", posesToLog.toArray(new Pose2d[0]));
     PerfTracker.end(id);
   }
 
   public static class TimestampedPose {
-
     public Pose2d pose;
     public double timestamp;
 

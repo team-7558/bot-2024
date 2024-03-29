@@ -68,7 +68,7 @@ public class RobotTeleop extends Command {
       }
     }
 
-    if (OI.DR.getPOV() == 270 || OI.XK.get(0, 6)) {
+    if (OI.DR.getPOV() == 270 || OI.XK.get(9, 3)) {
       ss.clearGamePiece();
     }
 
@@ -129,9 +129,7 @@ public class RobotTeleop extends Command {
       } else if (OI.XK.get(0, 3)) {
         ss.trackPreset(
             G.isRedAlliance() ? ShotPresets.SNIPE : ShotPresets.BLUE_SNIPE, Pipeline.FAR, true);
-      } else if (OI.XK.get(6, 5)) {
-        ss.limelightTrack();
-      } else if (OI.DR.getLeftBumper() || OI.DR.getBackButton()) {
+      } else if (OI.DR.getLeftBumper() || OI.DR.getBackButton() || OI.XK.get(6, 5)) {
         ss.intake();
       } else {
         ss.idle();

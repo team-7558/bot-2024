@@ -13,6 +13,8 @@
 
 package frc.robot;
 
+import edu.wpi.first.math.util.Units;
+
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
  * constants. This class should not be used for any other purpose. All constants should be declared
@@ -38,4 +40,6 @@ public final class Constants {
 
   public static final double globalDelta_sec = 0.02;
   public static final double driveDeadband = 0.05;
+
+  public static final double trueMass_kg = Units.lbsToKilograms(148.0);
 }

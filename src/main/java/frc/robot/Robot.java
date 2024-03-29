@@ -100,23 +100,23 @@ public class Robot extends LoggedRobot {
       drive.resetPose();
     }
 
-    if (!lastAS && OI.XK.get(2, 0)) {
+    if (!lastAS && OI.XK.get(0, 0)) {
       lastAS = true;
       AS.setCurrIdx(0);
       AS.generate();
-    } else if (!lastAS && OI.XK.get(3, 0)) {
+    } else if (!lastAS && OI.XK.get(1, 0)) {
       lastAS = true;
       AS.setCurrIdx(1);
       AS.generate();
-    } else if (!lastAS && OI.XK.get(4, 0)) {
+    } else if (!lastAS && OI.XK.get(2, 0)) {
       lastAS = true;
       AS.setCurrIdx(2);
       AS.generate();
-    } else if (!lastAS && OI.XK.get(5, 0)) {
+    } else if (!lastAS && OI.XK.get(3, 0)) {
       lastAS = true;
       AS.setCurrIdx(3);
       AS.generate();
-    } else if (!OI.XK.get(2, 0) && !OI.XK.get(3, 0) && !OI.XK.get(4, 0) && !OI.XK.get(5, 0)) {
+    } else if (!OI.XK.get(0, 0) && !OI.XK.get(1, 0) && !OI.XK.get(2, 0) && !OI.XK.get(3, 0)) {
       lastAS = false;
     }
 
@@ -224,17 +224,14 @@ public class Robot extends LoggedRobot {
     }
 
     if (OI.XK.get(1, 5)) {
-      LED.getInstance().drawRow(0, 128, 128, 0);
-      LED.getInstance().setBlinkin(0.71);
+      LED.getInstance().setAllRGB(128, 128, 0);
     } else if (OI.XK.get(2, 5)) {
-      LED.getInstance().drawRow(0, 128, 0, 128);
-      LED.getInstance().setBlinkin(0.91);
+      LED.getInstance().setAllRGB(128, 0, 128);
     } else if (shooter.beamBroken()
         && !(shooter.getCurrentState() == shooter.TRACKING
             || shooter.getCurrentState() == shooter.SHOOTING)) {
-      led.setBlinkin(-0.57);
+      // TODO: FIGURE OUT WHAT TO DO HERE
     } else {
-      LED.getInstance().setBlinkin(0.99);
     }
 
     if (!brake) {

@@ -476,15 +476,13 @@ public class SS {
         || (currState == State.CHAMBER && hasGamePiece)) {
       OI.DR.setRumble(RumbleType.kLeftRumble, 0.3);
       if (flash) {
-        LED.getInstance().drawRow(0, 255, 255, 255);
-        LED.getInstance().setBlinkin(0.93);
+        LED.getInstance().setAllRGB(128, 128, 128);
       }
     } else if (currState == State.TRACKING) {
       if (shooter.isAtSetpoints() && (!constrained || shooter.llOnTarget())) {
         OI.DR.setRumble(RumbleType.kBothRumble, 0.6);
         if (flash) {
-          LED.getInstance().drawRow(0, 0, 255, 0);
-          LED.getInstance().setBlinkin(0.77);
+          LED.getInstance().setAllRGB(0, 128, 0);
         }
       } else {
         OI.DR.setRumble(RumbleType.kBothRumble, 0.0);
@@ -631,15 +629,16 @@ public class SS {
   }
 
   public void limelightTrack() {
-    if (!resetting()) {
-      shooter.setTargetMode(TargetMode.SPEAKER);
-      Setpoints ps = shooter.limelightPipeline();
-      Setpoints cs =
-          shooter.constrainSetpoints(ps, !shooter.beamBroken() || !shooter.beamBrokenIn(), false);
-      shooter.queueSetpoints(cs);
-      constrained = !cs.equals(ps);
-      queueState(State.TRACKING);
-    }
+    // if (!resetting()) {
+    //   shooter.setTargetMode(TargetMode.SPEAKER);
+    //   Setpoints ps = shooter.limelightPipeline();
+    //   Setpoints cs =
+    //       shooter.constrainSetpoints(ps, !shooter.beamBroken() || !shooter.beamBrokenIn(),
+    // false);
+    //   shooter.queueSetpoints(cs);
+    //   constrained = !cs.equals(ps);
+    //   queueState(State.TRACKING);
+    // }
   }
 
   public void trackPreset(Setpoints s, Pipeline p, boolean adjust) {

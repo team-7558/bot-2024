@@ -43,7 +43,7 @@ public class Shooter extends StateMachineSubsystemBase {
   private static double HEIGHT_M = 0;
 
   public static final double LIMELIGHT_ANGLE = Units.degreesToRadians(30);
-  public static final double TARGET_HEIGHT = getTargetHeight();
+  public static final double SPEAKER_TAG_HEIGHT = Units.inchesToMeters(56.25 + 7.0 / 8.0);
   public static final double LIMELIGHT_HEIGHT = Units.inchesToMeters(11);
 
   public static final double TURRET_ZERO_POS = 0.2506; // 0.3;
@@ -476,6 +476,9 @@ public class Shooter extends StateMachineSubsystemBase {
     Logger.recordOutput("Shooter/TargetTurr", currSetpoints.turretPos_r);
     Logger.recordOutput("Shooter/TargetPivot", currSetpoints.pivotPos_r);
 
+    Logger.recordOutput("Shooter/LLonTarget", llOnTarget());
+    Logger.recordOutput("Shooter/LLdist", llDist());
+
     if (Constants.verboseLogging) {
       Logger.recordOutput("Shooter/PrevTargetFeed", lastSetpoints.feederVel_rps);
       Logger.recordOutput("Shooter/PrevTargetFly", lastSetpoints.flywheel_rps);
@@ -516,52 +519,13 @@ public class Shooter extends StateMachineSubsystemBase {
   }
 
   public static double getTargetHeight() {
-    return G.isRedAlliance() ? Units.inchesToMeters(57.13) : 0; // TODO: find for blue
+    return G.isRedAlliance()
+        ? Units.inchesToMeters(57.13)
+        : Units.inchesToMeters(57.13); // TODO: find for blue
   }
 
   public void setTargetMode(TargetMode mode) {
     targetMode = mode;
-  }
-
-  public Setpoints limelightPipeline() {
-    TargetMode targetMode = this.targetMode;
-
-    if (targetMode == TargetMode.SPEAKER) {
-      double tid = llInputs.tid;
-      if (tid == 4 || tid == 7) {
-        double kP = 0.45;
-
-        double tx = llInputs.tx;
-        double ty = llInputs.ty;
-
-        if (Math.abs(tx) < 0.2 || llInputs.tx == 0) {
-          return new Setpoints(
-              lastSetpoints.flywheel_rps,
-              lastSetpoints.feederVel_rps,
-              lastSetpoints.turretPos_r,
-              lastSetpoints.pivotPos_r);
-        }
-
-        double angleToGoal = LIMELIGHT_ANGLE + Units.degreesToRadians(ty);
-
-        // TODO: fix target height for blue side
-
-        double distToTarget = (TARGET_HEIGHT - LIMELIGHT_HEIGHT) / Math.tan(angleToGoal);
-
-        double flywheelRps = shotSpeedFromDistance.calcY(distToTarget);
-        double turretPos = inputs.turretPosR - Units.degreesToRotations(tx * kP);
-
-        double pivotHeight_r = pivotHeightFromDistance.calcY(distToTarget);
-
-        Logger.recordOutput("Shooter/TargetDist", distToTarget);
-
-        return constrainSetpoints(
-            new Setpoints(flywheelRps, 0, turretPos, pivotHeight_r), false, false);
-      }
-    } else if (targetMode == TargetMode.TRAP) {
-
-    }
-    return lastSetpoints;
   }
 
   private void track() {
@@ -811,7 +775,7 @@ public class Shooter extends StateMachineSubsystemBase {
     return newSetpoints;
   }
 
-  Debouncer lldb = new Debouncer(0.4, DebounceType.kFalling);
+  Debouncer lldb = new Debouncer(0.7, DebounceType.kFalling);
 
   public Setpoints llTakeover(Setpoints s, Pipeline p) {
     if (ll_enabled && lldb.calculate(llInputs.connected && llInputs.tv)) {
@@ -821,10 +785,12 @@ public class Shooter extends StateMachineSubsystemBase {
       } else {
         if ((G.isRedAlliance() && llInputs.tid == 4) || (!G.isRedAlliance() && llInputs.tid == 7)) {
 
-          double angleToGoal = LIMELIGHT_ANGLE + Units.degreesToRadians(llInputs.ty);
-
-          double distToTarget = (TARGET_HEIGHT - LIMELIGHT_HEIGHT) / Math.tan(angleToGoal);
+          double distToTarget = llDist();
           Logger.recordOutput("Shooter/TargetDist", distToTarget);
+
+          if (mws_enabled) {
+            double botRad = Drive.getInstance().getRotation().getRadians();
+          }
 
           double minDamp = 0.9;
           double maxDamp = 0.6;
@@ -852,6 +818,12 @@ public class Shooter extends StateMachineSubsystemBase {
 
   public boolean llOnTarget() {
     return llInputs.connected && llInputs.tv && Math.abs(llInputs.tx) < 2.6;
+  }
+
+  public double llDist() {
+    double angleToGoal = LIMELIGHT_ANGLE + Units.degreesToRadians(llInputs.ty);
+    double distToTarget = (SPEAKER_TAG_HEIGHT - LIMELIGHT_HEIGHT) / Math.tan(angleToGoal);
+    return distToTarget;
   }
 
   public Setpoints shooterPipeline() {
