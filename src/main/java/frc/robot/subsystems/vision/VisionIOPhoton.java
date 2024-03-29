@@ -47,6 +47,7 @@ public class VisionIOPhoton implements ApriltagIO {
 
   @Override
   public void updateInputs(ApriltagIOInputs inputs) {
+    // System.out.println("update inputs");
 
     double[] timestampsArray =
         timestamps.stream()
@@ -64,18 +65,22 @@ public class VisionIOPhoton implements ApriltagIO {
             .toArray();
     inputs.ambiguity = ambiguityArray;
 
-    while (!tids.isEmpty()) {
-      if (index >= result.length) {
-        // Handle the case where the result array is not large enough
-        break;
-      }
+    try {
+      while (!tids.isEmpty()) {
+        if (index >= result.length) {
+          // Handle the case where the result array is not large enough
+          break;
+        }
 
-      Integer[] currentArray = tids.poll();
-      int[] intArray = new int[currentArray.length];
-      for (int i = 0; i < currentArray.length; i++) {
-        intArray[i] = currentArray[i]; // Auto-unboxing from Integer to int
+        Integer[] currentArray = tids.poll();
+        int[] intArray = new int[currentArray.length];
+        for (int i = 0; i < currentArray.length; i++) {
+          intArray[i] = currentArray[i]; // Auto-unboxing from Integer to int
+        }
+        result[index++] = intArray;
       }
-      result[index++] = intArray;
+    } catch (Exception e) {
+
     }
     inputs.tids = result;
     inputs.pipelineID = camera.getPipelineIndex();

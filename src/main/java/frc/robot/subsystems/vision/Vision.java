@@ -76,49 +76,28 @@ public class Vision {
         case REAL:
           cam0 =
               new VisionIOPhoton(
-                  "BL",
-                  new Transform3d(
-                      0,
-                      0,
-                      0,
-                      new Rotation3d(
-                          Units.degreesToRadians(0),
-                          Units.degreesToRadians(0),
-                          Units.degreesToRadians(0)))); // TODO: needs to be found
-          cam1 =
-              new VisionIOPhoton(
-                  "BR",
-                  new Transform3d(
-                      0,
-                      0,
-                      0,
-                      new Rotation3d(
-                          Units.degreesToRadians(0),
-                          Units.degreesToRadians(0),
-                          Units.degreesToRadians(0)))); // TODO: needs to be found
-          cam2 =
-              new VisionIOPhoton(
-                  "FL",
-                  new Transform3d(
-                      0,
-                      0,
-                      0,
-                      new Rotation3d(
-                          Units.degreesToRadians(0),
-                          Units.degreesToRadians(0),
-                          Units.degreesToRadians(0)))); // TODO: needs to be found
-          cam3 =
-              new VisionIOPhoton(
                   "FR",
                   new Transform3d(
-                      0,
-                      0,
-                      0,
+                      -0.1905, // -0.1905
+                      0.33, // 0.33
+                      -0.508, // -0.508
                       new Rotation3d(
-                          Units.degreesToRadians(0),
-                          Units.degreesToRadians(0),
-                          Units.degreesToRadians(0)))); // TODO: needs to be found
-          instance = new Vision(cam0, cam1, cam2, cam3);
+                          Units.degreesToRadians(160), // 45
+                          Units.degreesToRadians(-30), // -30
+                          Units.degreesToRadians(310)))); // -90
+          // cam1 =
+          //     new VisionIOPhoton(
+          //         "BL",
+          //         new Transform3d(
+          //             0.1905,
+          //             -0.33,
+
+          //             0.508,
+          //             new Rotation3d(
+          //                 Units.degreesToRadians(45),
+          //                 Units.degreesToRadians(30),
+          //                 Units.degreesToRadians(0)))); // TODO: needs to be found
+          instance = new Vision(cam0);
           break;
         case SIM:
           cam0 = new VisionIOPhoton("camera0", new Transform3d(0, 0, 0, new Rotation3d()));
@@ -145,8 +124,7 @@ public class Vision {
   private Vision(VisionIOPhoton... cameras) {
     this.cameras = cameras;
     this.visionInputs =
-        new ApriltagIOInputs[] {
-          new ApriltagIOInputs(), new ApriltagIOInputs(),
+        new ApriltagIOInputs[] {new ApriltagIOInputs()
           // new ApriltagIOInputs(),
           // new ApriltagIOInputs()
         };
@@ -293,7 +271,7 @@ public class Vision {
 
   public void periodic() {
     int id = PerfTracker.start("Vision");
-    // handleFrameData();
+    handleFrameData();
     Logger.recordOutput("Vision/TagSet", posesToLog.toArray(new Pose2d[0]));
     PerfTracker.end(id);
   }
