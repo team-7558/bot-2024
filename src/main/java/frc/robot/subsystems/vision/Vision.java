@@ -82,9 +82,9 @@ public class Vision {
                       0.33, // 0.33
                       -0.508, // -0.508
                       new Rotation3d(
-                          Units.degreesToRadians(160), // 45
-                          Units.degreesToRadians(-30), // -30
-                          Units.degreesToRadians(310)))); // -90
+                          Units.degreesToRadians(45), // 45
+                          Units.degreesToRadians(-35), // -30
+                          Units.degreesToRadians(-90)))); // -90
           // cam1 =
           //     new VisionIOPhoton(
           //         "BL",
