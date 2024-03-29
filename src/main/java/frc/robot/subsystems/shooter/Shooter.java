@@ -30,6 +30,7 @@ import frc.robot.OI;
 import frc.robot.SS2d;
 import frc.robot.subsystems.StateMachineSubsystemBase;
 import frc.robot.subsystems.drive.Drive;
+import frc.robot.subsystems.shooter.TurretCamIO.LEDStatus;
 import frc.robot.subsystems.shooter.TurretCamIO.Pipeline;
 import frc.robot.util.LerpTable;
 import frc.robot.util.Util;
@@ -240,6 +241,7 @@ public class Shooter extends StateMachineSubsystemBase {
           @Override
           public void init() {
             stop();
+            llIO.setLEDs(LEDStatus.OFF);
           }
 
           @Override
@@ -257,6 +259,7 @@ public class Shooter extends StateMachineSubsystemBase {
           @Override
           public void init() {
             hold();
+            llIO.setLEDs(LEDStatus.OFF);
           }
 
           @Override
@@ -371,6 +374,7 @@ public class Shooter extends StateMachineSubsystemBase {
           public void init() {
             ShotLogger.log();
             llIO.snapshot();
+            llIO.setLEDs(LEDStatus.OFF);
           }
 
           @Override
@@ -807,8 +811,10 @@ public class Shooter extends StateMachineSubsystemBase {
     return newSetpoints;
   }
 
+  Debouncer lldb = new Debouncer(0.2, DebounceType.kFalling);
+
   public Setpoints llTakeover(Setpoints s, Pipeline p) {
-    if (ll_enabled && llInputs.connected && llInputs.tv) {
+    if (ll_enabled && lldb.calculate(llInputs.connected && llInputs.tv)) {
       Setpoints ns = new Setpoints().copy(s);
 
       if (p == Pipeline.TRAP) {
@@ -821,7 +827,7 @@ public class Shooter extends StateMachineSubsystemBase {
           Logger.recordOutput("Shooter/TargetDist", distToTarget);
 
           double minDamp = 0.8;
-          double maxDamp = 0.4;
+          double maxDamp = 0.5;
           double minLat = 20;
           double maxLat = 200;
 
@@ -831,11 +837,15 @@ public class Shooter extends StateMachineSubsystemBase {
                   - Units.degreesToRotations(llInputs.tx)
                       * Util.remap(minLat, maxLat, llInputs.latency, minDamp, maxDamp);
           ns.pivotPos_r = pivotHeightFromDistance.calcY(distToTarget);
+
+          if (Math.abs(llInputs.tx) < 4.0) llIO.setLEDs(LEDStatus.HI);
+          else llIO.setLEDs(LEDStatus.LOW);
         }
       }
 
       return ns;
     } else {
+      llIO.setLEDs(LEDStatus.OFF);
       return s;
     }
   }

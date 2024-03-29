@@ -21,6 +21,14 @@ public interface TurretCamIO {
 
   public default void snapshot() {}
 
+  public default void setLEDs(LEDStatus on) {}
+
+  enum LEDStatus {
+    OFF,
+    LOW,
+    HI
+  }
+
   enum Pipeline {
     NEAR,
     FAR,

@@ -4,9 +4,6 @@
 
 package frc.robot.subsystems.shooter;
 
-import edu.wpi.first.networktables.NetworkTable;
-import edu.wpi.first.networktables.NetworkTableEntry;
-import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.Preferences;
 import frc.robot.util.LimelightHelpers;
 import frc.robot.util.LimelightHelpers.LimelightResults;
@@ -15,15 +12,9 @@ import frc.robot.util.LimelightHelpers.LimelightTarget_Fiducial;
 /** Add your docs here. */
 public class TurretCamIOReal implements TurretCamIO {
 
-  NetworkTable table = NetworkTableInstance.getDefault().getTable("limelight");
-  NetworkTableEntry tv = table.getEntry("tv");
-  NetworkTableEntry tx = table.getEntry("tx");
-  NetworkTableEntry ty = table.getEntry("ty");
-  NetworkTableEntry ta = table.getEntry("ta");
-  NetworkTableEntry tid = table.getEntry("tid");
-  NetworkTableEntry sc = table.getEntry("snapshot");
-
   LimelightResults res;
+
+  TurretCamIOInputs lastInputs = new TurretCamIOInputs();
 
   @Override
   public void updateInputs(TurretCamIOInputs inputs) {
@@ -40,10 +31,23 @@ public class TurretCamIOReal implements TurretCamIO {
             + res.targetingResults.latency_capture
             + res.targetingResults.latency_jsonParse;
     inputs.ids = fids.length;
-    inputs.tx = v ? fids[0].tx : 0;
-    inputs.ty = v ? fids[0].ty : 0;
-    inputs.ta = v ? fids[0].ta : 0;
-    inputs.tid = v ? fids[0].fiducialID : 0;
+
+    if (v) {
+      inputs.tx = fids[0].tx;
+      inputs.ty = fids[0].ty;
+      inputs.ta = fids[0].ta;
+      inputs.tid = fids[0].fiducialID;
+    } else {
+      inputs.tx = lastInputs.tx;
+      inputs.ty = lastInputs.ty;
+      inputs.ta = lastInputs.ta;
+      inputs.tid = lastInputs.tid;
+    }
+
+    lastInputs.tx = inputs.tx;
+    lastInputs.ty = inputs.ty;
+    lastInputs.ta = inputs.ta;
+    lastInputs.tid = inputs.tid;
   }
 
   Pipeline pipeline = Pipeline.FAR;
@@ -61,6 +65,17 @@ public class TurretCamIOReal implements TurretCamIO {
 
   @Override
   public void snapshot() {
-    LimelightHelpers.takeSnapshot("", "Shot_" + Preferences.getLong("shotUUID", -1));
+    LimelightHelpers.takeSnapshot("", "Shot_" + Preferences.getLong("shotUUID", -1) + "_");
+  }
+
+  @Override
+  public void setLEDs(LEDStatus on) {
+    if (on == LEDStatus.HI) {
+      LimelightHelpers.setLEDMode_ForceOn("");
+    } else if (on == LEDStatus.LOW) {
+      LimelightHelpers.setLEDMode_PipelineControl("");
+    } else {
+      LimelightHelpers.setLEDMode_ForceOff("");
+    }
   }
 }
