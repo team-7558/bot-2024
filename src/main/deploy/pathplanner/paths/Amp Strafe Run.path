@@ -3,25 +3,25 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 2.2981782900502736,
-        "y": 5.500598388584165
+        "x": 2.45,
+        "y": 3.5210374609539774
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.002347788479361,
-        "y": 4.945916198138703
+        "x": 2.45,
+        "y": 5.429299679368471
       },
       "isLocked": false,
-      "linkedName": "ShootInnerFirstAmp"
+      "linkedName": "StrafePoint"
     },
     {
       "anchor": {
-        "x": 2.5662746820989137,
-        "y": 4.113892912470511
+        "x": 2.45,
+        "y": 7.066291135532123
       },
       "prevControl": {
-        "x": 1.9376348662607235,
-        "y": 4.123137615644602
+        "x": 2.45,
+        "y": 6.437583347610062
       },
       "nextControl": null,
       "isLocked": false,
@@ -32,21 +32,21 @@
   "constraintZones": [],
   "eventMarkers": [],
   "globalConstraints": {
-    "maxVelocity": 4.2,
-    "maxAcceleration": 4.0,
+    "maxVelocity": 0.75,
+    "maxAcceleration": 2.0,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 0,
+    "rotation": 25.0,
     "rotateFast": false
   },
   "reversed": false,
   "folder": "AmpSide",
   "previewStartingState": {
-    "rotation": 0,
+    "rotation": 25.0,
     "velocity": 0
   },
-  "useDefaultConstraints": true
+  "useDefaultConstraints": false
 }

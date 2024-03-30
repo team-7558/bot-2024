@@ -17,8 +17,10 @@ import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -75,6 +77,9 @@ public class Shooter extends StateMachineSubsystemBase {
 
   private static final Pose3d SPEAKER_POSE_RED = new Pose3d(16.28, 5.53, 1.987, new Rotation3d());
   private static final Pose3d SPEAKER_POSE_BLUE = new Pose3d(0.28, 5.53, 1.987, new Rotation3d());
+
+  private static final Translation2d SPEAKER_POSE_2D_RED = new Translation2d(16.28, 5.53);
+  private static final Translation2d SPEAKER_POSE_2D_BLUE = new Translation2d(0.28, 5.53);
 
   private static final Pose3d TRAP_LEFT_BLUE = new Pose3d(4.641, 4.498, 1.171, new Rotation3d());
   private static final Pose3d TRAP_RIGHT_BLUE = new Pose3d(4.641, 3.713, 1.171, new Rotation3d());
@@ -312,15 +317,16 @@ public class Shooter extends StateMachineSubsystemBase {
           @Override
           public void periodic() {
             // queueSetpoints(constrainSetpoints(shooterPipeline(), !inputs.beamBreakInActivated));
-            if (inputs.beamBreakInActivated) {
+            Setpoints s = new Setpoints().copy(currSetpoints);
+            if (inputs.beamBreakOutActivated) {
               setCurrentState(IDLE);
             } else if (!inputs.beamBreakInActivated) {
-              queueSetpoints(new Setpoints(Setpoints.DEFAULT, 8.5, 0, PIVOT_MIN_POS_r));
-              track();
+              s.feederVel_rps = 7.3;
             } else {
-              queueSetpoints(new Setpoints(Setpoints.DEFAULT, 2.5, 0, PIVOT_MIN_POS_r));
-              track();
+              s.feederVel_rps = 2.3;
             }
+            queueSetpoints(constrainSetpoints(s, true, false));
+            track();
           }
         };
 
@@ -788,20 +794,52 @@ public class Shooter extends StateMachineSubsystemBase {
           double distToTarget = llDist();
           Logger.recordOutput("Shooter/TargetDist", distToTarget);
 
+          double mwsTx = 0;
+
           if (mws_enabled) {
-            double botRad = Drive.getInstance().getRotation().getRadians();
+            double botRot = Drive.getInstance().getRotation().getRotations();
+            double aimRot = botRot + inputs.turretPosR;
+            Translation2d turrTranslation =
+                new Translation2d(distToTarget, Rotation2d.fromRotations(aimRot));
+            ChassisSpeeds fieldRelChassisSpeeds = Drive.getInstance().getFieldRelativeSpeeds();
+
+            double shotTime_s = TIME_TO_SHOOT;
+
+            Translation2d offset =
+                new Translation2d(
+                    -fieldRelChassisSpeeds.vxMetersPerSecond * shotTime_s,
+                    -fieldRelChassisSpeeds.vyMetersPerSecond * shotTime_s);
+            Translation2d ogPos =
+                G.isRedAlliance()
+                    ? SPEAKER_POSE_2D_RED.plus(turrTranslation)
+                    : SPEAKER_POSE_2D_BLUE.plus(turrTranslation);
+            Translation2d newTarget =
+                G.isRedAlliance()
+                    ? SPEAKER_POSE_2D_RED.plus(offset)
+                    : SPEAKER_POSE_2D_BLUE.plus(offset);
+            Translation2d newTurrTranslation = newTarget.minus(ogPos);
+
+            Logger.recordOutput("Shooter/ogPos", ogPos);
+            Logger.recordOutput("Shooter/turrTranslation", turrTranslation);
+            Logger.recordOutput("Shooter/newTarget", newTarget);
+            Logger.recordOutput("Shooter/newTurrTranslation", newTurrTranslation);
           }
 
-          double minDamp = 0.9;
-          double maxDamp = 0.6;
+          double minDamp = 0.85;
+          double maxDamp = 0.5;
           double minLat = 20;
           double maxLat = 200;
 
+          if (llInputs.connected && llInputs.tv) {
+            ns.turretPos_r =
+                inputs.turretPosR
+                    - Units.degreesToRotations(llInputs.tx)
+                        * Util.remap(minLat, maxLat, llInputs.latency, minDamp, maxDamp);
+          } else {
+            ns.turretPos_r = inputs.turretPosR;
+          }
+
           // ns.flywheel_rps = shotSpeedFromDistance.calcY(distToTarget);
-          ns.turretPos_r =
-              inputs.turretPosR
-                  - Units.degreesToRotations(llInputs.tx)
-                      * Util.remap(minLat, maxLat, llInputs.latency, minDamp, maxDamp);
           ns.pivotPos_r = pivotHeightFromDistance.calcY(distToTarget);
 
           if (llOnTarget()) llIO.setLEDs(LEDStatus.HI);

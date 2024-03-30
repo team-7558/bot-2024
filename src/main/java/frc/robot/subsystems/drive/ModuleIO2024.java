@@ -130,7 +130,7 @@ public class ModuleIO2024 implements ModuleIO {
 
     var driveConfig = new TalonFXConfiguration();
     driveConfig.Slot0 = driveGains;
-    driveConfig.CurrentLimits.SupplyCurrentLimit = 50.0;
+    driveConfig.CurrentLimits.SupplyCurrentLimit = 80.0;
     driveConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
     driveConfig.CurrentLimits.StatorCurrentLimit = 50.0;
     driveConfig.CurrentLimits.StatorCurrentLimitEnable = true;

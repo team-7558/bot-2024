@@ -31,7 +31,7 @@ public class SourceSeries extends AltAuto {
   @Override
   public void onInit() {
     double i = G.isRedAlliance() ? 1.0 : -1.0;
-    ss.autoPreset(new Setpoints(38, 0, 0.1025, G.isRedAlliance() ? 0.092 : 0.09));
+    ss.autoPreset(new Setpoints(38, 0, 0.1025, G.isRedAlliance() ? 0.092 : 0.09), false);
   }
 
   @Override
@@ -41,70 +41,32 @@ public class SourceSeries extends AltAuto {
 
     if (trajstack.getActiveIdx() == 0) {
 
-      if (between(0, 1.2)) {
-        ss.autoPreset(new Setpoints(35, 0, i * 0.1025, G.isRedAlliance() ? 0.092 : 0.09));
-      }
-
-      if (between(1.2, 1.8)) {
+      if (before(1.2)) {
+        ss.autoPreset(new Setpoints(35, 0, i * 0.1025, G.isRedAlliance() ? 0.092 : 0.09), false);
+      } else if (before(1.8)) {
         ss.shoot();
-      }
-
-      if (between(1.9, 6)) {
-        ss.autoPreset(new Setpoints(39, 0, i * 0.02, 0.083));
-      }
-
-      if (between(6.1, 6.4)) {
-        ss.autoShoot();
-      }
-
-      if (between(6.5, 10.3)) {
-        ss.autoPreset(new Setpoints(39, 0, i * 0.02, 0.083));
-      }
-
-      if (between(10.4, 11)) {
-        ss.autoShoot();
-      }
-
-      if (between(11.1, 14.7)) {
-        ss.autoPreset(new Setpoints(39, 0, i * 0.02, G.isRedAlliance() ? 0.083 : 0.081));
-      }
-
-      if (between(14.7, 15)) {
-        ss.autoShoot();
+      } else if (before(6)) {
+        ss.autoPreset(new Setpoints(39, 0, i * 0.02, 0.083), true);
+      } else if (before(6.4)) {
+        if (velUnder(0.1)) {
+          ss.autoShoot();
+        }
+      } else if (before(10.3)) {
+        ss.autoPreset(new Setpoints(39, 0, i * 0.02, 0.083), true);
+      } else if (before(11)) {
+        if (velUnder(0.1)) {
+          ss.autoShoot();
+        }
+      } else if (before(14.7)) {
+        ss.autoPreset(new Setpoints(39, 0, i * 0.02, G.isRedAlliance() ? 0.083 : 0.081), true);
+      } else if (before(15)) {
+        if (velUnder(0.1)) {
+          ss.autoShoot();
+        }
       }
 
     } else { // Variant
-      if (between(0, 1.2)) {
-        ss.autoPreset(new Setpoints(35, 0, i * 0.102, 0.092));
-      }
 
-      if (between(1.2, 1.8)) {
-        ss.shoot();
-      }
-
-      if (between(1.9, 6)) {
-        ss.autoPreset(new Setpoints(39, 0, i * 0.02, 0.083));
-      }
-
-      if (between(6.1, 6.4)) {
-        ss.autoShoot();
-      }
-
-      if (between(6.5, 10.3)) {
-        ss.autoPreset(new Setpoints(39, 0, i * 0.02, 0.083));
-      }
-
-      if (between(10.4, 11)) {
-        ss.autoShoot();
-      }
-
-      if (between(11.1, 14.7)) {
-        ss.autoPreset(new Setpoints(39, 0, i * 0.02, 0.083));
-      }
-
-      if (between(14.7, 15)) {
-        ss.autoShoot();
-      }
     }
 
     // intake 3.2

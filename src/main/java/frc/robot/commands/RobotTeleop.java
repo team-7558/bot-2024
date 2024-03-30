@@ -95,40 +95,50 @@ public class RobotTeleop extends Command {
         ss.trackPreset(
             G.isRedAlliance() ? ShotPresets.RED_FENDER : ShotPresets.BLUE_FENDER,
             Pipeline.NEAR,
-            true);
+            true,
+            false);
       } else if (OI.XK.get(3, 2)) {
         ss.trackPreset(
             G.isRedAlliance() ? ShotPresets.RED_AMP_BOX : ShotPresets.BLUE_AMP_BOX,
             Pipeline.NEAR,
+            true,
             true);
       } else if (OI.XK.get(1, 3)) {
         ss.trackPreset(
             G.isRedAlliance() ? ShotPresets.RED_SIDE_POST : ShotPresets.BLUE_SIDE_POST,
             Pipeline.NEAR,
+            true,
             true);
       } else if (OI.XK.get(4, 3)) {
         ss.trackPreset(
             G.isRedAlliance() ? ShotPresets.RED_FRONT_POST : ShotPresets.BLUE_FRONT_POST,
             Pipeline.NEAR,
+            true,
             true);
       } else if (OI.XK.get(1, 2)) {
         ss.trackPreset(
             G.isRedAlliance() ? ShotPresets.RED_FRONT_COURT : ShotPresets.BLUE_FRONT_COURT,
             Pipeline.NEAR,
+            true,
             true);
       } else if (OI.XK.get(2, 3)) {
         ss.trackPreset(
             G.isRedAlliance() ? ShotPresets.OP_SHOT : ShotPresets.BLUE_OP_SHOT,
             Pipeline.NEAR,
+            true,
             true);
       } else if (OI.XK.get(2, 2)) {
         ss.trackPreset(
             G.isRedAlliance() ? ShotPresets.RED_CLEAR_WALL : ShotPresets.BLUE_CLEAR_WALL,
             Pipeline.FAR,
+            true,
             true);
       } else if (OI.XK.get(0, 3)) {
         ss.trackPreset(
-            G.isRedAlliance() ? ShotPresets.SNIPE : ShotPresets.BLUE_SNIPE, Pipeline.FAR, true);
+            G.isRedAlliance() ? ShotPresets.SNIPE : ShotPresets.BLUE_SNIPE,
+            Pipeline.FAR,
+            true,
+            true);
       } else if (OI.DR.getLeftBumper() || OI.DR.getBackButton() || OI.XK.get(6, 5)) {
         ss.intake();
       } else {

@@ -3,16 +3,15 @@ package frc.robot.auto.ampside;
 import frc.robot.G;
 import frc.robot.auto.AltAuto;
 
-public class AmpSeries extends AltAuto {
-  public AmpSeries() {
-    super("AmpSeries", true);
-    trajstack
-        .appendChain()
-        .append("Ampside Start", false)
-        .append("AmpForkTo5ToStrafe", false)
-        .append("Amp Strafe Run", false);
+public class AmpBlitz extends AltAuto {
 
-    trajstack.setActiveIdx(0);
+  public AmpBlitz(int idx) {
+    super("AmpBlitz", true);
+    trajstack.appendChain().append("AmpSideBlitz456", true);
+
+    trajstack.appendChain().append("AmpSideBlitz546", true);
+
+    trajstack.setActiveIdx(idx);
   }
 
   @Override

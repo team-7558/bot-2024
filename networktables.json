@@ -2,7 +2,7 @@
   {
     "name": "/Preferences/shotUUID",
     "type": "int",
-    "value": 62,
+    "value": 75,
     "properties": {
       "persistent": true
     }

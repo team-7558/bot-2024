@@ -3,16 +3,16 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 3.1579356852407394,
-        "y": 5.556066607628711
+        "x": 5.001067701250446,
+        "y": 6.42
       },
       "prevControl": null,
       "nextControl": {
-        "x": 5.746452573986229,
-        "y": 6.794856832956909
+        "x": 6.439510790526006,
+        "y": 6.209037173236588
       },
       "isLocked": false,
-      "linkedName": "AmpsideStart2"
+      "linkedName": "AmpFork"
     },
     {
       "anchor": {
@@ -20,31 +20,37 @@
         "y": 5.768694780632805
       },
       "prevControl": {
-        "x": 7.207115675492612,
-        "y": 6.1292382044223555
+        "x": 7.290221179546504,
+        "y": 6.297670509683366
       },
       "nextControl": {
-        "x": 8.552230633326781,
-        "y": 5.614929544073996
+        "x": 9.040332133761613,
+        "y": 5.221015657370547
       },
       "isLocked": false,
       "linkedName": "AltStrafe"
     },
     {
       "anchor": {
-        "x": 4.26,
-        "y": 5.01
+        "x": 2.45,
+        "y": 3.5210374609539774
       },
       "prevControl": {
-        "x": 4.803492850228944,
-        "y": 3.2633802204541347
+        "x": 3.936875516523894,
+        "y": 2.2908538088462596
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "UnderStageShot"
+      "linkedName": "StrafePoint"
     }
   ],
-  "rotationTargets": [],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 1.55,
+      "rotationDegrees": 0,
+      "rotateFast": false
+    }
+  ],
   "constraintZones": [],
   "eventMarkers": [],
   "globalConstraints": {
@@ -55,7 +61,7 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 0.0,
+    "rotation": 25.0,
     "rotateFast": false
   },
   "reversed": false,

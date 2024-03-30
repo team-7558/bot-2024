@@ -641,14 +641,15 @@ public class SS {
     // }
   }
 
-  public void trackPreset(Setpoints s, Pipeline p, boolean adjust) {
+  public void trackPreset(Setpoints s, Pipeline p, boolean adjust, boolean track) {
     if (currState != State.BOOT) {
       shooter.setLLPipeline(p);
       shooter.setTargetMode(TargetMode.SPEAKER);
       Setpoints sp = adjust ? shooter.adjustPreset(s) : s;
 
       if (shooter.beamBroken()) {
-        Setpoints cs = shooter.constrainSetpoints(shooter.llTakeover(sp, p), false, false);
+        Setpoints cs =
+            shooter.constrainSetpoints(track ? shooter.llTakeover(sp, p) : sp, false, false);
         shooter.queueSetpoints(cs);
         constrained = !cs.equals(sp);
 
@@ -671,11 +672,11 @@ public class SS {
     }
   }
 
-  public void autoPreset(Setpoints s) {
+  public void autoPreset(Setpoints s, boolean track) {
     if (currState != State.BOOT) {
       shooter.setLLPipeline(Pipeline.FAR);
       if (shooter.beamBroken()) {
-        trackPreset(shooter.constrainSetpoints(s, false, false), Pipeline.FAR, true);
+        trackPreset(shooter.constrainSetpoints(s, false, false), Pipeline.NEAR, true, track);
       } else if (currState != State.AUTOCHAMBER && currState != State.AUTOPRECHAMBER) {
         queueState(State.AUTOPRECHAMBER);
       }

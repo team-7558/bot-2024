@@ -21,6 +21,7 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.auto.AutoSelector;
+import frc.robot.auto.ampside.AmpBlitz;
 import frc.robot.auto.ampside.AmpSeries;
 import frc.robot.auto.ampside.DefaultMovingWhileShooting;
 import frc.robot.auto.sourceside.SourceSeries;
@@ -51,7 +52,9 @@ public class Robot extends LoggedRobot {
           .add(new DefaultMovingWhileShooting(), 16, 16, 16)
           .add(new SourceSeries(0), 48, 0, 0)
           .add(new SourceSeries(1), 0, 48, 0)
-          .add(new AmpSeries(), 0, 0, 48);
+          .add(new AmpSeries(), 0, 0, 48)
+          .add(new AmpBlitz(0), 24, 0, 24)
+          .add(new AmpBlitz(1), 24, 24, 0);
 
   private Command autonomousCommand;
   private Drive drive;
@@ -116,7 +119,20 @@ public class Robot extends LoggedRobot {
       lastAS = true;
       AS.setCurrIdx(3);
       AS.generate();
-    } else if (!OI.XK.get(0, 0) && !OI.XK.get(1, 0) && !OI.XK.get(2, 0) && !OI.XK.get(3, 0)) {
+    } else if (!lastAS && OI.XK.get(4, 0)) {
+      lastAS = true;
+      AS.setCurrIdx(4);
+      AS.generate();
+    } else if (!lastAS && OI.XK.get(5, 0)) {
+      lastAS = true;
+      AS.setCurrIdx(5);
+      AS.generate();
+    } else if (!OI.XK.get(0, 0)
+        && !OI.XK.get(1, 0)
+        && !OI.XK.get(2, 0)
+        && !OI.XK.get(3, 0)
+        && !OI.XK.get(4, 0)
+        && !OI.XK.get(5, 0)) {
       lastAS = false;
     }
 
