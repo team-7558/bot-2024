@@ -785,11 +785,25 @@ public class Shooter extends StateMachineSubsystemBase {
       } else {
         if ((G.isRedAlliance() && llInputs.tid == 4) || (!G.isRedAlliance() && llInputs.tid == 7)) {
 
-          double distToTarget = llDist();
-          Logger.recordOutput("Shooter/TargetDist", distToTarget);
+          double tx = llInputs.tx;
+          double ty = llInputs.ty;
 
           if (mws_enabled) {
             double botRad = Drive.getInstance().getRotation().getRadians();
+
+            ChassisSpeeds botSpeeds = Drive.getInstance().getFieldRelativeSpeeds(); 
+
+            double omega = botSpeeds.omegaRadiansPerSecond;
+
+            double angularOffsetX = Units.radiansToDegrees(Math.atan(Math.tan(llInputs.tx) * botSpeeds.vxMetersPerSecond));
+            double angularOffsetY = Units.radiansToDegrees(Math.atan(Math.tan(llInputs.ty) * botSpeeds.vyMetersPerSecond));
+            
+
+            tx = llInputs.tx - angularOffsetX;
+            ty = llInputs.ty - angularOffsetY;
+
+            // untested code it sort of makes sense logically
+
           }
 
           double minDamp = 0.9;
@@ -797,10 +811,11 @@ public class Shooter extends StateMachineSubsystemBase {
           double minLat = 20;
           double maxLat = 200;
 
-          // ns.flywheel_rps = shotSpeedFromDistance.calcY(distToTarget);
+          double distToTarget = llDist(ty);
+          Logger.recordOutput("Shooter/TargetDist", distToTarget);
           ns.turretPos_r =
               inputs.turretPosR
-                  - Units.degreesToRotations(llInputs.tx)
+                  - Units.degreesToRotations(tx)
                       * Util.remap(minLat, maxLat, llInputs.latency, minDamp, maxDamp);
           ns.pivotPos_r = pivotHeightFromDistance.calcY(distToTarget);
 
@@ -818,6 +833,16 @@ public class Shooter extends StateMachineSubsystemBase {
 
   public boolean llOnTarget() {
     return llInputs.connected && llInputs.tv && Math.abs(llInputs.tx) < 2.6;
+  }
+
+  public boolean mwsEnabled() {
+    return mws_enabled;
+  }
+
+  public double llDist(double ty) {
+    double angleToGoal = LIMELIGHT_ANGLE + Units.degreesToRadians(ty);
+    double distToTarget = (SPEAKER_TAG_HEIGHT - LIMELIGHT_HEIGHT) / Math.tan(angleToGoal);
+    return distToTarget;
   }
 
   public double llDist() {
