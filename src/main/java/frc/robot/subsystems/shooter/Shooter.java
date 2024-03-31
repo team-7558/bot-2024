@@ -823,18 +823,21 @@ public class Shooter extends StateMachineSubsystemBase {
             Logger.recordOutput("Shooter/turrTranslation", turrTranslation);
             Logger.recordOutput("Shooter/newTarget", newTarget);
             Logger.recordOutput("Shooter/newTurrTranslation", newTurrTranslation);
-            // double botRad = Drive.getInstance().getRotation().getRadians();
 
-            // ChassisSpeeds botSpeeds = Drive.getInstance().getFieldRelativeSpeeds(); 
+            double botRad = Drive.getInstance().getRotation().getRadians();
 
-            // double omega = botSpeeds.omegaRadiansPerSecond;
+            ChassisSpeeds botSpeeds = Drive.getInstance().getFieldRelativeSpeeds(); 
 
-            // double angularOffsetX = Units.radiansToDegrees(Math.atan(Math.tan(llInputs.tx) * botSpeeds.vxMetersPerSecond));
-            // double angularOffsetY = Units.radiansToDegrees(Math.atan(Math.tan(llInputs.ty) * botSpeeds.vyMetersPerSecond));
+            double omega = botSpeeds.omegaRadiansPerSecond;
+
+            double angularOffsetX = Units.radiansToDegrees(Math.atan(Math.tan(llInputs.tx) * botSpeeds.vxMetersPerSecond));
+            double angularOffsetY = Units.radiansToDegrees(Math.atan(Math.tan(llInputs.ty) * botSpeeds.vyMetersPerSecond));
             
+            Logger.recordOutput("Shooter/xOffset", angularOffsetX);
+            Logger.recordOutput("Shooter/yOffset", angularOffsetY);
 
-            // tx = llInputs.tx - angularOffsetX;
-            // ty = llInputs.ty - angularOffsetY;
+            //tx = llInputs.tx - angularOffsetX;
+            //ty = llInputs.ty - angularOffsetY;
 
             // untested code it sort of makes sense logically
 
