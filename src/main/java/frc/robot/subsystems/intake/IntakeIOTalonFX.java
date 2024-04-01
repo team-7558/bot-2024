@@ -25,6 +25,7 @@ import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DigitalInput;
+import frc.robot.Constants;
 
 public class IntakeIOTalonFX implements IntakeIO {
   private static final double TOP_GEAR_RATIO = 16.0 / 24.0;
@@ -97,7 +98,7 @@ public class IntakeIOTalonFX implements IntakeIO {
     topMotor.getConfigurator().apply(topconfig);
 
     BaseStatusSignal.setUpdateFrequencyForAll(
-        50.0,
+        1.0 / Constants.globalDelta_sec,
         bottomVelocity,
         bottomAppliedVolts,
         bottomCurrent,

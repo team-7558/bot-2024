@@ -91,4 +91,12 @@ public class Trajstack implements IFollowable {
     }
     return null;
   }
+
+  @Override
+  public double segEnd(int i) {
+    if (generated) {
+      return trajs.get(activeTraj).segEnd(i);
+    }
+    return 0.0;
+  }
 }

@@ -99,4 +99,8 @@ public abstract class AltAuto {
         cs.vxMetersPerSecond * cs.vxMetersPerSecond + cs.vyMetersPerSecond * cs.vyMetersPerSecond;
     return vmag < (mag * mag);
   }
+
+  protected double segEnd(int i) {
+    return trajstack.segEnd(i);
+  }
 }

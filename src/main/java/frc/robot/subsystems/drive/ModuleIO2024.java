@@ -18,6 +18,7 @@ import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
 import edu.wpi.first.math.geometry.Rotation2d;
+import frc.robot.Constants;
 import java.util.Queue;
 
 /**
@@ -181,7 +182,7 @@ public class ModuleIO2024 implements ModuleIO {
     BaseStatusSignal.setUpdateFrequencyForAll(
         Module.ODOMETRY_FREQUENCY, drivePosition, turnPosition);
     BaseStatusSignal.setUpdateFrequencyForAll(
-        50.0,
+        1.0 / Constants.globalDelta_sec,
         driveVelocity,
         driveAppliedVolts,
         driveCurrent,

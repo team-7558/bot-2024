@@ -114,4 +114,12 @@ public class Trajchain implements IFollowable {
     }
     return null;
   }
+
+  @Override
+  public double segEnd(int i) {
+    if (generated) {
+      return startTimes.get(i) + trajs.get(i).endTime();
+    }
+    return 0.0;
+  }
 }

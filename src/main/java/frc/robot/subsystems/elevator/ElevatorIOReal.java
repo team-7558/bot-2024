@@ -14,6 +14,7 @@ import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.DigitalInput;
+import frc.robot.Constants;
 import org.littletonrobotics.junction.Logger;
 
 public class ElevatorIOReal implements ElevatorIO {
@@ -107,7 +108,7 @@ public class ElevatorIOReal implements ElevatorIO {
     rightFalcon.getConfigurator().apply(leaderConfig);
     // rightFalcon.setControl(new Follower(leftFalcon.getDeviceID(), false).withUpdateFreqHz(50));
     BaseStatusSignal.setUpdateFrequencyForAll(
-        50.0, pos_m, vel_mps, volts_V, leftCurrent_A, rightCurrent_A);
+        1.0 / Constants.globalDelta_sec, pos_m, vel_mps, volts_V, leftCurrent_A, rightCurrent_A);
     leftFalcon.optimizeBusUtilization();
     rightFalcon.optimizeBusUtilization();
 

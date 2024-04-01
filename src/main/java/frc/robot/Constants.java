@@ -38,7 +38,7 @@ public final class Constants {
     REPLAY
   }
 
-  public static final double globalDelta_sec = 0.02;
+  public static final double globalDelta_sec = 0.01;
   public static final double driveDeadband = 0.05;
 
   public static final double trueMass_kg = Units.lbsToKilograms(148.0);

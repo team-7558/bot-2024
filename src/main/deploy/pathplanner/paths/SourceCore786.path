@@ -32,16 +32,16 @@
     },
     {
       "anchor": {
-        "x": 5.605461317381116,
+        "x": 5.81473247902248,
         "y": 3.55
       },
       "prevControl": {
-        "x": 4.948207753950263,
-        "y": 3.6016866688033904
+        "x": 5.190503470536393,
+        "y": 3.7621129494845147
       },
       "nextControl": {
-        "x": 6.016332827555648,
-        "y": 3.5176889090470875
+        "x": 6.299056751505833,
+        "y": 3.385426664658639
       },
       "isLocked": false,
       "linkedName": null
@@ -52,44 +52,44 @@
         "y": 2.349639901550918
       },
       "prevControl": {
-        "x": 7.471991892173991,
-        "y": 3.1772525149024755
+        "x": 7.9118565788753985,
+        "y": 2.3731889351684305
       },
       "nextControl": {
-        "x": 8.67860919947004,
-        "y": 2.004540334942028
+        "x": 8.817873941009072,
+        "y": 2.3213621286224577
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 4.531325797924839,
-        "y": 4.403997452423578
+        "x": 4.255208321626082,
+        "y": 4.804496783034864
       },
       "prevControl": {
-        "x": 5.010806827683359,
-        "y": 4.266299633606112
+        "x": 4.734689351384602,
+        "y": 4.6667989642173975
       },
       "nextControl": {
-        "x": 4.051844768166319,
-        "y": 4.5416952712410446
+        "x": 3.775727291867562,
+        "y": 4.94219460185233
       },
       "isLocked": false,
       "linkedName": "AmpCoreFork"
     },
     {
       "anchor": {
-        "x": 4.860023006064465,
-        "y": 2.5550756566381843
+        "x": 4.628138011438264,
+        "y": 1.971199789007247
       },
       "prevControl": {
-        "x": 4.208498182787707,
-        "y": 3.3298619329673014
+        "x": 4.000766048464274,
+        "y": 2.818151939022135
       },
       "nextControl": {
-        "x": 5.291752973553509,
-        "y": 2.0416670466512143
+        "x": 5.403056847411629,
+        "y": 0.925059360443204
       },
       "isLocked": false,
       "linkedName": null
@@ -128,16 +128,16 @@
     },
     {
       "anchor": {
-        "x": 4.531325797924839,
-        "y": 4.403997452423578
+        "x": 4.255208321626082,
+        "y": 4.804496783034864
       },
       "prevControl": {
-        "x": 4.355719453488877,
-        "y": 4.750330873289006
+        "x": 4.07960197719012,
+        "y": 5.150830203900292
       },
       "nextControl": {
-        "x": 4.856452718798862,
-        "y": 3.7627773468321966
+        "x": 4.580335242500105,
+        "y": 4.163276677443482
       },
       "isLocked": false,
       "linkedName": "AmpCoreFork"
@@ -160,16 +160,16 @@
     },
     {
       "anchor": {
-        "x": 4.531325797924839,
-        "y": 4.403997452423578
+        "x": 4.255208321626082,
+        "y": 4.804496783034864
       },
       "prevControl": {
-        "x": 5.085366845896101,
-        "y": 3.492776068717504
+        "x": 4.809249369597344,
+        "y": 3.8932753993287896
       },
       "nextControl": {
-        "x": 4.20860857778318,
-        "y": 4.9347646816028
+        "x": 3.9324911014844233,
+        "y": 5.335264012214086
       },
       "isLocked": false,
       "linkedName": "AmpCoreFork"
@@ -200,6 +200,39 @@
         "maxAngularVelocity": 540.0,
         "maxAngularAcceleration": 720.0
       }
+    },
+    {
+      "name": "New Constraints Zone",
+      "minWaypointRelativePos": 3.8499999999999996,
+      "maxWaypointRelativePos": 4.2,
+      "constraints": {
+        "maxVelocity": 1.0,
+        "maxAcceleration": 3.7,
+        "maxAngularVelocity": 540.0,
+        "maxAngularAcceleration": 720.0
+      }
+    },
+    {
+      "name": "New Constraints Zone",
+      "minWaypointRelativePos": 7.699999999999999,
+      "maxWaypointRelativePos": 8.05,
+      "constraints": {
+        "maxVelocity": 1.0,
+        "maxAcceleration": 3.7,
+        "maxAngularVelocity": 540.0,
+        "maxAngularAcceleration": 720.0
+      }
+    },
+    {
+      "name": "New Constraints Zone",
+      "minWaypointRelativePos": 9.9,
+      "maxWaypointRelativePos": 10.1,
+      "constraints": {
+        "maxVelocity": 1.0,
+        "maxAcceleration": 3.7,
+        "maxAngularVelocity": 540.0,
+        "maxAngularAcceleration": 720.0
+      }
     }
   ],
   "eventMarkers": [],
@@ -217,5 +250,5 @@
   "reversed": false,
   "folder": "SourceSide",
   "previewStartingState": null,
-  "useDefaultConstraints": false
+  "useDefaultConstraints": true
 }

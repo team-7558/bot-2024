@@ -146,4 +146,11 @@ public class Traj implements IFollowable {
       return initState;
     }
   }
+
+  @Override
+  public double segEnd(int i) {
+    if (!generated) return 0;
+    if (i != 0) return 0;
+    return endTime();
+  }
 }

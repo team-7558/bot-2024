@@ -298,6 +298,7 @@ public class Shooter extends StateMachineSubsystemBase {
             // queueSetpoints(constrainSetpoints(shooterPipeline(), !inputs.beamBreakInActivated));
             Setpoints s = new Setpoints().copy(currSetpoints);
             if (inputs.beamBreakOutActivated) {
+              s.feederVel_rps = 0;
               setCurrentState(IDLE);
             } else if (!inputs.beamBreakInActivated) {
               s.feederVel_rps = 7.1;
@@ -319,6 +320,7 @@ public class Shooter extends StateMachineSubsystemBase {
             // queueSetpoints(constrainSetpoints(shooterPipeline(), !inputs.beamBreakInActivated));
             Setpoints s = new Setpoints().copy(currSetpoints);
             if (inputs.beamBreakOutActivated) {
+              s.feederVel_rps = 0;
               setCurrentState(IDLE);
             } else if (!inputs.beamBreakInActivated) {
               s.feederVel_rps = 7.3;
@@ -783,6 +785,8 @@ public class Shooter extends StateMachineSubsystemBase {
 
   Debouncer lldb = new Debouncer(0.7, DebounceType.kFalling);
 
+  double txOffset = 0;
+
   public Setpoints llTakeover(Setpoints s, Pipeline p) {
     if (ll_enabled && lldb.calculate(llInputs.connected && llInputs.tv)) {
       Setpoints ns = new Setpoints().copy(s);
@@ -795,15 +799,15 @@ public class Shooter extends StateMachineSubsystemBase {
           double ty = llInputs.ty;
           double distToTarget = llDist();
           double mwsTx = 0;
+          double botRot = Drive.getInstance().getRotation().getRotations();
+          double aimRot = Math.IEEEremainder(botRot + inputs.turretPosR, 1.0);
 
           if (mws_enabled) {
-            double botRot = Drive.getInstance().getRotation().getRotations();
-            double aimRot = botRot + inputs.turretPosR;
             Translation2d turrTranslation =
                 new Translation2d(distToTarget, Rotation2d.fromRotations(aimRot));
             ChassisSpeeds fieldRelChassisSpeeds = Drive.getInstance().getFieldRelativeSpeeds();
 
-            double shotTime_s = TIME_TO_SHOOT;
+            double shotTime_s = 0.1;
 
             Translation2d offset =
                 new Translation2d(
@@ -824,38 +828,63 @@ public class Shooter extends StateMachineSubsystemBase {
             Logger.recordOutput("Shooter/newTarget", newTarget);
             Logger.recordOutput("Shooter/newTurrTranslation", newTurrTranslation);
 
-            double botRad = Drive.getInstance().getRotation().getRadians();
+            double newBotRot = newTurrTranslation.getAngle().getRotations();
+            double newDist = newTarget.getDistance(ogPos);
 
-            ChassisSpeeds botSpeeds = Drive.getInstance().getFieldRelativeSpeeds(); 
+            double txOffset = Units.rotationsToDegrees(botRot - newBotRot);
 
-            double omega = botSpeeds.omegaRadiansPerSecond;
+            tx += txOffset;
+            distToTarget = newDist;
 
-            double angularOffsetX = Units.radiansToDegrees(Math.atan(Math.tan(llInputs.tx) * botSpeeds.vxMetersPerSecond));
-            double angularOffsetY = Units.radiansToDegrees(Math.atan(Math.tan(llInputs.ty) * botSpeeds.vyMetersPerSecond));
-            
-            Logger.recordOutput("Shooter/xOffset", angularOffsetX);
-            Logger.recordOutput("Shooter/yOffset", angularOffsetY);
+            // double botRad = Drive.getInstance().getRotation().getRadians();
 
-            //tx = llInputs.tx - angularOffsetX;
-            //ty = llInputs.ty - angularOffsetY;
+            // ChassisSpeeds botSpeeds = Drive.getInstance().getFieldRelativeSpeeds();
+
+            // double omega = botSpeeds.omegaRadiansPerSecond;
+
+            // double angularOffsetX =
+            //     Units.radiansToDegrees(
+            //         Math.atan(Math.tan(llInputs.tx) * botSpeeds.vxMetersPerSecond));
+            // double angularOffsetY =
+            //     Units.radiansToDegrees(
+            //         Math.atan(Math.tan(llInputs.ty) * botSpeeds.vyMetersPerSecond));
+
+            // Logger.recordOutput("Shooter/xOffset", angularOffsetX);
+            // Logger.recordOutput("Shooter/yOffset", angularOffsetY);
+
+            // // tx = llInputs.tx - angularOffsetX;
+            // // ty = llInputs.ty - angularOffsetY;
 
             // untested code it sort of makes sense logically
 
           }
 
-          double minDamp = 0.85;
-          double maxDamp = 0.5;
-          double minLat = 20;
-          double maxLat = 200;
-
+          double aaaimrot = Math.IEEEremainder(G.isRedAlliance() ? aimRot + 0.5 : aimRot, 1.0);
           if (llInputs.connected && llInputs.tv) {
+            txOffset = Util.remap(-0.5, 0.5, aaaimrot, -6, 6);
+
+            double minDamp = 0.85;
+            double maxDamp = 0.5;
+            double minLat = 20;
+            double maxLat = 200;
             ns.turretPos_r =
                 inputs.turretPosR
-                    - Units.degreesToRotations(llInputs.tx)
+                    - Units.degreesToRotations(tx - txOffset)
                         * Util.remap(minLat, maxLat, llInputs.latency, minDamp, maxDamp);
           } else {
-            ns.turretPos_r = inputs.turretPosR;
+            // txOffset = 0;
+            double minDamp = 0.05;
+            double maxDamp = 0.0;
+            double minLat = 20;
+            double maxLat = 200;
+            ns.turretPos_r =
+                inputs.turretPosR
+                    - Units.degreesToRotations(llInputs.tx - txOffset)
+                        * Util.remap(minLat, maxLat, llInputs.latency, minDamp, maxDamp);
           }
+
+          Logger.recordOutput("Shooter/aimRot", aaaimrot);
+          Logger.recordOutput("Shooter/txOffset", txOffset);
 
           // ns.flywheel_rps = shotSpeedFromDistance.calcY(distToTarget);
           ns.pivotPos_r = pivotHeightFromDistance.calcY(distToTarget);
@@ -873,7 +902,7 @@ public class Shooter extends StateMachineSubsystemBase {
   }
 
   public boolean llOnTarget() {
-    return llInputs.connected && llInputs.tv && Math.abs(llInputs.tx) < 2.6;
+    return llInputs.connected && llInputs.tv && Math.abs(llInputs.tx - txOffset) < 2.6;
   }
 
   public boolean mwsEnabled() {

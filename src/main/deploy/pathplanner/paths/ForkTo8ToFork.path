@@ -8,24 +8,24 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 5.1823360789578725,
-        "y": 3.936826445081462
+        "x": 3.891965117263567,
+        "y": 0.7942918068726978
       },
       "isLocked": false,
       "linkedName": "UnderStageShot"
     },
     {
       "anchor": {
-        "x": 8.263543669944482,
-        "y": 5.829855945426177
+        "x": 8.279943025962748,
+        "y": 0.7507026223491965
       },
       "prevControl": {
-        "x": 7.17605863783156,
-        "y": 4.493994702275118
+        "x": 7.7132836271572245,
+        "y": 0.8233512632216998
       },
       "nextControl": {
-        "x": 8.882736067641108,
-        "y": 6.5904688290164755
+        "x": 9.252761622926833,
+        "y": 0.6259822894050823
       },
       "isLocked": false,
       "linkedName": null
@@ -36,8 +36,8 @@
         "y": 5.01
       },
       "prevControl": {
-        "x": 6.296672593345187,
-        "y": 3.2051235531042495
+        "x": 7.645478229009556,
+        "y": 3.361210451034471
       },
       "nextControl": null,
       "isLocked": false,
@@ -64,7 +64,7 @@
   "constraintZones": [],
   "eventMarkers": [],
   "globalConstraints": {
-    "maxVelocity": 4.2,
+    "maxVelocity": 4.27,
     "maxAcceleration": 4.0,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0

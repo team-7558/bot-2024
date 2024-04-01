@@ -15,6 +15,7 @@ import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.wpilibj.DigitalInput;
+import frc.robot.Constants;
 import frc.robot.util.Util;
 
 public class ShooterIOTalonFx implements ShooterIO {
@@ -219,7 +220,7 @@ public class ShooterIOTalonFx implements ShooterIO {
     // talonL.setControl(new Follower(talonR.getDeviceID(), false));
 
     BaseStatusSignal.setUpdateFrequencyForAll(
-        50.0,
+        1.0 / Constants.globalDelta_sec,
         LVelocity,
         LAppliedVolts,
         LCurrent,

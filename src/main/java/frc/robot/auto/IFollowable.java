@@ -15,4 +15,6 @@ public interface IFollowable {
   public State getInitState();
 
   public State getEndState();
+
+  public double segEnd(int i);
 }

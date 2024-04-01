@@ -215,6 +215,7 @@ public class Robot extends LoggedRobot {
   }
 
   boolean lastLLDisable = false;
+  boolean lastMWSDisable = false;
 
   /** This function is called periodically during all modes. */
   @Override
@@ -237,6 +238,13 @@ public class Robot extends LoggedRobot {
       shooter.toggleCamera();
     } else if (!OI.XK.get(9, 0)) {
       lastLLDisable = false;
+    }
+
+    if (!lastMWSDisable && OI.XK.get(9, 1)) {
+      lastMWSDisable = true;
+      shooter.toggleMovingWhileShooting();
+    } else if (!OI.XK.get(9, 1)) {
+      lastMWSDisable = false;
     }
 
     // TODO: add mws toggle
