@@ -793,7 +793,7 @@ public class Shooter extends StateMachineSubsystemBase {
 
       if (p == Pipeline.TRAP) {
       } else {
-        if ((G.isRedAlliance() && llInputs.tid == 4) || (!G.isRedAlliance() && llInputs.tid == 4)) {
+        if ((G.isRedAlliance() && llInputs.tid == 4) || (!G.isRedAlliance() && llInputs.tid == 7)) {
 
           double tx = llInputs.tx;
           double ty = llInputs.ty;
