@@ -793,7 +793,7 @@ public class Shooter extends StateMachineSubsystemBase {
 
       if (p == Pipeline.TRAP) {
       } else {
-        if ((G.isRedAlliance() && llInputs.tid == 4) || (!G.isRedAlliance() && llInputs.tid == 7)) {
+        if ((G.isRedAlliance() && llInputs.tid == 4) || (!G.isRedAlliance() && llInputs.tid == 4)) {
 
           double tx = llInputs.tx;
           double ty = llInputs.ty;
@@ -861,7 +861,7 @@ public class Shooter extends StateMachineSubsystemBase {
 
           double aaaimrot = Math.IEEEremainder(G.isRedAlliance() ? aimRot + 0.5 : aimRot, 1.0);
           if (llInputs.connected && llInputs.tv) {
-            txOffset = Util.remap(-0.5, 0.5, aaaimrot, -6, 6);
+            txOffset = Util.remap(-0.25, 0.25, aaaimrot, -6, 6);
 
             double minDamp = 0.85;
             double maxDamp = 0.5;
@@ -886,7 +886,7 @@ public class Shooter extends StateMachineSubsystemBase {
           Logger.recordOutput("Shooter/aimRot", aaaimrot);
           Logger.recordOutput("Shooter/txOffset", txOffset);
 
-          // ns.flywheel_rps = shotSpeedFromDistance.calcY(distToTarget);
+          ns.flywheel_rps = shotSpeedFromDistance.calcY(distToTarget);
           ns.pivotPos_r = pivotHeightFromDistance.calcY(distToTarget);
 
           if (llOnTarget()) llIO.setLEDs(LEDStatus.HI);
@@ -899,6 +899,10 @@ public class Shooter extends StateMachineSubsystemBase {
       llIO.setLEDs(LEDStatus.OFF);
       return s;
     }
+  }
+
+  public boolean llHasComms() {
+    return llInputs.connected;
   }
 
   public boolean llOnTarget() {

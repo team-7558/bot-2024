@@ -8,13 +8,13 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Ampside Start"
+            "pathName": "Alt Ampside Start"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "AmpForkTo5ToFork"
+            "pathName": "AmpForkTo4ToFork"
           }
         },
         {

@@ -97,7 +97,7 @@ public class RobotTeleop extends Command {
             Pipeline.NEAR,
             true,
             false);
-      } else if (OI.XK.get(3, 2)) {
+      } else if (OI.XK.get(4, 2)) {
         ss.trackPreset(
             G.isRedAlliance() ? ShotPresets.RED_AMP_BOX : ShotPresets.BLUE_AMP_BOX,
             Pipeline.NEAR,
@@ -109,7 +109,7 @@ public class RobotTeleop extends Command {
             Pipeline.NEAR,
             true,
             true);
-      } else if (OI.XK.get(4, 3)) {
+      } else if (OI.XK.get(0, 2)) {
         ss.trackPreset(
             G.isRedAlliance() ? ShotPresets.RED_FRONT_POST : ShotPresets.BLUE_FRONT_POST,
             Pipeline.NEAR,
@@ -136,6 +136,18 @@ public class RobotTeleop extends Command {
       } else if (OI.XK.get(0, 3)) {
         ss.trackPreset(
             G.isRedAlliance() ? ShotPresets.SNIPE : ShotPresets.BLUE_SNIPE,
+            Pipeline.FAR,
+            true,
+            true);
+      } else if (OI.XK.get(3, 2)) {
+        ss.trackPreset(
+            G.isRedAlliance() ? ShotPresets.RED_AMP_SNIPE : ShotPresets.BLUE_AMP_SNIPE,
+            Pipeline.FAR,
+            true,
+            true);
+      } else if (OI.XK.get(4, 3)) {
+        ss.trackPreset(
+            G.isRedAlliance() ? ShotPresets.RED_STEAL_SHOT : ShotPresets.BLUE_STEAL_SHOT,
             Pipeline.FAR,
             true,
             true);

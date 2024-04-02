@@ -182,7 +182,7 @@ public class Drive extends StateMachineSubsystemBase {
   private Rotation2d lastGyroRotation = new Rotation2d();
   private ChassisSpeeds chassisSpeeds = new ChassisSpeeds(0, 0, 0);
 
-  private SlewRateLimiter throttleLimit = new SlewRateLimiter(3.0, -0.9, 0.0);
+  private SlewRateLimiter throttleLimit = new SlewRateLimiter(3.0, -1.1, 0.0);
 
   private Drive(
       GyroIO gyroIO,

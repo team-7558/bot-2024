@@ -55,6 +55,7 @@ public class SS {
     TRACKING,
     SHOOTER_SPIT,
     SHOOTING,
+    FORCE_SHOOTING,
     SHOOTING_FROM_GROUND,
     SOURCE_FEEDING,
     SOURCE_SHOOTING,
@@ -268,7 +269,7 @@ public class SS {
           hasGamePiece = false;
         }
 
-        if (after(0.1)) {
+        if (after(0.15)) {
           queueState(State.AMP_SCORING_DOWN);
         }
 
@@ -452,7 +453,6 @@ public class SS {
           shooter.setCurrentState(shooter.SHOOTING);
         }
         break;
-
       case AUTOSHOOTING:
         hasGamePiece = false;
         // intake.setCurrentState(intake.SHOOTER_SIDE);
@@ -676,7 +676,7 @@ public class SS {
     if (currState != State.BOOT) {
       shooter.setLLPipeline(Pipeline.FAR);
       if (shooter.beamBroken()) {
-        trackPreset(shooter.constrainSetpoints(s, false, false), Pipeline.NEAR, true, track);
+        trackPreset(shooter.constrainSetpoints(s, false, false), Pipeline.NEAR, false, track);
       } else if (currState != State.AUTOCHAMBER && currState != State.AUTOPRECHAMBER) {
         queueState(State.AUTOPRECHAMBER);
       }

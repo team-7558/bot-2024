@@ -1,0 +1,116 @@
+{
+  "version": 1.0,
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 1.7270356192629779,
+        "y": 6.271999328659424
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 1.7948410174106473,
+        "y": 6.974269523760286
+      },
+      "isLocked": false,
+      "linkedName": "AmpCore"
+    },
+    {
+      "anchor": {
+        "x": 3.1461057376392034,
+        "y": 7.095350591881125
+      },
+      "prevControl": {
+        "x": 2.9095788993764096,
+        "y": 7.331877430143919
+      },
+      "nextControl": {
+        "x": 3.4706030002030497,
+        "y": 6.770853329317278
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 2.1968301635718306,
+        "y": 6.271999328659424
+      },
+      "prevControl": {
+        "x": 2.2775932268426824,
+        "y": 6.855288118948911
+      },
+      "nextControl": {
+        "x": 2.153240979048329,
+        "y": 5.9571885515452445
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 3.281716533934542,
+        "y": 5.5164534635853935
+      },
+      "prevControl": {
+        "x": 2.700218277270956,
+        "y": 5.410158083335061
+      },
+      "nextControl": {
+        "x": 3.7321381073440607,
+        "y": 5.598788589907564
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 2.1968301635718306,
+        "y": 5.041815676551707
+      },
+      "prevControl": {
+        "x": 2.3324409598671694,
+        "y": 5.366312939115553
+      },
+      "nextControl": {
+        "x": 2.0705824619248996,
+        "y": 4.73972296189655
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 2.8409814459746907,
+        "y": 3.8939671507661595
+      },
+      "prevControl": {
+        "x": 2.172613949947663,
+        "y": 4.063480646135334
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": null
+    }
+  ],
+  "rotationTargets": [],
+  "constraintZones": [],
+  "eventMarkers": [],
+  "globalConstraints": {
+    "maxVelocity": 2.0,
+    "maxAcceleration": 3.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": 1.8476102659944968,
+    "rotateFast": false
+  },
+  "reversed": false,
+  "folder": "AmpSide",
+  "previewStartingState": {
+    "rotation": 0,
+    "velocity": 0
+  },
+  "useDefaultConstraints": false
+}

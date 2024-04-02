@@ -52,9 +52,9 @@ public class Robot extends LoggedRobot {
           .add(new DefaultMovingWhileShooting(), 16, 16, 16)
           .add(new SourceSeries(0), 48, 0, 0)
           .add(new SourceSeries(1), 0, 48, 0)
-          .add(new AmpSeries(), 0, 0, 48)
-          .add(new AmpBlitz(0), 24, 0, 24)
-          .add(new AmpBlitz(1), 24, 24, 0);
+          .add(new AmpSeries(0), 0, 0, 48)
+          .add(new AmpSeries(1), 0, 24, 24)
+          .add(new AmpBlitz(0), 24, 0, 24);
 
   private Command autonomousCommand;
   private Drive drive;
@@ -242,7 +242,7 @@ public class Robot extends LoggedRobot {
 
     if (!lastMWSDisable && OI.XK.get(9, 1)) {
       lastMWSDisable = true;
-      shooter.toggleMovingWhileShooting();
+      // shooter.toggleMovingWhileShooting();
     } else if (!OI.XK.get(9, 1)) {
       lastMWSDisable = false;
     }
@@ -263,6 +263,13 @@ public class Robot extends LoggedRobot {
     if (!brake) {
       for (int i = 1; i < LED.WIDTH; i += 2) {
         LED.getInstance().drawCol(i, 16, 0, 16);
+      }
+    }
+
+    if (!shooter.llHasComms()) {
+      for (int i = 0; i < LED.NUM_LEDS; i += 3) {
+        LED.getInstance().setRGB(i, 0, 64, 0);
+        ;
       }
     }
 

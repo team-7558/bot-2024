@@ -4,6 +4,8 @@
 
 package frc.robot.subsystems.shooter;
 
+import edu.wpi.first.math.filter.Debouncer;
+import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.wpilibj.Preferences;
 import frc.robot.util.LimelightHelpers;
 import frc.robot.util.LimelightHelpers.LimelightResults;
@@ -16,6 +18,9 @@ public class TurretCamIOReal implements TurretCamIO {
 
   TurretCamIOInputs lastInputs = new TurretCamIOInputs();
 
+  Debouncer commsDebouncer = new Debouncer(1.0, DebounceType.kRising);
+  double prevLatency = 0;
+
   @Override
   public void updateInputs(TurretCamIOInputs inputs) {
     res = LimelightHelpers.getLatestResults("");
@@ -24,14 +29,15 @@ public class TurretCamIOReal implements TurretCamIO {
 
     boolean v = res.targetingResults.valid;
 
-    inputs.connected = true;
     inputs.tv = v;
+    double lat = res.targetingResults.latency_pipeline;
     inputs.latency =
         res.targetingResults.latency_pipeline
             + res.targetingResults.latency_capture
             + res.targetingResults.latency_jsonParse;
+    inputs.connected = !commsDebouncer.calculate(lat == prevLatency);
     inputs.ids = fids.length;
-
+    prevLatency = lat;
     if (v) {
       inputs.tx = fids[0].tx;
       inputs.ty = fids[0].ty;
