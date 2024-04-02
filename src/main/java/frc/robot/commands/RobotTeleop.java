@@ -106,7 +106,7 @@ public class RobotTeleop extends Command {
       } else if (OI.XK.get(1, 3)) {
         ss.trackPreset(
             G.isRedAlliance() ? ShotPresets.RED_SIDE_POST : ShotPresets.BLUE_SIDE_POST,
-            Pipeline.NEAR,
+            Pipeline.FAR,
             true,
             true);
       } else if (OI.XK.get(0, 2)) {

@@ -51,8 +51,8 @@ public class SourceSeries extends AltAuto {
       } else if (before(segEnd(0) + 1.25)) {
         ss.autoShoot();
       } else if (before(segEnd(1) - 0.1)) {
-        ss.autoPreset(new Setpoints(39, 0, i * 0.04, 0.078), false);
-      } else if (before(segEnd(1) + 1.25)) {
+        ss.autoPreset(new Setpoints(39, 0, i * 0.04, 0.077), false);
+      } else if (before(segEnd(1) + 1.28)) {
         ss.autoShoot();
       } else if (before(segEnd(2) - 0.1)) {
         ss.autoPreset(new Setpoints(39, 0, i * 0.04, 0.078), false);

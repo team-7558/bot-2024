@@ -221,6 +221,8 @@ public class SS {
         break;
       case INTAKING_DEEP:
         if (first) {
+          elevator.setTargetHeight(Elevator.MIN_HEIGHT_M);
+          elevator.setCurrentState(elevator.TRAVELLING);
           shooter.queueSetpoints(new Setpoints(0, 0, 0, Shooter.PIVOT_MIN_FEED_POS_r));
           shooter.setCurrentState(shooter.TRACKING);
         }
@@ -275,10 +277,10 @@ public class SS {
 
         break;
       case AMP_SCORING_DOWN:
+        hasGamePiece = false;
         if (first) {
           elevator.setTargetHeight(Elevator.RESET_HEIGHT_M);
           elevator.setCurrentState(elevator.TRAVELLING);
-          hasGamePiece = false;
         }
 
         if (after(0.1) && elevator.isState(elevator.HOLDING)) {
@@ -474,7 +476,7 @@ public class SS {
 
     if (((currState == State.INTAKING_DEEP || currState == State.PREP_AMP) && hasGamePiece)
         || (currState == State.CHAMBER && hasGamePiece)) {
-      OI.DR.setRumble(RumbleType.kLeftRumble, 0.3);
+      OI.DR.setRumble(RumbleType.kLeftRumble, 0.9);
       if (flash) {
         LED.getInstance().setAllRGB(128, 128, 128);
       }
