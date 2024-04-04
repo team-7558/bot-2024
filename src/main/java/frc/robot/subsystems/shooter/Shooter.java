@@ -509,6 +509,10 @@ public class Shooter extends StateMachineSubsystemBase {
     ll_enabled = !ll_enabled;
   }
 
+  public boolean llEnabled() {
+    return ll_enabled;
+  }
+
   public void toggleMovingWhileShooting() {
     mws_enabled = !mws_enabled;
   }

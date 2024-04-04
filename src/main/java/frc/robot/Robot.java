@@ -153,6 +153,14 @@ public class Robot extends LoggedRobot {
     led.scaleCol(c, red ? 3 : 0, 0, red ? 0 : 3);
 
     AS.drawLEDS();
+
+    if (shooter.llEnabled()) {
+      LED.getInstance().drawPoint(0, LED.HEIGHT - 1, 0, 255, 0);
+      LED.getInstance().drawPoint(LED.WIDTH + 1, LED.HEIGHT + 1, 0, 255, 0);
+    } else {
+      LED.getInstance().drawPoint(0, LED.HEIGHT, 255, 0, 0);
+      LED.getInstance().drawPoint(LED.WIDTH, LED.HEIGHT, 255, 0, 0);
+    }
   }
 
   /**
@@ -259,6 +267,8 @@ public class Robot extends LoggedRobot {
       // TODO: FIGURE OUT WHAT TO DO HERE
     } else {
     }
+
+    // TODO: NEED TO PUSH
 
     if (!brake) {
       for (int i = 1; i < LED.WIDTH; i += 2) {
