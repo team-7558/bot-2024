@@ -577,6 +577,10 @@ public class SS {
     }
   }
 
+  public void setLastPreset(String presetName) {
+    shooter.setLastPreset(presetName);
+  }
+
   public void chamber() {
     if (!resetting() && currState != State.CHAMBER && currState != State.PRECHAMBER) {
       if (shooter.beamBroken()) {

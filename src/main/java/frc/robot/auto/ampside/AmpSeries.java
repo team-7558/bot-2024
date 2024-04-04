@@ -29,7 +29,7 @@ public class AmpSeries extends AltAuto {
   @Override
   public void onInit() {
     double i = G.isRedAlliance() ? 1.0 : -1.0;
-    ss.autoPreset(firstShot, false);
+    ss.autoPreset(new Setpoints(24, 0, i * -0.055, G.isRedAlliance() ? 0.108 : 0.107), false);
     // ss.queueSetpointsLive();
   }
 
@@ -41,19 +41,19 @@ public class AmpSeries extends AltAuto {
     if (trajstack.getActiveIdx() == 0) {
 
       if (before(0.9)) {
-        ss.autoPreset(firstShot, false);
-      } else if (before(1.8)) {
+        ss.autoPreset(new Setpoints(24, 0, i * -0.055, G.isRedAlliance() ? 0.108 : 0.107), false);
+      } else if (before(1.3)) {
         ss.shoot();
       } else if (before(segEnd(0) - 0.1)) {
-        ss.autoPreset(new Setpoints(39, 0, i * -0.02, 0.083), false);
+        ss.autoPreset(new Setpoints(39, 0, i * -0.02, G.isRedAlliance() ? 0.083 : 0.082), false);
       } else if (before(segEnd(0) + 1.0)) {
         ss.autoShoot();
       } else if (before(segEnd(1) - 0.1)) {
-        ss.autoPreset(new Setpoints(39, 0, i * 0.02, 0.073), false);
+        ss.autoPreset(new Setpoints(39, 0, i * 0.02, G.isRedAlliance() ? 0.073 : 0.072), false);
       } else if (before(segEnd(1) + 1.0)) {
         ss.autoShoot();
       } else if (before(segEnd(2) - 0.1)) {
-        ss.autoPreset(new Setpoints(39, 0, i * 0.02, 0.073), false);
+        ss.autoPreset(new Setpoints(39, 0, i * 0.02, G.isRedAlliance() ? 0.073 : 0.072), false);
       } else if (before(segEnd(2) + 1.0)) {
         ss.autoShoot();
       } else if (before(segEnd(3))) {
@@ -61,23 +61,23 @@ public class AmpSeries extends AltAuto {
       }
     } else { // Variant
       if (before(0.9)) {
-        ss.autoPreset(firstShot, false);
-      } else if (before(1.8)) {
+        ss.autoPreset(new Setpoints(24, 0, i * -0.055, G.isRedAlliance() ? 0.108 : 0.107), false);
+      } else if (before(1.3)) {
         ss.shoot();
       } else if (before(segEnd(0) - 0.1)) {
-        ss.autoPreset(new Setpoints(39, 0, i * -0.02, 0.073), false);
+        ss.autoPreset(new Setpoints(39, 0, i * -0.02, G.isRedAlliance() ? 0.073 : 0.072), false);
       } else if (before(segEnd(0) + 1.0)) {
         ss.autoShoot();
       } else if (before(segEnd(1) - 0.1)) {
-        ss.autoPreset(new Setpoints(39, 0, i * 0.02, 0.073), false);
+        ss.autoPreset(new Setpoints(39, 0, i * 0.02, G.isRedAlliance() ? 0.073 : 0.072), false);
       } else if (before(segEnd(1) + 1.0)) {
         ss.autoShoot();
       } else if (before(segEnd(2) - 0.1)) {
-        ss.autoPreset(new Setpoints(39, 0, i * 0.02, 0.083), false);
+        ss.autoPreset(new Setpoints(39, 0, i * 0.02, G.isRedAlliance() ? 0.083 : 0.082), false);
       } else if (before(segEnd(2) + 1.0)) {
         ss.autoShoot();
       } else if (before(segEnd(3))) {
-        ss.autoPreset(new Setpoints(39, 0, i * 0.02, 0.083), false);
+        ss.autoPreset(new Setpoints(39, 0, i * 0.02, G.isRedAlliance() ? 0.083 : 0.082), false);
       }
     }
   }

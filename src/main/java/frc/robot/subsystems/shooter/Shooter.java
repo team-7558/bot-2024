@@ -61,11 +61,15 @@ public class Shooter extends StateMachineSubsystemBase {
       TURRET_MAX_FEED_POS_r = -TURRET_MIN_FEED_POS_r;
   public static final double PIVOT_MIN_FEED_POS_r = PIVOT_ZERO_POS, PIVOT_MAX_FEED_POS_r = 0.02;
 
+  public String lastPreset = "None";
+
   private static LerpTable shotTimesFromDistance = new LerpTable("shottimes.lerp").compile();
   ;
   private static LerpTable shotSpeedFromDistance = new LerpTable("shotspeeds.lerp").compile();
 
   public static LerpTable pivotHeightFromDistance = new LerpTable("pivotheights.lerp").compile();
+  public static LerpTable pivotHeightFromDistance_blue =
+      new LerpTable("pivotheightsblue.lerp").compile();
 
   private static LerpTable turretConstraintsFromPivotPos =
       new LerpTable("turretConstraintsFromPivotPos.lerp").compile();
@@ -787,7 +791,7 @@ public class Shooter extends StateMachineSubsystemBase {
     return newSetpoints;
   }
 
-  Debouncer lldb = new Debouncer(0.7, DebounceType.kFalling);
+  Debouncer lldb = new Debouncer(0.3, DebounceType.kFalling);
 
   double txOffset = 0;
 
@@ -891,7 +895,10 @@ public class Shooter extends StateMachineSubsystemBase {
           Logger.recordOutput("Shooter/txOffset", txOffset);
 
           ns.flywheel_rps = shotSpeedFromDistance.calcY(distToTarget);
-          ns.pivotPos_r = pivotHeightFromDistance.calcY(distToTarget);
+          ns.pivotPos_r =
+              G.isRedAlliance()
+                  ? pivotHeightFromDistance.calcY(distToTarget)
+                  : pivotHeightFromDistance_blue.calcY(distToTarget);
 
           if (llOnTarget()) llIO.setLEDs(LEDStatus.HI);
           else llIO.setLEDs(LEDStatus.LOW);
@@ -982,6 +989,14 @@ public class Shooter extends StateMachineSubsystemBase {
       // return a default array so the whole code doesn't crash
       return new double[][] {{0, 0}};
     }
+  }
+
+  public void setLastPreset(String presetName) {
+    this.lastPreset = presetName;
+  }
+
+  public String getLastPreset() {
+    return this.lastPreset;
   }
 
   public Setpoints trapPipeline() {

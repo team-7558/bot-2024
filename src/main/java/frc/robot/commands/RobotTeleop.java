@@ -97,60 +97,70 @@ public class RobotTeleop extends Command {
             Pipeline.NEAR,
             true,
             false);
+        ss.setLastPreset("FENDER");
       } else if (OI.XK.get(4, 2)) {
         ss.trackPreset(
             G.isRedAlliance() ? ShotPresets.RED_AMP_BOX : ShotPresets.BLUE_AMP_BOX,
             Pipeline.NEAR,
             true,
             true);
+        ss.setLastPreset("AMP BOX");
       } else if (OI.XK.get(1, 3)) {
         ss.trackPreset(
             G.isRedAlliance() ? ShotPresets.RED_SIDE_POST : ShotPresets.BLUE_SIDE_POST,
             Pipeline.FAR,
             true,
             true);
+        ss.setLastPreset("SIDE POST");
       } else if (OI.XK.get(0, 2)) {
         ss.trackPreset(
             G.isRedAlliance() ? ShotPresets.RED_FRONT_POST : ShotPresets.BLUE_FRONT_POST,
             Pipeline.NEAR,
             true,
             true);
+        ss.setLastPreset("FRONT POST");
       } else if (OI.XK.get(1, 2)) {
         ss.trackPreset(
             G.isRedAlliance() ? ShotPresets.RED_FRONT_COURT : ShotPresets.BLUE_FRONT_COURT,
             Pipeline.NEAR,
             true,
             true);
+        ss.setLastPreset("FRONT COURT");
       } else if (OI.XK.get(2, 3)) {
         ss.trackPreset(
             G.isRedAlliance() ? ShotPresets.OP_SHOT : ShotPresets.BLUE_OP_SHOT,
             Pipeline.NEAR,
             true,
             true);
+        ss.setLastPreset("OP");
       } else if (OI.XK.get(2, 2)) {
         ss.trackPreset(
             G.isRedAlliance() ? ShotPresets.RED_CLEAR_WALL : ShotPresets.BLUE_CLEAR_WALL,
             Pipeline.FAR,
             true,
             true);
+        ss.setLastPreset("CLEAR WALL");
       } else if (OI.XK.get(0, 3)) {
         ss.trackPreset(
             G.isRedAlliance() ? ShotPresets.SNIPE : ShotPresets.BLUE_SNIPE,
             Pipeline.FAR,
             true,
             true);
+        ss.setLastPreset("SNIPE");
       } else if (OI.XK.get(3, 2)) {
         ss.trackPreset(
             G.isRedAlliance() ? ShotPresets.RED_AMP_SNIPE : ShotPresets.BLUE_AMP_SNIPE,
             Pipeline.FAR,
             true,
             true);
+        ss.setLastPreset("AMP SNIPE");
       } else if (OI.XK.get(4, 3)) {
         ss.trackPreset(
             G.isRedAlliance() ? ShotPresets.RED_STEAL_SHOT : ShotPresets.BLUE_STEAL_SHOT,
             Pipeline.FAR,
             true,
             true);
+        ss.setLastPreset("STEAL");
       } else if (OI.DR.getLeftBumper() || OI.DR.getBackButton() || OI.XK.get(6, 5)) {
         ss.intake();
       } else {

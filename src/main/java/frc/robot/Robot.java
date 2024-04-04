@@ -285,7 +285,6 @@ public class Robot extends LoggedRobot {
 
     SS.getInstance().periodic();
     SS2d.periodic();
-    vision.periodic();
     CommandScheduler.getInstance().run();
     led.render();
     PerfTracker.periodic();
