@@ -38,6 +38,7 @@ public class SS {
     AMP_SCORING_RELEASE,
     AMP_SCORING_DOWN,
     AMP_SCORING,
+    AMP_CANCEL,
     AUTO_AMP_LINEUP,
 
     AUTOPRECHAMBER,
@@ -290,6 +291,17 @@ public class SS {
 
         break;
 
+      case AMP_CANCEL:
+        if (first) {
+          elevator.setTargetHeight(Elevator.MIN_HEIGHT_M);
+          elevator.setCurrentState(elevator.TRAVELLING);
+        }
+
+        if (after(0.1) && elevator.isState(elevator.HOLDING)) {
+          queueState(State.IDLE);
+        }
+
+        break;
       case AUTO_AMP_LINEUP:
         if (drive.closeToPose(
             Drive.AMP_SCORING_POSE, new Pose2d(0.05, 0.05, Rotation2d.fromDegrees(1)))) {
@@ -490,6 +502,10 @@ public class SS {
         OI.DR.setRumble(RumbleType.kBothRumble, 0.0);
         LED.getInstance().drawRow(0, 255, 0, 0);
       }
+    } else if (currState == State.AMP_SCORING_UP
+        && elevator.atHeight(Elevator.AMP_HEIGHT_M, 0.02)) {
+      OI.DR.setRumble(RumbleType.kRightRumble, 0.6);
+      LED.getInstance().setAllRGB(0, 128, 0);
     } else {
       OI.DR.setRumble(RumbleType.kBothRumble, 0);
     }
@@ -518,8 +534,11 @@ public class SS {
       } else if (currState == State.CLIMBING_DOWN) {
         // queueState(State.CLIMBING_DOWN);
       } else if (currState == State.AMP_SCORING_UP) {
-        queueState(State.AMP_SCORING_RELEASE);
-      } else if (currState == State.AMP_SCORING_DOWN || currState == State.AMP_SCORING_RELEASE) {
+        if (elevator.atHeight(Elevator.AMP_HEIGHT_M, 0.05)) queueState(State.AMP_SCORING_RELEASE);
+        else queueState(State.AMP_CANCEL);
+      } else if (currState == State.AMP_SCORING_DOWN
+          || currState == State.AMP_SCORING_RELEASE
+          || currState == State.AMP_CANCEL) {
         // queueState(State.AMP_SCORING_DOWN);
       } else if (!elevator.atHeight(Elevator.MIN_HEIGHT_M, 0.01)) {
         queueState(State.RESETTING_ELEVATOR);

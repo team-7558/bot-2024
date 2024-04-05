@@ -27,8 +27,7 @@ public class SourceSeries extends AltAuto {
     trajstack.setActiveIdx(idx);
   }
 
-  Setpoints firstShot =
-      new Setpoints(24, 0, G.isRedAlliance() ? 0.1225 : 0.12, G.isRedAlliance() ? 0.092 : 0.092);
+  Setpoints firstShot = new Setpoints(24, 0, 0.115, G.isRedAlliance() ? 0.092 : 0.092);
 
   @Override
   public void onInit() {
@@ -44,38 +43,23 @@ public class SourceSeries extends AltAuto {
     if (trajstack.getActiveIdx() == 0) {
 
       if (before(0.9)) {
-        ss.autoPreset(
-            new Setpoints(
-                24, 0, i * (G.isRedAlliance() ? 0.1225 : 0.12), G.isRedAlliance() ? 0.092 : 0.092),
-            false);
+        ss.autoPreset(new Setpoints(24, 0, i * 0.115, G.isRedAlliance() ? 0.092 : 0.092), false);
       } else if (before(1.8)) {
         ss.shoot();
       } else if (before(segEnd(0) - 0.1)) {
-        ss.autoPreset(
-            new Setpoints(
-                39, 0, i * (G.isRedAlliance() ? 0.04 : 0.031), G.isRedAlliance() ? 0.078 : 0.077),
-            false);
+        ss.autoPreset(new Setpoints(39, 0, i * 0.04, 0.078), false);
       } else if (before(segEnd(0) + 1.25)) {
         ss.autoShoot();
       } else if (before(segEnd(1) - 0.1)) {
-        ss.autoPreset(
-            new Setpoints(
-                39, 0, i * (G.isRedAlliance() ? 0.04 : 0.031), G.isRedAlliance() ? 0.077 : 0.076),
-            false);
+        ss.autoPreset(new Setpoints(39, 0, i * 0.04, 0.077), false);
       } else if (before(segEnd(1) + 1.28)) {
         ss.autoShoot();
       } else if (before(segEnd(2) - 0.1)) {
-        ss.autoPreset(
-            new Setpoints(
-                39, 0, i * (G.isRedAlliance() ? 0.04 : 0.031), G.isRedAlliance() ? 0.078 : 0.077),
-            false);
+        ss.autoPreset(new Setpoints(39, 0, i * 0.04, 0.078), false);
       } else if (before(segEnd(2) + 1.25)) {
         ss.autoShoot();
       } else if (before(segEnd(3))) {
-        ss.autoPreset(
-            new Setpoints(
-                39, 0, i * (G.isRedAlliance() ? 0.04 : 0.031), G.isRedAlliance() ? 0.078 : 0.077),
-            false);
+        ss.autoPreset(new Setpoints(39, 0, i * 0.04, 0.078), false);
       }
 
       // System.out.println("0: " + segEnd(0) + " 1:" + segEnd(1) + "2: " + segEnd(2) + " 3:" +
@@ -107,38 +91,23 @@ public class SourceSeries extends AltAuto {
 
     } else { // Variant
       if (before(0.9)) {
-        ss.autoPreset(
-            new Setpoints(
-                24, 0, i * (G.isRedAlliance() ? 0.1225 : 0.12), G.isRedAlliance() ? 0.092 : 0.092),
-            false);
+        ss.autoPreset(new Setpoints(24, 0, i * 0.115, G.isRedAlliance() ? 0.092 : 0.092), false);
       } else if (before(1.8)) {
         ss.shoot();
       } else if (before(segEnd(0) - 0.1)) {
-        ss.autoPreset(
-            new Setpoints(
-                39, 0, i * (G.isRedAlliance() ? 0.04 : 0.031), G.isRedAlliance() ? 0.078 : 0.077),
-            false);
+        ss.autoPreset(new Setpoints(39, 0, i * 0.04, 0.078), false);
       } else if (before(segEnd(0) + 1.25)) {
         ss.autoShoot();
       } else if (before(segEnd(1) - 0.1)) {
-        ss.autoPreset(
-            new Setpoints(
-                39, 0, i * (G.isRedAlliance() ? 0.041 : 0.031), G.isRedAlliance() ? 0.078 : 0.077),
-            false);
+        ss.autoPreset(new Setpoints(39, 0, i * 0.04, 0.078), false);
       } else if (before(segEnd(1) + 1.25)) {
         ss.autoShoot();
       } else if (before(segEnd(2) - 0.1)) {
-        ss.autoPreset(
-            new Setpoints(
-                39, 0, i * (G.isRedAlliance() ? 0.04 : 0.031), G.isRedAlliance() ? 0.078 : 0.077),
-            false);
+        ss.autoPreset(new Setpoints(39, 0, i * 0.04, 0.078), false);
       } else if (before(segEnd(2) + 1.25)) {
         ss.autoShoot();
       } else if (before(segEnd(3))) {
-        ss.autoPreset(
-            new Setpoints(
-                39, 0, i * (G.isRedAlliance() ? 0.04 : 0.031), G.isRedAlliance() ? 0.078 : 0.077),
-            false);
+        ss.autoPreset(new Setpoints(39, 0, i * 0.04, 0.078), false);
       }
     }
 

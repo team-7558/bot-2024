@@ -795,6 +795,10 @@ public class Shooter extends StateMachineSubsystemBase {
 
   double txOffset = 0;
 
+
+
+  
+
   public Setpoints llTakeover(Setpoints s, Pipeline p) {
     if (ll_enabled && lldb.calculate(llInputs.connected && llInputs.tv)) {
       Setpoints ns = new Setpoints().copy(s);
@@ -895,10 +899,7 @@ public class Shooter extends StateMachineSubsystemBase {
           Logger.recordOutput("Shooter/txOffset", txOffset);
 
           ns.flywheel_rps = shotSpeedFromDistance.calcY(distToTarget);
-          ns.pivotPos_r =
-              G.isRedAlliance()
-                  ? pivotHeightFromDistance.calcY(distToTarget)
-                  : pivotHeightFromDistance_blue.calcY(distToTarget);
+          ns.pivotPos_r = pivotHeightFromDistance.calcY(distToTarget);
 
           if (llOnTarget()) llIO.setLEDs(LEDStatus.HI);
           else llIO.setLEDs(LEDStatus.LOW);

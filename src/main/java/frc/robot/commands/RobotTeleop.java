@@ -138,7 +138,7 @@ public class RobotTeleop extends Command {
             G.isRedAlliance() ? ShotPresets.RED_CLEAR_WALL : ShotPresets.BLUE_CLEAR_WALL,
             Pipeline.FAR,
             true,
-            true);
+            false);
         ss.setLastPreset("CLEAR WALL");
       } else if (OI.XK.get(0, 3)) {
         ss.trackPreset(
