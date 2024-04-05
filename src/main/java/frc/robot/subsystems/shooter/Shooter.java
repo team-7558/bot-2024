@@ -797,7 +797,7 @@ public class Shooter extends StateMachineSubsystemBase {
 
 
 
-  
+
 
   public Setpoints llTakeover(Setpoints s, Pipeline p) {
     if (ll_enabled && lldb.calculate(llInputs.connected && llInputs.tv)) {
@@ -893,6 +893,112 @@ public class Shooter extends StateMachineSubsystemBase {
                 inputs.turretPosR
                     - Units.degreesToRotations(llInputs.tx - txOffset)
                         * Util.remap(minLat, maxLat, llInputs.latency, minDamp, maxDamp);
+          }
+
+          Logger.recordOutput("Shooter/aimRot", aaaimrot);
+          Logger.recordOutput("Shooter/txOffset", txOffset);
+
+          ns.flywheel_rps = shotSpeedFromDistance.calcY(distToTarget);
+          ns.pivotPos_r = pivotHeightFromDistance.calcY(distToTarget);
+
+          if (llOnTarget()) llIO.setLEDs(LEDStatus.HI);
+          else llIO.setLEDs(LEDStatus.LOW);
+        }
+      }
+
+      return ns;
+    } else {
+      llIO.setLEDs(LEDStatus.OFF);
+      return s;
+    }
+  }
+
+    public Setpoints llTakeoverAuto(Setpoints s, Pipeline p) {
+    if (ll_enabled && lldb.calculate(llInputs.connected && llInputs.tv)) {
+      Setpoints ns = new Setpoints().copy(s);
+
+      if (p == Pipeline.TRAP) {
+      } else {
+        if ((G.isRedAlliance() && llInputs.tid == 4) || (!G.isRedAlliance() && llInputs.tid == 7)) {
+
+          double tx = llInputs.tx;
+          double ty = llInputs.ty;
+          double distToTarget = llDist();
+          double mwsTx = 0;
+          double botRot = Drive.getInstance().getRotation().getRotations();
+          double aimRot = Math.IEEEremainder(botRot + inputs.turretPosR, 1.0);
+
+          if (mws_enabled) {
+            Translation2d turrTranslation =
+                new Translation2d(distToTarget, Rotation2d.fromRotations(aimRot));
+            ChassisSpeeds fieldRelChassisSpeeds = Drive.getInstance().getFieldRelativeSpeeds();
+
+            double shotTime_s = 0.1;
+
+            Translation2d offset =
+                new Translation2d(
+                    -fieldRelChassisSpeeds.vxMetersPerSecond * shotTime_s,
+                    -fieldRelChassisSpeeds.vyMetersPerSecond * shotTime_s);
+            Translation2d ogPos =
+                G.isRedAlliance()
+                    ? SPEAKER_POSE_2D_RED.plus(turrTranslation)
+                    : SPEAKER_POSE_2D_BLUE.plus(turrTranslation);
+            Translation2d newTarget =
+                G.isRedAlliance()
+                    ? SPEAKER_POSE_2D_RED.plus(offset)
+                    : SPEAKER_POSE_2D_BLUE.plus(offset);
+            Translation2d newTurrTranslation = newTarget.minus(ogPos);
+
+            Logger.recordOutput("Shooter/ogPos", ogPos);
+            Logger.recordOutput("Shooter/turrTranslation", turrTranslation);
+            Logger.recordOutput("Shooter/newTarget", newTarget);
+            Logger.recordOutput("Shooter/newTurrTranslation", newTurrTranslation);
+
+            double newBotRot = newTurrTranslation.getAngle().getRotations();
+            double newDist = newTarget.getDistance(ogPos);
+
+            double txOffset = Units.rotationsToDegrees(botRot - newBotRot);
+
+            tx += txOffset;
+            distToTarget = newDist;
+
+            // double botRad = Drive.getInstance().getRotation().getRadians();
+
+            // ChassisSpeeds botSpeeds = Drive.getInstance().getFieldRelativeSpeeds();
+
+            // double omega = botSpeeds.omegaRadiansPerSecond;
+
+            // double angularOffsetX =
+            //     Units.radiansToDegrees(
+            //         Math.atan(Math.tan(llInputs.tx) * botSpeeds.vxMetersPerSecond));
+            // double angularOffsetY =
+            //     Units.radiansToDegrees(
+            //         Math.atan(Math.tan(llInputs.ty) * botSpeeds.vyMetersPerSecond));
+
+            // Logger.recordOutput("Shooter/xOffset", angularOffsetX);
+            // Logger.recordOutput("Shooter/yOffset", angularOffsetY);
+
+            // // tx = llInputs.tx - angularOffsetX;
+            // // ty = llInputs.ty - angularOffsetY;
+
+            // untested code it sort of makes sense logically
+
+          }
+
+          double aaaimrot = Math.IEEEremainder(G.isRedAlliance() ? aimRot + 0.5 : aimRot, 1.0);
+          if (llInputs.connected && llInputs.tv) {
+            txOffset = Util.remap(-0.25, 0.25, aaaimrot, -6, 6);
+
+            double minDamp = 0.85;
+            double maxDamp = 0.5;
+            double minLat = 20;
+            double maxLat = 200;
+          } else {
+            // txOffset = 0;
+            double minDamp = 0.05;
+            double maxDamp = 0.0;
+            double minLat = 20;
+            double maxLat = 200;
           }
 
           Logger.recordOutput("Shooter/aimRot", aaaimrot);
