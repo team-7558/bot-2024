@@ -795,10 +795,6 @@ public class Shooter extends StateMachineSubsystemBase {
 
   double txOffset = 0;
 
-
-
-
-
   public Setpoints llTakeover(Setpoints s, Pipeline p) {
     if (ll_enabled && lldb.calculate(llInputs.connected && llInputs.tv)) {
       Setpoints ns = new Setpoints().copy(s);
@@ -913,7 +909,7 @@ public class Shooter extends StateMachineSubsystemBase {
     }
   }
 
-    public Setpoints llTakeoverAuto(Setpoints s, Pipeline p) {
+  public Setpoints llTakeoverAuto(Setpoints s, Pipeline p) {
     if (ll_enabled && lldb.calculate(llInputs.connected && llInputs.tv)) {
       Setpoints ns = new Setpoints().copy(s);
 

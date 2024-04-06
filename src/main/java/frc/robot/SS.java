@@ -699,7 +699,7 @@ public class SS {
 
   public void autoPreset(Setpoints s, boolean track) {
     if (currState != State.BOOT) {
-      shooter.setLLPipeline(Pipeline.FAR);
+      shooter.setLLPipeline(Pipeline.NEAR);
       if (shooter.beamBroken()) {
         trackPreset(shooter.constrainSetpoints(s, false, false), Pipeline.NEAR, false, track);
       } else if (currState != State.AUTOCHAMBER && currState != State.AUTOPRECHAMBER) {
