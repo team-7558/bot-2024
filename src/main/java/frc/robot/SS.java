@@ -1,5 +1,7 @@
 package frc.robot;
 
+import edu.wpi.first.math.filter.Debouncer;
+import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
@@ -127,6 +129,8 @@ public class SS {
     Logger.recordOutput("SS/Constrained", constrained);
   }
 
+  Debouncer vibDb = new Debouncer(0.4, DebounceType.kFalling);
+
   public void periodic() {
     boolean first = currState != lastState;
     lastState = currState;
@@ -218,10 +222,14 @@ public class SS {
         }
         break;
       case PREP_AMP:
-        if (first) intake.setCurrentState(intake.AMP_READY);
+        if (first) {
+          if (hasGamePiece) hasGamePiece = false;
+          intake.setCurrentState(intake.AMP_READY);
+        }
         break;
       case INTAKING_DEEP:
         if (first) {
+          if (hasGamePiece) hasGamePiece = false;
           elevator.setTargetHeight(Elevator.MIN_HEIGHT_M);
           elevator.setCurrentState(elevator.TRAVELLING);
           shooter.queueSetpoints(new Setpoints(0, 0, 0, Shooter.PIVOT_MIN_FEED_POS_r));
@@ -484,26 +492,44 @@ public class SS {
 
     stateInfoLog();
 
-    boolean flash = Math.sin(timer.get() * 20) > 0.0 ? true : false;
+    boolean flash = Math.sin(timer.get() * 40) > 0.0 ? true : false;
 
     if (((currState == State.INTAKING_DEEP || currState == State.PREP_AMP) && hasGamePiece)
-        || (currState == State.CHAMBER && hasGamePiece)) {
+        || (currState == State.CHAMBER && vibDb.calculate(intake.beamBroken()))) {
       OI.DR.setRumble(RumbleType.kLeftRumble, 0.9);
       if (flash) {
         LED.getInstance().setAllRGB(128, 128, 128);
       }
     } else if (currState == State.TRACKING) {
-      if (shooter.isAtSetpoints() && (!constrained || shooter.llOnTarget())) {
-        OI.DR.setRumble(RumbleType.kBothRumble, 0.6);
+
+      boolean shotReady = false;
+
+      if (drive.getAngularVelocity() < 0.01 && drive.velUnder(0.01)) {
+        if (shooter.llEnabled() && shooter.llHasComms()) {
+          if (shooter.isAtSetpoints() && shooter.llOnTarget()) {
+            shotReady = true;
+          }
+        } else {
+          if (shooter.isAtSetpoints() && !constrained) {
+            shotReady = true;
+          }
+        }
+      }
+
+      if (shotReady) {
         if (flash) {
+          OI.DR.setRumble(RumbleType.kBothRumble, 1.0);
           LED.getInstance().setAllRGB(0, 128, 0);
+        } else {
+          OI.DR.setRumble(RumbleType.kBothRumble, 0.0);
         }
       } else {
         OI.DR.setRumble(RumbleType.kBothRumble, 0.0);
         LED.getInstance().drawRow(0, 255, 0, 0);
       }
+
     } else if (currState == State.AMP_SCORING_UP
-        && elevator.atHeight(Elevator.AMP_HEIGHT_M, 0.02)) {
+        && elevator.atHeight(Elevator.AMP_HEIGHT_M, 0.04)) {
       OI.DR.setRumble(RumbleType.kRightRumble, 0.6);
       LED.getInstance().setAllRGB(0, 128, 0);
     } else {
@@ -521,10 +547,6 @@ public class SS {
       LED.getInstance().drawRow(3, 0, 32, 0);
       LED.getInstance().drawRow(4, 0, 0, 32);
     }
-  }
-
-  public void action(State s) {
-    queueState(State.TEST_2);
   }
 
   public void idle() {
@@ -582,11 +604,8 @@ public class SS {
         s.pivotPos_r = Shooter.PIVOT_MIN_FEED_POS_r;
         queueSetpoints(s);
         queueState(State.PREUNCHAMBER);
-      } else*/ if (hasGamePiece) {
-        queueState(State.PREP_AMP);
-      } else {
-        queueState(State.INTAKING_DEEP);
-      }
+      } else*/
+      queueState(State.INTAKING_DEEP);
     }
   }
 

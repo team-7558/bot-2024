@@ -87,7 +87,7 @@ public class RobotTeleop extends Command {
         ss.shooterSpit();
       } else if (OI.DR.getLeftTriggerAxis() > 0.05) {
         ss.shoot();
-      } else if (OI.XK.get(4, 5)) {
+      } else if (OI.XK.get(4, 5) || OI.DR.getBackButton()) {
         ss.chamber();
       } else if (OI.XK.get(9, 7)) {
         ss.sourceShoot();
@@ -103,7 +103,7 @@ public class RobotTeleop extends Command {
             G.isRedAlliance() ? ShotPresets.RED_AMP_BOX : ShotPresets.BLUE_AMP_BOX,
             Pipeline.NEAR,
             true,
-            true);
+            false);
         ss.setLastPreset("AMP BOX");
       } else if (OI.XK.get(1, 3)) {
         ss.trackPreset(
@@ -161,7 +161,7 @@ public class RobotTeleop extends Command {
             true,
             true);
         ss.setLastPreset("STEAL");
-      } else if (OI.DR.getLeftBumper() || OI.DR.getBackButton() || OI.XK.get(6, 5)) {
+      } else if (OI.DR.getLeftBumper() || OI.XK.get(6, 5)) {
         ss.intake();
       } else {
         ss.idle();

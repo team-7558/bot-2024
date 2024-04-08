@@ -21,9 +21,7 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.auto.AutoSelector;
-import frc.robot.auto.ampside.AmpBlitz;
 import frc.robot.auto.ampside.AmpSeries;
-import frc.robot.auto.ampside.DefaultMovingWhileShooting;
 import frc.robot.auto.sourceside.SourceSeries;
 import frc.robot.commands.RobotTeleop;
 import frc.robot.subsystems.LED.LED;
@@ -49,12 +47,12 @@ public class Robot extends LoggedRobot {
 
   private final AutoSelector AS =
       new AutoSelector()
-          .add(new DefaultMovingWhileShooting(), 16, 16, 16)
+          .add(new SourceSeries(3), 16, 16, 16)
           .add(new SourceSeries(0), 48, 0, 0)
           .add(new SourceSeries(1), 0, 48, 0)
           .add(new AmpSeries(0), 0, 0, 48)
           .add(new AmpSeries(1), 0, 24, 24)
-          .add(new AmpBlitz(0), 24, 0, 24);
+          .add(new SourceSeries(2), 24, 0, 24);
 
   private Command autonomousCommand;
   private Drive drive;
@@ -277,9 +275,12 @@ public class Robot extends LoggedRobot {
     }
 
     if (!shooter.llHasComms()) {
-      for (int i = 0; i < LED.NUM_LEDS; i += 3) {
-        LED.getInstance().setRGB(i, 0, 64, 0);
-        ;
+      boolean j = true;
+      for (int i = 0; i < LED.NUM_LEDS; i += 5) {
+        if (j) LED.getInstance().setRGB(i, 0, 64, 0);
+        else LED.getInstance().setRGB(i, 56, 8, 0);
+
+        j = !j;
       }
     }
 
@@ -329,6 +330,8 @@ public class Robot extends LoggedRobot {
     if (tv < 10.0) led.drawNumber(tv, 48, 0, 0);
     else if (shooter.beamBroken()) {
       led.drawNumber(tv, 255, 25, 0);
+    } else if (!shooter.llEnabled()) {
+      led.drawNumber(tv, 255, 0, 25);
     } else led.drawNumber(tv, 16, 16, 16);
   }
 

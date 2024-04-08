@@ -1,7 +1,6 @@
 package frc.robot.auto;
 
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.Timer;
 import frc.robot.SS;
 import frc.robot.subsystems.LED.LED;
@@ -94,10 +93,7 @@ public abstract class AltAuto {
   }
 
   protected boolean velUnder(double mag) {
-    ChassisSpeeds cs = drive.getChassisSpeeds();
-    double vmag =
-        cs.vxMetersPerSecond * cs.vxMetersPerSecond + cs.vyMetersPerSecond * cs.vyMetersPerSecond;
-    return vmag < (mag * mag);
+    return drive.velUnder(mag);
   }
 
   protected double segEnd(int i) {

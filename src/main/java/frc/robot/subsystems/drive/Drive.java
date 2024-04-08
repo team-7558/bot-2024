@@ -255,7 +255,14 @@ public class Drive extends StateMachineSubsystemBase {
             double y_ = -OI.DR.getLeftX();
             double w_ = -Util.sqInput(OI.DR.getRightX());
 
-            runVelocity(drive(x_, y_, w_ * 0.75, throttleLimit.calculate(throttle)));
+            runVelocity(
+                drive(
+                    x_,
+                    y_,
+                    w_ * 0.75,
+                    OI.DR.getRightTriggerAxis() > 0.075
+                        ? throttle * OI.DR.getRightTriggerAxis() * OI.DR.getRightTriggerAxis()
+                        : throttle)); // throttleLimit.calculate(throttle)
 
             // TODO: REVERT!!!!!!!!!!!!!!!!
           }
@@ -443,8 +450,7 @@ public class Drive extends StateMachineSubsystemBase {
       }
     }
 
-    // Be wary about using Timer.getFPGATimestamp in AK
-
+    chassisSpeeds = getChassisSpeedsFromModuleStates();
     Logger.recordOutput("Drive/Speeds", chassisSpeeds);
   }
 
@@ -710,5 +716,12 @@ public class Drive extends StateMachineSubsystemBase {
     modules[1].mode = mode;
     modules[2].mode = mode;
     modules[3].mode = mode;
+  }
+
+  public boolean velUnder(double mag) {
+    ChassisSpeeds cs = getChassisSpeeds();
+    double vmag =
+        cs.vxMetersPerSecond * cs.vxMetersPerSecond + cs.vyMetersPerSecond * cs.vyMetersPerSecond;
+    return vmag < (mag * mag);
   }
 }

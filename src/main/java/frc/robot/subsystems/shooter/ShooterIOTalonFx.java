@@ -154,7 +154,7 @@ public class ShooterIOTalonFx implements ShooterIO {
     turretConfig.Slot0.kD = 0;
 
     // mmPosMove
-    turretConfig.Slot1.kP = 115;
+    turretConfig.Slot1.kP = 145;
     turretConfig.Slot1.kI = 0;
     turretConfig.Slot1.kD = 0;
     turretConfig.Slot1.kS = 0;
@@ -171,7 +171,7 @@ public class ShooterIOTalonFx implements ShooterIO {
 
     turretConfig.MotionMagic.MotionMagicCruiseVelocity = 4.3;
     turretConfig.MotionMagic.MotionMagicAcceleration = 3.3;
-    turretConfig.MotionMagic.MotionMagicJerk = 6;
+    turretConfig.MotionMagic.MotionMagicJerk = 20;
 
     var pivotConfig = new TalonFXConfiguration();
     pivotConfig.Feedback.SensorToMechanismRatio = PIVOT_GEAR_RATIO;
@@ -211,7 +211,7 @@ public class ShooterIOTalonFx implements ShooterIO {
 
     pivotConfig.MotionMagic.MotionMagicCruiseVelocity = 1.3; // 0.69;
     pivotConfig.MotionMagic.MotionMagicAcceleration = 0.8; // 0.56;
-    pivotConfig.MotionMagic.MotionMagicJerk = 4;
+    pivotConfig.MotionMagic.MotionMagicJerk = 8;
 
     feeder.getConfigurator().apply(feederConfig);
     turret.getConfigurator().apply(turretConfig);
