@@ -22,6 +22,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.auto.AutoSelector;
 import frc.robot.auto.ampside.AmpSeries;
+import frc.robot.auto.sourceside.S876;
 import frc.robot.auto.sourceside.SourceSeries;
 import frc.robot.commands.RobotTeleop;
 import frc.robot.subsystems.LED.LED;
@@ -48,9 +49,9 @@ public class Robot extends LoggedRobot {
   private final AutoSelector AS =
       new AutoSelector()
           .add(new SourceSeries(3), 16, 16, 16)
-          .add(new SourceSeries(0), 48, 0, 0)
+          .add(new S876(), 48, 0, 0)
           .add(new SourceSeries(1), 0, 48, 0)
-          .add(new AmpSeries(0), 0, 0, 48)
+          .add(new SourceSeries(4), 0, 0, 48)
           .add(new AmpSeries(1), 0, 24, 24)
           .add(new SourceSeries(2), 24, 0, 24);
 
@@ -189,7 +190,7 @@ public class Robot extends LoggedRobot {
     switch (Constants.currentMode) {
       case REAL:
         // Running on a real robot, log to a USB stick ("/U/logs")
-        Logger.addDataReceiver(new WPILOGWriter("/U/logs/dcmp/"));
+        Logger.addDataReceiver(new WPILOGWriter("/U/logs/tryouts/"));
         Logger.addDataReceiver(new NT4Publisher());
         break;
 

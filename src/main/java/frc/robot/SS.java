@@ -741,7 +741,11 @@ public class SS {
 
   public void trackTrap() {
     if (currState != State.BOOT) {
-      shooter.queueSetpoints(ShotPresets.TRAP_SHOT);
+      shooter.setLLPipeline(Pipeline.TRAP);
+      shooter.setTargetMode(TargetMode.TRAP);
+      shooter.queueSetpoints(
+          shooter.constrainSetpoints(
+              shooter.llTakeover(ShotPresets.TRAP_SHOT, Pipeline.TRAP), false, false));
       constrained = false;
       queueState(State.TRACKING);
     }

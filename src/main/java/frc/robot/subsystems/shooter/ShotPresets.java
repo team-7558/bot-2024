@@ -4,12 +4,12 @@ import frc.robot.subsystems.shooter.Shooter.Setpoints;
 
 public class ShotPresets {
 
-  public static final Setpoints TRAP_SHOT = new Setpoints(16, 0, 0, 0.14);
+  public static final Setpoints TRAP_SHOT = new Setpoints(43, 0, 0, 0.076);
 
   public static final Setpoints RED_AMP_SNIPE = new Setpoints(45, 0, -0.043, 0.057);
   public static final Setpoints RED_STEAL_SHOT = new Setpoints(45, 0, 0.17, 0.08);
   public static final Setpoints RED_BUDGET_AMP = new Setpoints(10.5, 0, 0, 0.14);
-  public static final Setpoints RED_FENDER = new Setpoints(29, 0, 0, 0.14);
+  public static final Setpoints RED_FENDER = new Setpoints(29, 0, 0, 0.14); // 29rps
   public static final Setpoints RED_FRONT_POST =
       new Setpoints(39, 0, 0.087, 0.088); // potentially make higher
   public static final Setpoints RED_SIDE_POST = new Setpoints(45, 0, 0.092, 0.080);

@@ -800,6 +800,46 @@ public class Shooter extends StateMachineSubsystemBase {
       Setpoints ns = new Setpoints().copy(s);
 
       if (p == Pipeline.TRAP) {
+        if ((G.isRedAlliance() && (llInputs.tid == 11 || llInputs.tid == 12 || llInputs.tid == 13))
+            || (!G.isRedAlliance() && (llInputs.tid > 13))) {
+          double tx = llInputs.tx;
+          double ty = llInputs.ty;
+          double distToTarget = llDist();
+          double botRot = Drive.getInstance().getRotation().getRotations();
+          double aimRot = Math.IEEEremainder(botRot + inputs.turretPosR, 1.0);
+
+          double aaaimrot = Math.IEEEremainder(G.isRedAlliance() ? aimRot + 0.5 : aimRot, 1.0);
+          if (llInputs.connected && llInputs.tv) {
+
+            double minDamp = 0.45;
+            double maxDamp = 0.2;
+            double minLat = 20;
+            double maxLat = 200;
+            ns.turretPos_r =
+                inputs.turretPosR
+                    - Units.degreesToRotations(tx - txOffset)
+                        * Util.remap(minLat, maxLat, llInputs.latency, minDamp, maxDamp);
+          } else {
+            // txOffset = 0;
+            double minDamp = 0.05;
+            double maxDamp = 0.0;
+            double minLat = 20;
+            double maxLat = 200;
+            ns.turretPos_r =
+                inputs.turretPosR
+                    - Units.degreesToRotations(llInputs.tx - txOffset)
+                        * Util.remap(minLat, maxLat, llInputs.latency, minDamp, maxDamp);
+          }
+
+          Logger.recordOutput("Shooter/aimRot", aaaimrot);
+          Logger.recordOutput("Shooter/txOffset", txOffset);
+
+          // ns.flywheel_rps = shotSpeedFromDistance.calcY(distToTarget);
+          // ns.pivotPos_r = pivotHeightFromDistance.calcY(distToTarget);
+
+          if (llOnTarget()) llIO.setLEDs(LEDStatus.HI);
+          else llIO.setLEDs(LEDStatus.LOW);
+        }
       } else {
         if ((G.isRedAlliance() && llInputs.tid == 4) || (!G.isRedAlliance() && llInputs.tid == 7)) {
 
@@ -869,9 +909,9 @@ public class Shooter extends StateMachineSubsystemBase {
 
           double aaaimrot = Math.IEEEremainder(G.isRedAlliance() ? aimRot + 0.5 : aimRot, 1.0);
           if (llInputs.connected && llInputs.tv) {
-            txOffset = Util.remap(-0.25, 0.25, aaaimrot, -6, 6);
+            txOffset = Util.remap(-0.25, 0.25, aaaimrot, -5, 5);
 
-            double minDamp = 0.85;
+            double minDamp = 0.75;
             double maxDamp = 0.5;
             double minLat = 20;
             double maxLat = 200;

@@ -15,14 +15,14 @@ import frc.robot.subsystems.shooter.ShotPresets;
 import frc.robot.subsystems.shooter.TurretCamIO.Pipeline;
 import frc.robot.subsystems.vision.Vision;
 
-public class RobotTeleop extends Command {
+public class RobotTeleopT extends Command {
 
   private final Drive drive;
   private final SS ss;
   private final Vision v;
 
   /** Creates a new DriveTeleop. */
-  public RobotTeleop() {
+  public RobotTeleopT() {
 
     // Use addRequirements() here to declare subsystem dependencies.
     drive = Drive.getInstance();
@@ -85,13 +85,12 @@ public class RobotTeleop extends Command {
         ss.spit();
       } else if (OI.XK.get(8, 3)) {
         ss.shooterSpit();
-      } else if (OI.DR.getLeftTriggerAxis() > 0.05) {
+      } else if (OI.DR.getBackButton()) {
         ss.shoot();
-      } else if (OI.XK.get(4, 5) || OI.DR.getBackButton()) {
+      } else if (OI.XK.get(4, 5) || OI.DR.getLeftBumper()) {
         ss.chamber();
       } else if (OI.XK.get(9, 7)) {
-        ss.trackTrap();
-        ss.setLastPreset("TRAP");
+        ss.sourceShoot();
       } else if (OI.XK.get(3, 3)) {
         ss.trackPreset(
             G.isRedAlliance() ? ShotPresets.RED_FENDER : ShotPresets.BLUE_FENDER,
@@ -162,7 +161,7 @@ public class RobotTeleop extends Command {
             true,
             true);
         ss.setLastPreset("STEAL");
-      } else if (OI.DR.getLeftBumper() || OI.XK.get(6, 5)) {
+      } else if (OI.DR.getLeftTriggerAxis() > 0.05 || OI.XK.get(6, 5)) {
         ss.intake();
       } else {
         ss.idle();

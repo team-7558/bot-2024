@@ -15,14 +15,14 @@ import frc.robot.subsystems.shooter.ShotPresets;
 import frc.robot.subsystems.shooter.TurretCamIO.Pipeline;
 import frc.robot.subsystems.vision.Vision;
 
-public class RobotTeleop extends Command {
+public class RobotTeleopG extends Command {
 
   private final Drive drive;
   private final SS ss;
   private final Vision v;
 
   /** Creates a new DriveTeleop. */
-  public RobotTeleop() {
+  public RobotTeleopG() {
 
     // Use addRequirements() here to declare subsystem dependencies.
     drive = Drive.getInstance();
@@ -77,7 +77,7 @@ public class RobotTeleop extends Command {
       if (OI.DR.getPOV() == 90 && OI.DR.getStartButton()) {
         ss.resetHomingFlags();
         ss.queueState(State.BOOT);
-      } else if (OI.DR.getRightBumper()) {
+      } else if (OI.DR.getLeftTriggerAxis() > 0.5) {
         ss.amp();
       } else if (OI.XK.get(5, 7)) {
         ss.climbUp();
@@ -85,13 +85,12 @@ public class RobotTeleop extends Command {
         ss.spit();
       } else if (OI.XK.get(8, 3)) {
         ss.shooterSpit();
-      } else if (OI.DR.getLeftTriggerAxis() > 0.05) {
+      } else if (OI.DR.getRightBumper()) {
         ss.shoot();
       } else if (OI.XK.get(4, 5) || OI.DR.getBackButton()) {
         ss.chamber();
       } else if (OI.XK.get(9, 7)) {
-        ss.trackTrap();
-        ss.setLastPreset("TRAP");
+        ss.sourceShoot();
       } else if (OI.XK.get(3, 3)) {
         ss.trackPreset(
             G.isRedAlliance() ? ShotPresets.RED_FENDER : ShotPresets.BLUE_FENDER,

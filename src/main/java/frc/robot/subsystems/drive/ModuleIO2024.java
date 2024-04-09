@@ -73,7 +73,7 @@ public class ModuleIO2024 implements ModuleIO {
   private static final Slot0Configs steerGains =
       new Slot0Configs().withKP(100.0).withKI(0).withKD(0).withKS(0).withKV(0.0).withKA(0);
   private static final Slot0Configs driveGains =
-      new Slot0Configs().withKP(3.0).withKI(0).withKD(0).withKS(0).withKV(1.2).withKA(0);
+      new Slot0Configs().withKP(2.2).withKI(0).withKD(0).withKS(0).withKV(0.9).withKA(0);
   private static final Slot1Configs steerGainsTorque =
       new Slot1Configs().withKP(10).withKI(0).withKD(0.2).withKS(0).withKV(0.0).withKA(0);
   private static final Slot1Configs driveGainsTorque =

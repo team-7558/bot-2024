@@ -8,8 +8,8 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 5.5531973718766245,
-        "y": 3.3245515317627725
+        "x": 5.146364982995451,
+        "y": 3.927869849839994
       },
       "isLocked": false,
       "linkedName": "UnderStageShot"
@@ -20,8 +20,8 @@
         "y": 3.152951013866629
       },
       "prevControl": {
-        "x": 6.66714319859318,
-        "y": 2.978594275772623
+        "x": 6.95289451935836,
+        "y": 3.453232062806309
       },
       "nextControl": null,
       "isLocked": false,

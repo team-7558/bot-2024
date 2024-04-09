@@ -12,30 +12,37 @@ public class SourceSeries extends AltAuto {
     // trajstack.appendChain().append("SourceCore786", false);
     trajstack
         .appendChain()
-        .append("SourceStart", false)
+        .append("SourceStart8", false)
         .append("ForkTo7ToFork", false)
         .append("ForkTo6ToFork", false)
         .append("ForkToSource", false);
 
     trajstack
         .appendChain()
-        .append("AltSourceStart", false)
+        .append("SourceStart7", false)
         .append("ForkTo8ToFork", false)
         .append("ForkTo6ToFork", false)
         .append("ForkToSource", false);
 
     trajstack
         .appendChain()
-        .append("AltSourceStart", false)
+        .append("SourceStart7", false)
         .append("ForkTo6ToFork", false)
         .append("ForkTo8ToFork", false)
         .append("ForkToSource", false);
 
     trajstack
         .appendChain()
-        .append("SourceStart", false)
+        .append("SourceStart8", false)
         .append("ForkTo6ToFork", false)
         .append("ForkTo7ToFork", false)
+        .append("ForkToSource", false);
+
+    trajstack
+        .appendChain()
+        .append("SourceStart6", false)
+        .append("ForkTo7ToFork", false)
+        .append("ForkTo8ToFork", false)
         .append("ForkToSource", false);
 
     trajstack.setActiveIdx(idx);
@@ -75,33 +82,6 @@ public class SourceSeries extends AltAuto {
       } else if (before(segEnd(3))) {
         ss.autoPreset(new Setpoints(39, 0, i * 0.03, 0.078), false);
       }
-
-      // System.out.println("0: " + segEnd(0) + " 1:" + segEnd(1) + "2: " + segEnd(2) + " 3:" +
-      // segEnd(3));
-
-      // if (before(1.2)) {
-      //   ss.autoPreset(new Setpoints(35, 0, i * 0.1025, G.isRedAlliance() ? 0.092 : 0.09), false);
-      // } else if (before(1.8)) {
-      //   ss.shoot();
-      // } else if (before(6)) {
-      //   ss.autoPreset(new Setpoints(39, 0, i * 0.02, 0.083), true);
-      // } else if (before(6.4)) {
-      //   if (velUnder(0.1)) {
-      //     ss.autoShoot();
-      //   }
-      // } else if (before(10.3)) {
-      //   ss.autoPreset(new Setpoints(39, 0, i * 0.02, 0.083), true);
-      // } else if (before(11)) {
-      //   if (velUnder(0.1)) {
-      //     ss.autoShoot();
-      //   }
-      // } else if (before(14.7)) {
-      //   ss.autoPreset(new Setpoints(39, 0, i * 0.02, G.isRedAlliance() ? 0.083 : 0.081), true);
-      // } else if (before(15)) {
-      //   if (velUnder(0.1)) {
-      //     ss.autoShoot();
-      //   }
-      // }
 
     } else if (trajstack.getActiveIdx() == 1) { // Variant
       if (before(0.9)) {
@@ -144,6 +124,26 @@ public class SourceSeries extends AltAuto {
         ss.autoPreset(new Setpoints(39, 0, i * 0.03, 0.078), false);
       }
     } else if (trajstack.getActiveIdx() == 3) { // 786
+      if (before(0.9)) {
+        ss.autoPreset(new Setpoints(24, 0, i * 0.115, G.isRedAlliance() ? 0.091 : 0.091), false);
+      } else if (before(1.8)) {
+        ss.shoot();
+      } else if (before(segEnd(0) - 0.1)) {
+        ss.autoPreset(new Setpoints(39, 0, i * 0.03, 0.078), false);
+      } else if (before(segEnd(0) + 1.25)) {
+        ss.autoShoot();
+      } else if (before(segEnd(1) - 0.1)) {
+        ss.autoPreset(new Setpoints(39, 0, i * 0.03, 0.078), false);
+      } else if (before(segEnd(1) + 1.25)) {
+        ss.autoShoot();
+      } else if (before(segEnd(2) - 0.1)) {
+        ss.autoPreset(new Setpoints(39, 0, i * 0.03, 0.078), false);
+      } else if (before(segEnd(2) + 1.25)) {
+        ss.autoShoot();
+      } else if (before(segEnd(3))) {
+        ss.autoPreset(new Setpoints(39, 0, i * 0.03, 0.078), false);
+      }
+    } else if (trajstack.getActiveIdx() == 4) { // 687
       if (before(0.9)) {
         ss.autoPreset(new Setpoints(24, 0, i * 0.115, G.isRedAlliance() ? 0.091 : 0.091), false);
       } else if (before(1.8)) {

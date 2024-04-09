@@ -8,7 +8,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "AltSourceStart"
+            "pathName": "SourceStart7"
           }
         },
         {
@@ -20,7 +20,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "ForkTo6ToFork"
+            "pathName": "ForkTo5ToFork"
           }
         }
       ]

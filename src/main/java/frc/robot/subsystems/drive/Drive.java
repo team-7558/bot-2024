@@ -58,7 +58,7 @@ import org.littletonrobotics.junction.Logger;
 
 public class Drive extends StateMachineSubsystemBase {
   public static final int FL = 0, FR = 1, BL = 2, BR = 3;
-  public static final double MAX_LINEAR_SPEED_MPS = 4.975;
+  public static final double MAX_LINEAR_SPEED_MPS = 5.575;
   public static final double TRACK_WIDTH_X = Units.inchesToMeters(18.75);
   public static final double TRACK_WIDTH_Y = Units.inchesToMeters(18.75);
   private static final double SKEW_CONSTANT = 0.06;
@@ -144,6 +144,7 @@ public class Drive extends StateMachineSubsystemBase {
       PATHING,
       STRAFE_N_TURN,
       STRAFE_AUTOLOCK,
+      TRAPPING,
       INTAKING,
       AMP_SCORING;
 
@@ -182,7 +183,7 @@ public class Drive extends StateMachineSubsystemBase {
   private Rotation2d lastGyroRotation = new Rotation2d();
   private ChassisSpeeds chassisSpeeds = new ChassisSpeeds(0, 0, 0);
 
-  private SlewRateLimiter throttleLimit = new SlewRateLimiter(3.0, -1.1, 0.0);
+  private SlewRateLimiter throttleLimit = new SlewRateLimiter(4.0, -2.1, 0.0);
 
   private Drive(
       GyroIO gyroIO,
@@ -260,9 +261,7 @@ public class Drive extends StateMachineSubsystemBase {
                     x_,
                     y_,
                     w_ * 0.75,
-                    OI.DR.getRightTriggerAxis() > 0.075
-                        ? throttle * OI.DR.getRightTriggerAxis() * OI.DR.getRightTriggerAxis()
-                        : throttle)); // throttleLimit.calculate(throttle)
+                    throttleLimit.calculate(throttle))); // throttleLimit.calculate(throttle)
 
             // TODO: REVERT!!!!!!!!!!!!!!!!
           }
@@ -290,6 +289,29 @@ public class Drive extends StateMachineSubsystemBase {
             con = Util.limit(con, Util.lerp(0.7, 0.2, mag * scaler));
             if (Constants.verboseLogging) Logger.recordOutput("Drive/Autolock Heading Output", con);
             runVelocity(drive(x_, y_, -con, throttleLimit.calculate(throttle)));
+          }
+        };
+
+    TRAPPING =
+        new State("TRAPPING") {
+          @Override
+          public void periodic() {
+            double throttle = 1.0;
+            throttle = Util.lerp(1, 0.4, OI.DR.getRightTriggerAxis() * OI.DR.getRightTriggerAxis());
+
+            double x_ = -OI.DR.getLeftY();
+            double y_ = -OI.DR.getLeftX();
+            double w_ = -Util.sqInput(OI.DR.getRightX());
+
+            ChassisSpeeds rrSpeeds = drive(x_, y_, w_ * 0.5, throttle);
+            if (llInputs.connected) {
+              if (llInputs.tv) {
+                rrSpeeds.vyMetersPerSecond += -0.01 * llInputs.tx;
+                rrSpeeds.vxMetersPerSecond += 0.00 * llInputs.ty;
+                rrSpeeds.omegaRadiansPerSecond += -0.005 * llInputs.tx;
+              }
+            }
+            runVelocity(rrSpeeds);
           }
         };
 
