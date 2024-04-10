@@ -62,6 +62,8 @@ public class RobotTeleop extends Command {
         drive.setCurrentState(drive.STRAFE_AUTOLOCK);
       } else if (OI.DR.getBackButton()) {
         drive.setCurrentState(drive.INTAKING);
+      } else if (OI.XK.get(9, 7)) {
+        drive.setCurrentState(drive.TRAPPING);
       } else {
         // strafe and turn if not other state
         drive.setCurrentState(drive.STRAFE_N_TURN);
@@ -77,7 +79,7 @@ public class RobotTeleop extends Command {
       if (OI.DR.getPOV() == 90 && OI.DR.getStartButton()) {
         ss.resetHomingFlags();
         ss.queueState(State.BOOT);
-      } else if (OI.DR.getRightBumper()) {
+      } else if (OI.XK.get(5, 5)) {
         ss.amp();
       } else if (OI.XK.get(5, 7)) {
         ss.climbUp();

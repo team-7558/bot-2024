@@ -77,7 +77,7 @@ public class RobotTeleopT extends Command {
       if (OI.DR.getPOV() == 90 && OI.DR.getStartButton()) {
         ss.resetHomingFlags();
         ss.queueState(State.BOOT);
-      } else if (OI.DR.getRightBumper()) {
+      } else if (OI.DR.getRightBumper() || OI.XK.get(5, 5)) {
         ss.amp();
       } else if (OI.XK.get(5, 7)) {
         ss.climbUp();

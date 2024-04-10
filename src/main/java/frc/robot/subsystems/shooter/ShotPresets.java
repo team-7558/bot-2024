@@ -4,7 +4,7 @@ import frc.robot.subsystems.shooter.Shooter.Setpoints;
 
 public class ShotPresets {
 
-  public static final Setpoints TRAP_SHOT = new Setpoints(43, 0, 0, 0.076);
+  public static final Setpoints TRAP_SHOT = new Setpoints(43, 0, 0, 0.077558);
 
   public static final Setpoints RED_AMP_SNIPE = new Setpoints(45, 0, -0.043, 0.057);
   public static final Setpoints RED_STEAL_SHOT = new Setpoints(45, 0, 0.17, 0.08);

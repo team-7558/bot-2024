@@ -74,10 +74,10 @@ public class RobotTeleopG extends Command {
 
     if (!ss.isDisabled()) {
 
-      if (OI.DR.getPOV() == 90 && OI.DR.getStartButton()) {
+      if (OI.DR.getPOV() == 90 && OI.DR.getLeftTriggerAxis() > 0.5) {
         ss.resetHomingFlags();
         ss.queueState(State.BOOT);
-      } else if (OI.DR.getLeftTriggerAxis() > 0.5) {
+      } else if (OI.DR.getStartButton() || OI.XK.get(5, 5)) {
         ss.amp();
       } else if (OI.XK.get(5, 7)) {
         ss.climbUp();

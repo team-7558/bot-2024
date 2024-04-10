@@ -48,7 +48,7 @@ public class Robot extends LoggedRobot {
 
   private final AutoSelector AS =
       new AutoSelector()
-          .add(new SourceSeries(3), 16, 16, 16)
+          .add(new SourceSeries(0), 16, 16, 16)
           .add(new S876(), 48, 0, 0)
           .add(new SourceSeries(1), 0, 48, 0)
           .add(new SourceSeries(4), 0, 0, 48)

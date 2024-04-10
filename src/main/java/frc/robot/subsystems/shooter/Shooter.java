@@ -46,6 +46,7 @@ public class Shooter extends StateMachineSubsystemBase {
 
   public static final double LIMELIGHT_ANGLE = Units.degreesToRadians(30);
   public static final double SPEAKER_TAG_HEIGHT = Units.inchesToMeters(56.25 + 7.0 / 8.0);
+  public static final double TRAP_TAG_HEIGHT = Units.inchesToMeters(36.0 + 11.5);
   public static final double LIMELIGHT_HEIGHT = Units.inchesToMeters(11);
 
   public static final double TURRET_ZERO_POS = 0.2506; // 0.3;
@@ -812,7 +813,7 @@ public class Shooter extends StateMachineSubsystemBase {
           if (llInputs.connected && llInputs.tv) {
 
             double minDamp = 0.45;
-            double maxDamp = 0.2;
+            double maxDamp = 0.35;
             double minLat = 20;
             double maxLat = 200;
             ns.turretPos_r =
@@ -953,6 +954,18 @@ public class Shooter extends StateMachineSubsystemBase {
     return llInputs.connected;
   }
 
+  public double lltx() {
+    return llInputs.tx;
+  }
+
+  public double llty() {
+    return llInputs.ty;
+  }
+
+  public boolean llHasCommsWithTarget() {
+    return llInputs.connected && llInputs.tv;
+  }
+
   public boolean llOnTarget() {
     return llInputs.connected && llInputs.tv && Math.abs(llInputs.tx - txOffset) < 2.6;
   }
@@ -970,6 +983,12 @@ public class Shooter extends StateMachineSubsystemBase {
   public double llDist() {
     double angleToGoal = LIMELIGHT_ANGLE + Units.degreesToRadians(llInputs.ty);
     double distToTarget = (SPEAKER_TAG_HEIGHT - LIMELIGHT_HEIGHT) / Math.tan(angleToGoal);
+    return distToTarget;
+  }
+
+  public double llDistTrap() {
+    double angleToGoal = LIMELIGHT_ANGLE + Units.degreesToRadians(llInputs.ty);
+    double distToTarget = (TRAP_TAG_HEIGHT - LIMELIGHT_HEIGHT) / Math.tan(angleToGoal);
     return distToTarget;
   }
 

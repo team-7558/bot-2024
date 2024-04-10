@@ -38,6 +38,7 @@ import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Timer;
 import frc.robot.Constants;
 import frc.robot.G;
@@ -45,6 +46,10 @@ import frc.robot.OI;
 import frc.robot.subsystems.StateMachineSubsystemBase;
 import frc.robot.subsystems.drive.Module.Mode;
 import frc.robot.subsystems.drive.OdometryState.VisionObservation;
+import frc.robot.subsystems.shooter.Shooter;
+import frc.robot.subsystems.shooter.TurretCamIO;
+import frc.robot.subsystems.shooter.TurretCamIOInputsAutoLogged;
+import frc.robot.subsystems.shooter.TurretCamIOReal;
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.util.Util;
 import java.util.Arrays;
@@ -86,6 +91,13 @@ public class Drive extends StateMachineSubsystemBase {
   public static final Lock odometryLock = new ReentrantLock();
   public static final Queue<Double> timestampQueue = new ArrayBlockingQueue<>(100);
 
+  private static final Pose2d TRAP_LEFT_BLUE = new Pose2d(4.641, 4.498, new Rotation2d());
+  private static final Pose2d TRAP_RIGHT_BLUE = new Pose2d(4.641, 3.713, new Rotation2d());
+  private static final Pose2d TRAP_BACK_BLUE = new Pose2d(5.321, 4.105, new Rotation2d());
+  private static final Pose2d TRAP_LEFT_RED = new Pose2d(11.905, 3.713, new Rotation2d());
+  private static final Pose2d TRAP_RIGHT_RED = new Pose2d(11.905, 4.498, new Rotation2d());
+  private static final Pose2d TRAP_BACK_RED = new Pose2d(11.220, 4.105, new Rotation2d());
+
   private static Drive instance;
 
   public static Drive getInstance() {
@@ -102,7 +114,8 @@ public class Drive extends StateMachineSubsystemBase {
                   new ModuleIO2024(1),
                   new ModuleIO2024(2),
                   new ModuleIO2024(3),
-                  new ObjectDetectorIO() {});
+                  new ObjectDetectorIO() {},
+                  new TurretCamIOReal() {});
           break;
 
         case SIM:
@@ -114,7 +127,8 @@ public class Drive extends StateMachineSubsystemBase {
                   new ModuleIOIdeal(1),
                   new ModuleIOIdeal(2),
                   new ModuleIOIdeal(3),
-                  new ObjectDetectorIO() {});
+                  new ObjectDetectorIO() {},
+                  new TurretCamIOReal() {});
           break;
 
         default:
@@ -126,7 +140,8 @@ public class Drive extends StateMachineSubsystemBase {
                   new ModuleIO() {},
                   new ModuleIO() {},
                   new ModuleIO() {},
-                  new ObjectDetectorIO() {});
+                  new ObjectDetectorIO() {},
+                  new TurretCamIOReal() {});
           break;
       }
     }
@@ -160,8 +175,13 @@ public class Drive extends StateMachineSubsystemBase {
 
   public static final Pose2d AMP_SCORING_POSE = getAmpPose();
 
+  public final Pose2d TRAP_SCORING_POSE = getClosestTrap();
+
   private final ObjectDetectorIO llIO;
   private final ObjectDetectorIOInputsAutoLogged llInputs = new ObjectDetectorIOInputsAutoLogged();
+
+  private final TurretCamIO llIO2;
+  private final TurretCamIOInputsAutoLogged llInputs2 = new TurretCamIOInputsAutoLogged();
 
   private final Module[] modules = new Module[4]; // FL, FR, BL, BR
 
@@ -191,11 +211,13 @@ public class Drive extends StateMachineSubsystemBase {
       ModuleIO frModuleIO,
       ModuleIO blModuleIO,
       ModuleIO brModuleIO,
-      ObjectDetectorIO llIO) {
+      ObjectDetectorIO llIO,
+      TurretCamIO llIO2) {
 
     super("Drive");
     this.gyroIO = gyroIO;
     this.llIO = llIO;
+    this.llIO2 = llIO2;
     modules[FL] = new Module(flModuleIO, FL, Mode.SETPOINT);
     modules[FR] = new Module(frModuleIO, FR, Mode.SETPOINT);
     modules[BL] = new Module(blModuleIO, BL, Mode.SETPOINT);
@@ -294,6 +316,9 @@ public class Drive extends StateMachineSubsystemBase {
 
     TRAPPING =
         new State("TRAPPING") {
+
+          boolean txLinedUp = false;
+
           @Override
           public void periodic() {
             double throttle = 1.0;
@@ -302,14 +327,24 @@ public class Drive extends StateMachineSubsystemBase {
             double x_ = -OI.DR.getLeftY();
             double y_ = -OI.DR.getLeftX();
             double w_ = -Util.sqInput(OI.DR.getRightX());
-
             ChassisSpeeds rrSpeeds = drive(x_, y_, w_ * 0.5, throttle);
-            if (llInputs.connected) {
-              if (llInputs.tv) {
-                rrSpeeds.vyMetersPerSecond += -0.01 * llInputs.tx;
-                rrSpeeds.vxMetersPerSecond += 0.00 * llInputs.ty;
-                rrSpeeds.omegaRadiansPerSecond += -0.005 * llInputs.tx;
+            if (Shooter.getInstance().llHasCommsWithTarget()) {
+              // rrSpeeds = drive(llInputs2.ty, llInputs2.tx, w_ * 0.5, throttle);
+
+              if (Math.abs(Shooter.getInstance().lltx()) < 0.2) {
+                txLinedUp = true;
+              } else {
+                rrSpeeds.vyMetersPerSecond -= -0.1 * Shooter.getInstance().lltx();
               }
+              if (txLinedUp) {
+                rrSpeeds.vxMetersPerSecond -= -0.1 * (Shooter.getInstance().llty() - -9.84);
+              }
+              rrSpeeds.omegaRadiansPerSecond += 0;
+            }
+
+            if ((Shooter.getInstance().llty() - -9.84) < 0.1) {
+              stop();
+              setCurrentState(STRAFE_N_TURN);
             }
             runVelocity(rrSpeeds);
           }
@@ -703,6 +738,61 @@ public class Drive extends StateMachineSubsystemBase {
         ? new Pose2d(1.76, 7.71, Rotation2d.fromDegrees(90))
         : new Pose2d(1.76, 7.71, Rotation2d.fromDegrees(90));
     // TODO: fill
+  }
+
+  public static Pose2d getTrapPose() {
+    return G.isRedAlliance()
+        ? new Pose2d(1.9, 7, Rotation2d.fromDegrees(60))
+        : new Pose2d(1.9, 7, Rotation2d.fromDegrees(60));
+    // TODO: set this
+  }
+
+  /**
+   * Gives pose for closest trap adjusted for alliance
+   *
+   * @return
+   */
+  private Pose2d getClosestTrap() {
+    Pose2d botpose = getPose();
+
+    boolean red =
+        DriverStation.getAlliance().isEmpty() || DriverStation.getAlliance().get() == Alliance.Red;
+    if (red) {
+      double l =
+          Util.dist2(botpose.getX() - TRAP_LEFT_RED.getX(), botpose.getY() - TRAP_LEFT_RED.getY());
+      double r =
+          Util.dist2(
+              botpose.getX() - TRAP_RIGHT_RED.getX(), botpose.getY() - TRAP_RIGHT_RED.getY());
+      double b =
+          Util.dist2(botpose.getX() - TRAP_BACK_RED.getX(), botpose.getY() - TRAP_BACK_RED.getY());
+
+      if (l < r) {
+        if (l < b) return TRAP_LEFT_RED;
+        else return TRAP_BACK_RED;
+      } else {
+        if (r < b) return TRAP_RIGHT_RED;
+        else return TRAP_BACK_RED;
+      }
+
+    } else {
+      double l =
+          Util.dist2(
+              botpose.getX() - TRAP_LEFT_BLUE.getX(), botpose.getY() - TRAP_LEFT_BLUE.getY());
+      double r =
+          Util.dist2(
+              botpose.getX() - TRAP_RIGHT_BLUE.getX(), botpose.getY() - TRAP_RIGHT_BLUE.getY());
+      double b =
+          Util.dist2(
+              botpose.getX() - TRAP_BACK_BLUE.getX(), botpose.getY() - TRAP_BACK_BLUE.getY());
+
+      if (l < r) {
+        if (l < b) return TRAP_LEFT_BLUE;
+        else return TRAP_BACK_BLUE;
+      } else {
+        if (r < b) return TRAP_RIGHT_BLUE;
+        else return TRAP_BACK_BLUE;
+      }
+    }
   }
 
   /** Returns an array of module translations. */

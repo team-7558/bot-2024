@@ -718,7 +718,7 @@ public class SS {
 
   public void autoPreset(Setpoints s, boolean track) {
     if (currState != State.BOOT) {
-      shooter.setLLPipeline(Pipeline.FAR);
+      shooter.setLLPipeline(Pipeline.NEAR);
       if (shooter.beamBroken()) {
         trackPreset(shooter.constrainSetpoints(s, false, false), Pipeline.NEAR, false, track);
       } else if (currState != State.AUTOCHAMBER && currState != State.AUTOPRECHAMBER) {
@@ -741,11 +741,10 @@ public class SS {
 
   public void trackTrap() {
     if (currState != State.BOOT) {
+      drive.setCurrentState(drive.TRAPPING);
       shooter.setLLPipeline(Pipeline.TRAP);
       shooter.setTargetMode(TargetMode.TRAP);
-      shooter.queueSetpoints(
-          shooter.constrainSetpoints(
-              shooter.llTakeover(ShotPresets.TRAP_SHOT, Pipeline.TRAP), false, false));
+      shooter.queueSetpoints(shooter.constrainSetpoints(ShotPresets.TRAP_SHOT, false, false));
       constrained = false;
       queueState(State.TRACKING);
     }
