@@ -326,23 +326,37 @@ public class Drive extends StateMachineSubsystemBase {
 
             double x_ = -OI.DR.getLeftY();
             double y_ = -OI.DR.getLeftX();
-            double w_ = -Util.sqInput(OI.DR.getRightX());
-            ChassisSpeeds rrSpeeds = drive(x_, y_, w_ * 0.5, throttle);
+            // double w_ = -Util.sqInput(OI.DR.getRightX());
+
+            // TODO: add some sort of logic to decide a autolock angle
+
+            double mag = Math.sqrt(x_ * x_ + y_ * y_);
+            intermediaryAutolockSetpoint_r = autolockSetpoint_r;
+            double err =
+                Math.IEEEremainder(
+                    getRotation().getRotations() - intermediaryAutolockSetpoint_r, 1.0);
+            if (Constants.verboseLogging) Logger.recordOutput("Drive/Autolock Heading Error", err);
+            double con = 6 * err;
+            con = Util.limit(con, Util.lerp(0.7, 0.2, mag * (1.0 / Math.sqrt(2))));
+            ChassisSpeeds rrSpeeds = drive(x_, y_, -con, throttle);
+
             if (Shooter.getInstance().llHasCommsWithTarget()) {
               // rrSpeeds = drive(llInputs2.ty, llInputs2.tx, w_ * 0.5, throttle);
 
               if (Math.abs(Shooter.getInstance().lltx()) < 0.2) {
                 txLinedUp = true;
               } else {
-                rrSpeeds.vyMetersPerSecond -= -0.1 * Shooter.getInstance().lltx();
+                rrSpeeds.vyMetersPerSecond -= -0.0557558 * Shooter.getInstance().lltx();
+                rrSpeeds.vxMetersPerSecond -= -0.0557558 * (Shooter.getInstance().llty() - -9.84);
               }
               if (txLinedUp) {
-                rrSpeeds.vxMetersPerSecond -= -0.1 * (Shooter.getInstance().llty() - -9.84);
+                // rrSpeeds.vxMetersPerSecond -= -0.054 * (Shooter.getInstance().llty() - -9.84);
               }
               rrSpeeds.omegaRadiansPerSecond += 0;
             }
 
-            if ((Shooter.getInstance().llty() - -9.84) < 0.1) {
+            if ((Shooter.getInstance().llty() - -9.84) < 0.1
+                && Shooter.getInstance().lltx() < 0.1) {
               stop();
               setCurrentState(STRAFE_N_TURN);
             }
