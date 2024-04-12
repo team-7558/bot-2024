@@ -67,7 +67,7 @@ public class S867 extends AltAuto {
       }
 
     } else if (trajstack.getActiveIdx() == 1) { // Bail 875
-      LED.getInstance().drawCol(16, 128, 128, 128);
+      LED.getInstance().setAllRGB(128, 0, 128);
       /*if (before(0.9)) {
         ss.autoPreset(new Setpoints(24, 0, i * 0.115, G.isRedAlliance() ? 0.091 : 0.091), false);
       } else if (before(1.8)) {

@@ -21,9 +21,12 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.auto.AutoSelector;
-import frc.robot.auto.ampside.AmpSeries;
+import frc.robot.auto.sourceside.S678;
+import frc.robot.auto.sourceside.S687;
+import frc.robot.auto.sourceside.S768;
+import frc.robot.auto.sourceside.S786;
+import frc.robot.auto.sourceside.S867;
 import frc.robot.auto.sourceside.S876;
-import frc.robot.auto.sourceside.SourceSeries;
 import frc.robot.commands.RobotTeleop;
 import frc.robot.subsystems.LED.LED;
 import frc.robot.subsystems.drive.Drive;
@@ -48,12 +51,12 @@ public class Robot extends LoggedRobot {
 
   private final AutoSelector AS =
       new AutoSelector()
-          .add(new SourceSeries(0), 16, 16, 16)
+          .add(new S867(), 16, 16, 16)
           .add(new S876(), 48, 0, 0)
-          .add(new SourceSeries(1), 0, 48, 0)
-          .add(new SourceSeries(4), 0, 0, 48)
-          .add(new AmpSeries(1), 0, 24, 24)
-          .add(new SourceSeries(2), 24, 0, 24);
+          .add(new S786(), 0, 48, 0)
+          .add(new S768(), 0, 0, 48)
+          .add(new S678(), 0, 24, 24)
+          .add(new S687(), 24, 0, 24);
 
   private Command autonomousCommand;
   private Drive drive;

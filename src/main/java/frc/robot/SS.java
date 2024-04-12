@@ -397,6 +397,10 @@ public class SS {
           }
         }
 
+        if (intake.beamBroken()) {
+          hasGamePiece = true;
+        }
+
         if (shooter.isState(shooter.IDLE)) {
           queueState(State.IDLE);
         }
