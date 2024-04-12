@@ -53,7 +53,7 @@ public class S867 extends AltAuto {
         ss.autoShoot();
       } else if (before(segEnd(1) - 0.1)) {
         ss.autoPreset(new Setpoints(39, 0, i * 0.03, 0.077), false);
-        if (after(segEnd(1) - 3.0) && !ss.hasGamePiece()) {
+        if (after(segEnd(1) - 2.2) && !ss.hasGamePiece()) {
           trajstack.setActiveIdx(1);
         }
       } else if (before(segEnd(1) + 1.28)) {
