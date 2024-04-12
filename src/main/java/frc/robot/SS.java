@@ -519,7 +519,7 @@ public class SS {
       if (shotReady) {
         if (flash) {
           OI.DR.setRumble(RumbleType.kBothRumble, 1.0);
-          LED.getInstance().setAllRGB(0, 128, 0);
+          LED.getInstance().setAllRGB(0, 190, 0);
         } else {
           OI.DR.setRumble(RumbleType.kBothRumble, 0.0);
         }

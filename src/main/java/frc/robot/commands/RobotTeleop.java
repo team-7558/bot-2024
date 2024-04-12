@@ -4,6 +4,7 @@
 
 package frc.robot.commands;
 
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.G;
 import frc.robot.OI;
@@ -11,9 +12,11 @@ import frc.robot.SS;
 import frc.robot.SS.State;
 import frc.robot.SS2d;
 import frc.robot.subsystems.drive.Drive;
+import frc.robot.subsystems.shooter.Shooter.Setpoints;
 import frc.robot.subsystems.shooter.ShotPresets;
 import frc.robot.subsystems.shooter.TurretCamIO.Pipeline;
 import frc.robot.subsystems.vision.Vision;
+import frc.robot.util.Util;
 
 public class RobotTeleop extends Command {
 
@@ -55,7 +58,7 @@ public class RobotTeleop extends Command {
         drive.setAutolockSetpoint(G.isRedAlliance() ? 0.5 : 0);
         drive.setCurrentState(drive.STRAFE_AUTOLOCK);
       } else if (OI.DR.getBButton()) {
-        drive.setAutolockSetpoint(G.isRedAlliance() ? 0.172 : -0.35);
+        drive.setAutolockSetpoint(G.isRedAlliance() ? 0.172 : Units.radiansToRotations(-2.086));
         drive.setCurrentState(drive.STRAFE_AUTOLOCK);
       } else if (OI.DR.getXButton()) {
         drive.setAutolockSetpoint(G.isRedAlliance() ? -0.172 : 0.35);
@@ -106,7 +109,7 @@ public class RobotTeleop extends Command {
             G.isRedAlliance() ? ShotPresets.RED_AMP_BOX : ShotPresets.BLUE_AMP_BOX,
             Pipeline.NEAR,
             true,
-            false);
+            true);
         ss.setLastPreset("AMP BOX");
       } else if (OI.XK.get(1, 3)) {
         ss.trackPreset(
@@ -137,11 +140,10 @@ public class RobotTeleop extends Command {
             true);
         ss.setLastPreset("OP");
       } else if (OI.XK.get(2, 2)) {
-        ss.trackPreset(
-            G.isRedAlliance() ? ShotPresets.RED_CLEAR_WALL : ShotPresets.BLUE_CLEAR_WALL,
-            Pipeline.FAR,
-            true,
-            false);
+        Setpoints s = G.isRedAlliance() ? ShotPresets.RED_CLEAR_WALL : ShotPresets.BLUE_CLEAR_WALL;
+        double speedMag = Math.abs(drive.getChassisSpeeds().vxMetersPerSecond);
+        s.flywheel_rps = Util.remap(0, 5.0, speedMag, 25, ShotPresets.RED_CLEAR_WALL.flywheel_rps);
+        ss.trackPreset(s, Pipeline.FAR, true, false);
         ss.setLastPreset("CLEAR WALL");
       } else if (OI.XK.get(0, 3)) {
         ss.trackPreset(

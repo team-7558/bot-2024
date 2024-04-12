@@ -912,8 +912,8 @@ public class Shooter extends StateMachineSubsystemBase {
           if (llInputs.connected && llInputs.tv) {
             txOffset = Util.remap(-0.25, 0.25, aaaimrot, -5, 5);
 
-            double minDamp = 0.75;
-            double maxDamp = 0.5;
+            double minDamp = 0.4;
+            double maxDamp = 0.15;
             double minLat = 20;
             double maxLat = 200;
             ns.turretPos_r =
