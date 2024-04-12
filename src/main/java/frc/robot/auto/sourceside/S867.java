@@ -5,23 +5,23 @@ import frc.robot.auto.AltAuto;
 import frc.robot.subsystems.LED.LED;
 import frc.robot.subsystems.shooter.Shooter.Setpoints;
 
-public class S876 extends AltAuto {
+public class S867 extends AltAuto {
 
-  public S876() {
-    super("S876", true);
+  public S867() {
+    super("S867", true);
     // trajstack.appendChain().append("SourceCore876", false);
     // trajstack.appendChain().append("SourceCore786", false);
     trajstack
         .appendChain()
         .append("SourceStart8", false)
-        .append("ForkTo7ToFork", false)
         .append("ForkTo6ToFork", false)
+        .append("ForkTo7ToFork", false)
         .append("ForkToSource", false);
 
     trajstack
         .appendChain()
         .append("SourceStart8", false)
-        .append("ForkTo7Bail6ToFork", false)
+        .append("ForkTo6Bail7ToFork", false)
         .append("ForkTo5ToFork", false)
         .append("ForkToSource", false);
 
@@ -66,7 +66,7 @@ public class S876 extends AltAuto {
         ss.autoPreset(new Setpoints(39, 0, i * 0.03, 0.078), false);
       }
 
-    } else if (trajstack.getActiveIdx() == 1) { // Bail 865
+    } else if (trajstack.getActiveIdx() == 1) { // Bail 875
       LED.getInstance().drawCol(16, 128, 128, 128);
       /*if (before(0.9)) {
         ss.autoPreset(new Setpoints(24, 0, i * 0.115, G.isRedAlliance() ? 0.091 : 0.091), false);
