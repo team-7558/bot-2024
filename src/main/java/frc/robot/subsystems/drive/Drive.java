@@ -328,7 +328,21 @@ public class Drive extends StateMachineSubsystemBase {
             double y_ = -OI.DR.getLeftX();
             // double w_ = -Util.sqInput(OI.DR.getRightX());
 
-            // TODO: add some sort of logic to decide a autolock angle
+            double tid = Shooter.getInstance().getTid();
+
+            if(tid == 12) {
+              autolockSetpoint_r = 0.172;
+            } else if(tid == 15) {
+              autolockSetpoint_r = -0.172;
+            } else if(tid == 11) {
+              autolockSetpoint_r = Units.radiansToRotations(-2.086);
+            } else if(tid == 16) {
+              autolockSetpoint_r = Units.radiansToRotations(2.086);
+            } else if(tid == 13) {
+              autolockSetpoint_r = Units.degreesToRotations(180);
+            } else if(tid == 14) {
+              autolockSetpoint_r = Units.degreesToRotations(180);
+            }
 
             double mag = Math.sqrt(x_ * x_ + y_ * y_);
             intermediaryAutolockSetpoint_r = autolockSetpoint_r;

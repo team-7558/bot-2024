@@ -992,6 +992,10 @@ public class Shooter extends StateMachineSubsystemBase {
     return distToTarget;
   }
 
+  public double getTid() {
+    return llInputs.tid;
+  }
+
   public Setpoints shooterPipeline() {
     switch (targetMode) {
       case SPEAKER:
