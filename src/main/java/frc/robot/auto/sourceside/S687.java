@@ -4,6 +4,7 @@ import frc.robot.G;
 import frc.robot.auto.AltAuto;
 import frc.robot.subsystems.LED.LED;
 import frc.robot.subsystems.shooter.Shooter.Setpoints;
+import frc.robot.subsystems.shooter.ShotPresets;
 
 public class S687 extends AltAuto {
 
@@ -28,12 +29,10 @@ public class S687 extends AltAuto {
     trajstack.setActiveIdx(0);
   }
 
-  Setpoints firstShot = new Setpoints(24, 0, 0.115, G.isRedAlliance() ? 0.091 : 0.091);
-
   @Override
   public void onInit() {
     double i = G.isRedAlliance() ? 1.0 : -1.0;
-    ss.autoPreset(firstShot, false);
+    ss.autoPreset(G.isRedAlliance() ? ShotPresets.RED_SOURCE_AUTO_FIRST_SHOT : ShotPresets.BLUE_SOURCE_AUTO_FIRST_SHOT, false);
   }
 
   @Override
@@ -44,21 +43,21 @@ public class S687 extends AltAuto {
     if (trajstack.getActiveIdx() == 0) {
 
       if (before(0.9)) {
-        ss.autoPreset(new Setpoints(24, 0, i * 0.115, G.isRedAlliance() ? 0.091 : 0.091), false);
+        ss.autoPreset(G.isRedAlliance() ? ShotPresets.RED_SOURCE_AUTO_FIRST_SHOT : ShotPresets.BLUE_SOURCE_AUTO_FIRST_SHOT, false);
       } else if (before(1.8)) {
         ss.shoot();
-      } else if (before(segEnd(0) - 0.1)) {
+      } else if (before(segEnd(0) + 0.1)) {
         ss.autoPreset(new Setpoints(39, 0, i * 0.03, 0.078), false);
       } else if (before(segEnd(0) + 1.25)) {
         ss.autoShoot();
-      } else if (before(segEnd(1) - 0.1)) {
+      } else if (before(segEnd(1) + 0.1)) {
         ss.autoPreset(new Setpoints(39, 0, i * 0.03, 0.077), false);
         if (after(segEnd(1) - 2.0) && !ss.hasGamePiece()) {
           trajstack.setActiveIdx(1);
         }
       } else if (before(segEnd(1) + 1.28)) {
         ss.autoShoot();
-      } else if (before(segEnd(2) - 0.1)) {
+      } else if (before(segEnd(2) + 0.1)) {
         ss.autoPreset(new Setpoints(39, 0, i * 0.03, 0.078), false);
       } else if (before(segEnd(2) + 1.25)) {
         ss.autoShoot();
@@ -68,25 +67,25 @@ public class S687 extends AltAuto {
 
     } else if (trajstack.getActiveIdx() == 1) { // Bail 667
       LED.getInstance().setAllRGB(128, 0, 128);
-      /*if (before(0.9)) {
-        ss.autoPreset(new Setpoints(24, 0, i * 0.115, G.isRedAlliance() ? 0.091 : 0.091), false);
+      if (before(0.9)) {
+        ss.autoPreset(G.isRedAlliance() ? ShotPresets.RED_SOURCE_AUTO_FIRST_SHOT : ShotPresets.BLUE_SOURCE_AUTO_FIRST_SHOT, false);
       } else if (before(1.8)) {
         ss.shoot();
-      } else if (before(segEnd(0) - 0.1)) {
+      } else if (before(segEnd(0) + 0.1)) {
         ss.autoPreset(new Setpoints(39, 0, i * 0.03, 0.078), false);
       } else if (before(segEnd(0) + 1.25)) {
         ss.autoShoot();
-      } else if (before(segEnd(1) - 0.1)) {
-        ss.autoPreset(new Setpoints(39, 0, i * 0.03, 0.078), false);
-      } else if (before(segEnd(1) + 1.25)) {
+      } else if (before(segEnd(1) + 0.1)) {
+        ss.autoPreset(new Setpoints(39, 0, i * 0.03, 0.077), false);
+      } else if (before(segEnd(1) + 1.28)) {
         ss.autoShoot();
-      } else if (before(segEnd(2) - 0.1)) {
+      } else if (before(segEnd(2) + 0.1)) {
         ss.autoPreset(new Setpoints(39, 0, i * 0.03, 0.078), false);
       } else if (before(segEnd(2) + 1.25)) {
         ss.autoShoot();
       } else if (before(segEnd(3))) {
         ss.autoPreset(new Setpoints(39, 0, i * 0.03, 0.078), false);
-      }*/
+      }
     }
   }
 }
