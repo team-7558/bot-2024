@@ -29,8 +29,6 @@ public class S867 extends AltAuto {
     trajstack.setActiveIdx(0);
   }
 
-  Setpoints firstShot = new Setpoints(24, 0, 0.115, G.isRedAlliance() ? 0.091 : 0.091);
-
   @Override
   public void onInit() {
     double i = G.isRedAlliance() ? 1.0 : -1.0;

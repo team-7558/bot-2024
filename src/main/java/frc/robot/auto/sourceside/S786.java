@@ -29,8 +29,6 @@ public class S786 extends AltAuto {
     trajstack.setActiveIdx(0);
   }
 
-  Setpoints firstShot = new Setpoints(24, 0, 0.115, G.isRedAlliance() ? 0.091 : 0.091);
-
   @Override
   public void onInit() {
     double i = G.isRedAlliance() ? 1.0 : -1.0;
@@ -49,22 +47,22 @@ public class S786 extends AltAuto {
       } else if (before(1.8)) {
         ss.shoot();
       } else if (before(segEnd(0) + 0.1)) {
-        ss.autoPreset(new Setpoints(39, 0, i * 0.03, 0.078), false);
+        ss.autoPreset(new Setpoints(39, 0, i * 0.03, 0.078), true);
       } else if (before(segEnd(0) + 1.25)) {
         ss.autoShoot();
       } else if (before(segEnd(1) + 0.1)) {
-        ss.autoPreset(new Setpoints(39, 0, i * 0.03, 0.077), false);
+        ss.autoPreset(new Setpoints(39, 0, i * 0.03, 0.077), true);
         if (after(segEnd(1) - 1.65) && !ss.hasGamePiece()) {
           trajstack.setActiveIdx(1);
         }
       } else if (before(segEnd(1) + 1.28)) {
         ss.autoShoot();
       } else if (before(segEnd(2) + 0.1)) {
-        ss.autoPreset(new Setpoints(39, 0, i * 0.03, 0.078), false);
+        ss.autoPreset(new Setpoints(39, 0, i * 0.03, 0.078), true);
       } else if (before(segEnd(2) + 1.25)) {
         ss.autoShoot();
       } else if (before(segEnd(3))) {
-        ss.autoPreset(new Setpoints(39, 0, i * 0.03, 0.078), false);
+        ss.autoPreset(new Setpoints(39, 0, i * 0.03, 0.078), true);
       }
 
     } else if (trajstack.getActiveIdx() == 1) { // Bail 765
@@ -74,19 +72,19 @@ public class S786 extends AltAuto {
       } else if (before(1.8)) {
         ss.shoot();
       } else if (before(segEnd(0) + 0.1)) {
-        ss.autoPreset(new Setpoints(39, 0, i * 0.03, 0.078), false);
+        ss.autoPreset(new Setpoints(39, 0, i * 0.03, 0.078), true);
       } else if (before(segEnd(0) + 1.25)) {
         ss.autoShoot();
       } else if (before(segEnd(1) + 0.1)) {
-        ss.autoPreset(new Setpoints(39, 0, i * 0.03, 0.077), false);
+        ss.autoPreset(new Setpoints(39, 0, i * 0.03, 0.077), true);
       } else if (before(segEnd(1) + 1.28)) {
         ss.autoShoot();
       } else if (before(segEnd(2) + 0.1)) {
-        ss.autoPreset(new Setpoints(39, 0, i * 0.03, 0.078), false);
+        ss.autoPreset(new Setpoints(39, 0, i * 0.03, 0.078), true);
       } else if (before(segEnd(2) + 1.25)) {
         ss.autoShoot();
       } else if (before(segEnd(3))) {
-        ss.autoPreset(new Setpoints(39, 0, i * 0.03, 0.078), false);
+        ss.autoPreset(new Setpoints(39, 0, i * 0.03, 0.078), true);
       }
     }
   }
