@@ -3,8 +3,8 @@ package frc.robot.auto.sourceside;
 import frc.robot.G;
 import frc.robot.auto.AltAuto;
 import frc.robot.subsystems.LED.LED;
-import frc.robot.subsystems.shooter.ShotPresets;
 import frc.robot.subsystems.shooter.Shooter.Setpoints;
+import frc.robot.subsystems.shooter.ShotPresets;
 
 public class S876 extends AltAuto {
 
@@ -29,11 +29,13 @@ public class S876 extends AltAuto {
     trajstack.setActiveIdx(0);
   }
 
-
-
   @Override
   public void onInit() {
-    ss.autoPreset(G.isRedAlliance() ? ShotPresets.RED_SOURCE_AUTO_FIRST_SHOT : ShotPresets.BLUE_SOURCE_AUTO_FIRST_SHOT, false);
+    ss.autoPreset(
+        G.isRedAlliance()
+            ? ShotPresets.RED_SOURCE_AUTO_FIRST_SHOT
+            : ShotPresets.BLUE_SOURCE_AUTO_FIRST_SHOT,
+        false);
   }
 
   @Override
@@ -44,7 +46,11 @@ public class S876 extends AltAuto {
     if (trajstack.getActiveIdx() == 0) {
 
       if (before(0.9)) {
-        ss.autoPreset(G.isRedAlliance() ? ShotPresets.RED_SOURCE_AUTO_FIRST_SHOT : ShotPresets.BLUE_SOURCE_AUTO_FIRST_SHOT, false);
+        ss.autoPreset(
+            G.isRedAlliance()
+                ? ShotPresets.RED_SOURCE_AUTO_FIRST_SHOT
+                : ShotPresets.BLUE_SOURCE_AUTO_FIRST_SHOT,
+            false);
       } else if (before(1.8)) {
         ss.shoot();
       } else if (before(segEnd(0) + 0.1)) {
@@ -70,7 +76,11 @@ public class S876 extends AltAuto {
       LED.getInstance().setAllRGB(128, 0, 128);
 
       if (before(0.9)) {
-        ss.autoPreset(G.isRedAlliance() ? ShotPresets.RED_SOURCE_AUTO_FIRST_SHOT : ShotPresets.BLUE_SOURCE_AUTO_FIRST_SHOT, false);
+        ss.autoPreset(
+            G.isRedAlliance()
+                ? ShotPresets.RED_SOURCE_AUTO_FIRST_SHOT
+                : ShotPresets.BLUE_SOURCE_AUTO_FIRST_SHOT,
+            false);
       } else if (before(1.8)) {
         ss.shoot();
       } else if (before(segEnd(0) + 0.1)) {

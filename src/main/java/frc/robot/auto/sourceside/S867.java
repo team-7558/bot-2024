@@ -32,7 +32,11 @@ public class S867 extends AltAuto {
   @Override
   public void onInit() {
     double i = G.isRedAlliance() ? 1.0 : -1.0;
-    ss.autoPreset(G.isRedAlliance() ? ShotPresets.RED_SOURCE_AUTO_FIRST_SHOT : ShotPresets.BLUE_SOURCE_AUTO_FIRST_SHOT, false);
+    ss.autoPreset(
+        G.isRedAlliance()
+            ? ShotPresets.RED_SOURCE_AUTO_FIRST_SHOT
+            : ShotPresets.BLUE_SOURCE_AUTO_FIRST_SHOT,
+        false);
   }
 
   @Override
@@ -43,7 +47,11 @@ public class S867 extends AltAuto {
     if (trajstack.getActiveIdx() == 0) {
 
       if (before(0.9)) {
-        ss.autoPreset(G.isRedAlliance() ? ShotPresets.RED_SOURCE_AUTO_FIRST_SHOT : ShotPresets.BLUE_SOURCE_AUTO_FIRST_SHOT, false);
+        ss.autoPreset(
+            G.isRedAlliance()
+                ? ShotPresets.RED_SOURCE_AUTO_FIRST_SHOT
+                : ShotPresets.BLUE_SOURCE_AUTO_FIRST_SHOT,
+            false);
       } else if (before(1.8)) {
         ss.shoot();
       } else if (before(segEnd(0) + 0.1)) {
@@ -69,7 +77,11 @@ public class S867 extends AltAuto {
       LED.getInstance().setAllRGB(128, 0, 128);
 
       if (before(0.9)) {
-        ss.autoPreset(G.isRedAlliance() ? ShotPresets.RED_SOURCE_AUTO_FIRST_SHOT : ShotPresets.BLUE_SOURCE_AUTO_FIRST_SHOT, false);
+        ss.autoPreset(
+            G.isRedAlliance()
+                ? ShotPresets.RED_SOURCE_AUTO_FIRST_SHOT
+                : ShotPresets.BLUE_SOURCE_AUTO_FIRST_SHOT,
+            false);
       } else if (before(1.8)) {
         ss.shoot();
       } else if (before(segEnd(0) + 0.1)) {
