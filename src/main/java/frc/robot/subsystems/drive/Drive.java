@@ -185,6 +185,8 @@ public class Drive extends StateMachineSubsystemBase {
   public static final double RED_STAGE_LEFT = 0;
   public static final double RED_STAGE_BACK = 0;
 
+  public double zeroCount = 0;
+
   public boolean isTrapped = false;
 
   private final ObjectDetectorIO llIO;
@@ -737,6 +739,8 @@ public class Drive extends StateMachineSubsystemBase {
 
   /** Resets the current odometry pose. */
   public void hardSetPose(Pose2d pose) {
+    zeroCount++;
+    Logger.recordOutput("Drive/ZeroCount", zeroCount);
     OdometryState.getInstance().resetPose(pose);
   }
 

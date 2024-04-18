@@ -4,8 +4,8 @@ import frc.robot.subsystems.shooter.Shooter.Setpoints;
 
 public class ShotPresets {
 
-  public static final Setpoints RED_SOURCE_AUTO_FIRST_SHOT = new Setpoints(24, 0, 0.115, 0.091);
-  public static final Setpoints BLUE_SOURCE_AUTO_FIRST_SHOT = new Setpoints(24, 0, -0.115, 0.091);
+  public static final Setpoints RED_SOURCE_AUTO_FIRST_SHOT = new Setpoints(34, 0, 0.125, 0.086);
+  public static final Setpoints BLUE_SOURCE_AUTO_FIRST_SHOT = new Setpoints(34, 0, -0.125, 0.086);
 
   public static final Setpoints RED_AMP_AUTO_FIRST_SHOT = new Setpoints(24, 0, -0.055, 0.108);
   public static final Setpoints BLUE_AMP_AUTO_FIRST_SHOT = new Setpoints(24, 0, 0.055, 0.108);
@@ -23,7 +23,7 @@ public class ShotPresets {
   public static final Setpoints RED_FRONT_COURT = new Setpoints(36, 0, 0, 0.103);
   public static final Setpoints RED_WING_POST = new Setpoints(49, 0, -0.02, 0.068);
   public static final Setpoints OP_SHOT = new Setpoints(43, 0, 0.02, 0.076);
-  public static final Setpoints RED_CLEAR_WALL = new Setpoints(20, 0, 0.125, 0.107);
+  public static final Setpoints RED_CLEAR_WALL = new Setpoints(18, 0, 0.085, 0.107);
   public static final Setpoints SNIPE = new Setpoints(45, 0, 0.095, 0.057);
   public static final Setpoints RED_CLEAR_CLOSE =
       new Setpoints(36, 0, 0.1, Shooter.PIVOT_MIN_POS_r);

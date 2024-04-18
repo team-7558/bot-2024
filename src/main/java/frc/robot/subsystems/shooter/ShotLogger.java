@@ -24,6 +24,7 @@ public class ShotLogger {
       Logger.recordOutput(logPrefix + "/Speeds", Drive.getInstance().getFieldRelativeSpeeds());
       Logger.recordOutput(logPrefix + "/TargetMode", Shooter.getInstance().getTargetMode());
       Logger.recordOutput(logPrefix + "/LLonTarget", Shooter.getInstance().llOnTarget());
+      Logger.recordOutput(logPrefix + "/LLenabled", Shooter.getInstance().llEnabled());
       Logger.recordOutput(logPrefix + "/MWSEnabled", Shooter.getInstance().mwsEnabled());
       Logger.recordOutput(logPrefix + "/LLdist", Shooter.getInstance().llDist());
       Logger.recordOutput(logPrefix + "/Preset", Shooter.getInstance().getLastPreset());

@@ -60,7 +60,7 @@ public class Robot extends LoggedRobot {
           .add(new S678(), 0, 24, 24)
           .add(new S687(), 24, 0, 24)
           .add(new Ampside54(0), 24, 24, 0)
-          .add(new Ampside45(0),255,25,0);
+          .add(new Ampside45(0), 255, 25, 0);
 
   private Command autonomousCommand;
   private Drive drive;
@@ -137,7 +137,7 @@ public class Robot extends LoggedRobot {
       lastAS = true;
       AS.setCurrIdx(6);
       AS.generate();
-    } else if(!lastAS && OI.XK.get(7,0)) {
+    } else if (!lastAS && OI.XK.get(7, 0)) {
       lastAS = true;
       AS.setCurrIdx(7);
       AS.generate();

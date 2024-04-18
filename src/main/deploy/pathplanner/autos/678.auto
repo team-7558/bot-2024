@@ -1,0 +1,31 @@
+{
+  "version": 1.0,
+  "startingPose": null,
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "path",
+          "data": {
+            "pathName": "SourceStart6"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "ForkTo7ToFork"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "ForkTo8ToFork"
+          }
+        }
+      ]
+    }
+  },
+  "folder": null,
+  "choreoAuto": false
+}
