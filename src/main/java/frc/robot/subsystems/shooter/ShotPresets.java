@@ -7,7 +7,10 @@ public class ShotPresets {
   public static final Setpoints RED_SOURCE_AUTO_FIRST_SHOT = new Setpoints(24, 0, 0.115, 0.091);
   public static final Setpoints BLUE_SOURCE_AUTO_FIRST_SHOT = new Setpoints(24, 0, -0.115, 0.091);
 
-  public static final Setpoints TRAP_SHOT = new Setpoints(43, 0, 0, 0.077558);
+  public static final Setpoints RED_AMP_AUTO_FIRST_SHOT = new Setpoints(24, 0, -0.055, 0.108);
+  public static final Setpoints BLUE_AMP_AUTO_FIRST_SHOT = new Setpoints(24, 0, 0.055, 0.108);
+
+  public static final Setpoints TRAP_SHOT = new Setpoints(48, 0, 0, 0.080);
 
   public static final Setpoints RED_AMP_SNIPE = new Setpoints(45, 0, -0.043, 0.057);
   public static final Setpoints RED_STEAL_SHOT = new Setpoints(45, 0, 0.17, 0.08);

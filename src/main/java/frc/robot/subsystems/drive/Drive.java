@@ -128,7 +128,7 @@ public class Drive extends StateMachineSubsystemBase {
                   new ModuleIOIdeal(2),
                   new ModuleIOIdeal(3),
                   new ObjectDetectorIO() {},
-                  new TurretCamIOReal() {});
+                  new TurretCamIO() {});
           break;
 
         default:
@@ -176,6 +176,16 @@ public class Drive extends StateMachineSubsystemBase {
   public static final Pose2d AMP_SCORING_POSE = getAmpPose();
 
   public final Pose2d TRAP_SCORING_POSE = getClosestTrap();
+
+  public static final double BLUE_STAGE_RIGHT = 0;
+  public static final double BLUE_STAGE_LEFT = 0;
+  public static final double BLUE_STAGE_BACK = 0;
+
+  public static final double RED_STAGE_RIGHT = 0;
+  public static final double RED_STAGE_LEFT = 0;
+  public static final double RED_STAGE_BACK = 0;
+
+  public boolean isTrapped = false;
 
   private final ObjectDetectorIO llIO;
   private final ObjectDetectorIOInputsAutoLogged llInputs = new ObjectDetectorIOInputsAutoLogged();
@@ -317,10 +327,16 @@ public class Drive extends StateMachineSubsystemBase {
     TRAPPING =
         new State("TRAPPING") {
 
-          boolean txLinedUp = false;
+          @Override
+          public void init() {
+            isTrapped = false;
+          }
 
           @Override
           public void periodic() {
+            if (isTrapped) {
+              return;
+            }
             double throttle = 1.0;
             throttle = Util.lerp(1, 0.4, OI.DR.getRightTriggerAxis() * OI.DR.getRightTriggerAxis());
 
@@ -330,19 +346,19 @@ public class Drive extends StateMachineSubsystemBase {
 
             double tid = Shooter.getInstance().getTid();
 
-            if (tid == 12) {
-              autolockSetpoint_r = 0.172;
-            } else if (tid == 15) {
-              autolockSetpoint_r = -0.172;
-            } else if (tid == 11) {
-              autolockSetpoint_r = Units.radiansToRotations(-2.086);
-            } else if (tid == 16) {
-              autolockSetpoint_r = Units.radiansToRotations(2.086);
-            } else if (tid == 13) {
-              autolockSetpoint_r = Units.degreesToRotations(180);
-            } else if (tid == 14) {
-              autolockSetpoint_r = Units.degreesToRotations(180);
-            }
+            // if (tid == 12) {
+            //   autolockSetpoint_r = 0.172;
+            // } else if (tid == 15) {
+            //   autolockSetpoint_r = -0.172;
+            // } else if (tid == 11) {
+            //   autolockSetpoint_r = Units.radiansToRotations(-2.086);
+            // } else if (tid == 16) {
+            //   autolockSetpoint_r = Units.radiansToRotations(2.086);
+            // } else if (tid == 13) {
+            //   autolockSetpoint_r = Units.degreesToRotations(180);
+            // } else if (tid == 14) {
+            //   autolockSetpoint_r = Units.degreesToRotations(180);
+            // }
 
             double mag = Math.sqrt(x_ * x_ + y_ * y_);
             intermediaryAutolockSetpoint_r = autolockSetpoint_r;
@@ -355,24 +371,21 @@ public class Drive extends StateMachineSubsystemBase {
             ChassisSpeeds rrSpeeds = drive(x_, y_, -con, throttle);
 
             if (Shooter.getInstance().llHasCommsWithTarget()) {
-              // rrSpeeds = drive(llInputs2.ty, llInputs2.tx, w_ * 0.5, throttle);
+              // .rrSpeeds = drive(llInputs2.ty, llInputs2.tx, w_ * 0.5, throttle);
 
               if (Math.abs(Shooter.getInstance().lltx()) < 0.2) {
-                txLinedUp = true;
               } else {
                 rrSpeeds.vyMetersPerSecond -= -0.0557558 * Shooter.getInstance().lltx();
-                rrSpeeds.vxMetersPerSecond -= -0.0557558 * (Shooter.getInstance().llty() - -9.84);
-              }
-              if (txLinedUp) {
-                // rrSpeeds.vxMetersPerSecond -= -0.054 * (Shooter.getInstance().llty() - -9.84);
+                rrSpeeds.vxMetersPerSecond -= -0.0557558 * (Shooter.getInstance().llty() - -7.9);
               }
               rrSpeeds.omegaRadiansPerSecond += 0;
             }
 
-            if ((Shooter.getInstance().llty() - -9.84) < 0.1
-                && Shooter.getInstance().lltx() < 0.1) {
+            if ((Shooter.getInstance().llty() - -7.9) < 0.1
+                && Shooter.getInstance().lltx() < 0.15) {
+              isTrapped = true;
               stop();
-              setCurrentState(STRAFE_N_TURN);
+              // setCurrentState(STRAFE_N_TURN);
             }
             runVelocity(rrSpeeds);
           }

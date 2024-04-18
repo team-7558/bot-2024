@@ -20,13 +20,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "AmpForkTo6ToOp"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "ForkTo7ToFork"
+            "pathName": "AmpForkToTrap"
           }
         }
       ]

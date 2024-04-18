@@ -508,7 +508,7 @@ public class SS {
 
       boolean shotReady = false;
 
-      if (drive.getAngularVelocity() < 0.01 && drive.velUnder(0.01)) {
+      if (drive.getAngularVelocity() < 0.01 && drive.velUnder(0.1)) {
         if (shooter.llEnabled() && shooter.llHasComms()) {
           if (shooter.isAtSetpoints() && shooter.llOnTarget()) {
             shotReady = true;
