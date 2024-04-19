@@ -5,25 +5,23 @@ import frc.robot.auto.AltAuto;
 import frc.robot.subsystems.LED.LED;
 import frc.robot.subsystems.shooter.Shooter.Setpoints;
 
-public class S678 extends AltAuto {
+public class S673 extends AltAuto {
 
-  public S678() {
-    super("S678", true);
+  public S673() {
+    super("S673", true);
     // trajstack.appendChain().append("SourceCore876", false);
     // trajstack.appendChain().append("SourceCore786", false);
     trajstack
         .appendChain()
         .append("SourceStart6", false)
         .append("ForkTo7ToFork", false)
-        .append("ForkTo8ToFork", false)
-        .append("ForkToSource", false);
+        .append("ForkTo3ForOP", false);
 
     trajstack
         .appendChain()
         .append("SourceStart6", false)
         .append("ForkTo7Bail8ToFork", false)
-        .append("ForkTo5ToFork", false)
-        .append("ForkToSource", false);
+        .append("ForkTo3ForOP", false);
 
     trajstack.setActiveIdx(0);
   }
@@ -61,12 +59,10 @@ public class S678 extends AltAuto {
         }
       } else if (before(segEnd(1) + 1.28)) {
         ss.autoShoot();
-      } else if (before(segEnd(2) + 0.03)) {
-        ss.autoPreset(new Setpoints(39, 0, i * 0.03, 0.078), true);
+      } else if (before(segEnd(2) - 0.4)) {
+        ss.autoPreset(new Setpoints(39, 0, i * 0.03, 0.108), true);
       } else if (before(segEnd(2) + 1.25)) {
         ss.autoShoot();
-      } else if (before(segEnd(3))) {
-        ss.autoPreset(new Setpoints(39, 0, i * 0.03, 0.078), true);
       }
 
     } else if (trajstack.getActiveIdx() == 1) { // Bail 685
@@ -84,12 +80,10 @@ public class S678 extends AltAuto {
         ss.autoPreset(new Setpoints(39, 0, i * 0.03, 0.077), true);
       } else if (before(segEnd(1) + 1.28)) {
         ss.autoShoot();
-      } else if (before(segEnd(2) + 0.03)) {
-        ss.autoPreset(new Setpoints(39, 0, i * 0.03, 0.078), true);
+      } else if (before(segEnd(2) - 0.4)) {
+        ss.autoPreset(new Setpoints(39, 0, i * 0.03, 0.108), true);
       } else if (before(segEnd(2) + 1.25)) {
         ss.autoShoot();
-      } else if (before(segEnd(3))) {
-        ss.autoPreset(new Setpoints(39, 0, i * 0.03, 0.078), true);
       }
     }
   }

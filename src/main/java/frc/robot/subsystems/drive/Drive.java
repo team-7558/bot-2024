@@ -313,16 +313,29 @@ public class Drive extends StateMachineSubsystemBase {
 
             double x_ = -OI.DR.getLeftY();
             double y_ = -OI.DR.getLeftX();
-            double mag = Math.sqrt(x_ * x_ + y_ * y_);
-            intermediaryAutolockSetpoint_r = autolockSetpoint_r;
-            double err =
-                Math.IEEEremainder(
-                    getRotation().getRotations() - intermediaryAutolockSetpoint_r, 1.0);
-            if (Constants.verboseLogging) Logger.recordOutput("Drive/Autolock Heading Error", err);
-            double con = 6 * err;
-            con = Util.limit(con, Util.lerp(0.7, 0.2, mag * scaler));
-            if (Constants.verboseLogging) Logger.recordOutput("Drive/Autolock Heading Output", con);
-            runVelocity(drive(x_, y_, -con, throttleLimit.calculate(throttle)));
+            double w_ = -Util.sqInput(OI.DR.getRightX());
+
+            if (Math.abs(w_) > 0.3) {
+              runVelocity(
+                  drive(
+                      x_,
+                      y_,
+                      w_ * 0.75,
+                      throttleLimit.calculate(throttle))); // throttleLimit.calculate(throttle)
+            } else {
+              double mag = Math.sqrt(x_ * x_ + y_ * y_);
+              intermediaryAutolockSetpoint_r = autolockSetpoint_r;
+              double err =
+                  Math.IEEEremainder(
+                      getRotation().getRotations() - intermediaryAutolockSetpoint_r, 1.0);
+              if (Constants.verboseLogging)
+                Logger.recordOutput("Drive/Autolock Heading Error", err);
+              double con = 6 * err;
+              con = Util.limit(con, Util.lerp(0.7, 0.2, mag * scaler));
+              if (Constants.verboseLogging)
+                Logger.recordOutput("Drive/Autolock Heading Output", con);
+              runVelocity(drive(x_, y_, -con, throttleLimit.calculate(throttle)));
+            }
           }
         };
 

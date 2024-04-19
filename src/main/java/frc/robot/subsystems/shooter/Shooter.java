@@ -220,6 +220,8 @@ public class Shooter extends StateMachineSubsystemBase {
   /** Creates a new Flywheel. */
   private Shooter(ShooterIO io, TurretCamIO llIO) {
     super("Shooter");
+    System.out.println(
+        "cameron is owed a steak dinner minimum of 120 usd - by Andrew Matteo Bettin (the goat)");
 
     this.io = io;
     this.llIO = llIO;
@@ -306,9 +308,9 @@ public class Shooter extends StateMachineSubsystemBase {
               s.feederVel_rps = 0;
               setCurrentState(IDLE);
             } else if (!inputs.beamBreakInActivated) {
-              s.feederVel_rps = 7.1;
+              s.feederVel_rps = 6.7; // 7.1
             } else {
-              s.feederVel_rps = 2.1;
+              s.feederVel_rps = 2.1; // 2.4
             }
             queueSetpoints(constrainSetpoints(s, true, false));
             track();
@@ -328,9 +330,9 @@ public class Shooter extends StateMachineSubsystemBase {
               s.feederVel_rps = 0;
               setCurrentState(IDLE);
             } else if (!inputs.beamBreakInActivated) {
-              s.feederVel_rps = 7.3;
+              s.feederVel_rps = 7.0; // 7.3
             } else {
-              s.feederVel_rps = 2.3;
+              s.feederVel_rps = 2.2; // 2.3
             }
             queueSetpoints(constrainSetpoints(s, true, false));
             track();
