@@ -144,13 +144,13 @@ public class RobotTeleop extends Command {
       } else if (OI.XK.get(2, 2)) {
         Setpoints s = G.isRedAlliance() ? ShotPresets.RED_CLEAR_WALL : ShotPresets.BLUE_CLEAR_WALL;
         double speedMag = Math.abs(drive.getChassisSpeeds().vxMetersPerSecond);
-        s.flywheel_rps = Util.remap(0, 5.0, speedMag, 25, ShotPresets.RED_CLEAR_WALL.flywheel_rps);
+        s.flywheel_rps = Util.remap(0, 5.0, speedMag, 24, ShotPresets.RED_CLEAR_WALL.flywheel_rps);
         ss.trackPreset(s, Pipeline.FAR, false, false);
         ss.setLastPreset("CLEAR WALL");
       } else if (OI.XK.get(4, 3)) {
         Setpoints s = G.isRedAlliance() ? ShotPresets.RED_CLEAR_MID : ShotPresets.BLUE_CLEAR_MID;
         double speedMag = Math.abs(drive.getChassisSpeeds().vxMetersPerSecond);
-        s.flywheel_rps = Util.remap(0, 5.0, speedMag, 25, ShotPresets.RED_CLEAR_MID.flywheel_rps);
+        s.flywheel_rps = Util.remap(0, 5.0, speedMag, 24, ShotPresets.RED_CLEAR_MID.flywheel_rps);
         ss.trackPreset(s, Pipeline.FAR, false, false);
         ss.setLastPreset("CLEAR MID");
       } else if (OI.XK.get(0, 3)) {
