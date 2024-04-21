@@ -21,8 +21,10 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.auto.AutoSelector;
+import frc.robot.auto.ampside.Ampside45;
+import frc.robot.auto.ampside.Ampside54;
+import frc.robot.auto.sourceside.S673;
 import frc.robot.auto.sourceside.S678;
-import frc.robot.auto.sourceside.S687;
 import frc.robot.auto.sourceside.S768;
 import frc.robot.auto.sourceside.S786;
 import frc.robot.auto.sourceside.S867;
@@ -56,7 +58,9 @@ public class Robot extends LoggedRobot {
           .add(new S786(), 0, 48, 0)
           .add(new S768(), 0, 0, 48)
           .add(new S678(), 0, 24, 24)
-          .add(new S687(), 24, 0, 24);
+          .add(new S673(), 24, 0, 24)
+          .add(new Ampside54(0), 24, 24, 0)
+          .add(new Ampside45(0), 255, 25, 0);
 
   private Command autonomousCommand;
   private Drive drive;
@@ -129,6 +133,14 @@ public class Robot extends LoggedRobot {
       lastAS = true;
       AS.setCurrIdx(5);
       AS.generate();
+    } else if (!lastAS && OI.XK.get(6, 0)) {
+      lastAS = true;
+      AS.setCurrIdx(6);
+      AS.generate();
+    } else if (!lastAS && OI.XK.get(7, 0)) {
+      lastAS = true;
+      AS.setCurrIdx(7);
+      AS.generate();
     } else if (!OI.XK.get(0, 0)
         && !OI.XK.get(1, 0)
         && !OI.XK.get(2, 0)
@@ -193,7 +205,7 @@ public class Robot extends LoggedRobot {
     switch (Constants.currentMode) {
       case REAL:
         // Running on a real robot, log to a USB stick ("/U/logs")
-        Logger.addDataReceiver(new WPILOGWriter("/U/logs/tryouts/"));
+        Logger.addDataReceiver(new WPILOGWriter("/U/logs/worlds/"));
         Logger.addDataReceiver(new NT4Publisher());
         break;
 

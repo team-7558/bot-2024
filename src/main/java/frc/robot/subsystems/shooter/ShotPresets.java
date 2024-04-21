@@ -4,10 +4,13 @@ import frc.robot.subsystems.shooter.Shooter.Setpoints;
 
 public class ShotPresets {
 
-  public static final Setpoints RED_SOURCE_AUTO_FIRST_SHOT = new Setpoints(24, 0, 0.115, 0.091);
-  public static final Setpoints BLUE_SOURCE_AUTO_FIRST_SHOT = new Setpoints(24, 0, -0.115, 0.091);
+  public static final Setpoints RED_SOURCE_AUTO_FIRST_SHOT = new Setpoints(34, 0, 0.125, 0.086);
+  public static final Setpoints BLUE_SOURCE_AUTO_FIRST_SHOT = new Setpoints(34, 0, -0.125, 0.086);
 
-  public static final Setpoints TRAP_SHOT = new Setpoints(43, 0, 0, 0.077558);
+  public static final Setpoints RED_AMP_AUTO_FIRST_SHOT = new Setpoints(24, 0, -0.055, 0.108);
+  public static final Setpoints BLUE_AMP_AUTO_FIRST_SHOT = new Setpoints(24, 0, 0.055, 0.108);
+
+  public static final Setpoints TRAP_SHOT = new Setpoints(48, 0, 0, 0.080);
 
   public static final Setpoints RED_AMP_SNIPE = new Setpoints(45, 0, -0.043, 0.057);
   public static final Setpoints RED_STEAL_SHOT = new Setpoints(45, 0, 0.17, 0.08);
@@ -20,7 +23,8 @@ public class ShotPresets {
   public static final Setpoints RED_FRONT_COURT = new Setpoints(36, 0, 0, 0.103);
   public static final Setpoints RED_WING_POST = new Setpoints(49, 0, -0.02, 0.068);
   public static final Setpoints OP_SHOT = new Setpoints(43, 0, 0.02, 0.076);
-  public static final Setpoints RED_CLEAR_WALL = new Setpoints(20, 0, 0.125, 0.107);
+  public static final Setpoints RED_CLEAR_WALL = new Setpoints(17, 0, 0.063, 0.11);
+  public static final Setpoints RED_CLEAR_MID = new Setpoints(17, 0, 0.043, 0.11);
   public static final Setpoints SNIPE = new Setpoints(45, 0, 0.095, 0.057);
   public static final Setpoints RED_CLEAR_CLOSE =
       new Setpoints(36, 0, 0.1, Shooter.PIVOT_MIN_POS_r);
@@ -38,6 +42,7 @@ public class ShotPresets {
   public static final Setpoints BLUE_WING_POST = new Setpoints().copyAndFlipTurret(RED_WING_POST);
   public static final Setpoints BLUE_SNIPE = new Setpoints().copyAndFlipTurret(SNIPE);
   public static final Setpoints BLUE_CLEAR_WALL = new Setpoints().copyAndFlipTurret(RED_CLEAR_WALL);
+  public static final Setpoints BLUE_CLEAR_MID = new Setpoints().copyAndFlipTurret(RED_CLEAR_MID);
   public static final Setpoints BLUE_OP_SHOT = new Setpoints().copyAndFlipTurret(OP_SHOT);
   public static final Setpoints BLUE_CLEAR_CLOSE =
       new Setpoints().copyAndFlipTurret(RED_CLEAR_CLOSE);

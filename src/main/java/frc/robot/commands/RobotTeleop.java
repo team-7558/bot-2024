@@ -54,14 +54,16 @@ public class RobotTeleop extends Command {
       if (OI.DR.getAButton()) {
         drive.setAutolockSetpoint(0.25);
         drive.setCurrentState(drive.STRAFE_AUTOLOCK);
-      } else if (OI.DR.getYButton()) {
+      } else if (OI.DR.getYButton() || (ss.isInShooter() && (OI.XK.get(2, 2) || OI.XK.get(4, 3)))) {
         drive.setAutolockSetpoint(G.isRedAlliance() ? 0.5 : 0);
         drive.setCurrentState(drive.STRAFE_AUTOLOCK);
       } else if (OI.DR.getBButton()) {
-        drive.setAutolockSetpoint(G.isRedAlliance() ? 0.172 : Units.radiansToRotations(-2.086));
+        drive.setAutolockSetpoint(
+            G.isRedAlliance() ? Units.radiansToRotations(1.054) : Units.radiansToRotations(-2.088));
         drive.setCurrentState(drive.STRAFE_AUTOLOCK);
       } else if (OI.DR.getXButton()) {
-        drive.setAutolockSetpoint(G.isRedAlliance() ? -0.172 : 0.35);
+        drive.setAutolockSetpoint(
+            G.isRedAlliance() ? Units.radiansToRotations(-1.028) : Units.radiansToRotations(2.072));
         drive.setCurrentState(drive.STRAFE_AUTOLOCK);
       } else if (OI.DR.getBackButton()) {
         drive.setCurrentState(drive.INTAKING);
@@ -142,9 +144,15 @@ public class RobotTeleop extends Command {
       } else if (OI.XK.get(2, 2)) {
         Setpoints s = G.isRedAlliance() ? ShotPresets.RED_CLEAR_WALL : ShotPresets.BLUE_CLEAR_WALL;
         double speedMag = Math.abs(drive.getChassisSpeeds().vxMetersPerSecond);
-        s.flywheel_rps = Util.remap(0, 5.0, speedMag, 25, ShotPresets.RED_CLEAR_WALL.flywheel_rps);
-        ss.trackPreset(s, Pipeline.FAR, true, false);
+        s.flywheel_rps = Util.remap(0, 5.0, speedMag, 24, ShotPresets.RED_CLEAR_WALL.flywheel_rps);
+        ss.trackPreset(s, Pipeline.FAR, false, false);
         ss.setLastPreset("CLEAR WALL");
+      } else if (OI.XK.get(4, 3)) {
+        Setpoints s = G.isRedAlliance() ? ShotPresets.RED_CLEAR_MID : ShotPresets.BLUE_CLEAR_MID;
+        double speedMag = Math.abs(drive.getChassisSpeeds().vxMetersPerSecond);
+        s.flywheel_rps = Util.remap(0, 5.0, speedMag, 24, ShotPresets.RED_CLEAR_MID.flywheel_rps);
+        ss.trackPreset(s, Pipeline.FAR, false, false);
+        ss.setLastPreset("CLEAR MID");
       } else if (OI.XK.get(0, 3)) {
         ss.trackPreset(
             G.isRedAlliance() ? ShotPresets.SNIPE : ShotPresets.BLUE_SNIPE,
@@ -159,7 +167,7 @@ public class RobotTeleop extends Command {
             true,
             true);
         ss.setLastPreset("AMP SNIPE");
-      } else if (OI.XK.get(4, 3)) {
+      } else if (OI.XK.get(2, 1)) {
         ss.trackPreset(
             G.isRedAlliance() ? ShotPresets.RED_STEAL_SHOT : ShotPresets.BLUE_STEAL_SHOT,
             Pipeline.FAR,

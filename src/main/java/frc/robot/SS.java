@@ -45,6 +45,7 @@ public class SS {
 
     AUTOPRECHAMBER,
     AUTOSHOOTING,
+    AUTOFIRSTSHOT,
     AUTOCHAMBER,
 
     GHOST,
@@ -273,6 +274,13 @@ public class SS {
           elevator.setCurrentState(elevator.TRAVELLING);
         }
 
+        if (OI.XK.get(7, 3)) {
+          intake.setCurrentState(intake.BOTTOM_SPIT);
+          hasGamePiece = false;
+        } else {
+          intake.setCurrentState(intake.IDLE);
+        }
+
         break;
       case AMP_SCORING_RELEASE:
         if (first) {
@@ -484,6 +492,13 @@ public class SS {
         // intake.setCurrentState(intake.SHOOTER_SIDE);
         shooter.setCurrentState(shooter.SHOOTING);
         break;
+      case AUTOFIRSTSHOT:
+        if (shooter.isPivotAtSetpoint(0.02) && shooter.isTurretAtSetpoint(0.02)) {
+          hasGamePiece = false;
+          // intake.setCurrentState(intake.SHOOTER_SIDE);
+          shooter.setCurrentState(shooter.SHOOTING);
+        }
+        break;
       case SHOOTING_FROM_GROUND:
         if (first) {
           shooter.setCurrentState(shooter.SHOOTING);
@@ -508,7 +523,7 @@ public class SS {
 
       boolean shotReady = false;
 
-      if (drive.getAngularVelocity() < 0.01 && drive.velUnder(0.01)) {
+      if (drive.getAngularVelocity() < 0.01 && drive.velUnder(0.15)) {
         if (shooter.llEnabled() && shooter.llHasComms()) {
           if (shooter.isAtSetpoints() && shooter.llOnTarget()) {
             shotReady = true;
@@ -642,6 +657,12 @@ public class SS {
   public void shoot() {
     if (!resetting()) {
       queueState(State.SHOOTING);
+    }
+  }
+
+  public void firstShoot() {
+    if (!resetting()) {
+      queueState(State.AUTOFIRSTSHOT);
     }
   }
 

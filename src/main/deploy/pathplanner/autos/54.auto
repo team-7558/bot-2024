@@ -8,13 +8,19 @@
         {
           "type": "path",
           "data": {
-            "pathName": "SourceStart6"
+            "pathName": "AmpStart5"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "ForkTo3ForOP"
+            "pathName": "AmpForkTo4ToFork"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "AmpForkToTrap"
           }
         }
       ]

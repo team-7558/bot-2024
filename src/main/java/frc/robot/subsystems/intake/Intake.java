@@ -54,7 +54,8 @@ public class Intake extends StateMachineSubsystemBase {
       AMP_SCORING,
       FAST_SHOOTER,
       SOURCE_FEEDING,
-      SPITTING;
+      SPITTING,
+      BOTTOM_SPIT;
 
   private final IntakeIO io;
   private final IntakeIOInputsAutoLogged inputs = new IntakeIOInputsAutoLogged();
@@ -161,16 +162,16 @@ public class Intake extends StateMachineSubsystemBase {
         new State("SHOOTER_SIDE") {
           @Override
           public void init() {
-            directionSpeed = -0.45;
-            intakeSpeed = 0.45;
+            directionSpeed = -0.40;
+            intakeSpeed = 0.40;
           }
         };
     FAST_FEED =
         new State("FAST_FEED") {
           @Override
           public void init() {
-            directionSpeed = -0.45;
-            intakeSpeed = 0.45;
+            directionSpeed = -0.40;
+            intakeSpeed = 0.40;
           }
         };
     FEEDING =
@@ -187,6 +188,15 @@ public class Intake extends StateMachineSubsystemBase {
           public void init() {
             intakeSpeed = -0.25;
             directionSpeed = -0.25;
+          }
+        };
+
+    BOTTOM_SPIT =
+        new State("BOTTOM_SPIT") {
+          @Override
+          public void init() {
+            intakeSpeed = -0.25;
+            directionSpeed = 0;
           }
         };
     SOURCE_FEEDING =

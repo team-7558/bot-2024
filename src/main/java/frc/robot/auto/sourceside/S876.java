@@ -52,7 +52,7 @@ public class S876 extends AltAuto {
                 : ShotPresets.BLUE_SOURCE_AUTO_FIRST_SHOT,
             false);
       } else if (before(1.8)) {
-        ss.shoot();
+        ss.firstShoot();
       } else if (before(segEnd(0) + 0.1)) {
         ss.autoPreset(new Setpoints(39, 0, i * 0.03, 0.078), true);
       } else if (before(segEnd(0) + 1.25)) {
@@ -82,7 +82,7 @@ public class S876 extends AltAuto {
                 : ShotPresets.BLUE_SOURCE_AUTO_FIRST_SHOT,
             false);
       } else if (before(1.8)) {
-        ss.shoot();
+        ss.firstShoot();
       } else if (before(segEnd(0) + 0.1)) {
         ss.autoPreset(new Setpoints(39, 0, i * 0.03, 0.078), true);
       } else if (before(segEnd(0) + 1.25)) {
