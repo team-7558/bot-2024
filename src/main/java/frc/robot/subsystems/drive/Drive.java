@@ -45,12 +45,10 @@ import frc.robot.G;
 import frc.robot.OI;
 import frc.robot.subsystems.StateMachineSubsystemBase;
 import frc.robot.subsystems.drive.Module.Mode;
-import frc.robot.subsystems.drive.OdometryState.VisionObservation;
 import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.subsystems.shooter.TurretCamIO;
 import frc.robot.subsystems.shooter.TurretCamIOInputsAutoLogged;
 import frc.robot.subsystems.shooter.TurretCamIOReal;
-import frc.robot.subsystems.vision.Vision;
 import frc.robot.util.Util;
 import java.util.Arrays;
 import java.util.Queue;
@@ -721,28 +719,28 @@ public class Drive extends StateMachineSubsystemBase {
   }
 
   public void addToPoseEstimator(
-      Pose2d pose, double timestamp, double ambiguity, double blacklistCoeff, int[] tids) {
-    if (pose.getTranslation().getDistance(getPose().getTranslation()) > CUTOFF_DISTANCE) return;
-    double distSums = 0;
-    for (int i = 0; i < tids.length; i++) {
-      try {
-        Pose2d tagPose = Vision.AT_MAP.getTagPose(i).orElseThrow().toPose2d();
-        distSums += tagPose.getTranslation().getDistance(getPose().getTranslation());
-      } catch (Exception e) {
+       Pose2d pose, double timestamp, double ambiguity, double blacklistCoeff, int[] tids) {
+    // if (pose.getTranslation().getDistance(getPose().getTranslation()) > CUTOFF_DISTANCE) return;
+    // double distSums = 0;
+    // for (int i = 0; i < tids.length; i++) {
+    //   try {
+    //     Pose2d tagPose = Vision.AT_MAP.getTagPose(i).orElseThrow().toPose2d();
+    //     distSums += tagPose.getTranslation().getDistance(getPose().getTranslation());
+    //   } catch (Exception e) {
 
-      }
-    }
-    double avgDistance = distSums / tids.length;
+    //   }
+    // }
+    // double avgDistance = distSums / tids.length;
 
-    OdometryState.getInstance()
-        .addVisionObservation(
-            new VisionObservation(
-                pose,
-                timestamp,
-                VecBuilder.fill(
-                    ((blacklistCoeff * avgDistance) - tids.length) * APRILTAG_COEFFICIENT,
-                    ((blacklistCoeff * avgDistance) - tids.length) * APRILTAG_COEFFICIENT,
-                    10)));
+    // OdometryState.getInstance()
+    //     .addVisionObservation(
+    //         new VisionObservation(
+    //             pose,
+    //             timestamp,
+    //             VecBuilder.fill(
+    //                 ((blacklistCoeff * avgDistance) - tids.length) * APRILTAG_COEFFICIENT,
+    //                 ((blacklistCoeff * avgDistance) - tids.length) * APRILTAG_COEFFICIENT,
+    //                 10)));
   }
 
   /** Returns the current odometry rotation. */

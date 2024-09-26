@@ -35,7 +35,6 @@ import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.shooter.Shooter;
-import frc.robot.subsystems.vision.Vision;
 import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
 import org.littletonrobotics.junction.Logger;
@@ -67,7 +66,6 @@ public class Robot extends LoggedRobot {
   private Elevator elevator;
   private Shooter shooter;
   private Intake intake;
-  private Vision vision;
   private LED led;
 
   boolean resetPose = false;
@@ -82,7 +80,6 @@ public class Robot extends LoggedRobot {
     intake = Intake.getInstance();
     drive = Drive.getInstance();
     shooter = Shooter.getInstance();
-    vision = Vision.getInstance();
     led = LED.getInstance();
   }
 
