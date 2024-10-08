@@ -489,6 +489,80 @@ public class LED {
     drawPoint(i + 7, 6, r, g, b);
   }
 
+  public void drawD(int i, int r, int g, int b) {
+    drawPoint(i + 1, 1, r, g, b);
+    drawPoint(i + 1, 2, r, g, b);
+    drawPoint(i + 1, 3, r, g, b);
+    drawPoint(i + 1, 4, r, g, b);
+    drawPoint(i + 1, 5, r, g, b);
+
+    drawPoint(i + 2, 1, r, g, b);
+    drawPoint(i + 2, 6, r, g, b);
+
+    drawPoint(i + 3, 1, r, g, b);
+    drawPoint(i + 3, 5, r, g, b);
+
+    drawPoint(i + 4, 1, r, g, b);
+    drawPoint(i + 4, 4, r, g, b);
+    drawPoint(i + 4, 5, r, g, b);
+  }
+
+  public void drawR(int i, int r, int g, int b) {
+    drawPoint(i + 1, 1, r, g, b);
+    drawPoint(i + 1, 2, r, g, b);
+    drawPoint(i + 1, 3, r, g, b);
+    drawPoint(i + 1, 4, r, g, b);
+
+    drawPoint(i + 2, 1, r, g, b);
+    drawPoint(i + 2, 6, r, g, b);
+
+    drawPoint(i + 3, 1, r, g, b);
+    drawPoint(i + 3, 5, r, g, b);
+
+    drawPoint(i + 4, 1, r, g, b);
+    drawPoint(i + 4, 4, r, g, b);
+  }
+
+  public void drawO(int i, int r, int g, int b) {
+    drawPoint(i + 1, 2, r, g, b);
+    drawPoint(i + 1, 3, r, g, b);
+    drawPoint(i + 1, 4, r, g, b);
+
+    drawPoint(i + 2, 1, r, g, b);
+    drawPoint(i + 2, 6, r, g, b);
+
+    drawPoint(i + 3, 1, r, g, b);
+    drawPoint(i + 3, 6, r, g, b);
+
+    drawPoint(i + 4, 2, r, g, b);
+    drawPoint(i + 4, 3, r, g, b);
+    drawPoint(i + 4, 4, r, g, b);
+  }
+
+  public void drawP(int i, int r, int g, int b) {
+    drawPoint(i + 1, 1, r, g, b);
+    drawPoint(i + 1, 2, r, g, b);
+    drawPoint(i + 1, 3, r, g, b);
+    drawPoint(i + 1, 4, r, g, b);
+
+    drawPoint(i + 2, 1, r, g, b);
+    drawPoint(i + 2, 5, r, g, b);
+
+    drawPoint(i + 3, 1, r, g, b);
+    drawPoint(i + 3, 5, r, g, b);
+
+    drawPoint(i + 4, 1, r, g, b);
+    drawPoint(i + 4, 4, r, g, b);
+  }
+
+  public void drawDrop(int r, int g, int b) {
+    int startX = 0; // Starting position for the first letter
+    drawD(startX, r, g, b);
+    drawR(startX + 6, r, g, b); // 6 pixels space after D
+    drawO(startX + 12, r, g, b); // 6 pixels space after R
+    drawP(startX + 18, r, g, b); // 6 pixels space after O
+  }
+
   public void drawJumper(int x, int y, int r, int g, int b) {
     drawPoint(x, y, r, g, b);
     drawPoint(x, y + 1, r, g, b);

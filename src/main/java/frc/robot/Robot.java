@@ -202,7 +202,7 @@ public class Robot extends LoggedRobot {
     switch (Constants.currentMode) {
       case REAL:
         // Running on a real robot, log to a USB stick ("/U/logs")
-        Logger.addDataReceiver(new WPILOGWriter("/U/logs/worlds/"));
+        Logger.addDataReceiver(new WPILOGWriter("/U/logs/offseason/"));
         Logger.addDataReceiver(new NT4Publisher());
         break;
 
@@ -269,7 +269,7 @@ public class Robot extends LoggedRobot {
     // TODO: add mws toggle
 
     if (OI.XK.get(1, 5)) {
-      LED.getInstance().setAllRGB(128, 128, 0);
+
     } else if (OI.XK.get(2, 5)) {
       LED.getInstance().setAllRGB(128, 0, 128);
     } else if (shooter.beamBroken()
@@ -339,8 +339,11 @@ public class Robot extends LoggedRobot {
   /** This function is called periodically during operator control. */
   @Override
   public void teleopPeriodic() {
+
     double tv = 135.0 - tt.get();
-    if (tv < 10.0) led.drawNumber(tv, 48, 0, 0);
+    if (OI.XK.get(1, 5)) {
+      LED.getInstance().drawDrop(255, 0, 0);
+    } else if (tv < 10.0) led.drawNumber(tv, 48, 0, 0);
     else if (shooter.beamBroken()) {
       led.drawNumber(tv, 255, 25, 0);
     } else if (!shooter.llEnabled()) {

@@ -41,9 +41,9 @@ public class S673 extends AltAuto {
         ss.autoPreset(new Setpoints(39, 0, i * 0.03, 0.078), true);
       } else if (before(segEnd(0) + 1.25)) {
         ss.autoShoot();
-      } else if (before(/*segEnd(1) + 1.3*/ 14.4)) {
+      } else if (before(segEnd(1) + 1.3)) {
         ss.autoPreset(new Setpoints(39, 0, i * 0.087, 0.088), true);
-      } else if (before(/*segEnd(1) + 2.36*/ 15.4)) {
+      } else if (before(15.4)) {
         drive.stop();
         ss.autoShoot();
       } else {
