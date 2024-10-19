@@ -23,8 +23,8 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.auto.AutoSelector;
 import frc.robot.auto.ampside.Ampside45;
 import frc.robot.auto.ampside.Ampside54;
-import frc.robot.auto.sourceside.S673;
 import frc.robot.auto.sourceside.S678;
+import frc.robot.auto.sourceside.S687;
 import frc.robot.auto.sourceside.S768;
 import frc.robot.auto.sourceside.S786;
 import frc.robot.auto.sourceside.S867;
@@ -57,7 +57,7 @@ public class Robot extends LoggedRobot {
           .add(new S786(), 0, 48, 0)
           .add(new S768(), 0, 0, 48)
           .add(new S678(), 0, 24, 24)
-          .add(new S673(), 24, 0, 24)
+          .add(new S687(), 24, 0, 24)
           .add(new Ampside54(0), 24, 24, 0)
           .add(new Ampside45(0), 255, 25, 0);
 

@@ -93,10 +93,10 @@ public class RobotTeleop extends Command {
         ss.shoot();
       } else if (OI.XK.get(4, 5) || OI.DR.getBackButton()) {
         ss.chamber();
-      } else if (OI.XK.get(8, 2)) {
-        ss.trackTrap();
-        ss.setLastPreset("TRAP");
-      } else if (OI.XK.get(3, 3)) {
+      } /* else if (OI.XK.get(8, 2)) {
+          ss.trackTrap();
+          ss.setLastPreset("TRAP");
+        }*/ else if (OI.XK.get(3, 3)) {
         ss.trackPreset(
             G.isRedAlliance() ? ShotPresets.RED_FENDER : ShotPresets.BLUE_FENDER,
             Pipeline.NEAR,
