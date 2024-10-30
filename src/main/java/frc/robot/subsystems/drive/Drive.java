@@ -282,7 +282,7 @@ public class Drive extends StateMachineSubsystemBase {
           @Override
           public void periodic() {
             double throttle = 1.0;
-            throttle = Util.lerp(1, 0.4, OI.DR.getRightTriggerAxis() * OI.DR.getRightTriggerAxis());
+            throttle = Util.lerp(1, 0.4, OI.DR.getLeftTriggerAxis() * OI.DR.getLeftTriggerAxis());
 
             double x_ = -OI.DR.getLeftY();
             double y_ = -OI.DR.getLeftX();
@@ -292,10 +292,11 @@ public class Drive extends StateMachineSubsystemBase {
                 drive(
                     x_,
                     y_,
-                    w_ * 0.75,
+                    w_ * 0.65,
                     throttleLimit.calculate(throttle))); // throttleLimit.calculate(throttle)
 
             // TODO: REVERT!!!!!!!!!!!!!!!!
+// Grant was here
           }
         };
 
@@ -307,7 +308,7 @@ public class Drive extends StateMachineSubsystemBase {
           @Override
           public void periodic() {
             double throttle = 1.0;
-            throttle = Util.lerp(1, 0.4, OI.DR.getRightTriggerAxis() * OI.DR.getRightTriggerAxis());
+            throttle = Util.lerp(1, 0.4, OI.DR.getLeftTriggerAxis() * OI.DR.getLeftTriggerAxis());
 
             double x_ = -OI.DR.getLeftY();
             double y_ = -OI.DR.getLeftX();
@@ -318,7 +319,7 @@ public class Drive extends StateMachineSubsystemBase {
                   drive(
                       x_,
                       y_,
-                      w_ * 0.75,
+                      w_ * 0.65,
                       throttleLimit.calculate(throttle))); // throttleLimit.calculate(throttle)
             } else {
               double mag = Math.sqrt(x_ * x_ + y_ * y_);
@@ -351,7 +352,7 @@ public class Drive extends StateMachineSubsystemBase {
               return;
             }
             double throttle = 1.0;
-            throttle = Util.lerp(1, 0.4, OI.DR.getRightTriggerAxis() * OI.DR.getRightTriggerAxis());
+            throttle = Util.lerp(1, 0.4, OI.DR.getLeftTriggerAxis() * OI.DR.getLeftTriggerAxis());
 
             double x_ = -OI.DR.getLeftY();
             double y_ = -OI.DR.getLeftX();
