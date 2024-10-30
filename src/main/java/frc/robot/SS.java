@@ -296,13 +296,13 @@ public class SS {
       case AMP_SCORING_DOWN:
         hasGamePiece = false;
         if (first) {
-          elevator.setTargetHeight(Elevator.RESET_HEIGHT_M);
+          elevator.setTargetHeight(Elevator.MIN_HEIGHT_M);
           elevator.setCurrentState(elevator.TRAVELLING);
         }
 
         if (after(0.1) && elevator.isState(elevator.HOLDING)) {
           homedClimb = false;
-          queueState(State.RESETTING_ELEVATOR);
+          queueState(State.IDLE);
         }
 
         break;

@@ -416,7 +416,7 @@ public class Shooter extends StateMachineSubsystemBase {
           @Override
           public void periodic() {
 
-            if (inputs.pivotHallEffect) {
+            if (true /*inputs.pivotHallEffect*/) {
               io.setPivotVolts(-.5);
               if (!zeroedPivot) {
                 io.zeroPivot();
